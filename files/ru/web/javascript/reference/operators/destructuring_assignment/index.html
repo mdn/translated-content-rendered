@@ -1,0 +1,350 @@
+---
+title: Деструктурирующее присваивание
+slug: Web/JavaScript/Reference/Operators/Destructuring_assignment
+tags:
+  - JavaScript
+  - Оператор
+translation_of: Web/JavaScript/Reference/Operators/Destructuring_assignment
+---
+<p>Синтаксис <strong>деструктурирующего присваивания</strong> в выражениях JavaScript позволяет извлекать данные из массивов или объектов при помощи синтаксиса, подобного объявлению массива или литералов в объекте.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="brush:js">var a, b, rest;
+[a, b] = [1, 2];
+console.log(a); // 1
+console.log(b); // 2
+
+[a, b, ...rest] = [1, 2, 3, 4, 5];
+console.log(a); // 1
+console.log(b); // 2
+console.log(rest); // [3, 4, 5]
+
+({a, b} = {a:1, b:2});
+console.log(a); // 1
+console.log(b); // 2
+
+({a, b, ...rest} = {a:1, b:2, c:3, d:4});
+// ES2016 - ещё не реализовано Firefox 47a01
+</pre>
+
+<h2 id="Описание">Описание</h2>
+
+<p>Выражения объявления объектов или массивов предоставляют простой способ создания пакета однородных данных. При создании такого пакета вы получаете возможность использовать его любым доступным образом. Также вы можете возвращать его в функциях.</p>
+
+<p>Одной из ключевых возможностей использования деструктурирующего присваивания является чтение структуры данных одним оператором, хотя помимо этого вы можете найти множество других применений в приведённых ниже примерах.</p>
+
+<p>Данная возможность подобна таковой, присутствующей в языках Perl и Python.</p>
+
+<h2 id="Разбор_массивов">Разбор массивов</h2>
+
+<h3 id="Простой_пример">Простой пример</h3>
+
+<pre class="brush: js">var foo = [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;];
+
+// без деструктурирования
+var one   = foo[0];
+var two   = foo[1];
+var three = foo[2];
+
+// с деструктурированием
+var [one, two, three] = foo;</pre>
+
+<h3 id="Обмен_значений_переменных">Обмен значений переменных</h3>
+
+<p>После выполнения фрагмента кода, значение <var>b</var> будет 1, <var>a</var> будет 3. Без деструктурирующего присваивания, для обмена значений требуется дополнительная временная переменная (или что-то наподобие <a href="http://en.wikipedia.org/wiki/XOR_swap" class="external">XOR-обмена</a>).</p>
+
+<pre class="brush:js">var a = 1;
+var b = 3;
+
+[a, b] = [b, a];</pre>
+
+<h3 id="Возврат_нескольких_значений">Возврат нескольких значений</h3>
+
+<p>Благодаря деструктурирующему присваиванию, функции могут возвращать несколько значений. Хотя всегда можно было возвращать массивы в функциях, оно предоставляет гибкость:</p>
+
+<pre class="brush:js">function f() {
+  return [1, 2];
+}
+</pre>
+
+<p>Как вы видите, возвращаемые результаты имеют вид массива, значения которого заключены в квадратные скобки. Вы можете возвращать неограниченное количество результатов таким образом. В следующем примере, <code>f()</code> возвращает <code>[1, 2]</code> как результат:</p>
+
+<pre class="brush:js">var a, b;
+[a, b] = f();
+console.log(&quot;A is &quot; + a + &quot; B is &quot; + b);
+</pre>
+
+<p>Оператор <code>[a, b] = f()</code> присваивает результаты функции переменным в квадратных скобках: <var>a</var> будет присвоено 1, <var>b</var> будет присвоено 2.</p>
+
+<p>Вы также можете использовать результат функции в виде массива:</p>
+
+<pre class="brush:js">var a = f();
+console.log(&quot;A is &quot; + a);
+</pre>
+
+<p>В данном случае <var>a</var> будет массивом с элементами 1 и 2.</p>
+
+<h3 id="Игнорирование_некоторых_значений">Игнорирование некоторых значений</h3>
+
+<p>Вы также можете проигнорировать не нужные значения:</p>
+
+<pre class="brush:js">function f() {
+  return [1, 2, 3];
+}
+
+var [a, , b] = f();
+console.log(&quot;A is &quot; + a + &quot; B is &quot; + b);
+</pre>
+
+<p>После выполнения кода, a будет 1, b будет 3. Значение 2 игнорируется. Таким же образом вы можете игнорировать любые (или все) значения. Например:</p>
+
+<pre class="brush:js">[,,] = f();
+</pre>
+
+<h3 id="Получение_значений_из_результата_регулярного_выражения">Получение значений из результата регулярного выражения</h3>
+
+<p>Когда метод <code><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec">exec()</a></code> регулярного выражения находит совпадение, он возвращает массив, содержащий первый совпадающий фрагмент строки и далее группы, определённые в регулярном выражении. Деструктурирующее присваивание упрощает получение данных из этих групп, игнорируя первый фрагмент:</p>
+
+<pre class="brush:js">var url = &quot;https://developer.mozilla.org/en-US/Web/JavaScript&quot;;
+
+var parsedURL = /^(\w+)\:\/\/([^\/]+)\/(.*)$/.exec(url);
+var [, protocol, fullhost, fullpath] = parsedURL;
+
+console.log(protocol); // выведет &quot;https&quot;
+</pre>
+
+<h2 id="Разбор_объектов">Разбор объектов</h2>
+
+<h3 id="Простой_пример_2">Простой пример</h3>
+
+<pre class="brush: js">var o = {p: 42, q: true};
+var {p, q} = o;
+
+console.log(p); // 42
+console.log(q); // true
+
+// Объявление новых переменных
+var {p: foo, q: bar} = o;
+
+console.log(foo); // 42
+console.log(bar); // true
+</pre>
+
+<h3 id="Загрузка_модулей">Загрузка модулей</h3>
+
+<p>Деструктурирующее присваивание помогает загружать специфичные наборы модулей, как в <a href="/en-US/Add-ons/SDK">Add-on SDK</a>:</p>
+
+<pre class="brush: js">const { Loader, main } = require(&apos;toolkit/loader&apos;);
+</pre>
+
+<h3 id="Вложенный_объект_и_разбор_массива">Вложенный объект и разбор массива</h3>
+
+<pre class="brush:js">var metadata = {
+    title: &quot;Scratchpad&quot;,
+    translations: [
+       {
+        locale: &quot;de&quot;,
+        localization_tags: [ ],
+        last_edit: &quot;2014-04-14T08:43:37&quot;,
+        url: &quot;/de/docs/Tools/Scratchpad&quot;,
+        title: &quot;JavaScript-Umgebung&quot;
+       }
+    ],
+    url: &quot;/en-US/docs/Tools/Scratchpad&quot;
+};
+
+var { title: englishTitle, translations: [{ title: localeTitle }] } = metadata;
+
+console.log(englishTitle); // &quot;Scratchpad&quot;
+console.log(localeTitle);  // &quot;JavaScript-Umgebung&quot;</pre>
+
+<h3 id="Деструктурирование_во_время_обхода">Деструктурирование во время обхода</h3>
+
+<pre class="brush: js">var people = [
+  {
+    name: &quot;Mike Smith&quot;,
+    family: {
+      mother: &quot;Jane Smith&quot;,
+      father: &quot;Harry Smith&quot;,
+      sister: &quot;Samantha Smith&quot;
+    },
+    age: 35
+  },
+  {
+    name: &quot;Tom Jones&quot;,
+    family: {
+      mother: &quot;Norah Jones&quot;,
+      father: &quot;Richard Jones&quot;,
+      brother: &quot;Howard Jones&quot;
+    },
+    age: 25
+  }
+];
+
+for (var {name: n, family: { father: f } } of people) {
+  console.log(&quot;Name: &quot; + n + &quot;, Father: &quot; + f);
+}
+
+// &quot;Name: Mike Smith, Father: Harry Smith&quot;
+// &quot;Name: Tom Jones, Father: Richard Jones&quot;</pre>
+
+<h3 id="Получение_полей_объекта-параметра_функции">Получение полей объекта-параметра функции</h3>
+
+<pre class="brush:js">function userId({id}) {
+  return id;
+}
+
+function whois({displayName, fullName: {firstName: name}}){
+  console.log(displayName + &quot; is &quot; + name);
+}
+
+var user = {
+  id: 42,
+  displayName: &quot;jdoe&quot;,
+  fullName: {
+      firstName: &quot;John&quot;,
+      lastName: &quot;Doe&quot;
+  }
+};
+
+console.log(&quot;userId: &quot; + userId(user)); // &quot;userId: 42&quot;
+whois(user); // &quot;jdoe is John&quot;</pre>
+
+<p>В приведённом примере извлекаются поля <code>id</code>, <code>displayName</code> и<span class="Apple-converted-space"> </span><code>firstName</code><span class="Apple-converted-space"> </span>из объекта пользователь.</p>
+
+<h3 id="Деструктурирование_вычисляемых_имён_свойств">Деструктурирование вычисляемых имён свойств</h3>
+
+<p>Вычисляемые имена свойств, например, <a href="/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names">литералы объектов</a>, могут использоваться при деструктурирующем присваивании:</p>
+
+<pre class="brush: js">let key = &quot;z&quot;;
+let { [key]: foo } = { z: &quot;bar&quot; };
+
+console.log(foo); // &quot;bar&quot;
+</pre>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарий</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://www.ecma-international.org/ecma-262/6.0/#sec-destructuring-assignment" class="external" hreflang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="ru">Определение &apos;Деструктурирующее присваивание&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-Standard">Стандарт</span></td>
+   <td>Изначальное определение.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость_с_браузерами">Совместимость с браузерами</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Возможность</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Edge</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Базовая поддержка</td>
+   <td>49.0</td>
+   <td><a href="/en-US/Firefox/Releases/2" title="Выпущен 2006-10-24.">2.0</a> (1.8.1)</td>
+   <td>14</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td>7.1</td>
+  </tr>
+  <tr>
+   <td>Вычисляемые имена свойств</td>
+   <td>49.0</td>
+   <td><a href="/en-US/Firefox/Releases/34" title="Выпущен 2014-12-01.">34</a> (34)</td>
+   <td>14</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+  <tr>
+   <td>Оператор spread</td>
+   <td>49.0</td>
+   <td><a href="/en-US/Firefox/Releases/34" title="Выпущен 2014-12-01.">34</a> (34)</td>
+   <td>12<sup>[1]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Возможность</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Базовая поддержка</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td>1.0 (1.0)</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td>iOS 8</td>
+  </tr>
+  <tr>
+   <td>Вычисляемые имена свойств</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td>34.0 (34)</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+  <tr>
+   <td>Оператор spread</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td>34.0 (34)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Необходимо включить &quot;Enable experimental Javascript features&quot; в `about:flags`</p>
+
+<h3 id="See_also" name="See_also">Смотрите также</h3>
+
+<ul>
+ <li><a href="/ru/docs/Web/JavaScript/Reference/Operators/Assignment_Operators">Операторы присваивания</a></li>
+</ul>

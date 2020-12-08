@@ -1,0 +1,1319 @@
+---
+title: 'Руководство часть 10: Тестирование приложений Django'
+slug: Learn/Server-side/Django/Testing
+tags:
+  - TDD
+  - django
+  - Для начинающих
+  - Разработка через тесты
+  - Руководство
+  - Сервер
+  - Тестирование в django
+  - сторона сервера
+  - тестирование
+  - юнит-тесты
+translation_of: Learn/Server-side/Django/Testing
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/ru/docs/Learn/Getting_started_with_the_web"><strong>Новички начинают здесь!</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Начало работы с Вебом</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web">Начало работы с Вебом</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/Installing_basic_software">Установка базового программного обеспечения</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">Каким должен быть ваш веб-сайт?</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/Dealing_with_files">Работа с файлами</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/HTML_basics">Основы HTML</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/CSS_basics">Основы CSS</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/JavaScript_basics">Основы JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/Publishing_your_website">Публикация вашего веб-сайта</a></li>
+            <li><a href="/ru/docs/Learn/Getting_started_with_the_web/How_the_Web_works">Как работает Веб</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ru/docs/Learn/HTML"><strong>HTML — структура Веба</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Вступление в HTML</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML">Вступление в HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Начало работы с HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">Что в &quot;шапке&quot;? Метаданные в HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">Тексты в HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">Создание гиперссылок</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Продвинутое форматирование текста</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Структура документа и веб-сайта</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Отладка HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Задание: Выделение символа</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Задание: Структура страницы</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Мультимедиа и встраивание</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding">Мультимедиа и встраивание</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Изображения в HTML</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Видео и аудио контент</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">От object до iframe — другие технологии встраивания</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Добавление векторный графики в Веб</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Отзывчивые изображения</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Задание: Страница о Mozilla</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/ru/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ru/docs/Learn/CSS"><strong>CSS — стилизирование Веба</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/ru/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/ru/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/ru/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/ru/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/ru/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Стилизирование текста</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text">Стилизирование текста</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text/Fundamentals">Основы стилизирования текста и шрифта</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text/Styling_lists">Стилизирование списков</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text/Styling_links">Стилизирование ссылок</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text/Web_fonts">Веб-шрифты</a></li>
+            <li><a href="/ru/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Задание: Стилизирование школьного сайта</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS макет</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout">CSS макет</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Introduction">Вступление</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Grids">Сетки</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Floats">Float</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Positioning">Позиционирование</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/ru/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ru/docs/Learn/JavaScript"><strong>JavaScript — динамический клиентский скриптинг</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Первые шаги в JavaScript</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps">Первые шаги в JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/What_is_JavaScript">Что такое JavaScript?</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/A_first_splash">Первое погружение в JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/What_went_wrong">Что-то пошло не так? Устранение ошибок JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Variables">Хранение нужной информации — Переменные</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Math">Основы JavaScript — Числа и операторы</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Strings">Работа с текстом — Строки в JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Useful_string_methods">Полезные методы для строк</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Arrays">Массивы</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/First_steps/Silly_story_generator">Задание: Генератор глупых историй</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Блоки в JavaScript</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks">Блоки в JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/conditionals">Делаем решения в вашем годе — Условия</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Looping_code">Повторение кода</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Functions">Функции — Переиспользуемые блоки кода</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Создаём свою функцию</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Return_values">Возвращаемые значения функций</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Events">Введение в события</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Building_blocks/Image_gallery">Задание: Галерея изображений</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Введение в объекты JavaScript</summary>
+          <ol>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects">Введение в объекты JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Basics">Основы объектов</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Object-oriented_JS">Объектно-ориентированный JavaScript для новичков</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Object_prototypes">Прототипы объектов</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Inheritance">Наследование в JavaScript</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/JSON">Работа с JSON данными</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Object_building_practice">Практика по созданию объектов</a></li>
+            <li><a href="/ru/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Задание: Добавление возможностей в пример с прыгающими шарами</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ru/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/ru/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/ru/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/ru/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/ru/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ru/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/ru/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/ru/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ru/docs/Learn/Tools_and_testing"><strong>Инструменты и тестирование</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Кроссбраузерное тестирование</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing">Кроссбраузерное тестирование</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Вступление в кроссбраузерное тестирование</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Стратегии выполнения тестирования</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Решение частых проблем с HTML и CSS</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Решение частых проблем с JavaScript</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Решение частых проблем доступности</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Проверка поддержки возможностей</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Вступление в автоматическое тестирование</a></li>
+          <li><a href="/ru/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Установка вашей автоматической среды тестирования</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="open"><a href="/ru/docs/Learn/Server-side"><strong>Программирование серверной части сайта</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Первые шаги</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Server-side/First_steps">Первые шаги</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/First_steps/Introduction">Вступление в серверное программирование</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/First_steps/Client-Server_overview">Клиент-сервер</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/First_steps/Web_frameworks">Веб-фреймворки для серверной части</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/First_steps/Website_security">Защищённость веб-сайтов</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Веб-фреймворк Django (Python)</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Server-side/Django">Веб-фреймворк Django (Python)</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Introduction">Вступление</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/development_environment">Установка среды разработки</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Tutorial_local_library_website">Руководство: Сайт местной библиотеки</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/skeleton_website">Руководство часть 2: Создаём набросок сайта</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Models">Руководство часть 3: Использование моделей</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Admin_site">Руководство часть 4: Django панель администратора</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Home_page">Руководство часть 5: Создание нашей домашней страницы</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Generic_views">Руководство часть 6: Списки и представления</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Sessions">Руководство часть 7: Сессии</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Authentication">Руководство часть 8: Аутенфикация и разрешения пользователей</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Forms">Руководство часть 9: Работа с формами</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Testing">Руководство часть 10: Тестирование веб-приложения на Django</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/Deployment">Руководство часть 11: Разворачивание Django на продакшн сервере</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/web_application_security">Защищённость веб-приложения</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Django/django_assessment_blog">Задание: создание мини блога</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/ru/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Дальнейшее чтение</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Общие вопросы</summary>
+        <ol>
+          <li><a href="/ru/docs/Learn/HTML/Howto">Вопросы по HTML</a></li>
+          <li><a href="/ru/docs/Learn/CSS/Howto">Вопросы по CSS</a></li>
+          <li><a href="/ru/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/ru/docs/Learn/Common_questions#How_the_Web_works">Как работает Веб</a></li>
+          <li><a href="/ru/docs/Learn/Common_questions#Tools_and_setup">Инструменты и установка</a></li>
+          <li><a href="/ru/docs/Learn/Common_questions#Design_and_accessibility">Дизайн и доступность</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/ru/docs/Learn/How_to_contribute">Как помочь?</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/ru/docs/Learn/Server-side/Django/Forms" class="button"><i class="icon-arrow-left"></i><span class="label"> Назад </span></a><a href="/ru/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Обзор: Django</a><a href="/ru/docs/Learn/Server-side/Django/Deployment" class="button"><span class="label"> Далее  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">Сайты, в процессе развития и разработки, становится все сложнее тестировать вручную. Кроме такого тестирования, сложными становятся внутренние взаимодействия между компонентами - внесение небольшого изменения в одной части приложения влияет на другие. При этом, чтобы все продолжало работать нужно вносить все больше и больше изменений и, желательно так, чтобы не добавлялись новые ошибки. Одним из способов который позволяет смягчить последствия добавления изменений, является внедрение в разработку автоматического тестирования - оно должно просто и надежно запускаться каждый раз, когда вы вносите изменения в свой код. Данное руководство рассматривает вопросы автоматизации<em> юнит-тестирования</em> вашего сайта при помощи фреймворка Django для тестов.</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">Требования:</th>
+   <td>Изучить все предыдущие темы руководства, включая <a href="/en-US/docs/Learn/Server-side/Django/Forms">Руководство Django Часть 9: Работа с формами</a>.</td>
+  </tr>
+  <tr>
+   <th scope="row">Цель:</th>
+   <td>Понимать как создавать юнит тесты для сайта на основе Django.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Обзор">Обзор</h2>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">LocalLibrary</a> в настоящий момент содержит страницы для показа списков всех книг, авторов, подробной информации о книгах <code>Book</code> и авторах <code>Author</code>, а также страницу для обновления информации об экземпляре книги <code>BookInstance</code> и, кроме того, страницы для создания, обновления и удаления записей модели <code>Author</code> (и модели <code>Book</code>, в том случае, если вы выполнили домашнее задание в руководстве <a href="/en-US/docs/Learn/Server-side/Django/Forms">работа с формами</a>). Даже в случае небольшого сайта, ручной переход на каждую страницу и <em>беглая</em> проверка того, что все работает как следует, может занять несколько минут. В процессе внесения изменений и роста сайта требуемое время для проведения проверок будет только возрастать. Если бы мы продолжили в том же духе, то в какой-то момент на проведение тестов мы тратили бы больше времени, чем на написание кода и внесение изменений.</p>
+
+<p>Автоматические тесты могут серьезно помочь нам справиться с этой проблемой! Очевидными преимуществами в таком случае являются значительно меньшие временные затраты на проведение тестов, их подробное выполнение, а кроме того, тесты имеют постоянную функциональность, или последовательность действий  (человек никогда не сможет тестировать так надежно!). В связи с быстротой их выполнения автоматические тесты можно выполнять более часто, а если они провалятся, то укажут на соответствующее место (где что-то пошло не так как ожидалось).</p>
+
+<p>Кроме того, автоматические тесты могут действовать как первый &quot;настоящий пользователь&quot; вашего кода, заставляя вас строго следить за объявлениями и документированием поведения вашего сайта. Тесты часто являются основой для создания примеров вашего кода и документации. По этим причинам иногда некоторые процессы разработки программного обеспечения начинаются с определения тестов и их реализации, а уже после этого следует написание кода который должен иметь соответствующее поведение (так называемая разработка <a href="https://en.wikipedia.org/wiki/Test-driven_development">на основе тестов</a> и <a href="https://en.wikipedia.org/wiki/Behavior-driven_development">на основе поведения</a>).</p>
+
+<p>Данное руководство показывает процесс создания автоматических тестов в Django при помощи добавления их к разработке сайта <em>LocalLibrary</em>.</p>
+
+<h3 id="Типы_тестирования">Типы тестирования</h3>
+
+<p>Существует несколько типов, уровней, классификаций тестов и тестовых приемов. Наиболее важными автоматическими тестами являются:</p>
+
+<dl>
+ <dt>Юнит-тесты</dt>
+ <dd>Проверяют функциональное поведение для отдельных компонентов, часто классов и функций.</dd>
+ <dt><strong>Регрессионное тестирование</strong></dt>
+ <dd>Тесты которые воспроизводят исторические ошибки (баги). Каждый тест вначале запускается для проверки того, что баг был исправлен, а затем перезапускается для того, чтобы убедиться, что он не был внесен снова с появлением новых изменений в коде.</dd>
+ <dt>Интеграционные тесты</dt>
+ <dd>Проверка совместной работы групп компонентов. Данные тесты отвечают за совместную работу между компонентами, не обращяя внимания на внутренние процессы в компонентах. Они проводятся как для простых групп компонентов, так и для целых веб-сайтов.</dd>
+</dl>
+
+<div class="note">
+<p><strong>Примечание:  </strong>К другим типам тестов относятся методы чёрного ящика, белого ящика, ручные, автоматические, канареечные (canary), дымные (smoke), соответствия (conformance), принятия (acceptance), функциональные (functional),  системные (system), эффективности (performance), загрузочные (load) и стресс-тесты (stress tests).</p>
+</div>
+
+<h3 id="Что_Django_предоставляет_для_тестирования">Что Django предоставляет для тестирования?</h3>
+
+<p>Тестирование сайта это сложная задача, потому что она состоит их нескольких логических слоев – от  HTTP-запроса и запроса к моделям, до валидации формы и их обработки, а кроме того, рендеринга шаблонов страниц.</p>
+
+<p>Django предоставляет фреймворк для создания тестов, построенного на основе иерархии классов, которые, в свою очередь, зависят от стандартной библиотеки Python  <code><a href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.5)">unittest</a></code>. Несмотря на название, данный фреймворк подходит и для юнит-, и для интеграционного тестирования. Фреймворк Django добавляет методы API и инструменты, которые помогают тестировать как веб так и, специфическое для Django, поведение. Это позволяет вам имитировать URL-запросы, добавление тестовых данных, а также проводить проверку выходных данных ваших приложений. Кроме того, Django предоставляет API (<a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#liveservertestcase">LiveServerTestCase</a>) и инструменты <a href="https://docs.djangoproject.com/en/1.10/topics/testing/advanced/#other-testing-frameworks">для применения различных фреймфорков тестирования</a>, например вы можете подключить популярный фреймворк <a href="/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Selenium</a> для имитации поведения пользователя в реальном браузере.</p>
+
+<p>Для написания теста вы должны наследоваться от любого из классов тестирования Django (или <em>юниттеста</em>)  (<a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#simpletestcase">SimpleTestCase</a>, <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#transactiontestcase">TransactionTestCase</a>, <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#testcase">TestCase</a>, <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#liveservertestcase">LiveServerTestCase</a>), а затем реализовать отдельные методы проверки кода (тесты это функции-&quot;утверждения&quot;, которые проверяют, что результатом выражения являются значения <code>True</code> или <code>False</code>, или что два значения равны и так далее). Когда вы запускаете тест, фреймворк выполняет соответствующие тестовые методы в вашем классе-наследнике. Методы тестирования запускаются независимо друг от друга, начиная с метода настроек и/или завершаясь методом разрушения (tear-down), определенном в классе, как показано ниже.</p>
+
+<pre class="brush: python notranslate">class YourTestClass(TestCase):
+
+    def setUp(self):
+        # Установки запускаются перед каждым тестом
+        pass
+
+    def tearDown(self):
+        # Очистка после каждого метода
+        pass
+
+    def test_something_that_will_pass(self):
+        self.assertFalse(False)
+
+    def test_something_that_will_fail(self):
+        self.assertTrue(False)
+</pre>
+
+<p>Самый подходящий базовый класс для большинства тестов это <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#testcase">django.test.TestCase</a>.  Этот класс создает чистую базу данных перед запуском своих методов, а также запускает каждую функцию тестирования в его собственной транзакции. У данного класса также имеется тестовый <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.Client" title="django.test.Client">Клиент</a>, который вы можете использовать для имитации взаимодействия пользователя с кодом на уровне отображения. В следующих разделах мы сконцентритуемся на юнит-тестах, которые будут созданы на основе класса <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#testcase">TestCase</a>.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> Класс <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#testcase">django.test.TestCase</a> очень удобен, но он может приводить к замедленной работе в некоторых случаях (не для каждого теста необходимо настраивать базу данных, или имитировать взаимодействие с отображеним). Когда вы познакомитесь с работой данного класса, то сможете заменить некоторые из ваших тестов на более простые классы тестирования.</p>
+</div>
+
+<h3 id="Что_вы_должны_тестировать">Что вы должны тестировать?</h3>
+
+<p>Вы должны тестировать все аспекты, касающиеся вашего кода, но не библиотеки, или функциональность, предоставляемые Python, или Django.</p>
+
+<p>Например, рассмотрим модель <code>Author</code>, определенную ниже. Вам не нужно проверять тот факт, что <code>first_name</code> и <code>last_name</code> были сохранены в базу данных как <code>CharField</code>, потому что за это отвечает непосредственно Django (хотя конечно, на практике  в течение разработки вы косвенно будете проверять данную функциональность). Тоже касается и, например, проверки того, что поле <code>date_of_birth</code> является датой, поскольку это тоже часть реализации Django.</p>
+
+<p>Вы должны проверить текст для меток (<em>First name, Last_name, Date of birth, Died</em>), и размер поля, выделенного для текста (<em>100 символов</em>), потому что они являются частью вашей разработки и чем-то, что может сломаться/измениться в будущем.</p>
+
+<pre class="brush: python notranslate">class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField(&apos;Died&apos;, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse(&apos;author-detail&apos;, args=[str(self.id)])
+
+    def __str__(self):
+        return &apos;%s, %s&apos; % (self.last_name, self.first_name)</pre>
+
+<p>Подобным же образом вы должны убедиться, что методы <code style="font-style: normal; font-weight: normal;">get_absolute_url()</code> и <code style="font-style: normal; font-weight: normal;">__str__()</code> ведут себя как требуется, потому что они являются частью вашей бизнес логики. В случае функции <code style="font-style: normal; font-weight: normal;">get_absolute_url()</code> вы можете быть уверены, что функция из Django <code>reverse()</code> была реализована правильно и, следовательно, вы тестируете только то, чтобы соответствующий вызов в отображении был правильно определен.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> Проницательные читатели могут заметить, что мы можем некоторым образом ограничить дату рождения и смерти какими-то граничными значениями и выполнять проверку, чтобы дата смерти шла после рождения. В Django данное ограничение может быть добавлено к вашим классам форм (хотя вы и можете определить валидаторы для этих полей, они будут проявлять себя только на уровне форм, а не уровне модели).</p>
+</div>
+
+<p>Ну что же, усвоив данную информацию, давайте перейдем к процессу определения и запуска тестов.</p>
+
+<h2 id="Обзор_стуктуры_тестов">Обзор стуктуры тестов</h2>
+
+<p>Перед тем как мы перейдем к тому &quot;что тестировать&quot;, давайте кратко взглянем на моменты <em>где</em> и <em>как</em> определяются тесты.</p>
+
+<p>Django использует юнит-тестовый модуль - <a href="https://docs.python.org/3/library/unittest.html#unittest-test-discovery" title="(in Python v3.5)">встроенный &quot;обнаружитель&quot; тестов</a>, который находит тесты в текущей рабочей директории, в любом файле с шаблонным именем<strong> test*.py</strong>. Предоставляя соответствующие имена файлов, вы можете работать с любой структурой которая вас устраивает. Мы рекомендуем создать пакет для вашего тестирующего кода и, следовательно, отделить файлы моделей, отображений, форм и любые другие, от кода который будет использоваться для тестов. Например:</p>
+
+<pre class="notranslate">catalog/
+  /tests/
+    __init__.py
+    test_models.py
+    test_forms.py
+    test_views.py
+</pre>
+
+<p>В проекте <em>LocalLibrary</em> создайте файловую структуру, указанную выше. Файл <strong>__init__.py</strong> должен быть пустым (так мы говорим Питону, что данная директория является пакетом). Вы можете создать три тестовых файла при помощи копирования и переименования файла-образца <strong>/catalog/tests.py</strong>.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> Скелет тестового файла <strong>/catalog/tests.py</strong> был создан автоматически когда мы выполняли <a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">построение скелета сайта Django</a>. Является абсолютно &quot;легальным&quot; действием - поместить все ваши тесты в данный файл, тем не менее, если вы проводите тесты &quot;правильно&quot;, то вы очень быстро придете к очень большому и неуправляемому файлу тестирования.</p>
+
+<p>Можете удалить данный файл, поскольку больше он нам не понадобится.</p>
+</div>
+
+<p>Откройте <strong>/catalog/tests/test_models.py</strong>. Файл должен импортировать <code>django.test.TestCase</code>, как показано ниже:</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+# Поместите ваш код тестов здесь
+</pre>
+
+<p>Вы часто будете добавлять соответствующий тестовый класс для каждой модели/отображения/формы с отдельными методами проверки каждой отдельной функциональности. В каких-то случаях вы захотите иметь отдельный класс для тестирования какого-то особого варианта работы, или функционала, с отдельными функциями тестирования, которые будут проверять элемент/элементы данного варианта (например, мы можем создать отдельный класс тестирования для проверки того, что поле валидно, - функции данного класса будут проверять каждый неверный вариант использования). Опять же, структура файлов и пакетов полностью зависит от вас и будет лучше если вы будете ее придерживаться.</p>
+
+<p>Добавьте тестовый класс, показанный ниже, в нижнюю часть файла. Данный класс демонстрирует как создать класс тестирования при помощи наследования от <code>TestCase</code>.</p>
+
+<pre class="brush: python notranslate">class YourTestClass(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        print(&quot;setUpTestData: Run once to set up non-modified data for all class methods.&quot;)
+        pass
+
+    def setUp(self):
+        print(&quot;setUp: Run once for every test method to setup clean data.&quot;)
+        pass
+
+    def test_false_is_false(self):
+        print(&quot;Method: test_false_is_false.&quot;)
+        self.assertFalse(False)
+
+    def test_false_is_true(self):
+        print(&quot;Method: test_false_is_true.&quot;)
+        self.assertTrue(False)
+
+    def test_one_plus_one_equals_two(self):
+        print(&quot;Method: test_one_plus_one_equals_two.&quot;)
+        self.assertEqual(1 + 1, 2)</pre>
+
+<p>Этот класс определяет два метода которые вы можете использовать для дотестовой настройки (например, создание какой-либо модели, или других объектов, которые вам понадобятся):</p>
+
+<ul>
+ <li><code>setUpTestData()</code> вызывается каждый раз перед запуском теста на уровне настройки всего класса. Вы должны использовать данный метод для создания объектов, которые не будут модифицироваться/изменяться в каком-либо из тестовых методов.</li>
+ <li><code>setUp()</code> вызывается перед каждой тестовой функцией для настройки объектов, которые могут изменяться во время тестов (каждая функция тестирования будет получать &quot;свежую&quot; версию данных объектов).</li>
+</ul>
+
+<div class="note">
+<p><strong>Примечание</strong>. Классы тестирования также содержат метод <code>tearDown()</code>, который мы пока не используем. Этот метод не особенно полезен для тестирования баз данных, поскольку базовый класс <code>TestCase</code> автоматически разрывает соединения с ними.</p>
+</div>
+
+<p>Далее идут несколько методов, которые используют функции <code>Assert</code>, проверяющие условия &quot;истинно&quot; (true), &quot;ложно&quot; (false) или равенство (<code>AssertTrue</code>, <code>AssertFalse</code>, <code>AssertEqual</code>). Если условия не выполняются как ожидалось, то это приводит к провалу теста и выводу соответствующего сообщения об ошибке на консоль.</p>
+
+<p>Функции проверки утверждений <code>AssertTrue</code>, <code>AssertFalse</code>, <code>AssertEqual</code> реализованы в <strong>unittest</strong>.  В данном фреймворке существуют и другие подобные функции, а кроме того, <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#assertions">специфические для Django функции</a> проверки, например, перехода из/к отображению (<code>assertRedirects</code>), проверки использования какого-то конкретного шаблона (<code>assertTemplateUsed</code>) и так далее.</p>
+
+<div class="note">
+<p>В обычной ситуации у вас нет необходимости вызывать функции <strong>print()</strong> из методов теста, как во фрагменте выше. Мы поступили так только для того, чтобы вы в консоле увидели порядок вызова тестовых функций класса.</p>
+</div>
+
+<h2 id="Как_запускать_тесты">Как запускать тесты</h2>
+
+<p>Простейшим способом запуска всех тестов является применение следующей команды:</p>
+
+<pre class="brush: bash notranslate">python3 manage.py test</pre>
+
+<p>Таким образом мы найдем в текущей директории все файлы с именем <strong>test*.py</strong> и запустим все тесты (у нас имеются несколько файлов для тестирования, но на данный момент, только <strong>/catalog/tests/test_models.py</strong> содержит какие-либо тесты). По умолчанию, тесты сообщат что-нибудь, только в случае провала.</p>
+
+<p>Запустите тесты из корневой папки сайта <em>LocalLibrary</em>. Вы должны увидеть вывод, который похож на следующий.</p>
+
+<pre class="brush: bash notranslate">&gt;python manage.py test
+
+Creating test database for alias &apos;default&apos;...
+<strong>setUpTestData: Run once to set up non-modified data for all class methods.
+setUp: Run once for every test method to setup clean data.
+Method: test_false_is_false.
+.setUp: Run once for every test method to setup clean data.
+Method: test_false_is_true.
+.setUp: Run once for every test method to setup clean data.
+Method: test_one_plus_one_equals_two.</strong>
+.
+======================================================================
+FAIL: test_false_is_true (catalog.tests.tests_models.YourTestClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;D:\Github\django_tmp\library_w_t_2\locallibrary\catalog\tests\tests_models.py&quot;, line 22, in test_false_is_true
+    self.assertTrue(False)
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.075s
+
+FAILED (failures=1)
+Destroying test database for alias &apos;default&apos;...</pre>
+
+<p>Как видите, один тест провалился и мы можем точно увидеть в какой именно функции это произошло и почему (так и было задумано, поскольку <code>False</code> не равен <code>True</code>!).</p>
+
+<div class="note">
+<p><strong>Совет: </strong> Самая важная вещь, которую нужно извлечь из тестового выхода выше, заключается в том, что это гораздо более ценно, если вы используете описательные/информативные имена для ваших объектов и методов.</p>
+</div>
+
+<p>Текст выделенный жирным, обычно не должен появляться в тестовом выводе (это результат работы функций <code>print()</code> в наших тестах). Он показывает, что вызов метода  <code>setUpTestData()</code> происходит один раз для всего класса в целом, а вызовы<code>setUp()</code> осуществляются перед каждым методом.</p>
+
+<p>Следующий раздел показывает как запускать отдельные тесты и как контролировать процесс вывода информации.</p>
+
+<h3 id="Еще_больше_тестовой_информации">Еще больше тестовой информации</h3>
+
+<p>Если вы желаете получать больше информации о тестах вы должны изменить значение параметра <em>verbosity</em>. Например, для вывода списка успешных и неуспешных тестов (и всю информацию о том, как прошла настройка базы данных) вы можете установить значение verbosity равным &quot;2&quot;:</p>
+
+<pre class="brush: bash notranslate">python3 manage.py test --verbosity 2</pre>
+
+<p>Доступными значениями для verbosity являются  0, 1 (значение по умолчанию), 2 и 3.</p>
+
+<h3 id="Запуск_определенных_тестов">Запуск определенных тестов</h3>
+
+<p>Если вы хотите запустить подмножество тестов, тогда вам надо указать полный путь к вашему пакету, модулю/подмодулю, классу наследнику<code>TestCase</code>, или методу:</p>
+
+<pre class="brush: bash notranslate">python3 manage.py test catalog.tests   # Run the specified module
+python3 manage.py test catalog.tests.test_models  # Run the specified module
+python3 manage.py test catalog.tests.test_models.YourTestClass # Run the specified class
+python3 manage.py test catalog.tests.test_models.YourTestClass.test_one_plus_one_equals_two  # Run the specified method
+</pre>
+
+<h2 id="Тестирование_LocalLibrary">Тестирование LocalLibrary</h2>
+
+<p>Теперь, когда мы знаем как запустить наши тесты и что именно мы должны тестировать, давайте рассмртрим некоторые практические примеры.</p>
+
+<div class="note">
+<p><strong>Примечание: </strong>Мы не будем расписывать все тесты, а просто покажем вам пример того, как они должны работать и что еще вы можете с ними сделать.</p>
+</div>
+
+<h3 id="Модели">Модели</h3>
+
+<p>Как было отмечено ранее, мы должны тестировать все то, что является частью нашего кода, а не библиотеки/код, которые уже были протестированы командами разработчиков Django, или Python.</p>
+
+<p>Рассмотрим модель <code>Author</code>. Мы должны провести тесты текстовых меток всех полей, поскольку, даже несмотря на то, что не все они определены, у нас есть проект, в котором сказано, что все их значения должны быть заданы. Если мы не проведем их тестирование, тогда мы не будем знать, что данные метки действительно содержат необходимые значения. Мы уверены в том, что Django создаст поле заданной длины, таким образом наши тесты будут проверять нужный нам размер поля, а заодно и его содержимое.</p>
+
+<pre class="brush: python notranslate">class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField(&apos;Died&apos;, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse(&apos;author-detail&apos;, args=[str(self.id)])
+
+    def __str__(self):
+        return &apos;%s, %s&apos; % (self.last_name, self.first_name)</pre>
+
+<p>Откройте файл <strong>/catalog/tests/test_models.py</strong> и замените все его содержимое кодом, приведенном во фрагменте для тестирования модели <code>Author</code> (фрагмент представлен ниже).</p>
+
+<p>В первой строке мы импортируем класс <code>TestCase</code>, а затем наследуемся от него, создавая класс с описательным именем (<code>AuthorModelTest</code>), оно поможет нам идентифицировать места провалов в тестах во время вывода информации на консоль. Затем мы создаем метод <code>setUpTestData()</code>, в котором создаем объект автора, который мы будем использовать в тестах, но нигде не будем изменять.</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+# Create your tests here.
+
+from catalog.models import Author
+
+class AuthorModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        #Set up non-modified objects used by all test methods
+        Author.objects.create(first_name=&apos;Big&apos;, last_name=&apos;Bob&apos;)
+
+    def test_first_name_label(self):
+        author=Author.objects.get(id=1)
+        field_label = author._meta.get_field(&apos;first_name&apos;).verbose_name
+        self.assertEquals(field_label,&apos;first name&apos;)
+
+    def test_date_of_death_label(self):
+        author=Author.objects.get(id=1)
+        field_label = author._meta.get_field(&apos;date_of_death&apos;).verbose_name
+        self.assertEquals(field_label,&apos;died&apos;)
+
+    def test_first_name_max_length(self):
+        author=Author.objects.get(id=1)
+        max_length = author._meta.get_field(&apos;first_name&apos;).max_length
+        self.assertEquals(max_length,100)
+
+    def test_object_name_is_last_name_comma_first_name(self):
+        author=Author.objects.get(id=1)
+        expected_object_name = &apos;%s, %s&apos; % (author.last_name, author.first_name)
+        self.assertEquals(expected_object_name,str(author))
+
+    def test_get_absolute_url(self):
+        author=Author.objects.get(id=1)
+        #This will also fail if the urlconf is not defined.
+        self.assertEquals(author.get_absolute_url(),&apos;/catalog/author/1&apos;)</pre>
+
+<p>Тесты полей проверяют значения текстовых меток (<code>verbose_name</code>), включая их ожидаемую длину. Все методы имеют описательные имена, а их логика придерживается одной и той же структуры:</p>
+
+<pre class="brush: python notranslate"># Получение объекта для тестирования
+author=Author.objects.get(id=1)
+
+# Получение метаданных поля для получения необходимых значений
+field_label = author._meta.get_field(&apos;first_name&apos;).verbose_name
+
+# Сравнить значение с ожидаемым результатом
+self.assertEquals(field_label,&apos;first name&apos;)  </pre>
+
+<p>Интересно отметить следующее:</p>
+
+<ul>
+ <li>Мы не можем получить поле <code>verbose_name</code> напрямую через <code>author.first_name.verbose_name</code>, потому что <code>author.first_name</code> является <em>строкой</em>. Вместо этого, нам надо использовать атрибут <code>_meta</code> объекта автора для получения того экземпляра поля, который будет использоваться для получения дополнительной информации.</li>
+ <li>Мы выбрали метод <code>assertEquals(field_label,&apos;first name&apos;)</code> вместо  <code>assertTrue(field_label == &apos;first name&apos;)</code>, потому что, в случае провала теста, в выводе будет указано какое именно значение содержит метка и это немного облегчит нам задачу по отладке кода.</li>
+</ul>
+
+<div class="note">
+<p><strong>Примечание:</strong> Тесты для текстовых меток <code>last_name</code> и <code>date_of_birth</code>, а также тест длины поля <code>last_name</code> были опущены. Добавьте свою версию этих тестов,  соблюдая соглашение об именовании и следуя структуре логики, представленной выше.</p>
+</div>
+
+<p>Кроме того, нам надо провести тесты наших собственных методов. Они просто проверяют, что имена объектов имеют следующие значения &quot;Last Name, First Name&quot; и что URL-адрес, по которому мы получаем экземпляр <code>Author</code>, такой как ожидается.</p>
+
+<pre class="brush: python notranslate">def test_object_name_is_last_name_comma_first_name(self):
+    author=Author.objects.get(id=1)
+    expected_object_name = &apos;%s, %s&apos; % (author.last_name, author.first_name)
+    self.assertEquals(expected_object_name,str(author))
+
+def test_get_absolute_url(self):
+    author=Author.objects.get(id=1)
+    #This will also fail if the urlconf is not defined.
+    self.assertEquals(author.get_absolute_url(),&apos;/catalog/author/1&apos;)</pre>
+
+<p>Теперь запустите тесты. Если вы создали модель Author, в соответствии с разделом о моделях данного руководства, то весьма вероятно, что вы получите сообщение об ошибке для метки <code>date_of_death</code>, как показано ниже. Тест провалился потому что, в соответствии с соглашением Django, первый символ имени метки должен быть в верхнем регистре (Django делает это автоматически).</p>
+
+<pre class="brush: bash notranslate">======================================================================
+FAIL: test_date_of_death_label (catalog.tests.test_models.AuthorModelTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;D:\...\locallibrary\catalog\tests\test_models.py&quot;, line 32, in test_date_of_death_label
+    self.assertEquals(field_label,&apos;died&apos;)
+AssertionError: &apos;Died&apos; != &apos;died&apos;
+- Died
+? ^
++ died
+? ^</pre>
+
+<p>Это несущественный баг, но он демонстрирует нам то, что написание тестов может более тщательно проверить все неточности, которые вы можете сделать.</p>
+
+<div class="note">
+<p><strong>Примечание: </strong>Измените значение метки для поля date_of_death (/catalog/models.py) на &quot;died&quot; и перезапустите тесты.</p>
+</div>
+
+<p>Тот же подход применяется к тестированию других моделей. Самостоятельно создайте свои собственные тесты для оставшихся моделей.</p>
+
+<h3 id="Формы">Формы</h3>
+
+<p>Смысл проведения тестов для форм тот же, что и для моделей; надо проверить весь собственный код и другие особенности проекта, но не то, что касается фреймворка, или сторонних библиотек.</p>
+
+<p>В основном это означает, что вы должны протестировать то, что формы имеют соответствующие поля и что они показываются с соответствующими метками и вспомогательными текстами. Вам не надо проверять то, что Django правильно осуществляет валидацию полей (если только вы не создали свое собственное поле и валидацию) — то есть вам не надо проверять что, например, поле ввода имейл-адреса принимает только имейл-адреса. Но вы должны протестировать каждую дополнительную валидацию, которую вы добавляете для полей и любые сообщения, который ваш код генерирует в случае ошибок.</p>
+
+<p>Рассмотрим форму для обновления книг. Она имеет только одно поле обновления даты, которое будет иметь текстовую метку и вспомогательный текст, который вам надо проверить.</p>
+
+<pre class="brush: python notranslate">class RenewBookForm(forms.Form):
+    &quot;&quot;&quot;
+    Форма обновления книг для библиотекарей
+    &quot;&quot;&quot;
+    renewal_date = forms.DateField(help_text=&quot;Enter a date between now and 4 weeks (default 3).&quot;)
+
+    def clean_renewal_date(self):
+        data = self.cleaned_data[&apos;renewal_date&apos;]
+
+        #Проверка, что дата не в прошлом.
+        if data &lt; datetime.date.today():
+            raise ValidationError(_(&apos;Invalid date - renewal in past&apos;))
+        #Если дата в &quot;далеком&quot; будущем (+4 недели)
+        if data &gt; datetime.date.today() + datetime.timedelta(weeks=4):
+            raise ValidationError(_(&apos;Invalid date - renewal more than 4 weeks ahead&apos;))
+
+        # Всегда надо возвращать очищенные данные.
+        return data</pre>
+
+<p>Откройте файл <strong>/catalog/tests/test_forms.py</strong> и замените весь существующий в нем код, следующим кодом теста для формы <code>RenewBookForm</code>. Мы начали его с импорта нашей формы и некоторых библиотек Python и Django, которые погут нам провести тесты. Затем, тем же способом как мы делали для моделей, объявляем тестовый класс нашей формы, то есть применяя описательное имя класс наследника <code>TestCase</code>.</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+# Создайте ваши тесты здесь
+
+import datetime
+from django.utils import timezone
+from catalog.forms import RenewBookForm
+
+class RenewBookFormTest(TestCase):
+
+    def test_renew_form_date_field_label(self):
+        form = RenewBookForm()
+        self.assertTrue(form.fields[&apos;renewal_date&apos;].label == None or form.fields[&apos;renewal_date&apos;].label == &apos;renewal date&apos;)
+
+    def test_renew_form_date_field_help_text(self):
+        form = RenewBookForm()
+        self.assertEqual(form.fields[&apos;renewal_date&apos;].help_text,&apos;Enter a date between now and 4 weeks (default 3).&apos;)
+
+    def test_renew_form_date_in_past(self):
+        date = datetime.date.today() - datetime.timedelta(days=1)
+        form_data = {&apos;renewal_date&apos;: date}
+        form = RenewBookForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_renew_form_date_too_far_in_future(self):
+        date = datetime.date.today() + datetime.timedelta(weeks=4) + datetime.timedelta(days=1)
+        form_data = {&apos;renewal_date&apos;: date}
+        form = RenewBookForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_renew_form_date_today(self):
+        date = datetime.date.today()
+        form_data = {&apos;renewal_date&apos;: date}
+        form = RenewBookForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_renew_form_date_max(self):
+        date = timezone.now() + datetime.timedelta(weeks=4)
+        form_data = {&apos;renewal_date&apos;: date}
+        form = RenewBookForm(data=form_data)
+        self.assertTrue(form.is_valid())
+</pre>
+
+<p>Первые две функции проверяют текст который должны содержать поля <code>label</code> и <code>help_text</code>. Доступ к полю мы получаем при помощи словаря (то есть, <code>form.fields[&apos;renewal_date&apos;]</code>). Отметим, что мы должны проверять содержит ли метка значение <code>None</code>, иначе в поле текста метки вы увидите &quot;<code>None</code>&quot;.</p>
+
+<p>Оставшиеся функции проверяют валидность дат, то есть их нахождение внутри определенного интервала, а также невалидность для значений, которые находятся вне заданного интервала. Для получения исходного значения мы использовали функцию получения текущей даты (<code>datetime.date.today()</code>), а также функцию <code>datetime.timedelta()</code> (которая принимает определенное число дней, или недель). Затем мы просто создали форму, передавая ей наши данные и проверяя ее на валидность.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> В данном примере мы не использовали ни базу данных, ни тестовый клиент. Рассмотрите модификацию этих тестов при помощи класса <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.SimpleTestCase">SimpleTestCase</a>.</p>
+
+<p>Нам также надо бы проверять возникновение ошибок, которые появляются если форма не валидна. Но, обычно, это относится к процессу вывода информации, таким образом, мы позаботимся об этом в следующем разделе.</p>
+</div>
+
+<p>На этом с формами можно закончить; у нас имеются и другие тесты, но они были созданы обобщенными классами отображения для редактирования! Запустите тесты и убедитесь, что наш код все еще им соответствует!</p>
+
+<h3 id="Отображения">Отображения</h3>
+
+<p>Для проверки поведения отображения мы используем тестовый клиет Django <a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.Client">Client</a>. Данный класс действует как упрощенный веб-браузер который мы применяем для имитации  <code>GET</code> и <code>POST</code> запросов и проверки ответов. Про ответы мы можем узнать почти все, начиная с низкоуровневого HTTP (итоговые заголовки и коды статусов) и вплоть до применяемых шаблонов, которые используются для HTML-рендера, а также контекста, который передается в соответствующий  шаблон. Кроме того, мы можем отследить последовательность перенаправлений (если имеются), проверить URL-адреса и коды статусов на каждом шаге. Все это позволит нам проверить, что каждое отображение выполняет то, что ожидается.</p>
+
+<p>Давайте начнем с одного из простейших отображений которое возвращает список всех авторов. Вы можете его увидеть по URL-адресу <strong>/catalog/authors/</strong> (данный URL-адрес можно найти в разделе приложения catalog,  в файле настроек urls.py по имени  &apos;authors&apos;).</p>
+
+<pre class="brush: python notranslate">class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+</pre>
+
+<p>Поскольку это обобщенное отображение списка, то почти все за нас делает Django. Если вы доверяете Django, то единственной вещью, которую вам нужно протестировать, является переход к данному отображению по указанному URL-адресу. Таким образом, если вы применяете методику TDD (test-driven development, разработка через тесты), то начните проект с написания тестов, которые будут проверять, что данное отображение выводит всех авторов и, к тому же, например, блоками по 10.</p>
+
+<p>Откройте файл <strong>/catalog/tests/test_views.py</strong> замените все его содержимое на следующий код теста для класса <code>AuthorListView</code>. Как и ранее, мы импортируем нашу модель и некоторые полезные классы. В методе <code>setUpTestData()</code> мы задаем число объектов класса <code>Author</code> которые мы тестируем при постраничном выводе.</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+# Create your tests here.
+
+from catalog.models import Author
+from django.urls import reverse
+
+class AuthorListViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        #Create 13 authors for pagination tests
+        number_of_authors = 13
+        for author_num in range(number_of_authors):
+            Author.objects.create(first_name=&apos;Christian %s&apos; % author_num, last_name = &apos;Surname %s&apos; % author_num,)
+
+    def test_view_url_exists_at_desired_location(self):
+        resp = self.client.get(&apos;/catalog/authors/&apos;)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        resp = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        resp = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertTemplateUsed(resp, &apos;catalog/author_list.html&apos;)
+
+    def test_pagination_is_ten(self):
+        resp = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(&apos;is_paginated&apos; in resp.context)
+        self.assertTrue(resp.context[&apos;is_paginated&apos;] == True)
+        self.assertTrue( len(resp.context[&apos;author_list&apos;]) == 10)
+
+    def test_lists_all_authors(self):
+        #Get second page and confirm it has (exactly) remaining 3 items
+        resp = self.client.get(reverse(&apos;authors&apos;)+&apos;?page=2&apos;)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(&apos;is_paginated&apos; in resp.context)
+        self.assertTrue(resp.context[&apos;is_paginated&apos;] == True)
+        self.assertTrue( len(resp.context[&apos;author_list&apos;]) == 3)</pre>
+
+<p>Все тесты используют клиент (принадлежащего классу <code>TestCase</code>, от которого мы наследовались) для имитации <code>GET</code>-запроса и получения ответа (<code>resp</code>). Первая версия проверяет заданный URL-адрес (заметьте, - просто определенный путь без указания домена), в то время как второй генерирует URL-адрес при помощи его имени, указанного в настройках.</p>
+
+<pre class="brush: python notranslate">resp = self.client.get(&apos;/catalog/authors/&apos;)
+resp = self.client.get(reverse(&apos;authors&apos;))
+</pre>
+
+<p>Когда мы получаем ответ, то мы извлекаем код статуса, используемый шаблон, &quot;включен&quot; ли постраничный вывод, количество элементов в подмножестве (на странице) и общее число элементов.</p>
+
+<p>Наиболее интересной переменной является <code>resp.context</code>, которая является объектом контекста, который передается шаблону из отображения. Он (объект контекста) очень полезен для тестов, поскольку позволяет нам убедиться, что наш шаблон получает все данные которые ему необходимы. Другими словами мы можем проверить, что мы используем правильный шаблон с данными, которые проделывают долгий путь проверок чтобы соответствовать данному шаблону.</p>
+
+<h4 id="Отображения_и_регистрация_пользователей">Отображения и регистрация пользователей</h4>
+
+<p>В некоторых случаях вам нужно провести тесты отображений к которым имеют доступ только зарегистрированные пользователи. Например, <code>LoanedBooksByUserListView</code> очень похоже на наше предыдущее отображение, но доступно только для залогинившихся пользователей и показывает только те записи (<code>BookInstance)</code>, которые соответствуют текущему пользователю, имеют статус &apos;on loan&apos; (книга взята домой), а также забронированны.</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
+    &quot;&quot;&quot;
+    Обобщенный класс отображения списка взятых книг текущим пользователем
+    &quot;&quot;&quot;
+    model = BookInstance
+    template_name =&apos;catalog/bookinstance_list_borrowed_user.html&apos;
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact=&apos;o&apos;).order_by(&apos;due_back&apos;)</pre>
+
+<p>Добавьте тестовый код следующего фрагмента в <strong>/catalog/tests/test_views.py</strong>. В нем, для создания нескольких аккаунтов и  объектов <code>BookInstance</code> которые будут использоваться в дальнейших тестах, мы используем метод <code>SetUp()</code> (вместе с соответствующими книгами и другими записями). Половина книг бронируется  тестовыми пользователями, но в начале для них всех мы устанавливаем статус &quot;доступно&quot;. Использование метода <code>SetUp()</code> предпочтительнее чем <code>setUpTestData()</code>, поскольку в дальнейшем мы будем модифицировать некоторые объекты.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> Метод <code>setUp()</code> создает книгу с заданным языком <code>Language</code>, но <em>ваш</em> код может не включать в себя модель <code>Language</code>, поскольку это было <em>домашним заданием</em>. В таком случае просто закомментируйте соответствующие строки. Поступите также и в следующем разделе, посвященном <code>RenewBookInstancesViewTest.</code></p>
+</div>
+
+<pre class="brush: python notranslate">import datetime
+from django.utils import timezone
+
+from catalog.models import BookInstance, Book, Genre, Language
+from django.contrib.auth.models import User # Необходимо для представления User как borrower
+
+class LoanedBookInstancesByUserListViewTest(TestCase):
+
+    def setUp(self):
+        # Создание двух пользователей
+        test_user1 = User.objects.create_user(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        test_user1.save()
+        test_user2 = User.objects.create_user(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        test_user2.save()
+
+        # Создание книги
+        test_author = Author.objects.create(first_name=&apos;John&apos;, last_name=&apos;Smith&apos;)
+        test_genre = Genre.objects.create(name=&apos;Fantasy&apos;)
+        test_language = Language.objects.create(name=&apos;English&apos;)
+        test_book = Book.objects.create(title=&apos;Book Title&apos;, summary = &apos;My book summary&apos;, isbn=&apos;ABCDEFG&apos;, author=test_author, language=test_language)
+        # Create genre as a post-step
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre.set(genre_objects_for_book) # Присвоение типов many-to-many напрямую недопустимо
+        test_book.save()
+
+        # Создание 30 объектов BookInstance
+        number_of_book_copies = 30
+        for book_copy in range(number_of_book_copies):
+            return_date= timezone.now() + datetime.timedelta(days=book_copy%5)
+            if book_copy % 2:
+                the_borrower=test_user1
+            else:
+                the_borrower=test_user2
+            status=&apos;m&apos;
+            BookInstance.objects.create(book=test_book,imprint=&apos;Unlikely Imprint, 2016&apos;, due_back=return_date, borrower=the_borrower, status=status)
+
+    def test_redirect_if_not_logged_in(self):
+        resp = self.client.get(reverse(&apos;my-borrowed&apos;))
+        self.assertRedirects(resp, &apos;/accounts/login/?next=/catalog/mybooks/&apos;)
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        # Проверка что пользователь залогинился
+        self.assertEqual(str(resp.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        # Проверка ответа на запрос
+        self.assertEqual(resp.status_code, 200)
+
+        # Проверка того, что мы используем правильный шаблон
+        self.assertTemplateUsed(resp, &apos;catalog/bookinstance_list_borrowed_user.html&apos;)
+</pre>
+
+<p>Если пользователь не залогирован то, чтобы убедиться в том что отображение перейдет на страницу входа (логирования), мы используем метод <code>assertRedirects</code>, что продемонстрировано в методе <code>test_redirect_if_not_logged_in()</code>. Затем мы осуществляем вход для пользователя и проверям что полученный статус <code>status_code</code> равен 200 (успешно). </p>
+
+<p>Остальные тесты проверяют, соответственно, что наше отображение показывает только те книги которые взяты текущим пользователем. Скопируйте код, показанный ниже, в нижнюю часть предыдущего класса.</p>
+
+<pre class="brush: python notranslate">    def test_only_borrowed_books_in_list(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        #Проверка, что пользователь залогинился
+        self.assertEqual(str(resp.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        #Check that we got a response &quot;success&quot;
+        self.assertEqual(resp.status_code, 200)
+
+        #Проверка, что изначально у нас нет книг в списке
+        self.assertTrue(&apos;bookinstance_list&apos; in resp.context)
+        self.assertEqual( len(resp.context[&apos;bookinstance_list&apos;]),0)
+
+        #Теперь все книги &quot;взяты на прокат&quot;
+        get_ten_books = BookInstance.objects.all()[:10]
+
+        for copy in get_ten_books:
+            copy.status=&apos;o&apos;
+            copy.save()
+
+        #Проверка, что все забронированные книги в списке
+        resp = self.client.get(reverse(&apos;my-borrowed&apos;))
+        #Проверка, что пользователь залогинился
+        self.assertEqual(str(resp.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        #Проверка успешности ответа
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertTrue(&apos;bookinstance_list&apos; in resp.context)
+
+        #Подтверждение, что все книги принадлежат testuser1 и взяты &quot;на прокат&quot;
+        for bookitem in resp.context[&apos;bookinstance_list&apos;]:
+            self.assertEqual(resp.context[&apos;user&apos;], bookitem.borrower)
+            self.assertEqual(&apos;o&apos;, bookitem.status)
+
+    def test_pages_ordered_by_due_date(self):
+
+        #Изменение статуса на &quot;в прокате&quot;
+        for copy in BookInstance.objects.all():
+            copy.status=&apos;o&apos;
+            copy.save()
+
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        #Пользователь залогинился
+        self.assertEqual(str(resp.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        #Check that we got a response &quot;success&quot;
+        self.assertEqual(resp.status_code, 200)
+
+        #Подтверждение, что из всего списка показывается только 10 экземпляров
+        self.assertEqual( len(resp.context[&apos;bookinstance_list&apos;]),10)
+
+        last_date=0
+        for copy in resp.context[&apos;bookinstance_list&apos;]:
+            if last_date==0:
+                last_date=copy.due_back
+            else:
+                self.assertTrue(last_date &lt;= copy.due_back)</pre>
+
+<p>Если хотите, то вы, безусловно, можете добавить тесты проверяющие постраничный вывод!</p>
+
+<h4 id="Тестирование_форм_и_отображений">Тестирование форм и отображений</h4>
+
+<p>Процесс тестирования отображений с формами немного более сложен, чем в представленных ранее случаях, поскольку вам надо протестировать большее количество кода: начальное состояние показа формы, показ формы и ее данных в случае ошибок, а также показ формы в случае успеха. Хорошей новостью является то, что мы применяем клиент для тестирования практически тем же способом, как мы делали это в случае отображений, которые отвечают только за вывод информации.</p>
+
+<p>В качестве демонстрации давайте напишем некоторые тесты для отображения, которые отвечают за обновление книг(<code>renew_book_librarian()</code>):</p>
+
+<pre class="brush: python notranslate">from .forms import RenewBookForm
+
+@permission_required(&apos;catalog.can_mark_returned&apos;)
+def renew_book_librarian(request, pk):
+    &quot;&quot;&quot;
+    Функция отображения обновления экземпляра BookInstance библиотекарем
+    &quot;&quot;&quot;
+    book_inst=get_object_or_404(BookInstance, pk = pk)
+
+    # Если это POST-запрос, тогда обработать данные формы
+    if request.method == &apos;POST&apos;:
+
+        # Создать объект формы и заполнить ее данными из запроса (связывание/биндинг):
+        form = RenewBookForm(request.POST)
+
+        # Проверка валидности формы:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            book_inst.due_back = form.cleaned_data[&apos;renewal_date&apos;]
+            book_inst.save()
+
+            # переход по URL-адресу:
+            return HttpResponseRedirect(reverse(&apos;all-borrowed&apos;) )
+
+    # Если это GET-запрос (или что-то еще), то создаем форму по умолчанию
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={&apos;renewal_date&apos;: proposed_renewal_date,})
+
+    return render(request, &apos;catalog/book_renew_librarian.html&apos;, {&apos;form&apos;: form, &apos;bookinst&apos;:book_inst})</pre>
+
+<p>Нам надо проверить что к данному отображению имеют доступ только те пользователи, которые имеют разрешение типа <code>can_mark_returned</code>, а кроме того, что пользователи перенаправляются на страницу ошибки HTTP 404  если они пытаются обновить экземпляр книги  <code>BookInstance</code>, который не существует. Мы должны проверить что начальное значение формы соответствует дате через 3 недели в будущем, а также то, что если форма прошла валидацию, то мы переходим на страницу отображения книг &quot;all-borrowed&quot; (забронированных). Для тестов, отвечающих за проверку &quot;провалов&quot;, мы также должны удостовериться что они отправляют соответствующие сообщения об ошибках.</p>
+
+<p>В нижнюю часть файла <strong>/catalog/tests/test_views.py</strong> добавьте класс тестрования (показан во фрагменте, ниже). Он создает двух пользователей и два экземпляра книги, но только один пользователь получает необходимый доступ к соответствующему отображению. Код, который &quot;присваивает&quot; соответствующий доступ, выделен в коде жирным:</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.models import Permission # Required to grant the permission needed to set a book as returned.
+
+class RenewBookInstancesViewTest(TestCase):
+
+    def setUp(self):
+        #Создание пользователя
+        test_user1 = User.objects.create_user(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        test_user1.save()
+
+        test_user2 = User.objects.create_user(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        test_user2.save()
+<strong>        permission = Permission.objects.get(name=&apos;Set book as returned&apos;)
+        test_user2.user_permissions.add(permission)
+        test_user2.save()</strong>
+
+        #Создание книги
+        test_author = Author.objects.create(first_name=&apos;John&apos;, last_name=&apos;Smith&apos;)
+        test_genre = Genre.objects.create(name=&apos;Fantasy&apos;)
+        test_language = Language.objects.create(name=&apos;English&apos;)
+        test_book = Book.objects.create(title=&apos;Book Title&apos;, summary = &apos;My book summary&apos;, isbn=&apos;ABCDEFG&apos;, author=test_author, language=test_language,)
+        #Создание жанра Create genre as a post-step
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre=genre_objects_for_book
+        test_book.save()
+
+        #Создание объекта BookInstance для для пользователя test_user1
+        return_date= datetime.date.today() + datetime.timedelta(days=5)
+        self.test_bookinstance1=BookInstance.objects.create(book=test_book,imprint=&apos;Unlikely Imprint, 2016&apos;, due_back=return_date, borrower=test_user1, status=&apos;o&apos;)
+
+        #Создание объекта BookInstance для для пользователя test_user2
+        return_date= datetime.date.today() + datetime.timedelta(days=5)
+        self.test_bookinstance2=BookInstance.objects.create(book=test_book,imprint=&apos;Unlikely Imprint, 2016&apos;, due_back=return_date, borrower=test_user2, status=&apos;o&apos;)</pre>
+
+<p>В нижнюю часть класса тестирования добавьте следующие методы (из следующего фрагмента). Они проверяют, что только пользователь с соответствущим доступом (<em>testuser2</em>) имеет доступ к отображению. Мы проверяем все случаи: когда пользователь не залогинился, когда залогинился, но не имеет соответствующего доступа, когда имеет доступ, но не является заемщиком книги (тест должен быть успешным), а также, что произойдет если попытаться получить доступ к книге <code>BookInstance</code> которой не существует. Кроме того, мы проверям то, что используется правильный (необходимый) шаблон.</p>
+
+<pre class="brush: python notranslate">    def test_redirect_if_not_logged_in(self):
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}) )
+        #Manually check redirect (Can&apos;t use assertRedirect, because the redirect URL is unpredictable)
+        self.assertEqual( resp.status_code,302)
+        self.assertTrue( resp.url.startswith(&apos;/accounts/login/&apos;) )
+
+    def test_redirect_if_logged_in_but_not_correct_permission(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}) )
+
+        #Manually check redirect (Can&apos;t use assertRedirect, because the redirect URL is unpredictable)
+        self.assertEqual( resp.status_code,302)
+        self.assertTrue( resp.url.startswith(&apos;/accounts/login/&apos;) )
+
+    def test_logged_in_with_permission_borrowed_book(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance2.pk,}) )
+
+        #Check that it lets us login - this is our book and we have the right permissions.
+        self.assertEqual( resp.status_code,200)
+
+    def test_logged_in_with_permission_another_users_borrowed_book(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}) )
+
+        #Check that it lets us login. We&apos;re a librarian, so we can view any users book
+        self.assertEqual( resp.status_code,200)
+
+    def test_HTTP404_for_invalid_book_if_logged_in(self):
+        import uuid
+        test_uid = uuid.uuid4() #unlikely UID to match our bookinstance!
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:test_uid,}) )
+        self.assertEqual( resp.status_code,404)
+
+    def test_uses_correct_template(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}) )
+        self.assertEqual( resp.status_code,200)
+
+        #Check we used correct template
+        self.assertTemplateUsed(resp, &apos;catalog/book_renew_librarian.html&apos;)
+</pre>
+
+<p>Добавьте еще один тестовый метод, показанный ниже. Он проверяет что начальная дата равна трем неделям в будущем. Заметьте, что мы имеем возможность получить доступ к начальному значению из поля формы (выделено жирным).</p>
+
+<pre class="brush: python notranslate">    def test_form_renewal_date_initially_has_date_three_weeks_in_future(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        resp = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}) )
+        self.assertEqual( resp.status_code,200)
+
+        date_3_weeks_in_future = datetime.date.today() + datetime.timedelta(weeks=3)
+        self.assertEqual(<strong>resp.context[&apos;form&apos;].initial[&apos;renewal_date&apos;]</strong>, date_3_weeks_in_future )
+</pre>
+
+<p>Следующий тест (тоже добавьте его в свой класс) проверяет что отображение, в случае успеха, перенаправляет пользователя к списку всех забронированных книг. Здесь мы показываем как при помощи клиента вы можете создать и передать данные в <code>POST</code>-запросе. Данный запрос передается вторым аргументом в пост-функцию и представляет из себя словарь пар ключ/значение.</p>
+
+<pre class="brush: python notranslate">    def test_redirects_to_all_borrowed_book_list_on_success(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        valid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=2)
+        resp = <strong>self.client.<em>post</em>(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:valid_date_in_future} )</strong>
+        self.assertRedirects(resp, reverse(&apos;all-borrowed&apos;) )
+</pre>
+
+<div class="warning notecard">
+<p>Вместо перехода к отображению <em>all-borrowed</em>, добавленого в качестве <em>домашнего задания</em>, вы можете перенаправить пользователя на домашнюю страницу &apos;/&apos;. В таком случае, исправьте две последние строки тестового кода на код, показанный ниже. Присваивание <code>follow=True</code>, в запросе, гарантирует что запрос вернет окончательный URL-адрес пункта назначения (следовательно проверяется <code>/catalog/</code>, а не <code>/</code>).</p>
+
+<pre class="brush: python notranslate"> resp = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:valid_date_in_future},<strong>follow=True</strong> )
+ <strong>self.assertRedirects(resp, &apos;/catalog/&apos;)</strong></pre>
+</div>
+
+<p>Скопируйте две последние функции в класс, представленные ниже. Они тоже проверяют  <code>POST</code>-запросы, но для случая неверных дат. Мы используем функцию <code>assertFormError()</code>, чтобы проверить сообщения об ошибках.</p>
+
+<pre class="brush: python notranslate">    def test_form_invalid_renewal_date_past(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        date_in_past = datetime.date.today() - datetime.timedelta(weeks=1)
+        resp = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:date_in_past} )
+        self.assertEqual( resp.status_code,200)
+        <strong>self.assertFormError(resp, &apos;form&apos;, &apos;renewal_date&apos;, &apos;Invalid date - renewal in past&apos;)</strong>
+
+    def test_form_invalid_renewal_date_future(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;12345&apos;)
+        invalid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=5)
+        resp = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:invalid_date_in_future} )
+        self.assertEqual( resp.status_code,200)
+        <strong>self.assertFormError(resp, &apos;form&apos;, &apos;renewal_date&apos;, &apos;Invalid date - renewal more than 4 weeks ahead&apos;)</strong>
+</pre>
+
+<p>Такие же способы тестрования могут применяться для проверок других отображений.</p>
+
+<h3 id="Шаблоны">Шаблоны</h3>
+
+<p>Django предоставляет API для тестирования, которое проверяет что функции отображения вызывают правильные шаблоны, а также позволяют убедиться, что им передается соответствующая информация. Кроме того, в Django имеется возможность использовать сторонние API для проверок того, что ваш HTML показывает то, что надо.</p>
+
+<h2 id="Другие_рекомендованные_инструменты_для_тестирования">Другие рекомендованные инструменты для тестирования</h2>
+
+<p>Django фреймворк для тестирования помогает вам создавать эффективные юнит- и интеграционные тесты — мы рассмотрели только небольшую часть того, что может делать фреймворк <strong>unittest</strong> и совсем не упоминали дополнения Django (например, посмотрите на модуль <a href="https://docs.python.org/3.5/library/unittest.mock-examples.html">unittest.mock</a>, который подключает сторонние библиотеки тестирования).</p>
+
+<p>Из всего множества сторонних инструментов тестирования, мы кратко опишем возможности двух:</p>
+
+<ul>
+ <li><a href="http://coverage.readthedocs.io/en/latest/">Coverage</a>: Это инструмент Python, который формирует отчеты о том, какое количество кода выполняется во время проведения тестов. Это полезно для уточнения степени &quot;покрытия&quot; кода тестами.</li>
+ <li><a href="/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Selenium</a> это фреймворк проведения автоматического тестирования в настоящем браузере. Он позволяет вам имитировать взаимодействие пользователя с вашим сайтом (что является следующим шагом в проведении интеграционных тестов).</li>
+</ul>
+
+<h2 id="Домашняя_работы">Домашняя работы</h2>
+
+<p>Существуют другие модели и отображения, которые мы могли бы протестировать. В качестве простого упражнения, попробуйте создать тестовый вариант для отображения <code>AuthorCreate</code>.</p>
+
+<pre class="brush: python notranslate">class AuthorCreate(PermissionRequiredMixin, CreateView):
+    model = Author
+    fields = &apos;__all__&apos;
+    initial={&apos;date_of_death&apos;:&apos;12/10/2016&apos;,}
+    permission_required = &apos;catalog.can_mark_returned&apos;</pre>
+
+<p>Помните, - вам надо проверить все, что касается вашего кода, или структуры. Это включает в себя: кто имеет доступ к отображению, начальную дату, применяемый шаблон, а также перенаправление из отображения в случае успеха.</p>
+
+<h2 id="Итоги">Итоги</h2>
+
+<p>Написание тестов не является ни весельем, ни развлечением и, соответственно, при создании сайтов часто остается напоследок (или вообще не используется). Но тем не менее, они являются действенным механизмом, который позволяет вам убедиться, что ваш код в находится безопасности, даже если в него добавляются какие-либо изменения. Кроме того, тесты повышают эффективность поддержки вашего кода.</p>
+
+<p>В данном руководстве мы продемонстрировали вам принципы написания тестов для ваших моделей, форм и отображений. Мы кратко перечислили что именно необходимо тестировать, что обычно сложно выявить в самом начале разработки. Существует много аспектов которые необходимо изучить, но даже с тем что мы уже узнали, вы имеете возможность создавать эффективные юнит-тесты для значительного улучшения процесса разработки.</p>
+
+<p>Следующая и последняя часть руководства покажет вам как запустить ваш чудесный (и полностью протестированный!) веб-сайт Django.</p>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="https://docs.djangoproject.com/en/1.10/topics/testing/overview/">Написание и запуск тестов</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/1.10/intro/tutorial05/">Написание вашего первого приложения Django, часть 5 &gt; Введение в автоматическое тестирование</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/1.10/topics/testing/tools/">Инструменты для тестирования</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/1.10/topics/testing/advanced/">Продвинутое тестирование</a> (Django docs)</li>
+ <li><a href="http://toastdriven.com/blog/2011/apr/10/guide-to-testing-in-django/">Путеводитель по тестированию в Django</a> (Toast Driven Blog, 2011)</li>
+ <li><a href="http://test-driven-django-development.readthedocs.io/en/latest/index.html">Мастерская: Разработка через тесты с Django (TDD)</a> (San Diego Python, 2014)</li>
+ <li><a href="https://realpython.com/blog/python/testing-in-django-part-1-best-practices-and-examples/">Тестирование в Django (Часть 1) - Лучшие практики и Примеры </a>(RealPython, 2013)</li>
+</ul>
+
+<div class="prevnext">
+  <a href="/ru/docs/Learn/Server-side/Django/Forms" class="button"><i class="icon-arrow-left"></i><span class="label"> Назад </span></a><a href="/ru/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Обзор: Django</a><a href="/ru/docs/Learn/Server-side/Django/Deployment" class="button"><span class="label"> Далее  </span><i class="icon-arrow-right"></i></a>
+</div>

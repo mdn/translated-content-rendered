@@ -1,0 +1,176 @@
+---
+title: MediaDevices.enumerateDevices()
+slug: Web/API/MediaDevices/enumerateDevices
+translation_of: Web/API/MediaDevices/enumerateDevices
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/WebRTC_API">WebRTC API</a></strong></li><li><strong><a href="/ru/docs/Web/API/MediaDevices"><code>MediaDevices</code></a></strong></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><a href="/ru/docs/Web/API/MediaDevices/ondevicechange"><code>ondevicechange</code></a> <a href="/ru/docs/Web/API/MediaDevices/ondevicechange$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Методы</summary><ol><li><em><code>enumerateDevices()</code></em></li><li><a href="/ru/docs/Web/API/MediaDevices/getDisplayMedia"><code>getDisplayMedia()</code></a> <a href="/ru/docs/Web/API/MediaDevices/getDisplayMedia$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/API/MediaDevices/getSupportedConstraints"><code>getSupportedConstraints()</code></a> <a href="/ru/docs/Web/API/MediaDevices/getSupportedConstraints$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/API/MediaDevices/getUserMedia"><code>getUserMedia()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Наследование:</summary><ol><li><a href="/ru/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Похожие страницы для WebRTC</summary><ol><li><a href="/ru/docs/Web/API/MediaDevices/getUserMedia"><code>MediaDevices.getUserMedia()</code></a></li><li><a href="/ru/docs/Web/API/Navigator/mediaDevices"><code>Navigator.mediaDevices</code></a></li><li><a href="/ru/docs/Web/API/RTCCertificate"><code>RTCCertificate</code></a></li><li><a href="/ru/docs/Web/API/RTCDTMFSender"><code>RTCDTMFSender</code></a></li><li><a href="/ru/docs/Web/API/RTCDTMFToneChangeEvent"><code>RTCDTMFToneChangeEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCDataChannel"><code>RTCDataChannel</code></a></li><li><a href="/ru/docs/Web/API/RTCDataChannelEvent"><code>RTCDataChannelEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCDtlsTransport"><code>RTCDtlsTransport</code></a></li><li><a href="/ru/docs/Web/API/RTCErrorEvent"><code>RTCErrorEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCIceCandidate"><code>RTCIceCandidate</code></a></li><li><a href="/ru/docs/Web/API/RTCIceTransport"><code>RTCIceTransport</code></a></li><li><a href="/ru/docs/Web/API/RTCPeerConnection"><code>RTCPeerConnection</code></a></li><li><a href="/ru/docs/Web/API/RTCPeerConnectionIceErrorEvent"><code>RTCPeerConnectionIceErrorEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCPeerConnectionIceEvent"><code>RTCPeerConnectionIceEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCRtpReceiver"><code>RTCRtpReceiver</code></a></li><li><a href="/ru/docs/Web/API/RTCRtpSender"><code>RTCRtpSender</code></a></li><li><a href="/ru/docs/Web/API/RTCRtpTransceiver"><code>RTCRtpTransceiver</code></a></li><li><a href="/ru/docs/Web/API/RTCSctpTransport"><code>RTCSctpTransport</code></a></li><li><a href="/ru/docs/Web/API/RTCSessionDescription"><code>RTCSessionDescription</code></a></li><li><a href="/ru/docs/Web/API/RTCStatsEvent"><code>RTCStatsEvent</code></a></li><li><a href="/ru/docs/Web/API/RTCStatsReport"><code>RTCStatsReport</code></a></li><li><a href="/ru/docs/Web/API/RTCTrackEvent"><code>RTCTrackEvent</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>Это экспериментальная технология</strong><br>Так как спецификация этой технологии ещё не стабилизировалась, смотрите <a href="#Browser_compatibility">таблицу совместимости</a> по поводу использования в различных браузерах. Также заметьте, что синтаксис и поведение экспериментальной технологии может измениться в будущих версиях браузеров, вслед за изменениями спецификации.</p>
+</div>
+
+<p>Метод <strong><code>MediaDevices.enumerateDevices()</code></strong> собирает информацию о медиа-устройствах ввода и вывода, доступных в системе.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="syntaxbox">navigator.mediaDevices.enumerateDevices()
+.then(function(MediaDeviceInfo) { ... })</pre>
+
+<h3 id="Возвращаемое_значение">Возвращаемое значение</h3>
+
+<p>Возвращает <a href="/ru/docs/Web/API/Promise"><code>Promise</code></a> который, если выполнится успешно, вернёт массив экземпляров <a href="/ru/docs/Web/API/MediaDeviceInfo"><code>MediaDeviceInfo</code></a> , которые содержат информацию о доступных медиа-устройствах ввода и вывода.</p>
+
+<h2 id="Пример">Пример</h2>
+
+<p>Ниже, пример, использующий метод <code>mediaDevices.enumerateDevices()</code>.</p>
+
+<pre class="brush: js">if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+  console.log(&quot;enumerateDevices() не поддерживается.&quot;);
+  return;
+}
+
+// Перечисление в цикле камер и микрофонов
+
+navigator.mediaDevices.enumerateDevices()
+.then(function(devices) {
+  devices.forEach(function(device) {
+    console.log(device.kind + &quot;: &quot; + device.label +
+                &quot; id = &quot; + device.deviceId);
+  });
+})
+.catch(function(err) {
+  console.log(err.name + &quot;: &quot; + err.message);
+});
+</pre>
+
+<p>результат перичисления в цикле:</p>
+
+<pre>videoinput: id = csO9c0YpAf274OuCPUA53CNE0YHlIr2yXCi+SqfBZZ8=
+audioinput: id = RKxXByjnabbADGQNNZqLVLdmXlS0YkETYCIbg+XxnvM=
+audioinput: id = r2/xw1xUPIyZunfV1lGrKOma5wTOvCkWfZ368XCndm0=
+</pre>
+
+<p>или, если один или более объектов <a href="/ru/docs/Web/API/MediaStream"><code>MediaStream</code></a> активны,  или получены постоянные разрешения:</p>
+
+<pre>videoinput: FaceTime HD Camera (Built-in) id=csO9c0YpAf274OuCPUA53CNE0YHlIr2yXCi+SqfBZZ8=
+audioinput: default (Built-in Microphone) id=RKxXByjnabbADGQNNZqLVLdmXlS0YkETYCIbg+XxnvM=
+audioinput: Built-in Microphone id=r2/xw1xUPIyZunfV1lGrKOma5wTOvCkWfZ368XCndm0=
+</pre>
+
+<h2 id="Разрешения">Разрешения</h2>
+
+<p>Что бы использовать метод  <code>enumerateDevices()</code> в устанавливаемом приложении  (к примеру в  <a href="/en-US/Apps/Build/Building_apps_for_Firefox_OS/Firefox_OS_app_beginners_tutorial">Firefox OS приложение</a>), необходимо указать оба поля внутри файла манифеста приложения:</p>
+
+<pre class="brush: js">&quot;permissions&quot;: {
+  &quot;audio-capture&quot;: {
+    &quot;description&quot;: &quot;Required to capture audio using getUserMedia()&quot;
+  },
+  &quot;video-capture&quot;: {
+    &quot;description&quot;: &quot;Required to capture video using getUserMedia()&quot;
+  }
+}</pre>
+
+<p>Смотри так же : <a href="/en-US/Apps/Developing/App_permissions#audio-capture">разрешение: аудио захват</a> and <a href="/en-US/Apps/Developing/App_permissions#video-capture">разрешение : видео захват</a> в продолжение темы.</p>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Коментарий</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/mediacapture-main/#mediadevices" hreflang="en" lang="en">Media Capture and Streams<br><small lang="ru">Определение &apos;mediaDevices.enumerateDevices&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-CR">Кандидат в рекомендации</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость_с_браузерами">Совместимость с браузерами</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>45.0 [1]</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td>39</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td>39</td>
+   <td>39</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Behind a flag.</p>
+
+<h3 id="Совместимость_с_Chrome_и_Opera">Совместимость с Chrome и Opera</h3>
+
+<ul>
+ <li>Интерфейс доступен в  Chrome и Opera через полифил <a href="https://github.com/webrtc/adapter">adapter.js</a>.</li>
+</ul>
+
+<h2 id="Смотри_так_же">Смотри так же</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia" title="mediaDevices.getUserMedia">navigator.mediaDevices.getUserMedia</a></li>
+ <li><a href="/en-US/docs/WebRTC" title="WebRTC">WebRTC</a> - the introductory page to the API</li>
+ <li><a href="/en-US/docs/WebRTC/MediaStream_API" title="WebRTC/MediaStream_API">MediaStream API</a> - the API for the media stream objects</li>
+ <li><a href="/en-US/docs/WebRTC/taking_webcam_photos" title="WebRTC/taking_webcam_photos">Taking webcam photos</a> - a tutorial on using <code>getUserMedia() for taking photos rather than video.</code></li>
+</ul>

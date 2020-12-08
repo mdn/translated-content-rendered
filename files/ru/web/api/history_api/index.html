@@ -1,0 +1,119 @@
+---
+title: History API
+slug: Web/API/History_API
+tags:
+  - API
+  - DOM
+  - HTML5
+  - История
+translation_of: Web/API/History_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/History_API">History API</a></strong></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/History"><code>History</code></a></li></ol></details></li></ol></section><br>
+ DOM-объект <a href="/ru/docs/Web/API/Window"><code>Window</code></a> предоставляет доступ к истории текущей сессии браузера (не путать с <a href="https://wiki.developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history">историей браузерных расширений</a>) через объект <a href="/ru/docs/Web/API/Window/history"><code>history</code></a>. Он предоставляет полезные методы и свойства, которые позволяют переходить назад и вперёд по истории пользователя и манипулировать её содержимым.
+
+<h2 id="Понятия_и_использование">Понятия и использование</h2>
+
+<p>Перемещение назад и вперёд по истории пользователя выполняется с помощью методов <a href="/ru/docs/Web/API/History/back"><code>back()</code></a>, <a href="/ru/docs/Web/API/History/forward"><code>forward()</code></a>, и <a href="/ru/docs/Web/API/History/go"><code>go()</code></a>.</p>
+
+<h3 id="Перемещение_вперёд_и_назад">Перемещение вперёд и назад</h3>
+
+<p>Чтобы переместиться назад по истории:</p>
+
+<pre class="brush: js notranslate">window.history.back();
+</pre>
+
+<p>Данный метод работает так, будто пользователь нажал на кнопку &quot;Назад&quot; на панели браузера.<br>
+ Похожим образом можно переместиться вперед (как если бы пользователь нажал на кнопку &quot;Вперед&quot;):</p>
+
+<pre class="brush: js notranslate">window.history.forward();
+</pre>
+
+<h3 id="Перемещение_к_определённой_странице_в_истории">Перемещение к определённой странице в истории</h3>
+
+<p>Вы можете использовать метод <a href="/ru/docs/Web/API/History/go"><code>go()</code></a> для загрузки конкретной страницы из истории сессии, определяемой её позицией относительно текущей страницы. Относительная позиция текущей страницы равняется <code>0</code>.</p>
+
+<p>Вернуться на одну страницу назад (равноценно вызову <a href="/ru/docs/Web/API/History/back"><code>back()</code></a>):</p>
+
+<pre class="brush: js notranslate">window.history.go(-1);
+</pre>
+
+<p>Перейти на одну страницу вперёд (равноценно вызову <a href="/ru/docs/Web/API/History/forward"><code>forward()</code></a>)</p>
+
+<pre class="brush: js notranslate">window.history.go(1);
+</pre>
+
+<p>По такому же принципу, можно перемещаться вперед на 2 страницы, передавая аргумент <code>2</code>, и так далее.</p>
+
+<p>Кроме того, метод <code>go()</code> можно использовать для обновления текущей страницы, передавая аргумент <code>0</code> или вызывая его без аргументов:</p>
+
+<pre class="notranslate">// Обе следующих инструкции обновляют текущую страницу
+window.history.go(0)
+window.history.go()</pre>
+
+<p>Узнать количество страниц, которые находятся в стеке истории, можно, получив значение свойства <code>length</code>:</p>
+
+<pre class="brush: js notranslate">var numberOfEntries = window.history.length;
+</pre>
+
+<h2 id="Интерфейсы">Интерфейсы</h2>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/History"><code>History</code></a></dt>
+ <dd>Позволяет манипулировать историей сессии браузера (то есть, страницами, посещёнными в той же закладке, что и текущая страница.</dd>
+</dl>
+
+<h2 id="Примеры">Примеры</h2>
+
+<p>В следующем примере свойству <code>onpopstate</code> назначается обработчик. А затем приводятся некоторые методы объекта истории для добавления, замени и перемещения по истории текущей вкладки браузера</p>
+
+<pre class="notranslate">window.onpopstate = function(event) {
+  alert(`location: ${document.location}, state: ${JSON.stringify(event.state)}`)
+}
+
+history.pushState({page: 1}, &quot;title 1&quot;, &quot;?page=1&quot;)
+history.pushState({page: 2}, &quot;title 2&quot;, &quot;?page=2&quot;)
+history.replaceState({page: 3}, &quot;title 3&quot;, &quot;?page=3&quot;)
+history.back() // alerts &quot;location: http://example.com/example.html?page=1, state: {&quot;page&quot;:1}&quot;
+history.back() // alerts &quot;location: http://example.com/example.html, state: null&quot;
+history.go(2)  // alerts &quot;location: http://example.com/example.html?page=3, state: {&quot;page&quot;:3}&quot;</pre>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарий</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/browsers.html#history" hreflang="en" lang="en">HTML Living Standard<br><small lang="ru">Определение &apos;History&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-Living">Живой стандарт</span></td>
+   <td>Нет изменений по сравнению с <a class="external" href="https://www.w3.org/TR/html52/" hreflang="en" lang="en" title="Спецификация &apos;HTML5&apos;">HTML5</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52/browsers.html#history" hreflang="en" lang="en">HTML5<br><small lang="ru">Определение &apos;History&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-REC">Рекомендация</span></td>
+   <td>Изначальное определение</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Поддержка_браузерами">Поддержка браузерами</h2>
+
+<div class="bc-data" id="bcd:api.History"></div>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<h3 id="Справочники">Справочники</h3>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/Window/history"><code>window.history</code></a></li>
+ <li><a href="/ru/docs/Web/API/Window/onpopstate"><code>window.onpopstate</code></a></li>
+</ul>
+
+<h3 id="Руководства">Руководства</h3>
+
+<ul>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/API/History_API/Working_with_the_History_API">Working with the History API</a></li>
+</ul>

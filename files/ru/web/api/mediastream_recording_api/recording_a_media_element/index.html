@@ -1,0 +1,272 @@
+---
+title: Запись медиа элемента
+slug: Web/API/MediaStream_Recording_API/Recording_a_media_element
+translation_of: Web/API/MediaStream_Recording_API/Recording_a_media_element
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/MediaStream_Recording_API">MediaStream Recording API</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Использование интерфейса записи медиапотока</a></li><li><a href="/ru/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element">Recording a media element</a> <a href="/ru/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a></li><li><a href="/ru/docs/Web/API/MediaRecorderErrorEvent"><code>MediaRecorderErrorEvent</code></a></li><li><a href="/ru/docs/Web/API/BlobEvent"><code>BlobEvent</code></a></li></ol></details></li></ol></section></div>
+
+<p>В статье Использование интерфейса MediaStream Recording API демонстрируется использование объекта типа <a href="/ru/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> для захвата потока, представляющего объект типа <a href="/ru/docs/Web/API/MediaStream"><code>MediaStream</code></a> , сгенерированного аппаратными средствами устройства и возвращаемого методом <a href="/ru/docs/Web/API/MediaDevices/getUserMedia"><code>navigator.mediaDevices.getUserMedia()</code></a>, но можно также использовать HTML медиа элемент (а именно <a href="/ru/docs/Web/HTML/Element/audio" title="HTML-элемент &lt;audio&gt; используется для встраивания звукового контента в документ. Он может содержать один или более источников аудио, представленных с помощью атрибута src или элемента &lt;source&gt; – браузер выберет один наиболее подходящий. Он так же может предназначаться для потокового мультимедиа, используя интерфейс MediaStream."><code>&lt;audio&gt;</code></a> или <a href="/ru/docs/Web/HTML/Element/video" title="Для встраивания видео контента в документ используйте элемент HTML &lt;video&gt;. Видео элемент может содержать один или несколько источников видео. Чтобы указать источник видео, необходимо использовать атрибут src или элемент &lt;source&gt;; браузер сам определит наиболее подходящий источник."><code>&lt;video&gt;</code></a>)  в качестве источника потока <code>MediaStream</code> для его записи. В этой статье рассматривается пример выполняющий это.</p>
+
+<div id="Example">
+<h2 id="HTML_содержимое">HTML содержимое</h2>
+
+<div class="hidden">
+<pre class="brush: html">&lt;p&gt;Click the &quot;Start&quot; button to begin video recording for a few seconds. You can stop
+   the video by clicking the creatively-named &quot;Stop&quot; button. The &quot;Download&quot;
+   button will download the received data (although it&apos;s in a raw, unwrapped form
+   that isn&apos;t very useful).
+&lt;/p&gt;
+&lt;br&gt;
+</pre>
+</div>
+
+<p>Рассмотрим ключевые моменты кода  HTML. Это только небольшой отрывок, относящийся к информационной части приложения.</p>
+
+<pre class="brush: html">&lt;div class=&quot;left&quot;&gt;
+  &lt;div id=&quot;startButton&quot; class=&quot;button&quot;&gt;
+    Start
+  &lt;/div&gt;
+  &lt;h2&gt;Preview&lt;/h2&gt;
+  &lt;video id=&quot;preview&quot; width=&quot;160&quot; height=&quot;120&quot; autoplay muted&gt;&lt;/video&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Основной интерфейс представляется в двух колонках. В левой находиться кнопка старта и элемент <a href="/ru/docs/Web/HTML/Element/video" title="Для встраивания видео контента в документ используйте элемент HTML &lt;video&gt;. Видео элемент может содержать один или несколько источников видео. Чтобы указать источник видео, необходимо использовать атрибут src или элемент &lt;source&gt;; браузер сам определит наиболее подходящий источник."><code>&lt;video&gt;</code></a> , который отображает предварительный просмотр видео. Это видео, воспроизводится камерой устройства. Заметте, что используется атрибут <code><a href="/ru/docs/Web/HTML/Element/video#attr-autoplay">autoplay</a></code>, что бы поток начал воспроизводиться немедленно, снимаясь прямо  с камеры. Атрибут <code><a href="/ru/docs/Web/HTML/Element/video#attr-muted">muted</a></code> гарантирует отключение звука с микрофона, для предотвращения цикличного эхо эффекта.</p>
+
+<pre class="brush: html">&lt;div class=&quot;right&quot;&gt;
+  &lt;div id=&quot;stopButton&quot; class=&quot;button&quot;&gt;
+    Stop
+  &lt;/div&gt;
+  &lt;h2&gt;Recording&lt;/h2&gt;
+  &lt;video id=&quot;recording&quot; width=&quot;160&quot; height=&quot;120&quot; controls&gt;&lt;/video&gt;
+  &lt;a id=&quot;downloadButton&quot; class=&quot;button&quot;&gt;
+    Download
+  &lt;/a&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Справа мы видим кнопку остановки и элемент <code>&lt;video&gt;,</code> который будет использоваться для воспроизведения записанного видео. Обратите внимание, что на панели воспроизведения не установлен режим автозапуска (поэтому воспроизведение не начинается сразу после поступления мультимедиа), а также установлен атрибут <code><a href="/ru/docs/Web/HTML/Element/video#attr-controls">controls</a></code>, что говорит о необходимости показывать пользовательские элементы управления для воспроизведения, паузы и т. д.</p>
+
+<p>Под элементом воспроизведения находится кнопка для загрузки записанного видео.</p>
+
+<div class="hidden">
+<pre class="brush: html">&lt;div class=&quot;bottom&quot;&gt;
+  &lt;pre id=&quot;log&quot;&gt;&lt;/pre&gt;
+&lt;/div&gt;</pre>
+<strong>CSS файл</strong>
+
+<pre class="brush: css">body {
+  font: 14px &quot;Open Sans&quot;, &quot;Arial&quot;, sans-serif;
+}
+
+video {
+  margin-top: 2px;
+  border: 1px solid black;
+}
+
+.button {
+  cursor: pointer;
+  display: block;
+  width: 160px;
+  border: 1px solid black;
+  font-size: 16px;
+  text-align: center;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  color: white;
+  background-color: darkgreen;
+  text-decoration: none;
+}
+
+h2 {
+  margin-bottom: 4px;
+}
+
+.left {
+  margin-right: 10px;
+  float: left;
+  width: 160px;
+  padding: 0px;
+}
+
+.right {
+  margin-left: 10px;
+  float: left;
+  width: 160px;
+  padding: 0px;
+}
+
+.bottom {
+  clear: both;
+  padding-top: 10px;
+}</pre>
+</div>
+
+<h2 id="JavaScript">JavaScript</h2>
+
+<p>Теперь давайте посмотрим на код JavaScript</p>
+
+<h3 id="Установка_глобальных_переменных">Установка глобальных переменных</h3>
+
+<p>Мы начнем с установления некоторых глобальных переменных, которые нам понадобятся.</p>
+
+<pre class="brush: js">let preview = document.getElementById(&quot;preview&quot;);
+let recording = document.getElementById(&quot;recording&quot;);
+let startButton = document.getElementById(&quot;startButton&quot;);
+let stopButton = document.getElementById(&quot;stopButton&quot;);
+let downloadButton = document.getElementById(&quot;downloadButton&quot;);
+let logElement = document.getElementById(&quot;log&quot;);
+
+let recordingTimeMS = 5000;
+</pre>
+
+<p>Большинство из них являются ссылками на элементы, с которыми нам нужно работать. Последняя, <code>recordingTimeMS</code>, установлена на 5000 миллисекунд (5 секунд);.</p>
+
+<h3 id="Используемые_функции">Используемые функции</h3>
+
+<p>Далее мы создадим несколько служебных функций, которые будут использованы позже.</p>
+
+<pre class="brush: js">function log(msg) {
+  logElement.innerHTML += msg + &quot;\n&quot;;
+}
+</pre>
+
+<p>Функция<code> log ()</code> используется для вывода текстовых строк в <a href="/ru/docs/Web/HTML/Element/div" title="Элемент разделения контента HTML (&lt;div&gt;) является универсальным контейнером для потокового контента. Он не влияет на контент или макет до тех пор, пока не будет стилизован с помощью CSS."><code>&lt;div&gt;</code></a>, чтобы мы могли делиться информацией с пользователем.</p>
+
+<pre class="brush: js">function wait(delayInMS) {
+  return new Promise(resolve =&gt; setTimeout(resolve, delayInMS));
+}
+</pre>
+
+<p>The <code>wait()</code> function returns a new <a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> which resolves once the specified number of milliseconds have elapsed. It works by using an <a href="/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow function</a> which calls <a href="/ru/docs/Web/API/Window/setTimeout"><code>window.setTimeout()</code></a>, specifying the promise&apos;s resolution handler as the timeout handler function. That lets us use promise syntax when using timeouts, which can be very handy when chaining promises, as we&apos;ll see later.</p>
+
+<h3 id="Starting_media_recording">Starting media recording</h3>
+
+<p>The <code>startRecording()</code> function handles starting the recording process:</p>
+
+<pre class="brush: js">function startRecording(stream, lengthInMS) {
+  let recorder = new MediaRecorder(stream);
+  let data = [];
+
+  recorder.ondataavailable = event =&gt; data.push(event.data);
+  recorder.start();
+  log(recorder.state + &quot; for &quot; + (lengthInMS/1000) + &quot; seconds...&quot;);
+
+  let stopped = new Promise((resolve, reject) =&gt; {
+    recorder.onstop = resolve;
+    recorder.onerror = event =&gt; reject(event.name);
+  });
+
+  let recorded = wait(lengthInMS).then(
+    () =&gt; recorder.state == &quot;recording&quot; &amp;&amp; recorder.stop()
+  );
+
+  return Promise.all([
+    stopped,
+    recorded
+  ])
+  .then(() =&gt; data);
+}
+</pre>
+
+<p><code>startRecording()</code> takes two input parameters: a <a href="/ru/docs/Web/API/MediaStream"><code>MediaStream</code></a> to record from and the length in milliseconds of the recording to make. We always record no more than the specified number of milliseconds of media, although if the media stops before that time is reached, <a href="/ru/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> automatically stops recording as well.</p>
+
+<dl>
+ <dt>Line 2</dt>
+ <dd>Creates the <code>MediaRecorder</code> that will handle recording the input <code>stream</code>.</dd>
+ <dt>Line 3</dt>
+ <dd>Creates an empty array, <code>data</code>, which will be used to hold the <a href="/ru/docs/Web/API/Blob"><code>Blob</code></a>s of media data provided to our <a href="/ru/docs/Web/API/MediaRecorder/ondataavailable"><code>ondataavailable</code></a> event handler.</dd>
+ <dt>Line 5</dt>
+ <dd>Sets up the handler for the <code><a href="/ru/docs/Web/Reference/Events/dataavailable" title="/ru/docs/Web/Reference/Events/dataavailable">dataavailable</a></code> event. The received event&apos;s <code>data</code> property is a <a href="/ru/docs/Web/API/Blob"><code>Blob</code></a> that contains the media data. The event handler simply pushes the <code>Blob</code> onto the <code>data</code> array.</dd>
+ <dt>Lines 6-7</dt>
+ <dd>Starts the recording process by calling <a href="/ru/docs/Web/API/MediaRecorder/start"><code>recorder.start()</code></a>, and outputs a message to the log with the updated state of the recorder and the number of seconds it will be recording.</dd>
+ <dt>Lines 9-12</dt>
+ <dd>Creates a new <a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>, named <code>stopped</code>, which is resolved when the <code>MediaRecorder</code>&apos;s <a href="/ru/docs/Web/API/MediaRecorder/onstop"><code>onstop</code></a> event handler is called, and is rejected if its <a href="/ru/docs/Web/API/MediaRecorder/onerror"><code>onerror</code></a> event handler is called. The rejection handler receives as input the name of the error that occurred.</dd>
+ <dt>Lines 14-16</dt>
+ <dd>Creates a new <code>Promise</code>, named <code>recorded</code>, which is resolved when the specified number of milliseconds have elapsed. Upon resolution, it stops the <code>MediaRecorder</code> if it&apos;s recording.</dd>
+ <dt>Lines 18-22</dt>
+ <dd>These lines create a new <code>Promise</code> which is fulfilled when both of the two <code>Promise</code>s (<code>stopped</code> and <code>recorded</code>) have resolved. Once that resolves, the array data is returned by <code>startRecording()</code> to its caller.</dd>
+</dl>
+
+<h3 id="Stopping_the_input_stream">Stopping the input stream</h3>
+
+<p>The <code>stop()</code> function simply stops the input media:</p>
+
+<pre class="brush: js">function stop(stream) {
+  stream.getTracks().forEach(track =&gt; track.stop());
+}
+</pre>
+
+<p>This works by calling <a href="/ru/docs/Web/API/MediaStream/getTracks"><code>MediaStream.getTracks()</code></a>, using <a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code>forEach()</code></a> to call <a href="/ru/docs/Web/API/MediaStreamTrack/stop"><code>MediaStreamTrack.stop()</code></a> on each track in the stream.</p>
+
+<h3 id="Getting_an_input_stream_and_setting_up_the_recorder">Getting an input stream and setting up the recorder</h3>
+
+<p>Now let&apos;s look at the most intricate piece of code in this example: our event handler for clicks on the start button:</p>
+
+<pre class="brush: js">startButton.addEventListener(&quot;click&quot;, function() {
+  navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+  }).then(stream =&gt; {
+    preview.srcObject = stream;
+    downloadButton.href = stream;
+    preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+    return new Promise(resolve =&gt; preview.onplaying = resolve);
+  }).then(() =&gt; startRecording(preview.captureStream(), recordingTimeMS))
+  .then (recordedChunks =&gt; {
+    let recordedBlob = new Blob(recordedChunks, { type: &quot;video/webm&quot; });
+    recording.src = URL.createObjectURL(recordedBlob);
+    downloadButton.href = recording.src;
+    downloadButton.download = &quot;RecordedVideo.webm&quot;;
+
+    log(&quot;Successfully recorded &quot; + recordedBlob.size + &quot; bytes of &quot; +
+        recordedBlob.type + &quot; media.&quot;);
+  })
+  .catch(log);
+}, false);</pre>
+
+<p>When a <code><a href="/ru/docs/Web/Reference/Events/click" title="/ru/docs/Web/Reference/Events/click">click</a></code> event occurs, here&apos;s what happens:</p>
+
+<dl>
+ <dt>Lines 2-4</dt>
+ <dd><a href="/ru/docs/Web/API/Navigator/mediaDevices/getUserMedia"><code>navigator.mediaDevices.getUserMedia()</code></a> is called to request a new <a href="/ru/docs/Web/API/MediaStream"><code>MediaStream</code></a> that has both video and audio tracks. This is the stream we&apos;ll record.</dd>
+ <dt>Lines 5-9</dt>
+ <dd>When the Promise returned by <code>getUserMedia()</code> is resolved, the preview <a href="/ru/docs/Web/HTML/Element/video" title="Для встраивания видео контента в документ используйте элемент HTML &lt;video&gt;. Видео элемент может содержать один или несколько источников видео. Чтобы указать источник видео, необходимо использовать атрибут src или элемент &lt;source&gt;; браузер сам определит наиболее подходящий источник."><code>&lt;video&gt;</code></a> element&apos;s <a href="/ru/docs/Web/API/HTMLMediaElement/srcObject"><code>srcObject</code></a> property is set to be the input stream, which causes the video being captured by the user&apos;s camera to be displayed in the preview box. Since the <code>&lt;video&gt;</code> element is muted, the audio won&apos;t play. The &quot;Download&quot; button&apos;s link is then set to refer to the stream as well. Then, in line 8, we arrange for <code>preview.captureStream()</code> to call <code>preview.mozCaptureStream()</code> so that our code will work on Firefox, on which the <a href="/ru/docs/Web/API/MediaRecorder/captureStream"><code>MediaRecorder.captureStream()</code></a> method is prefixed. Then a new <a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> which resolves when the preview video starts to play is created and returned.</dd>
+ <dt>Line 10</dt>
+ <dd>When the preview video begins to play, we know there&apos;s media to record, so we respond by calling the <code><a href="#Starting_media_recording">startRecording()</a></code> function we created earlier, passing in the preview video stream (as the source media to be recorded) and <code>recordingTimeMS</code> as the number of milliseconds of media to record. As mentioned before, <code>startRecording()</code> returns a <a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> whose resolution handler is called (receiving as input an array of <a href="/ru/docs/Web/API/Blob"><code>Blob</code></a> objects containing the chunks of recorded media data) once recording has completed.</dd>
+ <dt>Lines 11-15</dt>
+ <dd>The recording process&apos;s resolution handler receives as input an array of media data <code>Blob</code>s locally known as <code>recordedChunks</code>. The first thing we do is merge the chunks into a single <a href="/ru/docs/Web/API/Blob"><code>Blob</code></a> whose MIME type is <code>&quot;video/webm&quot;</code> by taking advantage of the fact that the <a href="/ru/docs/Web/API/Blob/Blob"><code>Blob()</code></a> constructor concatenates arrays of objects into one object. Then <a href="/ru/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a> is used to create an URL that references the blob; this is then made the value of the recorded video playback element&apos;s <code><a href="/ru/docs/Web/HTML/Element/video#attr-src">src</a></code> attribute (so that you can play the video from the blob) as well as the target of the download button&apos;s link.
+ <p>Then the download button&apos;s <code><a href="/ru/docs/Web/HTML/Element/a#attr-download">download</a></code> attribute is set. While the <code>download</code> attribute can be a Boolean, you can also set it to a string to use as the name for the downloaded file. So by setting the download link&apos;s <code>download</code> attribute to &quot;RecordedVideo.webm&quot;, we tell the browser that clicking the button should download a file named <code>&quot;RecordedVideo.webm&quot;</code> whose contents are the recorded video.</p>
+ </dd>
+ <dt>Lines 17-18</dt>
+ <dd>The size and type of the recorded media are output to the log area below the two videos and the download button.</dd>
+ <dt>Line 20</dt>
+ <dd>The <code>catch()</code> for all the <code>Promise</code>s outputs the error to the logging area by calling our <code>log()</code> function.</dd>
+</dl>
+
+<h3 id="Handling_the_stop_button">Handling the stop button</h3>
+
+<p>The last bit of code adds a handler for the <code><a href="/ru/docs/Web/Reference/Events/click" title="/ru/docs/Web/Reference/Events/click">click</a></code> event on the stop button using <a href="/ru/docs/Web/API/EventTarget/addEventListener"><code>addEventListener()</code></a>:</p>
+
+<pre class="brush: js">stopButton.addEventListener(&quot;click&quot;, function() {
+  stop(preview.srcObject);
+}, false);</pre>
+
+<p>This simply calls the <code><a href="#Stopping_the_input_stream">stop()</a></code> function we covered earlier.</p>
+</div>
+
+<h2 id="Result">Result</h2>
+
+<p>When put all together with the rest of the HTML and the CSS not shown above, it looks and works like this:</p>
+
+<p><iframe allow="camera;microphone" class="live-sample-frame sample-code-frame" frameborder="0" height="440" id="frame_Example" src="https://mdn.mozillademos.org/ru/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$samples/Example?revision=1612266" width="600"></iframe></p>
+
+<p>You can <a href="https://mdn.mozillademos.org/ru/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$samples/Example?revision=1612266">take a look at all the code</a>, including the parts hidden above because they aren&apos;t critical to the explanation of how the APIs are being used.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/MediaStream_Recording_API">MediaStream Recording API</a></li>
+ <li><a href="/en-US/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Using the MediaStream Recording API</a></li>
+ <li><a href="/en-US/docs/Web/API/Media_Streams_API">Media Capture and Streams API</a></li>
+</ul>

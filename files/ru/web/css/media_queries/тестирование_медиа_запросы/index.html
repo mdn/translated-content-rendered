@@ -1,0 +1,83 @@
+---
+title: Тестирование медиа-запросов программно
+slug: Web/CSS/Media_Queries/Тестирование_медиа_запросы
+tags:
+  - Запросы
+  - медиа-запросы
+translation_of: Web/CSS/Media_Queries/Testing_media_queries
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/Reference">CSS документация</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/Media_Queries">Media Queries</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/CSS/Media_Queries/%D0%A2%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%BC%D0%B5%D0%B4%D0%B8%D0%B0_%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D1%8B">Тестирование медиа-запросов программно</a></li><li><a href="/ru/docs/Web/CSS/Media_Queries/Using_Media_Queries_for_Accessibility">Using Media Queries for Accessibility</a> <a href="/ru/docs/Web/CSS/Media_Queries/Using_Media_Queries_for_Accessibility$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/Media_Queries/Using_media_queries">Использование медиа-запросов</a></li></ol></details></li><li class="toggle"><details open><summary>@-правила</summary><ol><li><a href="/ru/docs/Web/CSS/@import"><code>@import</code></a> <a href="/ru/docs/Web/CSS/@import$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/@media"><code>@media</code></a></li></ol></details></li></ol></section></div>
+
+<p> <a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/DOM">DOM</a> предоставляет возможности, позволяющие тестировать результат  <a href="/en-US/docs/Web/CSS/Media_Queries">медиа-запросов</a> программно, с помощью интерфейса <a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a>, его методов и свойств. Однажды, создав объект <a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> вы можете проверить результат запроса или получать уведомление, при изменении результата.</p>
+
+<h2 id="Создание_списка_медиа-запросов">Создание списка медиа-запросов</h2>
+
+<p>Прежде, чем вы сможете оценить результаты медиа-запросов, вам необходимо создать объект <a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> , отражающий запрос. Для этого используйется метод <a href="/ru/docs/Web/API/Window/matchMedia"><code>window.matchMedia</code></a>.</p>
+
+<p>Например, настройка списка запросов, который определяет, находится ли устройство в альбомной или книжной ориентации:</p>
+
+<pre class="brush: js notranslate">var mediaQueryList = window.matchMedia(&quot;(orientation: portrait)&quot;);
+</pre>
+
+<h2 id="Проверка_результата_запроса">Проверка результата запроса</h2>
+
+<p>После того, как вы создали свой список медиа-запросов, вы можете проверить результат запроса, посмотрев на значение его свойства <code>matches</code>:</p>
+
+<pre class="brush: js notranslate">if (mediaQueryList.matches) {
+  /* Окно просмотра в настоящее время находится в книжной ориентации */
+} else {
+  /* Окно просмотра в настоящее время находится в альбомной ориентации */
+}
+</pre>
+
+<h2 id="Получение_уведомлений_о_запросах">Получение уведомлений о запросах</h2>
+
+<p>Если вам необходимо постоянно следить за изменениями в результате запроса, эффективнее зарегистрировать <a href="/en-US/docs/Web/API/EventTarget/addEventListener">слушатель</a>, чем вытаскивать результат запросов.  Для этого вызовите метод <code>addListener()</code> объекта <a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> с функцией обратного вызова, которая вызывается при изменении статуса медиа-запроса (например, тест медиа-запроса переходит от <code>true</code> к <code>false</code>):</p>
+
+<pre class="brush: js notranslate">var mediaQueryList = window.matchMedia(&quot;(orientation: portrait)&quot;); // Создание списка запросов.
+function handleOrientationChange(mql) { ... } // Определение функции обратного вызова для слушателя событий.
+mediaQueryList.addListener(handleOrientationChange); // Добавление функции обратного вызова в качестве слушателя к списку запросов.
+
+handleOrientationChange(mediaQueryList); // Запуск обработчика изменений, один раз.
+</pre>
+
+<p>Этот код создает список медиа-запросов для тестирование ориентации, а затем добавляет к нему слушатель событий. После добавления слушателя, мы, также, непосредственно вызываем слушателя. Это заставляет нашего слушателя выполнять настройки, основываясь на текущей ориентации устройства; в противном случае, наш код может предполагать, что устройство находится в книжной ориентации при запуске, даже если оно фактически находится в альбомном положении.</p>
+
+<p>Функция <code>handleOrientationChange()</code> будет следить за результатом запроса и обрабатывать все, что нам нужно сделать при изменении ориентации:</p>
+
+<pre class="brush: js notranslate">function handleOrientationChange(evt) {
+  if (evt.matches) {
+    /* Окно просмотра в настоящее время находится в книжной ориентации */
+  } else {
+    /* Окно просмотра в настоящее время находится в альбомной ориентации */
+  }
+}
+</pre>
+
+<p>Выше, мы определяем параметры как <code>evt</code> — event объект. Это имеет значение, поскольку <a href="/en-US/docs/Web/API/MediaQueryList#Browser_compatibility">новые реализации <code>MediaQueryList</code></a> обрабатывают слушатели событий стандартным способом. Они больше не используют нестандартный механизм  <a href="/ru/docs/Web/API/MediaQueryListListener"><code>MediaQueryListListener</code></a> , а используют стандартную настройку слушателя событий, передавая <a href="/en-US/docs/Web/API/Event">объект event</a>  <a href="/ru/docs/Web/API/MediaQueryListEvent"><code>MediaQueryListEvent</code></a> как аргумент функции обратного вызова.</p>
+
+<p>Этот event объект также включает свойства <a href="/ru/docs/Web/API/MediaQueryListEvent/media"><code>media</code></a> и <a href="/ru/docs/Web/API/MediaQueryListEvent/matches"><code>matches</code></a>, поэтому вы можете запросить эти свойства <code>MediaQueryList</code> путем прямого доступа к нему или доступа к event объекту.</p>
+
+<h2 id="Уведомление_о_завершении_запроса">Уведомление о завершении запроса</h2>
+
+<p>Для прекращения уведомлений об изменении значения вашего медиа-запроса вызовите метод <code>removeListener()</code> для <a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a>, передав ему имя, ранее определенной функции:</p>
+
+<pre class="brush: js notranslate">mediaQueryList.removeListener(handleOrientationChange);
+</pre>
+
+<h2 id="Поддержка_браузеров">Поддержка браузеров</h2>
+
+<h3 id="MediaQueryList_interface"><code>MediaQueryList</code> interface</h3>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.MediaQueryList"></div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/CSS/Media_queries">Media queries</a></li>
+ <li><a href="/ru/docs/Web/API/Window/matchMedia"><code>window.matchMedia()</code></a></li>
+ <li><a href="/ru/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a></li>
+ <li><a href="/ru/docs/Web/API/MediaQueryListEvent"><code>MediaQueryListEvent</code></a></li>
+</ul>

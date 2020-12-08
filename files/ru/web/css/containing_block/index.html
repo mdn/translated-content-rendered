@@ -1,0 +1,293 @@
+---
+title: Разметка и содержащий блок
+slug: Web/CSS/Containing_block
+translation_of: Web/CSS/Containing_block
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/Reference">CSS документация</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/Containing_block">Containing block</a></strong></li></ol></section></div>
+
+<p class="summary" dir="ltr">На размер и позицию элемента часто влияет его <strong>содержащий блок</strong> (containing block). Чаще всего содержащим блоком является content область (<a href="/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model#content-area">content area</a>) ближайшего блочного (<a href="/en-US/docs/Web/HTML/Block-level_elements">block-level</a>) предка, но это не всегда так. <span class="seoSummary">В этой статье мы рассмотрим факторы, которые</span> определяют <span class="seoSummary">содержащий блок элемента.</span></p>
+
+<p class="summary" dir="ltr">Когда пользовательский агент (такой как ваш браузер) делает разметку документа, он создает бокс (box) для каждого элемента. Каждый бокс разделяется на следующие области:</p>
+
+<ol dir="ltr" start="1">
+ <li>Сontent область или область контента (content area).</li>
+ <li>Padding область или область внутреннего поля (padding area).</li>
+ <li>Border область или область границы (border area).</li>
+ <li>Margin область или область внешнего поля (margin area).</li>
+</ol>
+
+<p><img alt="Diagram of the box model" src="https://mdn.mozillademos.org/files/16558/box-model.png" style="height: 300px; width: 544px;"></p>
+
+<p dir="ltr">Многие разработчики верят, что содержащий блок элемента - это всегда content область его родителя, но это не всегда является правдой. Давайте исследуем факторы, которые определяют, что представляет собой содержащий элемент блок.</p>
+
+<h2 dir="ltr" id="Эффекты_содержащего_блока">Эффекты содержащего блока</h2>
+
+<p dir="ltr">Перед изучением того, что определяет содержащий блок элемента, будет полезно сначала узнать, почему этот блок так важен.</p>
+
+<p dir="ltr">На размер и положение элемента часто влияет его содержащий блок. </p>
+
+<p dir="ltr">Значения заданные в процентах для свойств <a href="/ru/docs/Web/CSS/width" title="Свойство CSS width устанавливает ширину элемента. По умолчанию она равняется ширине внутренней области, но если box-sizing имеет значение border-box, то она будет равняться ширине области рамки."><code>width</code></a>, <a href="/ru/docs/Web/CSS/height" title="CSS атрибут height позволят обозначать высоту элемента. По умолчанию, свойство определяет высоту внутренней области. Если box-sizing имеет значение border-box, то свойство будет определять высоту области рамки.
+
+ "><code>height</code></a>, <a href="/ru/docs/Web/CSS/padding" title="Свойство padding устанавливает внутренние отступы/поля со всех сторон элемента. Область отступов это пространство между содержанием элемента и его границей. Отрицательные значения не допускаются."><code>padding</code></a>, <a href="/ru/docs/Web/CSS/margin" title="Свойство margin CSS определяет внешний отступ на всех четырех сторонах элемента. Это сокращение, которое устанавливает все отдельные поля одновременно: margin-top, margin-right, margin-bottom и margin-left."><code>margin</code></a>, и свойства задающие смещение абсолютно позиционированного элемента (т.е., такого, у которого свойство <a href="/ru/docs/Web/CSS/position" title="Исходный код этого интерактивного примера хранится в GitHub репозитории. Если вы хотите внести свой вклад в проект интерактивных примеров, скопируйте https://github.com/mdn/interactive-examples и отправьте нам запрос на перенос."><code>position</code></a> имеет значение <code>absolute</code> или <code>fixed</code>) рассчитываются исходя из его содержащего блока.</p>
+
+<h2 dir="ltr" id="Определение_содержащего_блока">Определение содержащего блока</h2>
+
+<p dir="ltr">Определение содержащего блока элемента полностью зависит от значения свойства <a href="/ru/docs/Web/CSS/position" title="Исходный код этого интерактивного примера хранится в GitHub репозитории. Если вы хотите внести свой вклад в проект интерактивных примеров, скопируйте https://github.com/mdn/interactive-examples и отправьте нам запрос на перенос."><code>position</code></a>:</p>
+
+<ol dir="ltr" start="1">
+ <li>Если свойство <code>position</code> имеет значение  <code><strong>static</strong></code>,<strong> </strong><code><strong>relative</strong></code>, или <strong><code>sticky</code></strong>, то содержащий блок задается краем <em>content бокса</em> ближайшего предка, который:
+
+  <ul>
+   <li>либо является <strong>блочным контейнером</strong> (block container), например, если его свойство display имеет значение inline-block, block или list-item.</li>
+   <li>либо <strong>устанавливает контекст форматирования</strong> (formatting context), например, контейнер таблицы (table container), flex-контейнер (flex container), grid-контейнер (grid container) или блочный контейнер (block container).</li>
+  </ul>
+ </li>
+ <li>Если свойство <code>position</code><strong> </strong>имеет значение <code><strong>absolute</strong></code>, то содержащий блок задается краем <em>padding бокса</em> ближайшего предка, у которого свойство <code>position</code><strong> </strong>имеет значение отличное от <code>static</code> (<code>fixed</code>, <code>absolute</code>, <code>relative</code> или <code>sticky</code>).</li>
+ <li>Если свойство <code>position</code><strong> </strong>имеет значение <code><strong>fixed</strong></code>, то содержащий блок задается:
+  <ul>
+   <li>в случае непрерывного медиа (continuous media) областью просмотра (вьюпорт - <a class="glossaryLink" href="/ru/docs/Словарь/viewport" title="viewport: Viewport - это видимая пользователю область веб-страницы, то, что может увидеть пользователь, не прибегая к прокрутке.">viewport</a>);</li>
+   <li>в случае страничного медиа (paged media) областью страницы.</li>
+  </ul>
+ </li>
+ <li>Если свойство <code>position</code><strong> </strong>имеет значение <code><strong>absolute</strong></code> или <code><strong>fixed</strong></code>, то содержащий блок может также задаваться краем padding бокса ближайшего предка, у которого:
+  <ol start="1">
+   <li>Свойство <a href="/ru/docs/Web/CSS/transform" title="CSS-свойство transform позволяет вам поворачивать, маштабировать, наклонять или сдвигать элемент. Оно модифицирует координатное пространство для CSS визуальной форматируемой модели."><code>transform</code></a> или <a href="/ru/docs/Web/CSS/perspective" title="Свойство CSS perspective определяет расcтояние между плоскостью z = 0 и пользователем для того чтобы придать 3D-позиционируемому элементу эффект переспективы. Каждый трансформируемый элемент с z > 0 станет больше, с z &lt; 0 соответственно меньше."><code>perspective</code></a> имеет значение отличное от <code>none</code>.</li>
+   <li>Свойство <a href="/ru/docs/Web/CSS/will-change" title=", таким образом браузер может настроить соответсвующую оптимизацию до того как элемент действительно изменится. Такой тип оптимизации может повысить отзывчивость страницы, совершая, возможно дорогие операции до того как они действительно понадобятся. "><code>will-change</code></a> имеет значение <code>transform</code> или <code>perspective</code>.</li>
+   <li>Свойство <a href="/ru/docs/Web/CSS/filter" title="CSS свойство filter  позволяет Вам применять к элементу такие графические эффекты, как размытие и смещение цвета. Фильтры обычно используются для регулировки рендеринга изображений, фонов и рамок."><code>filter</code></a><strong> </strong> имеет значение отличное от <code>none</code> или <code>will-change</code> value of <code>filter</code> (работает только в Firefox).</li>
+   <li>Свойство <a href="/ru/docs/Web/CSS/contain" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>contain</code></a> имеет значение <code>paint</code> (например, <code>contain: paint;</code>).</li>
+  </ol>
+ </li>
+</ol>
+
+<div class="note">
+<p dir="ltr"><strong>Примечание: </strong>Содержащий блок в котором находится корневой элемент (<a href="/ru/docs/Web/HTML/Element/html" title="HTML-элемент &lt;html> представляет собой корень (элемент верхнего уровня) HTML-документа, поэтому его так же называют корневым элементом. Все другие элементы должны быть потомками этого элемента (должны находиться внутри него)."><code>&lt;html&gt;</code></a>) представляет собой прямоугольник, который называется <strong>начальный содержащий блок</strong>. Он имеет размеры области просмотра (вьюпорт - viewport) для непрерывного медиа (continuous media) или области страницы (page area) для страничного медиа (paged media).</p>
+</div>
+
+<h2 dir="ltr" id="Calculating_percentage_values_from_the_containing_block">Calculating percentage values from the containing block</h2>
+
+<p dir="ltr">As noted above, when certain properties are given a percentage value, the computed value depends on the element's containing block. The properties that work this way are <strong>box model properties</strong> and <strong>offset properties</strong>:</p>
+
+<ol dir="ltr" start="1">
+ <li>The <a href="/ru/docs/Web/CSS/height" title="CSS атрибут height позволят обозначать высоту элемента. По умолчанию, свойство определяет высоту внутренней области. Если box-sizing имеет значение border-box, то свойство будет определять высоту области рамки.
+
+ "><code>height</code></a>, <a href="/ru/docs/Web/CSS/top" title="CSS свойство top частично определяет вертикальную позицию позиционируемого элемента. Оно не влияет на непозиционируемые элементы (т.е. top не применится, если задано position: static)."><code>top</code></a>, and <a href="/ru/docs/Web/CSS/bottom" title="CSS свойство bottom частично определяет вертикальную позицию позиционируемого элемента. Оно не влияет на непозиционируемые элементы (т.е. bottom не применится, если задано position: static)."><code>bottom</code></a> properties compute percentage values from the <code>height</code><strong> </strong>of the containing block.</li>
+ <li>The <a href="/ru/docs/Web/CSS/width" title="Свойство CSS width устанавливает ширину элемента. По умолчанию она равняется ширине внутренней области, но если box-sizing имеет значение border-box, то она будет равняться ширине области рамки."><code>width</code></a>, <a href="/ru/docs/Web/CSS/left" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>left</code></a>, <a href="/ru/docs/Web/CSS/right" title="CSS свойство right частично определяет горизонтальное положение позиционируемого элемента. Оно не влияет на непозиционируемые элементы (т.е. right не применится, если задано position: static)."><code>right</code></a>, <a href="/ru/docs/Web/CSS/padding" title="Свойство padding устанавливает внутренние отступы/поля со всех сторон элемента. Область отступов это пространство между содержанием элемента и его границей. Отрицательные значения не допускаются."><code>padding</code></a>, and <a href="/ru/docs/Web/CSS/margin" title="Свойство margin CSS определяет внешний отступ на всех четырех сторонах элемента. Это сокращение, которое устанавливает все отдельные поля одновременно: margin-top, margin-right, margin-bottom и margin-left."><code>margin</code></a> properties compute percentage values from the <code>width</code><strong> </strong>of the containing block.</li>
+</ol>
+
+<h2 dir="ltr" id="Some_examples">Some examples</h2>
+
+<p dir="ltr">The HTML code for all our examples is:</p>
+
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+
+<p dir="ltr">Only the CSS is altered in each instance below.</p>
+
+<h3 id="Example_1">Example 1</h3>
+
+<p>In this example, the paragraph is statically positioned, so its containing block is <a href="/ru/docs/Web/HTML/Element/section" title="HTML-элемент &lt;section> представляет собой автономный раздел — который не может быть представлен более точным по семантике элементом — внутри HTML-документа."><code>&lt;section&gt;</code></a> because it's the nearest ancestor that is a block container.</p>
+
+<div class="hidden">
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css" dir="ltr">body {
+  background: beige;
+}
+
+section {
+  display: block;
+  width: 400px;
+  height: 160px;
+  background: lightgray;
+}
+
+p {
+  width: 50%;   /* == 400px * .5 = 200px */
+  height: 25%;  /* == 160px * .25 = 40px */
+  margin: 5%;   /* == 400px * .05 = 20px */
+  padding: 5%;  /* == 400px * .05 = 20px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_1" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/Containing_block$samples/Example_1?revision=1598740" width="100%"></iframe></p>
+
+<h3 id="Example_2">Example 2</h3>
+
+<p>In this example, the paragraph's containing block is the <a href="/ru/docs/Web/HTML/Element/body" title="HTML-элемент &lt;body> представляет собой контент (содержимое) документа HTML. В документе может быть только один элемент &lt;body>."><code>&lt;body&gt;</code></a><strong> </strong>element, because <code>&lt;section&gt;</code> is not a block container (because of <code>display: inline</code>) and doesn’t establish a formatting context.</p>
+
+<div class="hidden">
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css" dir="ltr">body {
+  background: beige;
+}
+
+section {
+  display: inline;
+  background: lightgray;
+}
+
+p {
+  width: 50%;     /* == half the body's width */
+  height: 200px;  /* Note: a percentage would be 0 */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_2" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/Containing_block$samples/Example_2?revision=1598740" width="100%"></iframe></p>
+
+<h3 id="Example_3">Example 3</h3>
+
+<p>In this example, the paragraph's containing block is <code>&lt;section&gt;</code> because the latter's <code>position</code> is <code>absolute</code>. The paragraph's percentage values are affected by the <code>padding</code> of its containing block, though if the containing block's <a href="/ru/docs/Web/CSS/box-sizing" title="Свойство  box-sizing используется для изменения блочной модели CSS применяемой по умолчанию, с помощью которой вычисляются ширина и высота элементов.  Это свойство можно использовать для  эмулирования работы браузеров, которые не корректно  следуют спецификации Блочной модели CSS."><code>box-sizing</code></a> value were <code>border-box</code> this would not be the case.</p>
+
+<div class="hidden">
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css" dir="ltr">body {
+  background: beige;
+}
+
+section {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 400px;
+  height: 160px;
+  padding: 30px 20px;
+  background: lightgray;
+}
+
+p {
+  position: absolute;
+  width: 50%;   /* == (400px + 20px + 20px) * .5 = 220px */
+  height: 25%;  /* == (160px + 30px + 30px) * .25 = 55px */
+  margin: 5%;   /* == (400px + 20px + 20px) * .05 = 22px */
+  padding: 5%;  /* == (400px + 20px + 20px) * .05 = 22px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_3" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/Containing_block$samples/Example_3?revision=1598740" width="100%"></iframe></p>
+
+<h3 id="Example_4">Example 4</h3>
+
+<p>In this example, the paragraph's <code>position</code> is <code>fixed</code>, so its containing block is the initial containing block (on screens, the viewport). Thus, the paragraph's dimensions change based on the size of the browser window.</p>
+
+<div class="hidden">
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css" dir="ltr">body {
+  background: beige;
+}
+
+section {
+  width: 400px;
+  height: 480px;
+  margin: 30px;
+  padding: 15px;
+  background: lightgray;
+}
+
+p {
+  position: fixed;
+  width: 50%;   /* == (50vw - (width of vertical scrollbar)) */
+  height: 50%;  /* == (50vh - (height of horizontal scrollbar)) */
+  margin: 5%;   /* == (5vw - (width of vertical scrollbar)) */
+  padding: 5%;  /* == (5vw - (width of vertical scrollbar)) */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_4" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/Containing_block$samples/Example_4?revision=1598740" width="100%"></iframe></p>
+
+<h3 id="Example_5">Example 5</h3>
+
+<p>In this example, the paragraph's <code>position</code> is <code>absolute</code>, so its containing block is <code>&lt;section&gt;</code>, which is the nearest ancestor with a <a href="/ru/docs/Web/CSS/transform" title="CSS-свойство transform позволяет вам поворачивать, маштабировать, наклонять или сдвигать элемент. Оно модифицирует координатное пространство для CSS визуальной форматируемой модели."><code>transform</code></a> property that isn't <code>none</code>.</p>
+
+<div class="hidden">
+<pre class="brush: html" dir="ltr">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css" dir="ltr">body {
+  background: beige;
+}
+
+section {
+  transform: rotate(0deg);
+  width: 400px;
+  height: 160px;
+  background: lightgray;
+}
+
+p {
+  position: absolute;
+  left: 80px;
+  top: 30px;
+  width: 50%;   /* == 200px */
+  height: 25%;  /* == 40px */
+  margin: 5%;   /* == 20px */
+  padding: 5%;  /* == 20px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_5" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/Containing_block$samples/Example_5?revision=1598740" width="100%"></iframe></p>
+
+<h2 id="Смотри_также">Смотри также</h2>
+
+<ul>
+ <li>Ключевые концепции CSS:
+ <a href="/ru/docs/Web/CSS/Синтаксис" title="Синтаксис">Синтаксис CSS</a>,
+ <a href="/ru/docs/Web/CSS/At-rule" title="@-правила">@-правила</a>,
+ <a href="/ru/docs/Web/CSS/Comments" title="Комментарии">комментарии</a>,
+ <a href="/ru/docs/Web/CSS/Specificity" title="Специфичность">специфичность</a> и
+ <a href="/ru/docs/Web/CSS/inheritance" title="Наследование">наследование</a>,
+ <a href="/ru/docs/Web/CSS/box_model" title="Блочная модель">блочная модель</a>,
+ <a href="/ru/docs/Web/CSS/Layout_mode" title="Режимы компоновки CSS">режимы компоновки</a> и
+ <a href="/ru/docs/Web/CSS/Visual_formatting_model" title="Модель визуального форматирования">модели визуального форматирования</a>,
+ <a href="/ru/docs/Web/CSS/margin_collapsing" title="Схлопывание отступов">схлопывание отступов</a>,
+ <a href="/ru/docs/Web/CSS/initial_value" title="Начальное значение">начальные</a>,
+ <a href="/ru/docs/Web/CSS/computed_value" title="Вычисленное значение">вычисленные</a>,
+ <a href="/ru/docs/Web/CSS/resolved_value" title="Решённое значение">решённые</a>,
+ <a href="/ru/docs/Web/CSS/specified_value" title="Указанное значение">указанные</a>,
+ <a href="/ru/docs/Web/CSS/used_value" title="Используемое значение">используемые</a> и
+ <a href="/ru/docs/Web/CSS/actual_value" title="Действительное значение">действительные</a> значения.
+ <a href="/ru/docs/Web/CSS/Value_definition_syntax" title="Синтаксис определения значений">Синтаксис определения значений</a>,
+ <a href="/ru/docs/Web/CSS/Shorthand_properties" title="Сокращённые свойства">сокращённые свойства</a> и
+ <a href="/ru/docs/Web/CSS/Замещаемый_элемент" title="Замещаемые элементы">замещаемые элементы</a>.</li>
+ <li>The <a href="/ru/docs/Web/CSS/all" title="Сокращенное свойство CSS all сбрасывает все свойства, кроме unicode-bidi и direction, до их начального или унаследованного значения."><code>all</code></a> property resets all CSS declarations to a given known state</li>
+</ul>

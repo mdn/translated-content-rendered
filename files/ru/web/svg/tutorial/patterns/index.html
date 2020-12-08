@@ -1,0 +1,80 @@
+---
+title: Шаблоны
+slug: Web/SVG/Tutorial/Patterns
+translation_of: Web/SVG/Tutorial/Patterns
+---
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/ru/docs/Web/SVG/Tutorial/Gradients" style="float: left;" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/Texts" class="button">Следующая статья  »</a></p>
+</div>
+
+<h2 id="Шаблоны_Patterns">Шаблоны (Patterns)</h2>
+
+<p>Patterns, по моему мнению, одни из самых запутанных типов заполнения (<strong>fill </strong>types) в SVG. Несмотря на это ,они являются очень мощным инструментом, так что о них определенно стоит поговорить и понять хотя бы основные части. Как и градиенты, элементы <a href="/ru/docs/Web/SVG/Element/pattern" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;pattern&gt;</code></a> должны быть помещены в секцию <code>&lt;defs&gt; в Вашем SVG-файле.</code></p>
+
+<pre class="brush: html">&lt;svg width=&quot;200&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;white&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;blue&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;red&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;orange&quot;/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;pattern id=&quot;Pattern&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+      &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+
+  &lt;rect fill=&quot;url(#Pattern)&quot; stroke=&quot;black&quot; width=&quot;200&quot; height=&quot;200&quot;/&gt;
+&lt;/svg&gt;</pre>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="/files/725/SVG_Pattern_Example.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="220" id="frame_Patterns" src="https://mdn.mozillademos.org/ru/docs/Web/SVG/Tutorial/Patterns$samples/Patterns?revision=1589587" width="220"></iframe></td></tr></tbody></table>
+
+<p>Внутри элемента &lt;pattern&gt; вы можете использовать любые другие основные фигуры, которые использовались ранее.  И каждая из них может быть стилизована, используя любые из возможных вариантов стилизаций, которые Вы изучали до этого, включая градиенты и прозрачность. Выше мы просто нарисовали два прямоугольника внутри нашего шаблона (которые перекрываются, и один из которых в два раза больше другого и используется для заполнения всего шаблона), и один круг.</p>
+
+<p>Сбивающая с толку вещь - это определение единиц измерения и размера. В примере выше мы определили ширину и высоту соответствующими аттрибутами внутри паттерна, что бы указать как далеко паттерн будет &quot;продолжаться&quot;, прежде чем начать повторяться. Также доступны <strong>x</strong> и <strong>y</strong> атрибуты для смещения стартовой точки этого прямоугольника в том месте где вы его отрисовываете. Причина по которой они тут использованы, описана ниже.</p>
+
+<p>Как и с <strong><code>gradientUnits</code></strong> атрибутом, использованном ранее, у паттерна также есть атрибут <strong><code>patternUnits</code> </strong>. Он определяет единицы измерения, которые принимают атрибуты. По дефолту используется значене &quot;<strong>objectBoundingBox</strong>&quot;, (как и в предыдущем разделе). Так что значения от 0 до 1 будут масштабированы в зависимости от размеров объекта, к которому вы применяете паттерн. Поскольку в данном случае мы хотим, чтобы шаблон повторялся 4 раза по горизонтали и вертикали, ширину и высоту мы установили в значение 0.25. Что означает 0.25 от размера целевого объекта</p>
+
+<p>В отличие от градиентов, у паттернов есть 2ой атрибут - <code><strong>patternContentUnits</strong>, </code>который описывает единицы измерения, используемые в базовых фигурах внутри элемента <strong>pattern</strong>. Дефолтное значение для этого атрибута -  <strong>userSpaceOnUse</strong>, противоположность атрибуту <code><strong>patternUnits</strong>. </code>Это означает, что если Вы не укажете один или оба этих атрибута (<strong><code>patternContentUnits</code> </strong>и/или <strong><code>patternUnits</code></strong>), фигуры, которые Вы будете рисовать внутри блока &lt;<strong>pattern&gt;</strong>, будут отрисованы в другой системе координат (отличной от той, которую использует паттерн). Это может немного запутывать, если Вы пишете код вручную.</p>
+
+<p>Чтобы сделать эту работу в приведенном выше примере, нам пришлось рассмотреть размер нашей коробки (200 пикселей) и тот факт, что мы хотели, чтобы рисунок повторялся 4 раза по горизонтали и по вертикали. Это означает, что каждый блок шаблонов был квадратом 50 × 50. Затем два прямоугольника и круг внутри рисунка были рассчитаны на размер в коробке 50x50.<br>
+ Все, что мы нарисовали вне этой коробки, не было бы показано. Шаблон также должен был быть смещен на 10 пикселей, чтобы он начинался в верхнем левом углу нашего окна, поэтому атрибуты <strong>x</strong> и <strong>y</strong> шаблона должны были быть скорректированы до 10/200 = 0,05.</p>
+
+
+
+<p>Здесь предостережение заключается в том, что если объект изменяет размер, сам шаблон будет масштабироваться, чтобы соответствовать ему, но объекты внутри не будут. Таким образом, хотя у нас все еще будет 4 повторяющихся блока внутри шаблона, объекты, составляющие этот шаблон, будут оставаться одного и того же размера, и вы окажетесь в больших областях между ними.<br>
+ Изменяя атрибут <strong><code>patternContentUnits</code></strong> , мы можем поместить все элементы в одну единую систему:</p>
+
+<pre class="brush: xml"> &lt;pattern id=&quot;Pattern&quot; width=&quot;.25&quot; height=&quot;.25&quot; patternContentUnits=&quot;objectBoundingBox&quot;&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot; fill=&quot;skyblue&quot;/&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.125&quot; height=&quot;.125&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+   &lt;circle cx=&quot;.125&quot; cy=&quot;.125&quot; r=&quot;.1&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+ &lt;/pattern&gt;
+</pre>
+
+<p>Теперь, поскольку содержимое шаблона находится в той же единичной системе, что и шаблон, нам не нужно смещать поле так, чтобы шаблон начинался в правильном месте, и если размер объекта был изменен на более крупный, шаблон автоматически масштабируется так, чтобы в нем было одинаковое количество объектов, повторяющихся внутри него. Это контрастирует с системой <strong>userSpaceOnUse</strong>, где, если объект изменяет размер, шаблон останется прежним и просто повторится больше раз, чтобы заполнить поле.</p>
+
+<p>Как ни удивительно, но в кругах Gecko, похоже, есть проблемы с рисованием, если их радиус установлен на что-то меньшее 0.075 (хотя их нужно масштабировать, чтобы иметь гораздо больший радиус, чем этот. Это может быть ошибкой только в шаблоне , Или вообще не ошибка, я не уверен).<br>
+ Чтобы обойти это, вероятно, лучше всего избегать рисования блоков «objectBoundingBox», если вам это не нужно.</p>
+
+<p>Ни одно из этих применений не является тем, о чем обычно думают, когда вы думаете о шаблоне. Шаблоны обычно имеют заданный размер и повторяются независимо от формы объекта. Чтобы создать что-то подобное - шаблон и его содержимое должны быть нарисованы в текущем userSpace, чтобы они не меняли форму, если объект:</p>
+
+<pre class="brush: xml"> &lt;pattern id=&quot;Pattern&quot; x=&quot;10&quot; y=&quot;10&quot; width=&quot;50&quot; height=&quot;50&quot; patternUnits=&quot;userSpaceOnUse&quot;&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+   &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+ &lt;/pattern&gt;
+</pre>
+
+<p>Конечно, это означает, что шаблон не будет масштабироваться, если вы позже измените размер своего объекта. Все три из приведенных выше примеров показаны ниже на прямоугольнике, который слегка удлинен до высоты 300 пикселей, но я должен отметить его не исчерпывающее изображение, и есть другие варианты, доступные в зависимости от вашего приложения.</p>
+
+<p><img alt="Image:SVG_Pattern_Comparison_of_Units.png" class="internal" src="/@api/deki/files/349/=SVG_Pattern_Comparison_of_Units.png"></p>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/ru/docs/Web/SVG/Tutorial/Gradients" style="float: left;" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/Texts" class="button">Следующая статья  »</a></p>
+</div>

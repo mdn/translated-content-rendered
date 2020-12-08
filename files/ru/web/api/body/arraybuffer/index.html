@@ -1,0 +1,90 @@
+---
+title: Body.arrayBuffer()
+slug: Web/API/Body/arrayBuffer
+tags:
+  - АПИ
+  - Экспериментальный
+  - справочник
+translation_of: Web/API/Body/arrayBuffer
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/body"><code>body</code></a> <a href="/ru/docs/Web/API/Body/body$translate" style="opacity: 0.5;">[Перевести]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a> <a href="/ru/docs/Web/API/Body/bodyUsed$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Методы</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><em><code>arrayBuffer()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/blob"><code>blob()</code></a> <a href="/ru/docs/Web/API/Body/blob$translate" style="opacity: 0.5;">[Перевести]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Body/text"><code>text()</code></a> <a href="/ru/docs/Web/API/Body/text$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Выполняется:</summary><ol><li><a href="/ru/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/ru/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section></div>
+
+<p>Метод <strong><code>arrayBuffer()</code></strong> из примеси(mixin) <a href="/ru/docs/Web/API/Body"><code>Body</code></a> берет поток(stream) <a href="/ru/docs/Web/API/Response"><code>Response</code></a> и читает его до завершения. Он возвращает промисс, который будет успешно завершен с помощью <a href="/ru/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a>.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="brush: js notranslate">response.arrayBuffer().then(function(buffer) {
+  // можно сделать что либо с буфером
+});</pre>
+
+<h3 id="Параметры">Параметры</h3>
+
+<p>Нат параметров.</p>
+
+<h3 id="Возвращаемое_значение">Возвращаемое значение</h3>
+
+<p>Промисс, который содержит <a href="/ru/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a>.</p>
+
+<h2 id="Пример">Пример</h2>
+
+<p>В нашем примере <a href="http://mdn.github.io/fetch-examples/fetch-array-buffer/">живой загрузки с array buffer</a> есть кнопка Play. При нажатии на кнопку вызывается функция <code>getData()</code>. Стоит учесть что до проигрывания аудио файл будет скачан целиком. Если вам необходимо начать воспроизведение файла ogg во время загрузки (стримить аудио) - то лучше рассмотреть  <a href="/ru/docs/Web/API/HTMLAudioElement"><code>HTMLAudioElement</code></a>:</p>
+
+<pre class="brush: js notranslate">new Audio(music.ogg).play()
+</pre>
+
+<p>В функции <code>getData()</code> мы создаем новый запрос используя конструктор <a href="/ru/docs/Web/API/Request/Request"><code>Request.Request</code></a>, после этого используем его чтобы загрузить OGG звук. Мы также используем <a href="/ru/docs/Web/API/AudioContext/createBufferSource"><code>AudioContext.createBufferSource</code></a> чтобы создать ресурс аудиобуффера. При успешном завершении запроса, мы считываем <a href="/ru/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a> из ответа испозуя <code>arrayBuffer()</code>, декодируем аудио с помощью <a href="/ru/docs/Web/API/AudioContext/decodeAudioData"><code>AudioContext.decodeAudioData</code></a>, устанавливаем раскодированные данные как ресурс аудио буфера (<code>source.buffer</code>), затем используем данные этого ресурса в  <a href="/ru/docs/Web/API/AudioContext/destination"><code>AudioContext.destination</code></a>.</p>
+
+<p>Когда функция <code>getData()</code> заканчивает свое выполнение, мы стартуем проигрывание аудио ресурса функцией <code>start(0)</code>, потом блокируем кнопку проигрывания для предотвращения повторного проигрывания (это может привести к ошибкам)</p>
+
+<pre class="brush: js notranslate">function getData() {
+  source = audioCtx.createBufferSource();
+
+  var myRequest = new Request(&apos;viper.ogg&apos;);
+
+  fetch(myRequest).then(function(response) {
+    return response.arrayBuffer();
+  }).then(function(buffer) {
+    audioCtx.decodeAudioData(buffer, function(decodedData) {
+      source.buffer = decodedData;
+      source.connect(audioCtx.destination);
+    });
+  });
+};
+
+// навешиваем обработчики старт и стоп на кнопку
+play.onclick = function() {
+  getData();
+  source.start(0);
+  play.setAttribute(&apos;disabled&apos;, &apos;disabled&apos;);
+}</pre>
+
+<h2 id="Спецификация">Спецификация</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарии</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-arraybuffer" hreflang="en" lang="en">Fetch<br><small lang="ru">Определение &apos;arrayBuffer()&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-Living">Живой стандарт</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Поддержка_браузерами">Поддержка браузерами</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Body.arrayBuffer"></div>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/en-US/docs/Web/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/en-US/docs/Web/HTTP">HTTP</a></li>
+</ul>

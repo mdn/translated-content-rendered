@@ -1,0 +1,170 @@
+---
+title: Использование Geolocation API
+slug: Web/API/Geolocation/Using_geolocation/Using_the_Geolocation_API
+tags:
+  - Geolocation API
+  - Guide
+  - Tutorial
+translation_of: Web/API/Geolocation_API/Using_the_Geolocation_API
+---
+<div><div class="secureContexts notecard"><p><strong>Secure context</strong><br>This feature is available only in <a href="/ru/docs/Web/Security/Secure_Contexts">secure contexts</a> (HTTPS), in some or all <a href="#Browser_compatibility">supporting browsers</a>.</p></div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Geolocation_API">Geolocation API</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/API/Geolocation_API/Using_the_Geolocation_API">Using the Geolocation API</a> <a href="/ru/docs/Web/API/Geolocation_API/Using_the_Geolocation_API$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/Geolocation"><code>Geolocation</code></a></li><li><a href="/ru/docs/Web/API/GeolocationCoordinates"><code>GeolocationCoordinates</code></a></li><li><a href="/ru/docs/Web/API/GeolocationPosition"><code>GeolocationPosition</code></a></li><li><a href="/ru/docs/Web/API/GeolocationPositionError"><code>GeolocationPositionError</code></a></li></ol></details></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><a href="/ru/docs/Web/API/Navigator/geolocation"><code>Navigator.geolocation</code></a></li></ol></details></li></ol></section></div>
+
+<p>Geolocation API позволяет пользователю предоставлять свое местоположение web-приложению, если пользователь согласится предоставить его. Из соображений конфиденциальности, у пользователя будет запрошено разрешение на предоставление информации о местоположении.</p>
+
+<h2 id="Объект_геолокации">Объект геолокации</h2>
+
+<p><a href="ru/docs/Web/API/Geolocation">API геолокации</a> доступен через объект <a href="/ru/docs/Web/API/Navigator/geolocation" title="Свойство Navigator.geolocation только для чтения, возвращающие объект Geolocation, который дает веб контенту доступ к месторасположению устройства. Это позволяет веб-сайту или приложению предложить индивидуальный результат основанный на месторасположении пользователя."><code>navigator.geolocation</code></a>.</p>
+
+<p>Если объект существует, функции определения местоположения доступны. Вы можете проверить это слеюущим образом:</p>
+
+<pre class="brush: js">if (&quot;geolocation&quot; in navigator) {
+  /* местоположение доступно */
+} else {
+  /* местоположение НЕ доступно */
+}
+</pre>
+
+<h3 id="Получение_текущего_местоположения">Получение текущего местоположения</h3>
+
+<p>Чтобы получить текущее местоположение пользователя, вы должны вызвать метод <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a>. Это инициирует асихронный запрос для обнаружения местоположения пользователя, и запрашивает аппаратные средства позиционирования, чтобы получить последнюю актуальную информацию. Когда местоположение определено, выполняется callback. По желанию вы можете указать вторую callback функцию для обработки ошибки, которая запустится в случае ошибки. Третий, опциональный параметр - объект с опциями, где вы можете настроить максимальное значение возвращаемых данных, время ожидания ответа на запрос, и, при желании, точность возвращаемых данных.</p>
+
+<div class="note">
+<p><strong>Note:</strong> По умолчанию <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a> пытается вернуть результат так быстро, как это возможно, за счёт чего даёт не очень точный результат. Это может быть полезно, если вам нужно быстро получить ответ, при этом не важна точность. Устройства с GPS, например, могут пытаться скорректировать данные GPS около минуты и даже больше, поэтому в самом начале могут вернуться менее точные данные (местоположение IP или wifi-сети), полученные <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a>.</p>
+</div>
+
+<pre class="brush: js">navigator.geolocation.getCurrentPosition(function(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+});</pre>
+
+<p>Функция <code>do_something()</code>, в примере выше, будет вызвана лишь тогда, когда данные о местоположении будут получены.</p>
+
+<h3 id="Наблюдение_за_текущим_местоположением">Наблюдение за текущим местоположением</h3>
+
+<p>Если данные о местоположении меняются (либо устройство находится в движении, либо пришли более точные данные о геопозиции), вы можете указать callback функцию, которая будет вызывается при любом обновлении данных о местоположении. Это делается с использованием функции <a href="/ru/docs/Web/API/Geolocation/watchPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>watchPosition()</code></a>, которая имеет несколько входных параметров: <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a>. Эта функция вызывается много раз, позволяя браузеру обновлять данные о текущей локации либо во время движения, либо после получения более точной информации о местоположении (после применения более точных приемов). Функция, которая вызывается при ошибке, для <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a>, при желании, может быть вызвана неоднократно.</p>
+
+<div class="note">
+<p><strong>Примечание:</strong> Вы можете использовать <a href="/ru/docs/Web/API/Geolocation/watchPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>watchPosition()</code></a> без вызова <a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a>.</p>
+</div>
+
+<pre class="brush: js">var watchID = navigator.geolocation.watchPosition(function(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+});</pre>
+
+<p>Метод <a href="/ru/docs/Web/API/Geolocation/watchPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>watchPosition()</code></a> возвращает числовой ID, который может быть использован для идентификации наблюдателя за местоположением; используйте его вместе с методом <a href="/ru/docs/Web/API/Geolocation/clearWatch" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>clearWatch()</code></a>, чтобы перестать получать новые данные о местоположении.</p>
+
+<pre class="brush: js">navigator.geolocation.clearWatch(watchID);
+</pre>
+
+<h3 id="Точная_настройка_отклика"><span class="short_text" id="result_box" lang="ru"><span>Точная</span> <span>настройка</span> <span>отклика</span></span></h3>
+
+<p><a href="/ru/docs/Web/API/Geolocation/getCurrentPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>getCurrentPosition()</code></a> и <a href="/ru/docs/Web/API/Geolocation/watchPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>watchPosition()</code></a> принимают callback-функцию при успехе, необязательную callback-функцию при ошибке и необязательный объект <code><a href="/ru/docs/Web/API/PositionOptions">PositionOptions</a></code>.</p>
+
+<p>Этот объект позволяет вам включить возможность определения позиции с высокой точностью, указать максимальное время кэширования значения позиции (при повторных запросах, пока время не вышло, вам будет возвращается кэшированное значение; после браузер будет запрашивать актуальные данные), а также указать значение, устанавливающее интервал — как часто браузер должен пытаться получить данные о местоположении, прежде чем выйдет время.</p>
+
+<p>Вызов <a href="/ru/docs/Web/API/Geolocation/watchPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>watchPosition</code></a> может выглядит следующим образом:</p>
+
+<pre class="brush: js">function geo_success(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+}
+
+function geo_error() {
+  alert(&quot;Извините, нет доступной позиции.&quot;);
+}
+
+var geo_options = {
+  enableHighAccuracy: true,
+  maximumAge        : 30000,
+  timeout           : 27000
+};
+
+var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);</pre>
+
+<h2 id="Описание_позиции">Описание позиции</h2>
+
+<p>Местоположение пользователя содержится в экземпляре объекта <a href="/ru/docs/Web/API/GeolocationPosition" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>GeolocationPosition</code></a>, содержащего внутри экземпляр другого объекта — <a href="/ru/docs/Web/API/GeolocationCoordinates" title="Интерфейс Coordinates отображает позицию устройства и его высоту над уровнем моря с рассчётным уровнем точности."><code>GeolocationCoordinates</code></a>.</p>
+
+<p>Экземпляр <code>GeolocationPosition</code> содержит только две вещи, свойство <code>coords</code>, внутри которого <code>GeolocationCoordinates</code> и свойство timestamp, внутри которого экземпляр <a href="/ru/docs/Web/API/DOMTimeStamp" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>DOMTimeStamp</code></a>, предоставляющее метку времени, созданную при получении данные.</p>
+
+<p>Экземпляр <code>GeolocationCoordinates</code> содержит некоторое количество свойств, двое из которых вы будете чаще всего использовать: <code>latitude</code> и <code>longitude</code>, которые помогут вам отобразить полученную позицию на карте. Поэтому многие callback-функции с успешным получением позиции выглядят очень просто:</p>
+
+<pre class="brush: js">function success(position) {
+  const latitude  = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  // Дальше код, который что-то делает с широтой(latitude) и долготой(longitude)
+}</pre>
+
+<p>Однако, вы также можете получить и другую информацию из объекта <code>GeolocationCoordinates</code>, такую как высота над уровнем моря, скорость, направление устройства и точные данные о высоте, долготе и широте.</p>
+
+<h2 id="Обработка_ошибок">Обработка ошибок</h2>
+
+<p>Callback-функция для ошибок, если она была передана в <code>getCurrentPosition()</code> или <code>watchPosition()</code>, ожидает экземпляр объекта <code><a href="/en-US/docs/Web/API/GeolocationPositionError">GeolocationPositionError</a></code> в качестве первого аргумента. Он будет содержать два свойства, <code>code</code>, который укажет на то, какая именно ошибка произошла и понятное для человека <code>message</code>, описывающее значение поля code.</p>
+
+<p>Функция может выглядеть примерно так:</p>
+
+<pre class="brush: js">function errorCallback(error) {
+  alert(&apos;ERROR(&apos; + error.code + &apos;): &apos; + error.message);
+};
+</pre>
+
+<h2 id="Примеры">Примеры</h2>
+
+<p>Следующий пример использует Geolocation API для того, чтобы получить широту и долготу пользователя. При успешном выполнении, ссылка будет вести на <code>openstreetmap.org</code>, который отобразит пользовательскую позицию на карте.</p>
+
+<div class="hidden">
+<pre class="brush: css">body {
+  padding: 20px;
+  background-color:#ffffc9
+}
+
+button {
+  margin: .5rem 0;
+}
+</pre>
+</div>
+
+<h3 id="HTML">HTML</h3>
+
+<pre class="brush: html;">&lt;button id = &quot;find-me&quot;&gt;Show my location&lt;/button&gt;&lt;br/&gt;
+&lt;p id = &quot;status&quot;&gt;&lt;/p&gt;
+&lt;a id = &quot;map-link&quot; target=&quot;_blank&quot;&gt;&lt;/a&gt;
+</pre>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<pre class="brush: js">function geoFindMe() {
+
+  const status = document.querySelector(&apos;#status&apos;);
+  const mapLink = document.querySelector(&apos;#map-link&apos;);
+
+  mapLink.href = &apos;&apos;;
+  mapLink.textContent = &apos;&apos;;
+
+  function success(position) {
+    const latitude  = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    status.textContent = &apos;&apos;;
+    mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+    mapLink.textContent = `Широта: ${latitude} °, Долгота: ${longitude} °`;
+  }
+
+  function error() {
+    status.textContent = &apos;Невозможно получить ваше местоположение&apos;;
+  }
+
+  if (!navigator.geolocation) {
+    status.textContent = &apos;Geolocation не поддерживается вашим браузером&apos;;
+  } else {
+    status.textContent = &apos;Определение местоположения…&apos;;
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+
+}
+
+document.querySelector(&apos;#find-me&apos;).addEventListener(&apos;click&apos;, geoFindMe);
+</pre>
+
+<h3 id="Демо">Демо</h3>
+
+<p><iframe allow="geolocation" class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_Examples" src="https://mdn.mozillademos.org/ru/docs/Web/API/Geolocation/Using_geolocation/Using_the_Geolocation_API$samples/Examples?revision=1607420" width="350"></iframe></p>

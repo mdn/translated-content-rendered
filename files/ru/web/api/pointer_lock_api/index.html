@@ -1,0 +1,336 @@
+---
+title: Pointer Lock API
+slug: Web/API/Pointer_Lock_API
+translation_of: Web/API/Pointer_Lock_API
+---
+<p><span class="seoSummary"><strong>Pointer lock</strong> <strong>API</strong>(прежнее название Mouse Lock API) </span><span style="line-height: 1.5;">обеспечивает методы ввода, основанные на движении мыши , а не только абсолютно позиционированых координатах курсора </span><span style="line-height: 1.5;">в окне. Это дает вам доступ к необработанным движениям мыши, прикрепляет курсор мыши к любому элементу </span><span style="line-height: 1.5;">в окне браузера</span><span style="line-height: 1.5;">, предоставляет возможность вычислять координаты мыши не ограниченной областью окна проекции, и скрывает курсор из поля зрения. Это идеальное решение для 3D игр, например.</span></p>
+
+<p>Более того, API полезно для любых приложений, которые используют данные мыши для управления движениями, вращения обьектов и изменения записей. Например пользователь может управлять наклоном просто двигая мышь, не нажимая ни на какие кнопки. Сами кнопки освобождаются под другие задачи. Примерами могут послужить  программы для просмотра карт или спутниковой съемки.</p>
+
+<p>Блокировка указателя позволяет вам получить доступ к данным мыши, даже если курсор ушел за границы экрана или браузера. Например, ваши пользователи могут продолжать вращать или управлять 3D моделью движением мыши бесконечно. Без блокировки вращение или управление останавливается, как только курсор достигает края браузера или экрана. Геймеры теперь могут нажимать кнопки и водить курсором взад и вперед, не боясь покинуть игровое поле и случайно переключится на другое приложение.</p>
+
+<h2 id="basics" name="basics">Основные концепции</h2>
+
+<p>Pointer lock is related to <a href="/en/DOM/element.setCapture" title="element.setCapture">mouse capture</a>. Mouse capture provides continued delivery of events to a target element while a mouse is being dragged, but it stops when the mouse button is released. Pointer lock is different from mouse capture in the following ways:</p>
+
+<ul>
+ <li>It is persistent: Pointer lock does not release the mouse until an explicit API call is made or the user uses a specific release gesture.</li>
+ <li>It is not limited by browser or screen boundaries.</li>
+ <li>It continues to send events regardless of mouse button state.</li>
+ <li>It hides the cursor.</li>
+</ul>
+
+<h2 id="method_overview" name="method_overview">Обзор методов/свойств</h2>
+
+<p>Этот раздел содержит краткое описание каждого свойства и метода, связанного со спецификацией блокировки указателя.</p>
+
+<h3 id="requestPointerLock()">requestPointerLock()</h3>
+
+<p>The Pointer lock API, similar to the <a href="/en-US/docs/Web/Guide/API/DOM/Using_full_screen_mode">Fullscreen API</a>, extends DOM elements by adding a new method, <a href="/ru/docs/Web/API/Element/requestPointerLock" title="Метод Element.requestPointerLock() позволяет асинхронно запросить блокировку курсора для заданного элемента."><code>requestPointerLock</code></a>, which is vendor-prefixed for now. You would currently declare it something like this, for example if you wanted to request pointer lock on a <code>canvas</code> element.:</p>
+
+<pre class="brush: js">canvas.requestPointerLock = canvas.requestPointerLock ||
+                            canvas.mozRequestPointerLock ||
+                            canvas.webkitRequestPointerLock;
+
+canvas.requestPointerLock()
+</pre>
+
+<h3 id="pointerLockElement_and_exitPointerLock()">pointerLockElement and exitPointerLock()</h3>
+
+<p>The Pointer lock API also extends the <a href="/ru/docs/Web/API/Document" title="Каждая веб-страница, которая загружается в браузер, имеет свой собственный объект document. Интерфейс документа служит точкой входа для получения содержимого веб-страницы (всего DOM - дерева, включая такие элементы как &lt;body&gt; и &lt;table&gt;), а также обеспечивает функциональность, которая является глобальной для документа, например, для получения URL-адреса страницы или создания новых элементов в документе)."><code>Document</code></a> interface, adding both a new property and a new method. The new property is used for accessing the currently locked element (if any), and is named <a href="/ru/docs/Web/API/Document/pointerLockElement" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>pointerLockElement</code></a>, which is vendor-prefixed for now. The new method on <a href="/ru/docs/Web/API/Document" title="Каждая веб-страница, которая загружается в браузер, имеет свой собственный объект document. Интерфейс документа служит точкой входа для получения содержимого веб-страницы (всего DOM - дерева, включая такие элементы как &lt;body&gt; и &lt;table&gt;), а также обеспечивает функциональность, которая является глобальной для документа, например, для получения URL-адреса страницы или создания новых элементов в документе)."><code>Document</code></a> is <a href="/ru/docs/Web/API/Document/exitPointerLock" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>exitPointerLock</code></a> and, as the name implies, it is used to exit Pointer lock.</p>
+
+<p>The <a href="/ru/docs/Web/API/Document/pointerLockElement" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>pointerLockElement</code></a> property is useful for determining if any element is currently pointer locked (e.g., for doing a boolean check) and also for obtaining a reference to the locked element, if any.</p>
+
+<p>Here is an example of using <code>pointerLockElement</code>:</p>
+
+<pre class="brush: js"><span class="idlInterface" id="idl-def-MouseLockable"><span class="idlInterface" id="idl-def-MouseLockable">if(document.pointerLockElement === canvas ||
+  document.mozPointerLockElement === canvas ||
+  document.webkitPointerLockElement === canvas) {
+    console.log(&apos;The pointer lock status is now locked&apos;);
+} else {
+    console.log(&apos;The pointer lock status is now unlocked&apos;);
+}</span></span></pre>
+
+<p>The <a href="/ru/docs/Web/API/Document/exitPointerLock" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Document.exitPointerLock</code></a> method is used to exit pointer lock, and like <a href="/ru/docs/Web/API/Element/requestPointerLock" title="Метод Element.requestPointerLock() позволяет асинхронно запросить блокировку курсора для заданного элемента."><code>requestPointerLock</code></a>, works asynchronously using the <code><a href="/ru/docs/Web/Reference/Events/pointerlockchange" title="/ru/docs/Web/Reference/Events/pointerlockchange">pointerlockchange</a></code> and <code><a href="/ru/docs/Web/Reference/Events/pointerlockerror" title="/ru/docs/Web/Reference/Events/pointerlockerror">pointerlockerror</a></code> events, which you&apos;ll see more about below.</p>
+
+<pre class="brush: js">document.exitPointerLock = document.exitPointerLock    ||
+                           document.mozExitPointerLock ||
+                           document.webkitExitPointerLock;
+
+// Attempt to unlock
+document.exitPointerLock();
+</pre>
+
+<h2 id="mouselocklostevent" name="mouselocklostevent">pointerlockchange event</h2>
+
+<p>When the Pointer lock state changes—for example, when calling <a href="/ru/docs/Web/API/Element/requestPointerLock" title="Метод Element.requestPointerLock() позволяет асинхронно запросить блокировку курсора для заданного элемента."><code>requestPointerLock</code></a>, <a href="/ru/docs/Web/API/Document/exitPointerLock" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>exitPointerLock</code></a>, the user pressing the ESC key, etc.—the <code><a href="/ru/docs/Web/Reference/Events/pointerlockchange" title="/ru/docs/Web/Reference/Events/pointerlockchange">pointerlockchange</a></code> event is dispatched to the <code>document</code>. This is a simple event and contains no extra data.</p>
+
+<pre class="brush: js">if (&quot;onpointerlockchange&quot; in document) {
+  document.addEventListener(&apos;pointerlockchange&apos;, lockChangeAlert, false);
+} else if (&quot;onmozpointerlockchange&quot; in document) {
+  document.addEventListener(&apos;mozpointerlockchange&apos;, lockChangeAlert, false);
+} else if (&quot;onwebkitpointerlockchange&quot; in document) {
+  document.addEventListener(&apos;webkitpointerlockchange&apos;, lockChangeAlert, false);
+}
+
+function lockChangeAlert() {
+  if(document.pointerLockElement === canvas ||
+  document.mozPointerLockElement === canvas ||
+  document.webkitPointerLockElement === canvas) {
+    console.log(&apos;The pointer lock status is now locked&apos;);
+    // Do something useful in response
+  } else {
+    console.log(&apos;The pointer lock status is now unlocked&apos;);
+    // Do something useful in response
+  }
+}</pre>
+
+<h2 id="mouselocklostevent" name="mouselocklostevent">pointerlockerror event</h2>
+
+<p>When there is an error caused by calling <a href="/ru/docs/Web/API/Element/requestPointerLock" title="Метод Element.requestPointerLock() позволяет асинхронно запросить блокировку курсора для заданного элемента."><code>requestPointerLock</code></a> or <a href="/ru/docs/Web/API/Document/exitPointerLock" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>exitPointerLock</code></a>, the <code><a href="/ru/docs/Web/Reference/Events/pointerlockerror" title="/ru/docs/Web/Reference/Events/pointerlockerror">pointerlockerror</a></code> event is dispatched to the <code>document</code>. This is a simple event and contains no extra data.</p>
+
+<pre class="brush: js">document.addEventListener(&apos;pointerlockerror&apos;, lockError, false);
+document.addEventListener(&apos;mozpointerlock<span style="font-size: 1rem;">error</span><span style="font-size: 1rem;">&apos;, lockError, false);</span>
+document.addEventListener(&apos;webkitpointerlock<span style="font-size: 1rem;">error</span><span style="font-size: 1rem;">&apos;, lockError, false);</span>
+
+function lockError(e) {
+  alert(&quot;Pointer lock failed&quot;);
+}</pre>
+
+<div class="note"><strong>Note</strong>: The above events are currently prefixed with <code>moz</code> in Firefox and <code>webkit</code> in Chrome. </div>
+
+<h2 id="extensions" name="extensions">Extensions to mouse events</h2>
+
+<p>The Pointer lock API extends the normal <a href="/ru/docs/Web/API/MouseEvent" title="Интерфейс MouseEvent представляет собой событие, которое происходит в результате взаимодествия пользователя с  манипулятором ( например, мышью). Наиболее частые из таких событий: click, dblclick, mouseup, mousedown."><code>MouseEvent</code></a> interface with movement attributes.</p>
+
+<pre class="idl"><span class="idlInterface" id="idl-def-MouseEvent">partial interface <span class="idlInterfaceID">MouseEvent</span> {
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span> <span class="idlAttrName"><a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html#widl-MouseEvent-movementX">movementX</a></span>;</span>
+<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span> <span class="idlAttrName"><a href="http://dvcs.w3.org/hg/webevents/raw-file/default/mouse-lock.html#widl-MouseEvent-movementY">movementY</a></span>;</span>
+};</span></pre>
+
+<div class="note">The movement attributes are currently prefixed as <code>.mozMovementX</code> and <code>.mozMovementY</code> in Firefox, and<code>.webkitMovementX</code> and <code>.webkitMovementY</code> in Chrome.</div>
+
+<p>Two new parameters to mouse events—<a href="/ru/docs/Web/API/MouseEvent/movementX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/movementY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementY</code></a>—provide the change in mouse positions. The values of the parameters are the same as the difference between the values of <a href="/ru/docs/Web/API/MouseEvent" title="Интерфейс MouseEvent представляет собой событие, которое происходит в результате взаимодествия пользователя с  манипулятором ( например, мышью). Наиболее частые из таких событий: click, dblclick, mouseup, mousedown."><code>MouseEvent</code></a> properties, <a href="/ru/docs/Web/API/MouseEvent/screenX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>screenX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/screenY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>screenY</code></a>, which are stored in two subsequent <code><a href="/ru/docs/Web/Reference/Events/mousemove" title="/ru/docs/Web/Reference/Events/mousemove">mousemove</a></code> events, <code>eNow</code> and <code>ePrevious</code>. In other words, the Pointer lock parameter <code>movementX = eNow.screenX - ePrevious.screenX</code>.</p>
+
+<h3 id="locked_state" name="locked_state">Locked state</h3>
+
+<p>When Pointer lock is enabled, the standard <a href="/ru/docs/Web/API/MouseEvent" title="Интерфейс MouseEvent представляет собой событие, которое происходит в результате взаимодествия пользователя с  манипулятором ( например, мышью). Наиболее частые из таких событий: click, dblclick, mouseup, mousedown."><code>MouseEvent</code></a> properties <a href="/ru/docs/Web/API/MouseEvent/clientX" title="MouseEvent.clientX свойство доступное только для чтения. Это свойство является горизонтальной координатой в пределах клиентской области приложения, на которой произошло событие (в отличие от координат внутри страницы). Для примера, нажатие в верхнем левом углу клиентской области будет всегда приводить к событию со значением свойства clientX равным 0, независимо от того, прокручена страницы по горизонтали или нет."><code>clientX</code></a>, <a href="/ru/docs/Web/API/MouseEvent/clientY" title="MouseEvent.clientY свойство доступное только для чтения. Это свойство является вертикальной координатой в пределах клиентской области приложения, на которой произошло событие (в отличие от координат внутри страницы). Для примера, нажатие в верхнем левом углу клиентской области будет всегда приводить к событию со значением свойства clientY равным 0, независимо от того, прокручена страницы по вертикали или нет."><code>clientY</code></a>, <a href="/ru/docs/Web/API/MouseEvent/screenX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>screenX</code></a>, and <a href="/ru/docs/Web/API/MouseEvent/screenY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>screenY</code></a> are held constant, as if the mouse is not moving. The <a href="/ru/docs/Web/API/MouseEvent/movementX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/movementY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementY</code></a> properties continue to provide the mouse&apos;s change in position. There is no limit to <a href="/ru/docs/Web/API/MouseEvent/movementX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/movementY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementY</code></a> values if the mouse is continuously moving in a single direction. The concept of the mouse cursor does not exist and the cursor cannot move off the window or be clamped by a screen edge.</p>
+
+<h3 id="unlocked_state" name="unlocked_state">Unlocked state</h3>
+
+<p>The parameters <a href="/ru/docs/Web/API/MouseEvent/movementX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/movementY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementY</code></a> are valid regardless of the mouse lock state, and are available even when unlocked for convenience.</p>
+
+<p>When the mouse is unlocked, the system cursor can exit and re-enter the browser window. If that happens, <a href="/ru/docs/Web/API/MouseEvent/movementX" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementX</code></a> and <a href="/ru/docs/Web/API/MouseEvent/movementY" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>movementY</code></a> could be set to zero.</p>
+
+<h2 id="example" name="example">Simple example walkthrough</h2>
+
+<p>We&apos;ve written a <a href="http://mdn.github.io/pointer-lock-demo/">simple pointer lock demo</a> to show you how to use it to set up a simple control system (<a href="https://github.com/mdn/pointer-lock-demo">see source code</a>). The demo looks like this:</p>
+
+<p><img src="https://mdn.mozillademos.org/files/7953/pointer-lock.png" alt="A red circle on top of a black background." style="display: block; height: 362px; margin: 0px auto; width: 640px;"></p>
+
+<p>This demo uses JavaScript to draw a ball on top of an <a href="/ru/docs/Web/HTML/Element/canvas" title="HTML &lt;canvas&gt; Элемент может быть использован для отрисовки графики через скрипты (обычно используется JavaScript). На пример, его можно использовать для отрисовки графиков, делать композиции фото или даже выполнять анимации. Вы можете (и должны) дать альтернативное содержание внури блока &lt;canvas&gt;. Этот контент будет рендерится в обоих браузерах, в старых которые не поддерживают canvas и в браузерах с отключённым JavaScript."><code>&lt;canvas&gt;</code></a> element. When you click the canvas, pointer lock is then used to remove the mouse pointer and allow you to move the ball directly using the mouse. Let&apos;s see how this works.</p>
+
+<p>Set initial x and y positions on the canvas:</p>
+
+<pre class="brush: js">var x = 50;
+var y = 50;</pre>
+
+<p>The <code>canvasDraw()</code> function draws the ball in the current x and y positions, but it also includes <code>if()</code> statements to check whether the ball has gone off the edges of the canvas. If so, it makes the ball wrap around to the opposite edge.</p>
+
+<pre class="brush: js">function canvasDraw() {
+  if(x &gt; canvas.clientWidth+20) {
+    x = 0;
+  }
+
+  if(y &gt; canvas.clientHeight+20) {
+    y = 0;
+  }
+
+  if(x &lt; -20) {
+    x = canvas.clientWidth;
+  }
+
+  if(y &lt; -20) {
+    y = canvas.clientHeight;
+  }
+
+  ctx.fillStyle = &quot;black&quot;;
+  ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+  ctx.fillStyle = &quot;#f00&quot;;
+
+  ctx.beginPath();
+  ctx.arc(x,y,20,0,degToRad(360), true);
+  ctx.fill();
+}</pre>
+
+<p>The pointer lock methods are currently prefixed, so next we&apos;ll fork them for the different browser implementations.</p>
+
+<pre class="brush: js">canvas.requestPointerLock = canvas.requestPointerLock ||
+           canvas.mozRequestPointerLock ||
+           canvas.webkitRequestPointerLock;
+// pointer lock object forking for cross browser
+
+document.exitPointerLock = document.exitPointerLock ||
+         document.mozExitPointerLock ||
+         document.webkitExitPointerLock;
+//document.exitPointerLock();</pre>
+
+<p>Now we set up an event listener to run the requestPointerLock() method on the canvas when it is clicked, which initiates pointer lock.</p>
+
+<pre class="brush: js">canvas.onclick = function() {
+  canvas.requestPointerLock();
+}</pre>
+
+<p>Now for the dedicated pointer lock event listener: <code>pointerlockchange</code>. When this occurs, we run a function called <code>lockChangeAlert()</code> to handle the change.</p>
+
+<pre class="brush: js">// pointer lock event listener
+
+// Hook pointer lock state change events for different browsers
+document.addEventListener(&apos;pointerlockchange&apos;, lockChangeAlert, false);
+document.addEventListener(&apos;mozpointerlockchange&apos;, lockChangeAlert, false);
+document.addEventListener(&apos;webkitpointerlockchange&apos;, lockChangeAlert, false);</pre>
+
+<p>This function checks the pointLockElement property to see if it is our canvas. If so, it attached an event listener to handle the mouse movements with the <code>canvasLoop()</code> function. If not, it removes the event listener again.</p>
+
+<pre class="brush: js">function lockChangeAlert() {
+  if(document.pointerLockElement === canvas ||
+  document.mozPointerLockElement === canvas ||
+  document.webkitPointerLockElement === canvas) {
+    console.log(&apos;The pointer lock status is now locked&apos;);
+    document.addEventListener(&quot;mousemove&quot;, canvasLoop, false);
+  } else {
+    console.log(&apos;The pointer lock status is now unlocked&apos;);
+    document.removeEventListener(&quot;mousemove&quot;, canvasLoop, false);
+  }
+}</pre>
+
+<p>A tracker is set up to write out the X and Y values to the screen, for reference.</p>
+
+<pre class="brush: js">  var tracker = document.createElement(&apos;p&apos;);
+  var body = document.querySelector(&apos;body&apos;);
+  body.appendChild(tracker);
+  tracker.style.position = &apos;absolute&apos;;
+  tracker.style.top = &apos;0&apos;;
+  tracker.style.right = &apos;10px&apos;;
+  tracker.style.backgroundColor = &apos;white&apos;;</pre>
+
+<p>The <code>canvasLoop()</code> function first forks the <code>movementX</code> and <code>movementY</code> properties, as they are also prefixed currently in some browsers. It then adds those property&apos;s values to x and y, and reruns <code>canvasDraw()</code> with those new values so the ball position is updated. Finally, we use <code>requestAnimationFrame()</code> to run the loop again and again.</p>
+
+<pre>function canvasLoop(e) {
+  var movementX = e.movementX ||
+      e.mozMovementX          ||
+      e.webkitMovementX       ||
+      0;
+
+  var movementY = e.movementY ||
+      e.mozMovementY      ||
+      e.webkitMovementY   ||
+      0;
+
+  x += movementX;
+  y += movementY;
+
+  canvasDraw();
+
+  var animation = requestAnimationFrame(canvasLoop);
+
+  tracker.innerHTML = &quot;X position: &quot; + x + &apos;, Y position: &apos; + y;
+}</pre>
+
+<h2 id="iframe_limitations">iframe limitations</h2>
+
+<p>Pointer lock can only lock one iframe at a time. If you lock one iframe, you cannot try to lock another iframe and transfer the target to it; Pointer lock will error out. To avoid this limitation, first unlock the locked iframe, and then lock the other.</p>
+
+<p>While iframes work by default, &quot;sandboxed&quot; iframes block Pointer lock. The ability to avoid this limitation, in the form of the attribute/value combination <code>&lt;iframe sandbox=&quot;allow-pointer-lock&quot;&gt;</code>, is expected to appear in Chrome soon.</p>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a lang="en" title="Спецификация &apos;Pointer Lock&apos;" href="https://w3c.github.io/pointerlock/" class="external" hreflang="en">Pointer Lock</a></td>
+   <td><span class="spec-CR">Кандидат в рекомендации</span></td>
+   <td>Initial specification.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">Browser compatibility</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>
+    <p>Yes <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/ru/docs/Web/Guide/Prefixes" title="Эта возможность с префиксом с версии &apos;webkit&apos; этого браузера, считается экспериментальной">webkit</a></span></p>
+   </td>
+   <td>
+    <p>Yes <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/ru/docs/Web/Guide/Prefixes" title="Эта возможность с префиксом с версии &apos;gecko&apos; этого браузера, считается экспериментальной">gecko</a></span></p>
+   </td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="See_also" name="See_also">See also</h2>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/MouseEvent" title="Интерфейс MouseEvent представляет собой событие, которое происходит в результате взаимодествия пользователя с  манипулятором ( например, мышью). Наиболее частые из таких событий: click, dblclick, mouseup, mousedown."><code>MouseEvent</code></a></li>
+</ul>

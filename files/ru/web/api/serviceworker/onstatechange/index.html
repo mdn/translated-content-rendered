@@ -1,0 +1,73 @@
+---
+title: ServiceWorker.onstatechange
+slug: Web/API/ServiceWorker/onstatechange
+translation_of: Web/API/ServiceWorker/onstatechange
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Service_Worker_API">Service Worker API</a></strong></li><li><strong><a href="/ru/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></strong></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><a href="/ru/docs/Web/API/AbstractWorker/onerror"><code>onerror</code></a> <a href="/ru/docs/Web/API/AbstractWorker/onerror$translate" style="opacity: 0.5;">[Перевести]</a></li><li><em><code>onstatechange</code></em></li><li><a href="/ru/docs/Web/API/ServiceWorker/scriptURL"><code>scriptURL</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorker/state"><code>state</code></a></li></ol></details></li><li class="toggle"><details open><summary>Наследование:</summary><ol><li><a href="/ru/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Похожие страницы для Service Workers API</summary><ol><li><a href="/ru/docs/Web/API/Cache"><code>Cache</code></a></li><li><a href="/ru/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li><li><a href="/ru/docs/Web/API/Client"><code>Client</code></a></li><li><a href="/ru/docs/Web/API/Clients"><code>Clients</code></a></li><li><a href="/ru/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li><li><a href="/ru/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li><li><a href="/ru/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li><li><a href="/ru/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li><li><a href="/ru/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li><li><a href="/ru/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li><li><a href="/ru/docs/Web/API/SyncManager"><code>SyncManager</code></a></li><li><a href="/ru/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li><li><a href="/ru/docs/Web/API/WindowClient"><code>WindowClient</code></a></li></ol></details></li></ol></section></div>
+
+<p>Обработчик события, вызываемый при срабатывании события <code>statechange</code>; по сути, срабатывает при изменении <a href="/ru/docs/Web/API/ServiceWorker/state"><code>ServiceWorker.state</code></a>.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="syntaxbox notranslate">ServiceWorker.onstatechange = function(statechangeevent) { ... }
+ServiceWorker.addEventListener(&apos;statechange&apos;, function(statechangeevent) { ... } )</pre>
+
+<h2 id="Примеры">Примеры</h2>
+
+<p>Данный фрагмент кода из <a href="https://github.com/GoogleChrome/samples/blob/gh-pages/service-worker/registration-events/index.html">примера событий service worker</a> (<a href="https://googlechrome.github.io/samples/service-worker/registration-events/">демо</a>) возвращает состояние при каждом его изменении.</p>
+
+<pre class="brush: js notranslate">var serviceWorker;
+if (registration.installing) {
+  serviceWorker = registration.installing;
+  document.querySelector(&apos;#kind&apos;).textContent = &apos;installing&apos;;
+} else if (registration.waiting) {
+  serviceWorker = registration.waiting;
+  document.querySelector(&apos;#kind&apos;).textContent = &apos;waiting&apos;;
+} else if (registration.active) {
+  serviceWorker = registration.active;
+  document.querySelector(&apos;#kind&apos;).textContent = &apos;active&apos;;
+}
+
+if (serviceWorker) {
+  logState(serviceWorker.state);
+  serviceWorker.addEventListener(&apos;statechange&apos;, function(e) {
+  logState(e.target.state);
+  });
+}</pre>
+
+<p>Обратите внимание, что при срабатывании <code>statechange</code>, ссылки на service worker могли измениться. Например:</p>
+
+<pre class="brush: js notranslate">navigator.serviceWorker.register(..).then(function(swr) {
+  swr.installing.state == &quot;installing&quot;
+  swr.installing.onstatechange = function() {
+    swr.installing == null;
+    // At this point, swr.waiting OR swr.active might be true. This is because the statechange
+    // event gets queued, meanwhile the underlying worker may have gone into the waiting
+    // state and will be immediately activated if possible.
+  }
+})</pre>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарии</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#dom-serviceworker-onstatechange" hreflang="en" lang="en">Service Workers<br><small lang="ru">Определение &apos;ServiceWorker.onstatechange&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-WD">Рабочий черновик</span></td>
+   <td>Изначальное определение</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость">Совместимость</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.ServiceWorker.onstatechange"></div>
+</div>

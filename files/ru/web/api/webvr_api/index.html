@@ -1,0 +1,259 @@
+---
+title: WebVR API
+slug: Web/API/WebVR_API
+translation_of: Web/API/WebVR_API
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><span title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span> <strong>Это экспериментальная технология</strong><br>Так как спецификация этой технологии ещё не стабилизировалась, смотрите <a href="#Browser_compatibility">таблицу совместимости</a> по поводу использования в различных браузерах. Также заметьте, что синтаксис и поведение экспериментальной технологии может измениться в будущих версиях браузеров, вслед за изменениями спецификации.</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/WebVR_API">WebVR API</a></strong></li><li><strong><a href="/ru/docs/Web/API/WebVR_API"><code>WebVR_API</code></a></strong></li><li class="toggle"><details open><summary>События</summary><ol><li><a href="/ru/docs/Web/Events/vrdisplayconnected"><code>vrdisplayconnected</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplaydisconnected"><code>vrdisplaydisconnected</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplayactivate"><code>vrdisplayactivate</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplaydeactivate"><code>vrdisplaydeactivate</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplayblur"><code>vrdisplayblur</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplayfocus"><code>vrdisplayfocus</code></a></li><li><a href="/ru/docs/Web/Events/vrdisplaypresentchange"><code>vrdisplaypresentchange</code></a></li></ol></details></li><li class="toggle"><details open><summary>Похожие страницы для WebVR API</summary><ol><li><a href="/ru/docs/Web/API/Gamepad/displayId"><code>Gamepad.displayId</code></a></li><li><a href="/ru/docs/Web/API/Navigator/getVRDisplays"><code>Navigator.getVRDisplays()</code></a></li><li><a href="/ru/docs/Web/API/VRDisplay"><code>VRDisplay</code></a></li><li><a href="/ru/docs/Web/API/VRDisplayCapabilities"><code>VRDisplayCapabilities</code></a></li><li><a href="/ru/docs/Web/API/VRDisplayEvent"><code>VRDisplayEvent</code></a></li><li><a href="/ru/docs/Web/API/VREyeParameters"><code>VREyeParameters</code></a></li><li><a href="/ru/docs/Web/API/VRFieldOfView"><code>VRFieldOfView</code></a></li><li><a href="/ru/docs/Web/API/VRFrameData"><code>VRFrameData</code></a></li><li><a href="/ru/docs/Web/API/VRLayerInit"><code>VRLayerInit</code></a></li><li><a href="/ru/docs/Web/API/VRPose"><code>VRPose</code></a></li><li><a href="/ru/docs/Web/API/VRStageParameters"><code>VRStageParameters</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">WebVR обеспечивает поддержку для использования устройств виртуальной реальности — например, шлемы виртуальной реальности, таких как Oculus Rift или HTC Vive — для веб-приложений, позволяя разработчикам передавать  информацию о местоположении и движения с дисплея в движение вокруг 3D-сцены. Это имеет множество интересных приложений, от виртуальных туров продукта и интерактивных обучающих приложений до захватывающих игр от первого лица.</p>
+
+<h2 id="Концепция_и_использование">Концепция и использование</h2>
+
+<p>Любые VR-устройства, подключенные к вашему компьютеру, будут возвращены методом <a href="/ru/docs/Web/API/Navigator/getVRDisplays" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Navigator.getVRDisplays()</code></a>; каждое из которых будет представлено  <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> объектом.</p>
+
+<p><img src="https://mdn.mozillademos.org/files/11035/hw-setup.png" alt="Sketch of a person in a chair with wearing goggles labelled &quot;Head mounted display (HMD)&quot; facing a monitor with a webcam labelled &quot;Position sensor&quot;" style="display: block; height: 78px; margin: 0px auto; width: 60%;"></p>
+
+<p><a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> является центральным интерфейсом в API WebVR - с помощью его свойств и методов вы получить доступ к функциям:</p>
+
+<ul>
+ <li>Получить полезную информацию, чтобы мы могли идентифицировать дисплей, какие возможности он имеет, контроллеры, связанные с ним и многое другое.</li>
+ <li>Получить <a href="/ru/docs/Web/API/VRFrameData" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>frame data</code></a> для каждого кадра контента, который вы хотите представить на дисплее, и отправьте эти кадры для отображения с постоянной скоростью.</li>
+ <li>Начать и прекратить подачу на дисплей.</li>
+</ul>
+
+<p>Типичное (простое) WebVR приложение будет работать так:</p>
+
+<ol>
+ <li><a href="/ru/docs/Web/API/Navigator/getVRDisplays" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Navigator.getVRDisplays()</code></a> используется для получения ссылки на ваш VR-дисплей.</li>
+ <li><a href="/ru/docs/Web/API/VRDisplay/requestPresent" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.requestPresent()</code></a> используется для начала представления на дисплей VR.</li>
+ <li>Выделенный <a href="/ru/docs/Web/API/VRDisplay/requestAnimationFrame" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.requestAnimationFrame()</code></a>  WebVR&apos;s используется для запуска цикла рендеринга приложения с правильной частотой обновления для отображения.</li>
+ <li>Внутри цикла рендеринга берутся данные, необходимые для отоброжения текущего кадра  (<a href="/ru/docs/Web/API/VRDisplay/getFrameData" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.getFrameData()</code></a>), дважды нарисуйте отображаемую сцену - один раз для просмотра в каждом глазу, затем отправьте отображаемый вид на дисплей, чтобы показать пользовотелю (<a href="/ru/docs/Web/API/VRDisplay/submitFrame" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.submitFrame()</code></a>).</li>
+</ol>
+
+<p>Кроме того, WebVR 1.1 добавляет ряд событий <a href="/ru/docs/Web/API/Window" title="Объект window представляет собой окно, содержащее DOM документ; свойство document указывает на DOM document, загруженный в данном окне."><code>Window</code></a> объекту, чтобы JavaScript мог реагировать на изменения состояния дисплея.</p>
+
+<div class="note">
+<p><strong>Примечание</strong>: Вы можете найте намого больше о том, как работает API в <a href="/en-US/docs/Web/API/WebVR_API/Using_the_WebVR_API">Using the WebVR API</a> и <a href="/en-US/docs/Web/API/WebVR_API/Concepts">WebVR Concepts</a> статьях.</p>
+</div>
+
+<h3 id="Использование_контроллеров_Объединение_WebVR_с_API-интерфейсом_геймпада">Использование контроллеров: Объединение WebVR с API-интерфейсом геймпада</h3>
+
+<p>Многие аппаратные настройки WebVR оснащены контроллерами, которые сочетаются с гарнитурой. Они могут быть использованы в WebVR приложениях через <a href="/en-US/docs/Web/API/Gamepad_API">Gamepad API</a>, и, в частности, <a href="/en-US/docs/Web/API/Gamepad_API#Experimental_Gamepad_extensions">Gamepad расширения API</a>, которые добавляют API функции для доступа к <a href="/en-US/docs/Web/API/GamepadPose">позе контроллера</a>, <a href="/en-US/docs/Web/API/GamepadHapticActuator">haptic actuators</a>, и многоe другое.</p>
+
+<div class="note">
+<p><strong>Примечание</strong>: Наша <a href="/en-US/docs/Web/API/WebVR_API/Using_VR_controllers_with_WebVR">Using VR controllers with WebVR</a> статья объясняет основы использования VR-контроллеров в приложениях WebVR.</p>
+</div>
+
+<h2 id="WebVR_Интерфейс">WebVR Интерфейс</h2>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a></dt>
+ <dd>Представляет любое устройство VR, поддерживаемое этим API. VRDisplay включает в себя общую информацию, такую как идентификаторые устройств и  описания, а также методы для начала представления сцены VR, получения параметров глаз и возможностей отображения и других важных функций.</dd>
+ <dt><a href="/ru/docs/Web/API/VRDisplayCapabilities" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplayCapabilities</code></a></dt>
+ <dd>описывает возможности <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> — его функции могут использоваться для тестирования возможностей устройства VR, например, может ли он возвращать информацию о местоположении.</dd>
+ <dt><a href="/ru/docs/Web/API/VRDisplayEvent" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplayEvent</code></a></dt>
+ <dd>Возвращает объект события (event) связанного с WebVR-событием (см. <a href="#Window">window object extensions</a> , перечисленны ниже).</dd>
+ <dt><a href="/ru/docs/Web/API/VRFrameData" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRFrameData</code></a></dt>
+ <dd>Представляет всю информацию, необходимую для создания одного кадра сцены VR; созданный от  <a href="/ru/docs/Web/API/VRDisplay/getFrameData" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.getFrameData()</code></a>.</dd>
+ <dt><a href="/ru/docs/Web/API/VRPose" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRPose</code></a></dt>
+ <dd>Предстовляет состояние позиции на заданной временой отметке (которая включает в себя ориентацию, положение, скорость и ускорение).</dd>
+ <dt><a href="/ru/docs/Web/API/VREyeParameters" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VREyeParameters</code></a></dt>
+ <dd>Предоставляет доступ ко все информации, необзходимой для корректного отображения сцены для каждого задного глаза, включая информацию о поле зрения.</dd>
+ <dt><a href="/ru/docs/Web/API/VRFieldOfView" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRFieldOfView</code></a></dt>
+ <dd>Представляет поле зрения, определенное четырьмя различными значениями степени, описывающими представление из центральной точки.</dd>
+ <dt><a href="/ru/docs/Web/API/VRLayerInit" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRLayerInit</code></a></dt>
+ <dd>Представляет слой, который должен быть представлен в <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a>.</dd>
+ <dt><a href="/ru/docs/Web/API/VRStageParameters" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRStageParameters</code></a></dt>
+ <dd>Представляет значения, описывающие область сцены для устройств, поддерживающих опыт в помещении.</dd>
+</dl>
+
+<h3 id="Расширения_для_других_интерфейсов">Расширения для других интерфейсов</h3>
+
+<p>WebVR API асширяет следующие API, добавляя перечисленные функции.</p>
+
+<h4 id="Геймпад">Геймпад</h4>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/Gamepad/displayId" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Gamepad.displayId</code></a> <span class="readOnly readOnlyInline notecard inline" title="Это значение изменять нельзя.">Только для чтения </span></dt>
+ <dd><dfn>Возвращает <a href="/ru/docs/Web/API/VRDisplay/displayId" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.displayId</code></a> связанного с  <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> — <code>VRDisplay</code> , которым гейпад управляет отображаемой сценой.</dfn></dd>
+</dl>
+
+<h4 id="Навигатор">Навигатор</h4>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/Navigator/activeVRDisplays" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Navigator.activeVRDisplays</code></a> <span class="readOnly readOnlyInline notecard inline" title="Это значение изменять нельзя.">Только для чтения </span></dt>
+ <dd>Возвращает массив, содержащий каждый <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> объект, который в настоящее время отображается (<a href="/ru/docs/Web/API/VRDisplay/ispresenting" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay.ispresenting</code></a> является <code>true</code>).</dd>
+ <dt><a href="/ru/docs/Web/API/Navigator/getVRDisplays" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Navigator.getVRDisplays()</code></a></dt>
+ <dd>Возвращает обещание, которое преобразуется в массив <a href="/ru/docs/Web/API/VRDisplay" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>VRDisplay</code></a> объектов,  представляющих любые доступные VR-дисплеи, подключенные к компьютеру.</dd>
+</dl>
+
+<h4 id="Window_события">Window события</h4>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplaypresentchange" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplaypresentchange</code></a></dt>
+ <dd>Представляет обработчик событий, который будет выполняться, при изменении состояния отображения VR-дисплея — т.е. идёт от отображения до неотображения, или наоброт (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplaypresentchange" title="/ru/docs/Web/Reference/Events/vrdisplaypresentchange">vrdisplaypresentchange</a></code> событие срабатывает).</dd>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplayconnect" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplayconnect</code></a></dt>
+ <dd>Представляет обработчик событий, который будет запускаться, когда к компьютеру подключен совместимый VR-дисплей (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplayconnect" title="/ru/docs/Web/Reference/Events/vrdisplayconnect">vrdisplayconnect</a></code> событие срабатывает).</dd>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplaydisconnect" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplaydisconnect</code></a></dt>
+ <dd>Представляет обработчик событий, который будет зпускаться, когда совместимый VR-дисплей был отключён от компьютера (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplaydisconnect" title="/ru/docs/Web/Reference/Events/vrdisplaydisconnect">vrdisplaydisconnect</a></code> событие срабатывает).</dd>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplayactivate" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplayactivate</code></a></dt>
+ <dd>Представляет обработчик событий, который будет выполняться, когда дисплей может быть представлен (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplayactivate" title="/ru/docs/Web/Reference/Events/vrdisplayactivate">vrdisplayactivate</a></code>событие срабатывает), например, HMD (Head Mounted Display) был перемещён, чтобы вывести его из режима ожидания, или проснулся, будучи перемещенным.</dd>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplaydeactivate" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplaydeactivate</code></a></dt>
+ <dd>Представляет обработчик событий, который будет запускаться, когда дисплей больше не будет отображаться (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplaydeactivate" title="/ru/docs/Web/Reference/Events/vrdisplaydeactivate">vrdisplaydeactivate</a></code> событие срабатывает), например, HMD (Head Mounted Display) перешёл в режим ожидания или спящий режим из-за периода бездействия.</dd>
+</dl>
+
+<h4 id="Невыполненные_window_события">Невыполненные window события</h4>
+
+<p>Следующие события перечислены в спецификации, but do not currently seem to be implemented anywhere as yet.</p>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplayblur" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplayblur</code></a></dt>
+ <dd>Представляет обработчик событий, который будет выполняться, когда презентация на дисплей была преостановлена по какой-то причине в браузере, ОС или оборудованием VR (когда  <code><a href="/ru/docs/Web/Reference/Events/vrdisplayblur" title="/ru/docs/Web/Reference/Events/vrdisplayblur">vrdisplayblur</a></code> событие срабатывает) — например, в то время как пользователь взаимодействует с системным меню или браузером, чтобы предотвратить отслеживание или потерю опыта.</dd>
+ <dt><a href="/ru/docs/Web/API/Window/onvrdisplayfocus" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Window.onvrdisplayfocus</code></a></dt>
+ <dd>Представляет обработчик событий, который будет выполняться, когда презентация на дисплей возобновляется после потери фокуса (когда <code><a href="/ru/docs/Web/Reference/Events/vrdisplayfocus" title="/ru/docs/Web/Reference/Events/vrdisplayfocus">vrdisplayfocus</a></code> событие срабатывает).</dd>
+</dl>
+
+<h2 id="Примеры">Примеры</h2>
+
+<p>Вы можете найти несколько примеров в этих местах:</p>
+
+<ul>
+ <li><a href="https://github.com/mdn/webvr-tests">webvr-tests</a> — очень простые примеры для сопровождения MDM WebVR документации.</li>
+ <li><a href="https://github.com/facebook/Carmel-Starter-Kit">Carmel starter kit</a> — простые, хорошо прокомментированные примеры, которые идут вместе с Carmel,браузером WebVR от Facebook&apos;s .</li>
+ <li><a href="https://webvr.info/samples/">WebVR.info samples</a> — несколько более подробных примеров плюс исходный код</li>
+ <li><a href="https://webvr.rocks/firefox#demos">WebVR.rocks Firefox demos</a> — демонстрация примеров</li>
+ <li><a href="https://aframe.io/">A-Frame homepage</a> — примеры использования A-Frame</li>
+</ul>
+
+<h2 id="Спецификация">Спецификация</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарий</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="Спецификация &apos;Gamepad Extensions&apos;" href="https://w3c.github.io/gamepad/extensions.html" class="external" hreflang="en">Gamepad Extensions</a></td>
+   <td><span class="spec-ED">Редакторский черновик</span></td>
+   <td>
+    <p>Определяет <a href="/en-US/docs/Web/API/Gamepad_API#Experimental_Gamepad_extensions">Experimental Gamepad extensions</a>.</p>
+   </td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="Спецификация &apos;WebVR 1.1&apos;" href="https://immersive-web.github.io/webvr/spec/1.1/" class="external" hreflang="en">WebVR 1.1</a></td>
+   <td><span class="spec-Draft">Черновик</span></td>
+   <td>Первоначальное определение</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость_с_брауезерами">Совместимость с брауезерами</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Нет</span><sup>[1]</sup></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><a href="/en-US/Firefox/Releases/55" title="Выпущен 2017-08-08.">55</a> (55)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+  <tr>
+   <td>Gamepad extensions</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span><sup>[3]</sup></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android Webview</th>
+   <th>Chrome for Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Samsung Internet for GearVR</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span><sup>[1]</sup></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span><br>
+     </td>
+  </tr>
+  <tr>
+   <td>Gamepad extensions</td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span><sup>[3]</sup></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] <a href="https://github.com/GoogleChrome/OriginTrials/blob/gh-pages/explainer.md">Origin trials only</a>.</p>
+
+<p>[2] В настоящее время только в Windows и Mac OSX поддержка включена по умолчанию.</p>
+
+<p>[3] Включено в Firefox Nightly и Beta, версии 55 и выше. Включено / отключено с помощью  <code>dom.gamepad-extensions.enabled</code> pref.</p>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="https://vr.mozilla.org">vr.mozilla.org</a> — Основная посадочная площадка Mozilla для WebVR с демонстрационными материалами, утилитами и другой информацией.</li>
+ <li><a href="https://aframe.io/">A-Frame</a> — Веб-платформа с открытым исходным кодом для создания опыта VR.</li>
+ <li><a href="https://webvr.info">webvr.info</a> — Актуальная информация о WebVR, настройке браузера и сообществе.</li>
+ <li><a href="http://mozvr.com/">MozVr.com</a> — Демонстрации, загрузки и другие ресурсы от команды Mozilla VR.</li>
+ <li><a href="https://github.com/MozVR/vr-web-examples/tree/master/threejs-vr-boilerplate">threejs-vr-boilerplate</a> — Полезный стартовый шаблон для написания приложений WebVR.</li>
+ <li><a href="https://github.com/googlevr/webvr-polyfill/">Web VR polyfill</a> — JavaScript-реализация WebVR.</li>
+</ul>

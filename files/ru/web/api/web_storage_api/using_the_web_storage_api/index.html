@@ -1,0 +1,253 @@
+---
+title: Использование Web Storage API
+slug: Web/API/Web_Storage_API/Using_the_Web_Storage_API
+translation_of: Web/API/Web_Storage_API/Using_the_Web_Storage_API
+---
+<div class="summary">
+<p>Web Storage API предоставляет механизм, при помощи которого браузер может безопасно хранить пары ключей/значениий в намного более интуитивной форме, чем используя cookies. Эта статья предоставляет пошаговое руководство о том, как использовать эту простую технологию.</p>
+</div>
+
+<h2 id="Основные_концепции">Основные концепции</h2>
+
+<p>Storage объекты простые хранилища вида ключ-значение, похожие чем-то на объекты, но они остаются неизменными при загрузке страницы.  Ключи и значения всегда являются строками (обратите внимание, что числовые ключи будут автоматически конвертироваться в строку, точно также как объекты).  Вы можете получить доступ к этим значениям как в объектах, или getItem() и setItem() методами.  Все три строки ниже устанавливают одинаковое значение в  colorSetting:</p>
+
+<pre style="white-space: pre;">localStorage.colorSetting = &apos;#a4509b&apos;;
+localStorage[&apos;colorSetting&apos;] = &apos;#a4509b&apos;;
+localStorage.setItem(&apos;colorSetting&apos;, &apos;#a4509b&apos;);
+</pre>
+
+<p>В основе Веб хранилища лежат два механизма:</p>
+
+<ul>
+ <li><code>(sessionStorage)</code> обслуживает область хранения данных для каждого домена, доступное на протяжении сессии. (пока браузер открыт, даже в случае перезагрузки страницы)</li>
+ <li><code>(localStorage)</code> делает то же самое, но сохраняет данные даже в случае, если переоткрыть браузер. </li>
+</ul>
+
+<p>Оба механизма доступны через  <a href="/ru/docs/Web/API/Window/sessionStorage"><code>Window.sessionStorage</code></a> и <a href="/ru/docs/Web/API/Window/localStorage"><code>Window.localStorage</code></a> свойства (если быть более точным, в броузерах, поддерживающих хранилища объект <code>Window</code>  выполняет объекты <code>WindowLocalStorage</code>и <code>WindowSessionStorage</code>, которые содержат свойства <code>localStorage</code>и <code>sessionStorage</code>) — вызов одного из них создает экземляр объекта Storage, через который можно устанавливать, редактировать и удалять данные. Разные Storage объекты будут использовать <code>sessionStorage</code> и <code>localStorage поэтому они используются и управляются раздельно </code></p>
+
+<p>Так, например, изначально вызов <code>localStorage</code> в документе возвращает <a href="/ru/docs/Web/API/Storage"><code>Storage</code></a> объект; вызов <code>sessionStorage</code> в документе возвращает другой <a href="/ru/docs/Web/API/Storage"><code>Storage</code></a> объект. Оба объекта могут управляться одинаково, но отдельно.</p>
+
+<h2 id="Функция_обнаружения_localStorage">Функция обнаружения localStorage</h2>
+
+<p>Чтобы использовать localStorage, мы должны сперва проверить, что localStorage поддерживается и доступно в текущем браузере.</p>
+
+<h3 id="Проверка_на_наличие">Проверка на наличие</h3>
+
+<p>Браузеры поддерживаемые localStorage будут иметь свойство localStorage объекта window. Тем не менее по различным причинам, простое утверждение, что это свойство существует, может вызывать исключение. Если localStorage существует это еще не дает гарантии, что оно доступно,  т.к. различные броузеры обладают настройками которые отключают его. Поэтому браузер может поддерживать localStorage, но не делает его доступным для скриптов на странице. Один из таких примеров браузер Safari, который в Private Browsing mode возвращает нам пустой localStorage объект, фактически делая его непригодным для использования . Наша функция должна принимать во внимание этот сценарий. </p>
+
+<p>Функция, которая проверяет браузеры на подержку и доступность localStorage:</p>
+
+<pre class="brush: js notranslate">function storageAvailable(type) {
+	try {
+		var storage = window[type],
+			x = &apos;__storage_test__&apos;;
+		storage.setItem(x, x);
+		storage.removeItem(x);
+		return true;
+	}
+	catch(e) {
+		return false;
+	}
+}</pre>
+
+<p>Вот как вы бы могли использовать это:</p>
+
+<pre class="brush: js notranslate">if (storageAvailable(&apos;localStorage&apos;)) {
+	// Yippee! We can use localStorage awesomeness
+}
+else {
+	// Too bad, no localStorage for us
+}</pre>
+
+<p>Вы можете протестировать sessionStorage вместо этого используйте <code>storageAvailable(&apos;sessionStorage&apos;)</code>Смотрите здесь <a href="https://gist.github.com/paulirish/5558557">краткую историю функции-обнаружения localStorage</a></p>
+
+<h2 id="Пример">Пример</h2>
+
+<p>Чтобы проилюстрировать типичное использование Web storage, мы создали простой пример, назвав его <strong>Web Storage Demo. </strong>На <a href="https://mdn.github.io/dom-examples/web-storage/">целевой странице</a> представлены элементы управления, которые можно использовать для настройки цвета, шрифта и декоративного изображения:</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/9685/landing.png" style="display: block; height: 482px; margin: 0px auto; width: 700px;">Когда вы выбираете различные опции, страница немедленно перезагружается; в дополнение, ваш выбор сохраняется в localStorage, таким образом когда вы покидаете страницу и загружаете ее снова спустя некоторое время, ваши параметры сохраняются.</p>
+
+<p>Мы также предоставили <a href="https://mdn.github.io/dom-examples/web-storage/event.html">страницу вывода событий</a> - если вы загрузите эту страницу в другой вкладке, затем сделаете некоторые изменения в landing page, вы увидите обновленную информацию о хранилище.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/9687/event-output.png" style="display: block; height: 482px; margin: 0px auto; width: 700px;"></p>
+
+<div class="note">
+<p><strong>Примечание</strong>: Помимо просмотра примеров выше, используя приведенные ссылки выше , вы можете также <a href="https://github.com/mdn/dom-examples/tree/master/web-storage">просмотреть исходный код</a>.</p>
+</div>
+
+<h2 id="Проверка_на_заполненность_хранилища">Проверка на заполненность хранилища</h2>
+
+<p>Начнем с main.js, мы проверим был ли уже заполнен объект Storage (т.е страница была ранее доступна)</p>
+
+<pre class="brush: js notranslate">if(!localStorage.getItem(&apos;bgcolor&apos;)) {
+  populateStorage();
+} else {
+  setStyles();
+}
+</pre>
+
+<p>Метод <a href="/ru/docs/Web/API/Storage/getItem"><code>Storage.getItem()</code></a> используется для получения данных из storage; в этом примере мы проверяем, чтобы увидеть существует ли bgcolor; если нет, мы запускаем <code>populateStorage(), чтобы добавить значение по-умолчанию в storage. Если значения уже есть там, мы запускаем setStyles(), для обновления стиля страница с сохраненными значениями.</code><br>
+ <strong>Примечание</strong>: Вы можете также использовать <a href="/ru/docs/Web/API/Storage/length"><code>Storage.length</code></a> для проверки storage object.</p>
+
+<h2 id="Получение_данных_из_Storage">Получение данных из Storage</h2>
+
+<p>Как было отмечено выше, значения хранилища могут быть извлечены используя <a href="/ru/docs/Web/API/Storage/getItem"><code>Storage.getItem()</code></a>. В качестве аргумента функция принимает значение ключа элемента хранилища, а возвращает значение этого элемента. Например:</p>
+
+<pre class="brush: js notranslate">function setStyles() {
+  var currentColor = localStorage.getItem(&apos;bgcolor&apos;);
+  var currentFont = localStorage.getItem(&apos;font&apos;);
+  var currentImage = localStorage.getItem(&apos;image&apos;);
+
+  document.getElementById(&apos;bgcolor&apos;).value = currentColor;
+  document.getElementById(&apos;font&apos;).value = currentFont;
+  document.getElementById(&apos;image&apos;).value = currentImage;
+
+  htmlElem.style.backgroundColor = &apos;#&apos; + currentColor;
+  pElem.style.fontFamily = currentFont;
+  imgElem.setAttribute(&apos;src&apos;, currentImage);
+}</pre>
+
+<p>Первые три строки извлекают значения элементов локального хранилища. Next, we set the values displayed in the form elements to those values, so that they keep in sync when you reload the page. Finally, we update the styles/decorative image on the page, so your customization options come up again on reload.</p>
+
+<h2 id="Setting_values_in_storage">Setting values in storage</h2>
+
+<p><a href="/ru/docs/Web/API/Storage/setItem"><code>Storage.setItem()</code></a> is used both to create new data items, and (if the data item already exists) update existing values. This takes two arguments — the key of the data item to create/modify, and the value to store in it.</p>
+
+<pre class="brush: js notranslate">function populateStorage() {
+  localStorage.setItem(&apos;bgcolor&apos;, document.getElementById(&apos;bgcolor&apos;).value);
+  localStorage.setItem(&apos;font&apos;, document.getElementById(&apos;font&apos;).value);
+  localStorage.setItem(&apos;image&apos;, document.getElementById(&apos;image&apos;).value);
+
+  setStyles();
+}</pre>
+
+<p>The <code>populateStorage()</code> function sets three items in local storage — the background color, font, and image path. It then runs the <code>setStyles()</code> function to update the page styles, etc.</p>
+
+<p>We&apos;ve also included an <code>onchange</code> handler on each form element, so that the data and styling is updated whenever a form value is changed:</p>
+
+<pre class="brush: js notranslate">bgcolorForm.onchange = populateStorage;
+fontForm.onchange = populateStorage;
+imageForm.onchange = populateStorage;</pre>
+
+<h2 id="Responding_to_storage_changes_with_the_StorageEvent">Responding to storage changes with the StorageEvent</h2>
+
+<p>The <a href="/ru/docs/Web/API/StorageEvent"><code>StorageEvent</code></a> is fired whenever a change is made to the <a href="/ru/docs/Web/API/Storage"><code>Storage</code></a> object. This won&apos;t work on the same page that is making the changes — it is really a way for other pages on the domain using the storage to sync any changes that are made. Pages on other domains can&apos;t access the same storage objects.</p>
+
+<p>On the events page (see <a href="https://github.com/mdn/web-storage-demo/blob/gh-pages/event.js">events.js</a>) the only JavaScript is as follows:</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&apos;storage&apos;, function(e) {
+  document.querySelector(&apos;.my-key&apos;).textContent = e.key;
+  document.querySelector(&apos;.my-old&apos;).textContent = e.oldValue;
+  document.querySelector(&apos;.my-new&apos;).textContent = e.newValue;
+  document.querySelector(&apos;.my-url&apos;).textContent = e.url;
+  document.querySelector(&apos;.my-storage&apos;).textContent = e.storageArea;
+});</pre>
+
+<p>Here we add an event listener to the <code>window</code> object that fires when the <a href="/ru/docs/Web/API/Storage"><code>Storage</code></a> object associated with the current origin is changed. As you can see above, the event object associated with this event has a number of properties containing useful information — the key of the data that changed, the old value before the change, the new value after that change, the URL of the document that changed the storage, and the storage object itself.</p>
+
+<h2 id="Удаление_записанных_данных">Удаление записанных данных</h2>
+
+<p>Web Storage также предоставляет несколько простых методов для удаления данных. Мы не используем эти методы в нашем дема, но они очень простые, чтобы добавить их в проект:</p>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/Storage/removeItem"><code>Storage.removeItem()</code></a> принимает единственный аргумент - ключ элемента данных, который вы хотите удалить - и удаляет его из объекта хранения для этого домена. </li>
+ <li><a href="/ru/docs/Web/API/Storage/clear"><code>Storage.clear()</code></a> не принимает аргументов, полностью очищает объекта storage  для данного домена.</li>
+</ul>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en" title="Спецификация &apos;Unknown&apos;">Unknown</a></td>
+   <td><span class="spec-">Неизвестно</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>localStorage</td>
+   <td>4</td>
+   <td>3.5</td>
+   <td>8</td>
+   <td>10.50</td>
+   <td>4</td>
+  </tr>
+  <tr>
+   <td>sessionStorage</td>
+   <td>5</td>
+   <td>2</td>
+   <td>8</td>
+   <td>10.50</td>
+   <td>4</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>2.1</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td>8</td>
+   <td>11</td>
+   <td>iOS 3.2</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>All browsers have varying capacity levels for both localStorage and sessionStorage. Here is a <a class="external" href="http://dev-test.nemikor.com/web-storage/support-test/" title="http://dev-test.nemikor.com/web-storage/support-test/">detailed rundown of all the storage capacities for various browsers</a>.</p>
+
+<div class="note">
+<p><strong>Note: </strong>since iOS 5.1, Safari Mobile stores localStorage data in the cache folder, which is subject to occasional clean up, at the behest of the OS, typically if space is short.</p>
+</div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Web_Storage_API">Web Storage API landing page</a></li>
+</ul>

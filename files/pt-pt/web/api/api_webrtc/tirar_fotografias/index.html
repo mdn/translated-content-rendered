@@ -1,0 +1,287 @@
+---
+title: Tirar fotografias com a câmara da Web
+slug: Web/API/API_WebRTC/Tirar_fotografias
+tags:
+  - API
+  - Avançado
+  - Código amostra
+  - Exemplo
+  - Vídeo(2)
+  - WebRTC
+  - cãmara da Web
+translation_of: Web/API/WebRTC_API/Taking_still_photos
+---
+<p></p><section id="Quick_Links">
+ <ol>
+  <li><a href="/pt-PT/docs/Web/API/WebRTC_API"><strong>WebRTC API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>WebRTC Guides</summary>
+      <ol>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Architecture">WebRTC Architecture</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/WebRTC_Basics">WebRTC Basics</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Protocols">WebRTC Protocols</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Connectivity">Dealing with connectivity</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Overview">Overview of WebRTC interfaces</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Session_lifetime">Lifetime of a WebRTC Session</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Using_data_channels">Using data channels</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>WebRTC Tutorials</summary>
+      <ol>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/adapter.js">Interoperability with adapter.js</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Taking_still_photos">Taking still photos from the camera</a></li>
+        <li><a href="/pt-PT/docs/Web/API/WebRTC_API/Simple_RTCDataChannel_sample">A simple data channel example</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/pt-PT/docs/Web/API/RTCPeerConnection"><code>RTCPeerConnection</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCSessionDescription"><code>RTCSessionDescription</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCIceCandidate"><code>RTCIceCandidate</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCPeerConnectionIceEvent"><code>RTCPeerConnectionIceEvent</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/MessageEvent"><code>MessageEvent</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/MediaStream"><code>MediaStream</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCStatsReport"><code>RTCStatsReport</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCIdentityEvent"><code>RTCIdentityEvent</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/RTCIdentityErrorEvent"><code>RTCIdentityErrorEvent</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/MediaStreamEvent"><code>MediaStreamEvent</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/MediaStreamTrack"><code>MediaStreamTrack</code></a></li>
+        <li><a href="/pt-PT/docs/Web/API/MediaDevices"><code>MediaDevices</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/pt-PT/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/pt-PT/docs/tag/WebRTC">Pages tagged &quot;WebRTC&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/pt-PT/docs/MDN/Doc_status/API/WebRTC">WebRTC doc status</a></li>
+        <li><a href="/pt-PT/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section><p></p>
+
+<p><span class="seoSummary">This article shows how to use WebRTC to access the camera on a computer or mobile phone with WebRTC support and take a photo with it.</span> <a href="https://mdn-samples.mozilla.org/s/webrtc-capturestill">Try this sample</a> then read on to learn how it works.</p>
+
+<p>You can also jump straight to the <a href="https://github.com/mdn/samples-server/tree/master/s/webrtc-capturestill" class="external" rel="noopener">code on Github</a> if you like.</p>
+
+<h2 id="The_HTML_markup">The HTML markup</h2>
+
+<p><a href="https://github.com/mdn/samples-server/tree/master/s/webrtc-capturestill/index.html" class="external" rel="noopener">Our HTML interface</a> has two main operational sections: the stream and capture panel and the presentation panel. Each of these is presented side-by-side in its own <a href="/pt-PT/docs/Web/HTML/Element/div" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;div&gt;</code></a> to facilitate styling and control.</p>
+
+<p>The first panel on the left contains two components: a <a href="/pt-PT/docs/Web/HTML/Element/video" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;video&gt;</code></a> element, which will receive the stream from WebRTC, and a <a href="/pt-PT/docs/Web/HTML/Element/button" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;button&gt;</code></a> the user clicks to capture a video frame.</p>
+
+<pre class="brush: html">  &lt;div class=&quot;camera&quot;&gt;
+    &lt;video id=&quot;video&quot;&gt;Video stream not available.&lt;/video&gt;
+    &lt;button id=&quot;startbutton&quot;&gt;Take photo&lt;/button&gt;
+  &lt;/div&gt;</pre>
+
+<p>This is straightforward, and we&apos;ll see how it ties together when we get into the JavaScript code.</p>
+
+<p>Next, we have a <a href="/pt-PT/docs/Web/HTML/Element/canvas" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;canvas&gt;</code></a> element into which the captured frames are stored, potentially manipulated in some way, and then converted into an output image file. This canvas is kept hidden by styling the canvas with <a href="/pt-PT/docs/Web/CSS/display" title="Esta propriedade display de CSS especifica o tipo de caixa de renderização utilizado para um elemento. Em HTML, os valores da propriedade display predefinidos têm o seu comportamento descrito nas especificações de HTML ou de uma folha de estilo predefinida do navegador ou do utilizador. O valor predefinido no XML é  inline, incluindo os elementos de SVG ."><code>display</code></a><code>:none</code>, to avoid cluttering up the screen — the user does not need to see this intermediate stage.</p>
+
+<p>We also have an <a href="/pt-PT/docs/Web/HTML/Element/img" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;img&gt;</code></a> element into which we will draw the image — this is the final display shown to the user.</p>
+
+<pre class="brush: html">  &lt;canvas id=&quot;canvas&quot;&gt;
+  &lt;/canvas&gt;
+  &lt;div class=&quot;output&quot;&gt;
+    &lt;img id=&quot;photo&quot; alt=&quot;The screen capture will appear in this box.&quot;&gt;
+  &lt;/div&gt;</pre>
+
+<p>That&apos;s all of the relevant HTML. The rest is just some page layout fluff and a bit of text offering a link back to this page.</p>
+
+<h2 id="O_código_de_JavaScript"><span style="font-size: 30px;">O código de JavaScript</span></h2>
+
+<p>Now let&apos;s take a look at the <a href="https://github.com/mdn/samples-server/tree/master/s/webrtc-capturestill/capture.js" class="external" rel="noopener">JavaScript code</a>. We&apos;ll break it up into a few bite-sized pieces to make it easier to explain.</p>
+
+<h3 id="Initialização">Initialização</h3>
+
+<p>We start by wrapping the whole script in an anonymous function to avoid global variables, then setting up various variables we&apos;ll be using.</p>
+
+<pre class="brush: js">(function() {
+  var width = 320;    // We will scale the photo width to this
+  var height = 0;     // This will be computed based on the input stream
+
+  var streaming = false;
+
+  var video = null;
+  var canvas = null;
+  var photo = null;
+  var startbutton = null;</pre>
+
+<p>Those variables are:</p>
+
+<dl>
+ <dt><code>largura</code></dt>
+ <dd>Whatever size the incoming video is, we&apos;re going to scale the resulting image to be 320 pixels wide.</dd>
+ <dt><code>altura</code></dt>
+ <dd>The output height of the image will be computed given the <code>width</code> and the aspect ratio of the stream.</dd>
+ <dt><code>transmissão</code></dt>
+ <dd>Indicates whether or not there is currently an active stream of video running.</dd>
+ <dt><code>vídeo</code></dt>
+ <dd>This will be a reference to the <a href="/pt-PT/docs/Web/HTML/Element/video" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;video&gt;</code></a> element after the page is done loading.</dd>
+ <dt><code>canvas</code></dt>
+ <dd>This will be a reference to the <a href="/pt-PT/docs/Web/HTML/Element/canvas" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;canvas&gt;</code></a> element after the page is done loading.</dd>
+ <dt><code>foto</code></dt>
+ <dd>This will be a reference to the <a href="/pt-PT/docs/Web/HTML/Element/img" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;img&gt;</code></a> element after the page is done loading.</dd>
+ <dt><code>startbutton</code></dt>
+ <dd>This will be a reference to the <a href="/pt-PT/docs/Web/HTML/Element/button" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;button&gt;</code></a> element that&apos;s used to trigger capture. We&apos;ll get that after the page is done loading.</dd>
+</dl>
+
+<h3 id="The_startup()_function">The startup() function</h3>
+
+<p>The <code>startup()</code> function is run when the page has finished loading, courtesy of <a href="/pt-PT/docs/Web/API/Window/addEventListener" title="The documentation about this has not yet been written; please consider contributing!"><code>window.addEventListener()</code></a>. This function&apos;s job is to request access to the user&apos;s webcam, initialize the output <a href="/pt-PT/docs/Web/HTML/Element/img" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;img&gt;</code></a> to a default state, and to establish the event listeners needed to receive each frame of video from the camera and react when the button is clicked to capture an image.</p>
+
+<h4 id="Getting_element_references">Getting element references</h4>
+
+<p>First, we grab references to the major elements we need to be able to access.</p>
+
+<pre class="brush: js">  function startup() {
+    video = document.getElementById(&apos;video&apos;);
+    canvas = document.getElementById(&apos;canvas&apos;);
+    photo = document.getElementById(&apos;photo&apos;);
+    startbutton = document.getElementById(&apos;startbutton&apos;);</pre>
+
+<h4 id="Get_the_media_stream">Get the media stream</h4>
+
+<p>The next task is to get the media stream:</p>
+
+<pre class="brush: js">    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+    })
+    .catch(function(err) {
+        console.log(&quot;An error occured! &quot; + err);
+    });
+</pre>
+
+<p>Here, we&apos;re calling <a href="/pt-PT/docs/Web/API/MediaDevices/getUserMedia" title="The documentation about this has not yet been written; please consider contributing!"><code>MediaDevices.getUserMedia()</code></a> and requesting a video stream (without audio). It returns a promise which we attach success and failure callbacks to.</p>
+
+<p>The success callback receives a <code>stream</code> object as input. It the <a href="/pt-PT/docs/Web/HTML/Element/video" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;video&gt;</code></a> element&apos;s source to our new stream.</p>
+
+<p>Once the stream is linked to the <code>&lt;video&gt;</code> element, we start it playing by calling <code><a href="/en-US/docs/Web/API/HTMLMediaElement#play">HTMLMediaElement.play()</a></code>.</p>
+
+<p>The error callback is called if opening the stream doesn&apos;t work. This will happen for example if there&apos;s no compatible camera connected, or the user denied access.</p>
+
+<h4 id="Listen_for_the_video_to_start_playing">Listen for the video to start playing</h4>
+
+<p>After calling <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement#play">HTMLMediaElement.play()</a></code> on the <a href="/pt-PT/docs/Web/HTML/Element/video" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;video&gt;</code></a>, there&apos;s a (hopefully brief) period of time that elapses before the stream of video begins to flow. To avoid blocking until that happens, we add an event listener to <code>video</code>, <code>canplay</code>, which is delivered when the video playback actually begins. At that point, all the properties in the <code>video</code> object have been configured based on the stream&apos;s format.</p>
+
+<pre class="brush: js">    video.addEventListener(&apos;canplay&apos;, function(ev){
+      if (!streaming) {
+        height = video.videoHeight / (video.videoWidth/width);
+
+        video.setAttribute(&apos;width&apos;, width);
+        video.setAttribute(&apos;height&apos;, height);
+        canvas.setAttribute(&apos;width&apos;, width);
+        canvas.setAttribute(&apos;height&apos;, height);
+        streaming = true;
+      }
+    }, false);</pre>
+
+<p>This callback does nothing unless it&apos;s the first time it&apos;s been called; this is tested by looking at the value of our <code>streaming</code> variable, which is <code>false</code> the first time this method is run.</p>
+
+<p>If this is indeed the first run, we set the video&apos;s height based on the size difference between the video&apos;s actual size, <code>video.videoWidth</code>, and the width at which we&apos;re going to render it, <code>width</code>.</p>
+
+<p>Finally, the <code>width</code> and <code>height</code> of both the video and the canvas are set to match each other by calling <a href="/pt-PT/docs/Web/API/Element/setAttribute" title="The documentation about this has not yet been written; please consider contributing!"><code>Element.setAttribute()</code></a> on each of the two properties on each element, and setting widths and heights as appropriate. Finally, we set the <code>streaming</code> variable to <code>true</code> to prevent us from inadvertently running this setup code again.</p>
+
+<h4 id="Handle_clicks_on_the_button">Handle clicks on the button</h4>
+
+<p>To capture a still photo each time the user clicks the <code>startbutton</code>, we need to add an event listener to the button, to be called when the <code>click</code> event is issued:</p>
+
+<pre class="brush: js">    startbutton.addEventListener(&apos;click&apos;, function(ev){
+      takepicture();
+      ev.preventDefault();
+    }, false);</pre>
+
+<p>This method is simple enough: it just calls our <code>takepicture()</code> function, defined below in the section <a href="#Capturing_a_frame_from_the_stream">Capturing a frame from the stream</a>, then calls <a href="/pt-PT/docs/Web/API/Event/preventDefault" title="The documentation about this has not yet been written; please consider contributing!"><code>Event.preventDefault()</code></a> on the received event to prevent the click from being handled more than once.</p>
+
+<h4 id="Wrapping_up_the_startup()_method">Wrapping up the startup() method</h4>
+
+<p>There are only two more lines of code in the <code>startup()</code> method:</p>
+
+<pre class="brush: js">    clearphoto();
+  }</pre>
+
+<p>This is where we call the <code>clearphoto()</code> method we&apos;ll describe below in the section <a href="#Clearing_the_photo_box">Clearing the photo box</a>.</p>
+
+<h3 id="Clearing_the_photo_box">Clearing the photo box</h3>
+
+<p>Clearing the photo box involves creating an image, then converting it into a format usable by the <a href="/pt-PT/docs/Web/HTML/Element/img" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;img&gt;</code></a> element that displays the most recently captured frame. That code looks like this:</p>
+
+<pre class="brush: js">  function clearphoto() {
+    var context = canvas.getContext(&apos;2d&apos;);
+    context.fillStyle = &quot;#AAA&quot;;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var data = canvas.toDataURL(&apos;image/png&apos;);
+    photo.setAttribute(&apos;src&apos;, data);
+  }</pre>
+
+<p>We start by getting a reference to the hidden <a href="/pt-PT/docs/Web/HTML/Element/canvas" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;canvas&gt;</code></a> element that we use for offscreen rendering.  Next we set the <code>fillStyle</code> to <code>#AAA</code> (a fairly light grey), and fill the entire canvas with that color by calling <a href="/pt-PT/docs/Web/API/CanvasRenderingContext2D/fillRect" title="The documentation about this has not yet been written; please consider contributing!"><code>fillRect()</code></a>.</p>
+
+<p>Last in this function, we convert the canvas into a PNG image and call <code><a href="/pt-PT/docs/Web/API/Element/setAttribute" title="The documentation about this has not yet been written; please consider contributing!"><code>photo.setAttribute()</code></a></code> to make our captured still box display the image.</p>
+
+<h3 id="Capturing_a_frame_from_the_stream">Capturing a frame from the stream</h3>
+
+<p>There&apos;s one last function to define, and it&apos;s the point to the entire exercise: the <code>takepicture()</code> function, whose job it is to capture the currently displayed video frame, convert it into a PNG file, and display it in the captured frame box. The code looks like this:</p>
+
+<pre class="brush: js">  function takepicture() {
+    var context = canvas.getContext(&apos;2d&apos;);
+    if (width &amp;&amp; height) {
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+
+      var data = canvas.toDataURL(&apos;image/png&apos;);
+      photo.setAttribute(&apos;src&apos;, data);
+    } else {
+      clearphoto();
+    }
+  }</pre>
+
+<p>As is the case any time we need to work with the contents of a canvas, we start by getting the <a href="/pt-PT/docs/Web/API/CanvasRenderingContext2D" title="The documentation about this has not yet been written; please consider contributing!"><code>2D drawing context</code></a> for the hidden canvas.</p>
+
+<p>Then, if the width and height are both non-zero (meaning that there&apos;s at least potentially valid image data), we set the width and height of the canvas to match that of the captured frame, then call <a href="/pt-PT/docs/Web/API/CanvasRenderingContext2D/drawImage" title="The documentation about this has not yet been written; please consider contributing!"><code>drawImage()</code></a> to draw the current frame of the video into the context, filling the entire canvas with the frame image.</p>
+
+<div class="note">
+<p><strong>Note:</strong> This takes advantage of the fact that the <a href="/pt-PT/docs/Web/API/HTMLVideoElement" title="The documentation about this has not yet been written; please consider contributing!"><code>HTMLVideoElement</code></a> interface looks like a <a href="/pt-PT/docs/Web/API/HTMLImageElement" title="The documentation about this has not yet been written; please consider contributing!"><code>HTMLImageElement</code></a> to any API that accepts an <code>HTMLImageElement</code> as a parameter, with the video&apos;s current frame presented as the image&apos;s contents.</p>
+</div>
+
+<p>Once the canvas contains the captured image, we convert it to PNG format by calling <a href="/pt-PT/docs/Web/API/HTMLCanvasElement/toDataURL" title="The documentation about this has not yet been written; please consider contributing!"><code>HTMLCanvasElement.toDataURL()</code></a> on it; finally, we call <a href="/pt-PT/docs/Web/API/Element/setAttribute" title="The documentation about this has not yet been written; please consider contributing!"><code>photo.setAttribute()</code></a> to make our captured still box display the image.</p>
+
+<p>If there isn&apos;t a valid image available (that is, the <code>width</code> and <code>height</code> are both 0), we clear the contents of the captured frame box by calling <code>clearphoto()</code>.</p>
+
+<h2 id="Fun_with_filters">Fun with filters</h2>
+
+<p>Since we&apos;re capturing images from the user&apos;s webcam by grabbing frames from a <a href="/pt-PT/docs/Web/HTML/Element/video" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;video&gt;</code></a> element, we can very easily apply filters and fun effects to the video. As it turns out, any CSS filters you apply to the element using the <a href="/pt-PT/docs/Web/CSS/filter" title="The documentation about this has not yet been written; please consider contributing!"><code>filter</code></a> property affect the captured photo. These filters can range from the simple (making the image black and white)  to the extreme (gaussian blurs and hue rotation).</p>
+
+<p>You can play with this effect using, for example, the Firefox developer tools&apos; <a href="/en-US/docs/Tools/Style_Editor">style editor</a>; see <a href="/en-US/docs/Tools/Page_Inspector/How_to/Edit_CSS_filters">Edit CSS filters</a> for details on how to do so.</p>
+
+<h2 id="Consultar_também">Consultar também</h2>
+
+<ul>
+ <li><a href="https://mdn-samples.mozilla.org/s/webrtc-capturestill">Try this sample</a></li>
+ <li><a href="https://github.com/mdn/samples-server/tree/master/s/webrtc-capturestill">Sample code on Github</a></li>
+ <li><a href="/pt-PT/docs/Web/API/Navigator/getUserMedia" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.getUserMedia()</code></a></li>
+ <li><a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Using_frames_from_a_video" title="Importing images into a canvas is basically a two step process:">Using frames from a video</a> in <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images" title="Importing images into a canvas is basically a two step process:">Using images</a></li>
+ <li><a href="/pt-PT/docs/Web/API/CanvasRenderingContext2D/drawImage" title="The documentation about this has not yet been written; please consider contributing!"><code>CanvasRenderingContext2D.drawImage()</code></a></li>
+</ul>

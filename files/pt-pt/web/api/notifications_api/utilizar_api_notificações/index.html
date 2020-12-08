@@ -1,0 +1,1295 @@
+---
+title: Utilizar a API de Notificações
+slug: Web/API/Notifications_API/Utilizar_API_Notificações
+translation_of: Web/API/Notifications_API/Using_the_Notifications_API
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-PT/docs/Web/API/Notifications_API">Notifications API</a></strong></li><li><strong><a href="/pt-PT/docs/Web/API/Notifications_API"><code>Notifications_API</code></a></strong></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/pt-PT/docs/Web/Events/error"><code>error</code></a></li><li><a href="/pt-PT/docs/Web/Events/click"><code>click</code></a></li><li><a href="/pt-PT/docs/Web/Events/close"><code>close</code></a></li><li><a href="/pt-PT/docs/Web/Events/show"><code>show</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Web Notifications</summary><ol><li><a href="/pt-PT/docs/Web/API/Notification"><code>Notification</code></a></li><li><a href="/pt-PT/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/pt-PT/docs/Web/API/ServiceWorkerRegistration/getNotifications"><code>ServiceWorkerRegistration.getNotifications()</code></a></li><li><a href="/pt-PT/docs/Web/API/ServiceWorkerRegistration/showNotification"><code>ServiceWorkerRegistration.showNotification()</code></a></li></ol></details></li></ol></section><p></p>
+
+<p class="summary">The <a href="/en-US/docs/Web/API/Notifications_API">Notifications API</a> lets a web page or app send notifications that are displayed outside the page at the system level; this lets web apps send information to a user even if the application is idle or in the background. This article looks at the basics of using this API in your own apps.</p>
+
+<p></p><div class="note notecard"><strong>Note:</strong> This feature is available in <a href="/pt-PT/docs/Web/API/Web_Workers_API">Web Workers</a>.</div><p></p>
+
+<p>Typically, system notifications refer to the operating system&apos;s standard notification mechanism: think for example of how a typical desktop system or mobile device brodcasts notifications.</p>
+
+<p><img src="https://mdn.mozillademos.org/files/10959/android-notification.png" alt style="display: block; height: 184px; margin: 0px auto; width: 300px;"><img src="https://mdn.mozillademos.org/files/10961/mac-notification.png" alt style="display: block; height: 97px; margin: 0px auto; width: 358px;"></p>
+
+<p>The system notification system will vary of course by platform and browser, but this is ok, and the Notifications API is written to be general enough for compatibility with most system notification systems.</p>
+
+<h2 id="Exemplos">Exemplos</h2>
+
+<div class="column-container">
+<div class="column-half">
+<p>One of the most obvious use cases for web notifications is a web-based mail or IRC application that needs to notify the user when a new message is received, even if the user is doing something else with another application. Many real examples of this now exist, such as <a href="https://slack.com/">Slack</a>.</p>
+
+<p>We&apos;ve written a couple of real world demos to give more of an idea of how web notifications can be used:</p>
+
+<ul>
+ <li><strong>To-do list</strong>: This is a simple to-do list app that stores data locally using <a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a> and notifies users when tasks are due using system notifications. <a href="https://github.com/mdn/to-do-notifications/tree/gh-pages">Download the To-do list code</a>, or <a href="http://mdn.github.io/to-do-notifications/">view the app running live</a>.</li>
+ <li><strong>Emogotchi</strong>: A rather silly parody of Tamagotchi, in which you have to keep your Emo miserable otherwise you lose the game. This uses system notifications to tell you how well you are doing, and to complain at you, ALL THE TIME. <a href="https://github.com/mdn/emogotchi">Download the Emogotchi code</a>, or <a href="http://mdn.github.io/emogotchi/">view it running live</a>.</li>
+</ul>
+</div>
+
+<div class="column-half">
+<p style="text-align: center;"><img src="https://mdn.mozillademos.org/files/10963/emogotchi.png" alt style="max-width: 300px; width: 70%;">.</p>
+</div>
+</div>
+
+<h2 id="Solicitar_permissão">Solicitar permissão</h2>
+
+<p>Before an app can send a notification, the user must grant the application the right to do so. This is a common requirement when an API tries to interact with something outside a web page — at least once, the user needs to specifically grant that application permission to present notifications, thereby letting the user control which apps/sites are allowed to display notifications.</p>
+
+<h3 id="Verificação_do_estado_da_permissão_atual">Verificação do estado da permissão atual</h3>
+
+<p>You can check to see if you already have permission by checking the value of the <a href="/pt-PT/docs/Web/API/Notification/permission" title="The documentation about this has not yet been written; please consider contributing!"><code>Notification.permission</code></a> read only property. It can have one of three possible values:</p>
+
+<dl>
+ <dt><code>default</code></dt>
+ <dd>The user hasn&apos;t been asked for permission yet, so notifications won&apos;t be displayed.</dd>
+ <dt><code>granted</code></dt>
+ <dd>The user has granted permission to display notifications, after having been asked previously.</dd>
+ <dt><code>denied</code></dt>
+ <dd>The user has explicitly declined permission to show notifications.</dd>
+</dl>
+
+<h3 id="Obter_permissão">Obter permissão</h3>
+
+<p>If permission to display notifications hasn&apos;t been granted yet, the application needs to use the <a href="/pt-PT/docs/Web/API/Notification/requestPermission" title="The documentation about this has not yet been written; please consider contributing!"><code>Notification.requestPermission()</code></a> method to request this form the user. In its simplest form, as used in the <a href="https://github.com/mdn/emogotchi/blob/gh-pages/main.js#L54">Emogotchi demo</a>, we just include the following:</p>
+
+<pre class="brush: js">Notification.requestPermission();</pre>
+
+<p>The method also optionally accepts a callback function that is called once the user has responded to the request to display permissions (as seen in the second <code>else ... if</code> block below.) Commonly, you&apos;ll ask for permission to display notifications when your app is first initialized, and before trying to instantiate any. If you wanted to be really thorough, you could use a construct like the following (see <a href="https://github.com/mdn/to-do-notifications/blob/gh-pages/scripts/todo.js#L305-L344">To-do List Notifications</a>):</p>
+
+<pre class="brush: js">function notifyMe() {
+  // Let&apos;s check if the browser supports notifications
+  if (!(&quot;Notification&quot; in window)) {
+    alert(&quot;This browser does not support system notifications&quot;);
+  }
+
+  // Let&apos;s check whether notification permissions have already been granted
+  else if (Notification.permission === &quot;granted&quot;) {
+    // If it&apos;s okay let&apos;s create a notification
+    var notification = new Notification(&quot;Hi there!&quot;);
+  }
+
+  // Otherwise, we need to ask the user for permission
+  else if (Notification.permission !== &apos;denied&apos;) {
+    Notification.requestPermission(function (permission) {
+      // If the user accepts, let&apos;s create a notification
+      if (permission === &quot;granted&quot;) {
+        var notification = new Notification(&quot;Hi there!&quot;);
+      }
+    });
+  }
+
+  // Finally, if the user has denied notifications and you
+  // want to be respectful there is no need to bother them any more.
+}</pre>
+
+<div class="note">
+<p><strong>Note:</strong> Before version 37, Chrome doesn&apos;t let you call <a href="/pt-PT/docs/Web/API/Notification/requestPermission" title="The documentation about this has not yet been written; please consider contributing!"><code>Notification.requestPermission()</code></a> in the <code>load</code> event handler (see <a href="https://code.google.com/p/chromium/issues/detail?id=274284" title="https://code.google.com/p/chromium/issues/detail?id=274284">issue 274284</a>).</p>
+</div>
+
+<h3 id="Permissões_de_manifesto_do_Firefox_OS">Permissões de manifesto do Firefox OS</h3>
+
+<p>Please note that while the Notifications API is not <a href="/en-US/docs/Glossary/privileged" class="glossaryLink" title="privileged: Users are said to be privileged when they are granted additional rights to a system, or given ultimate access to content in a higher priority level when compared to normal users.">privileged</a> or <a href="/en-US/docs/Glossary/certified" class="glossaryLink" title="certified: Certified means that an application, content or data transmission has successfully undergone evaluation by professionals with expertise in the relevant field, thereby indicating completeness, security and trustworthiness.">certified</a>, you should still include an entry in your <code>manifest.webapp</code> file when including it in an Firefox OS app:</p>
+
+<pre>&quot;permissions&quot;: {
+  &quot;desktop-notification&quot;: {
+    &quot;description&quot;: &quot;Needed for creating system notifications.&quot;
+  }
+},
+&quot;messages&quot;: [{&quot;notification&quot;: &quot;path/to/your/index.html&quot;}]
+
+</pre>
+
+<div class="note">
+<p><strong>Note</strong>: When an application is installed, you shouldn&apos;t need to <a href="#Getting_permission">explicitly request permission</a>, but you will still need the permissions and messages entries above for the notifications to be fired.</p>
+</div>
+
+<h2 id="Criação_de_uma_notificação">Criação de uma notificação</h2>
+
+<p>Creating a notification is easy; just use the <a href="/pt-PT/docs/Web/API/Notification" title="The Notification interface of the Notifications API is used to configure and display desktop notifications to the user."><code>Notification</code></a> constructor. This constructor expects a title to display within the notification and some options to enhance the notification such as an <a href="/pt-PT/docs/Web/API/Notification/icon" title="The documentation about this has not yet been written; please consider contributing!"><code>icon</code></a> or a text <a href="/pt-PT/docs/Web/API/Notification/body" title="The documentation about this has not yet been written; please consider contributing!"><code>body</code></a>.</p>
+
+<p>For example, in the <a href="https://github.com/mdn/emogotchi/blob/gh-pages/main.js#L101-L117">Emogotchi example</a> we have two functions that can be called when a notification needs to be fired; which one is used depends on whether we want a set notification, or a notification that includes random body content:</p>
+
+<pre class="brush: js">function spawnNotification(theBody,theIcon,theTitle) {
+  var options = {
+      body: theBody,
+      icon: theIcon
+  }
+  var n = new Notification(theTitle,options);
+  setTimeout(n.close.bind(n), 5000);
+}
+
+function randomNotification() {
+  var randomQuote = quoteChooser();
+  var options = {
+      body: randomQuote,
+      icon: &apos;img/sad_head.png&apos;,
+  }
+
+  var n = new Notification(&apos;Emogotchi says&apos;,options);
+  setTimeout(n.close.bind(n), 5000);
+}</pre>
+
+<h2 id="Fechar_notificações">Fechar notificações</h2>
+
+<p>Firefox and Safari close notifications automatically after a few moments (around four seconds). This may also happen at the operating system level. Some browsers don&apos;t however, such as Chrome. To make sure that the notifications close in all browsers, at the end of the above functions, we call the <a href="/pt-PT/docs/Web/API/Notification/close" title="The documentation about this has not yet been written; please consider contributing!"><code>Notification.close</code></a> func<code>tion</code> inside a <a href="/pt-PT/docs/Web/API/WindowTimers/setTimeout" title="The documentation about this has not yet been written; please consider contributing!"><code>setTimeout()</code></a> function to close the notification after 4 seconds. Also note the use of <code><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">bind()</a></code> to make sure the <code>close()</code> call is associated with the notification.</p>
+
+<pre class="brush: js">setTimeout(n.close.bind(n), 5000);
+</pre>
+
+<div class="note">
+<p><strong>Note</strong>: When you receive a &quot;close&quot; event, there is no guarantee that it&apos;s the user who closed the notification. This is in line with the specification, which states: &quot;When a notification is closed, either by the underlying notifications platform or by the user, the close steps for it must be run.&quot;</p>
+</div>
+
+<h2 id="Eventos_de_notificação">Eventos de notificação</h2>
+
+<p>The notifications API spec lists two events that are triggered on the <a href="/pt-PT/docs/Web/API/Notification" title="The Notification interface of the Notifications API is used to configure and display desktop notifications to the user."><code>Notification</code></a> instance:</p>
+
+<dl>
+ <dt><code><a href="/pt-PT/docs/Web/Reference/Events/click" title="/pt-PT/docs/Web/Reference/Events/click">click</a></code></dt>
+ <dd>Triggered when the user clicks on the notification.</dd>
+ <dt><code><a href="/pt-PT/docs/Web/Reference/Events/error" title="/pt-PT/docs/Web/Reference/Events/error">error</a></code></dt>
+ <dd>Triggered if something goes wrong with the notification; this is usually because the notification couldn&apos;t be displayed for some reason.</dd>
+</dl>
+
+<p>These events can be tracked using the <a href="/pt-PT/docs/Web/API/Notification/onclick" title="The documentation about this has not yet been written; please consider contributing!"><code>onclick</code></a> and <a href="/pt-PT/docs/Web/API/Notification/onerror" title="The documentation about this has not yet been written; please consider contributing!"><code>onerror</code></a> handlers. Because <a href="/pt-PT/docs/Web/API/Notification" title="The Notification interface of the Notifications API is used to configure and display desktop notifications to the user."><code>Notification</code></a> also inherits from <a href="/pt-PT/docs/Web/API/EventTarget" title="The documentation about this has not yet been written; please consider contributing!"><code>EventTarget</code></a>, it&apos;s possible to use the <a href="/pt-PT/docs/Web/API/EventTarget/addEventListener" title="The documentation about this has not yet been written; please consider contributing!"><code>addEventListener()</code></a> method on it.</p>
+
+<p>There are also two other events that used to be listed in the spec, but were recently removed. These may still work in browsers for a while, but they should be treated as obsolete and not used:</p>
+
+<dl>
+ <dt><code><a href="/pt-PT/docs/Web/Reference/Events/close" title="/pt-PT/docs/Web/Reference/Events/close">close</a></code></dt>
+ <dd>Triggered once the notification is closed.</dd>
+ <dt><code><a href="/pt-PT/docs/Web/Reference/Events/show" title="/pt-PT/docs/Web/Reference/Events/show">show</a></code></dt>
+ <dd>Triggered when the notification is displayed to the user.</dd>
+</dl>
+
+<h2 id="Substituir_notificações_existentes">Substituir notificações existentes</h2>
+
+<p>It is usually undesirable for a user to receive a lot of notifications in a short space of time — for example, what if a messenger application notified a user for each incoming message, and they were being sent a lot? To avoid spamming the user with too many notifications, it&apos;s possible to modify the pending notifications queue, replacing single or multiple pending notifications with a new one.</p>
+
+<p>To do this, it&apos;s possible to add a tag to any new notification. If a notification already has the same tag and has not been displayed yet, the new notification replaces that previous notification. If the notification with the same tag has already <span style="line-height: 1.5;">been </span><span style="line-height: 1.5;">displayed, the previous notification is closed and the new one is displayed.</span></p>
+
+<h3 id="Exemplo_de_etiqueta">Exemplo de etiqueta</h3>
+
+<p>Assume the following basic HTML:</p>
+
+<pre class="brush: html">&lt;button&gt;Notify me!&lt;/button&gt;</pre>
+
+<p>It&apos;s possible to handle multiple notifications this way:</p>
+
+<pre class="brush: js">window.addEventListener(&apos;load&apos;, function () {
+  // At first, let&apos;s check if we have permission for notification
+  // If not, let&apos;s ask for it
+  if (window.Notification &amp;&amp; Notification.permission !== &quot;granted&quot;) {
+    Notification.requestPermission(function (status) {
+      if (Notification.permission !== status) {
+        Notification.permission = status;
+      }
+    });
+  }
+
+  var button = document.getElementsByTagName(&apos;button&apos;)[0];
+
+  button.addEventListener(&apos;click&apos;, function () {
+    // If the user agreed to get notified
+    // Let&apos;s try to send ten notifications
+    if (window.Notification &amp;&amp; Notification.permission === &quot;granted&quot;) {
+      var i = 0;
+      // Using an interval cause some browsers (including Firefox) are blocking notifications if there are too much in a certain time.
+      var interval = window.setInterval(function () {
+        // Thanks to the tag, we should only see the &quot;Hi! 9&quot; notification
+        var n = new Notification(&quot;Hi! &quot; + i, {tag: &apos;soManyNotification&apos;});
+        if (i++ == 9) {
+          window.clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    // If the user hasn&apos;t told if he wants to be notified or not
+    // Note: because of Chrome, we are not sure the permission property
+    // is set, therefore it&apos;s unsafe to check for the &quot;default&quot; value.
+    else if (window.Notification &amp;&amp; Notification.permission !== &quot;denied&quot;) {
+      Notification.requestPermission(function (status) {
+        if (Notification.permission !== status) {
+          Notification.permission = status;
+        }
+
+        // If the user said okay
+        if (status === &quot;granted&quot;) {
+          var i = 0;
+          // Using an interval cause some browsers (including Firefox) are blocking notifications if there are too much in a certain time.
+          var interval = window.setInterval(function () {
+            // Thanks to the tag, we should only see the &quot;Hi! 9&quot; notification
+            var n = new Notification(&quot;Hi! &quot; + i, {tag: &apos;soManyNotification&apos;});
+            if (i++ == 9) {
+              window.clearInterval(interval);
+            }
+          }, 200);
+        }
+
+        // Otherwise, we can fallback to a regular modal alert
+        else {
+          alert(&quot;Hi!&quot;);
+        }
+      });
+    }
+
+    // If the user refuses to get notified
+    else {
+      // We can fallback to a regular modal alert
+      alert(&quot;Hi!&quot;);
+    }
+  });
+});</pre>
+
+<p>See the live result below:</p>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-PT/docs/Web/API/Notifications_API/Utilizar_API_Notifica%C3%A7%C3%B5es$samples/Tag_example?revision=965019" width="100%" height="30" frameborder="0" class="live-sample-frame sample-code-frame" id="frame_Tag_example"></iframe></p>
+
+<h2 id="Receber_notificação_de_cliques_nas_notificações_da_aplicação">Receber notificação de cliques nas notificações da aplicação</h2>
+
+<p>When a user clicks on a notification generated by an app, you will be notified of this event in two different ways, depending on the circumstance:</p>
+
+<ol>
+ <li>A click event if your app has not closed or been put in the background between the time you create the notification and the time the user clicks on it.</li>
+ <li>A <a href="/en-US/docs/Web/API/Navigator/mozSetMessageHandler">system message</a> otherwise.</li>
+</ol>
+
+<p>See <a href="https://github.com/mozilla/buddyup/commit/829cba7afa576052cf601c3e286b8d1981f93f45#diff-3">this code snippet</a> for an example of how to deal with this.</p>
+
+<h2 id="Especificações">Especificações</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="The &apos;Notifications API&apos; specification" href="https://notifications.spec.whatwg.org/" class="external" hreflang="en">Notifications API</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Living standard</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidade_do_navegador">Compatibilidade do navegador</h2>
+
+<p></p><div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<p></p><div class="bc-data"><a href="https://github.com/mdn/browser-compat-data" class="bc-github-link">Update compatibility data on GitHub</a><table class="bc-table bc-table-web"><thead><tr class="bc-platforms"><td></td><th colspan="6" class="bc-platform-desktop"><span>Desktop</span></th><th colspan="7" class="bc-platform-mobile"><span>Mobile</span></th></tr><tr class="bc-browsers"><td></td><th class="bc-browser-chrome"><span class="bc-head-txt-label bc-head-icon-chrome">Chrome</span></th><th class="bc-browser-edge"><span class="bc-head-txt-label bc-head-icon-edge">Edge</span></th><th class="bc-browser-firefox"><span class="bc-head-txt-label bc-head-icon-firefox">Firefox</span></th><th class="bc-browser-ie"><span class="bc-head-txt-label bc-head-icon-ie">Internet Explorer</span></th><th class="bc-browser-opera"><span class="bc-head-txt-label bc-head-icon-opera">Opera</span></th><th class="bc-browser-safari"><span class="bc-head-txt-label bc-head-icon-safari">Safari</span></th><th class="bc-browser-webview_android"><span class="bc-head-txt-label bc-head-icon-webview_android">Android webview</span></th><th class="bc-browser-chrome_android"><span class="bc-head-txt-label bc-head-icon-chrome_android">Chrome for Android</span></th><th class="bc-browser-edge_mobile"><span class="bc-head-txt-label bc-head-icon-edge_mobile">Edge Mobile</span></th><th class="bc-browser-firefox_android"><span class="bc-head-txt-label bc-head-icon-firefox_android">Firefox for Android</span></th><th class="bc-browser-opera_android"><span class="bc-head-txt-label bc-head-icon-opera_android">Opera for Android</span></th><th class="bc-browser-safari_ios"><span class="bc-head-txt-label bc-head-icon-safari_ios">Safari on iOS</span></th><th class="bc-browser-samsunginternet_android"><span class="bc-head-txt-label bc-head-icon-samsunginternet_android">Samsung Internet</span></th></tr></thead><tbody><tr><th scope="row"><a href="/docs/Web/API/Notification">Basic support</a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div><section class="bc-history" id="sect1"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div></dt><dd><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> Before Chrome 22, the support for notification followed an old prefixed version of the specification and used the <code>navigator.webkitNotifications</code> object to instantiate a new notification. Before Chrome 32, <code>Notification.permission</code> was not supported. Before Chrome 42, service worker additions were not supported. Starting in Chrome 49, notifications do not work in incognito mode.</dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              5<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -webkit-</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect2"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -moz-</dd></dl></section></td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              6</td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android bc-has-history"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect3"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -webkit-</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row">Available in workers</th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              45</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              41</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              32</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              45</td><td class="bc-supports-yes bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              41</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              32</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row">Secure contexts only</th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              62</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              49</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              62</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              49</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/Notification"><code>Notification()</code> constructor</a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect4"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              5<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect5"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              6</td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android bc-has-history"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect6"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/actions"><code>actions</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              18</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/badge"><code>badge</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              18</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/body"><code>body</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/data"><code>data</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/dir"><code>dir</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/icon"><code>icon</code></a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect7"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              5<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -webkit-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -webkit-</dd></dl></section></td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect8"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -moz-</dd></dl></section></td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-no bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android bc-has-history"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div><section class="bc-history" id="sect9"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              4<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: -moz-"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: -moz-</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/image"><code>image</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              18</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              40</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              40</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/lang"><code>lang</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/maxActions"><code>maxActions</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              18</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/onclick"><code>onclick</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/onclose"><code>onclose</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/onerror"><code>onerror</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/onshow"><code>onshow</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/permission"><code>permission</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/renotify"><code>renotify</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              50</td><td class="bc-supports-no bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              37</td><td class="bc-supports-no bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              50</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              37</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/requireInteraction"><code>requireInteraction</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              17</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/silent"><code>silent</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              43</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              17</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              30</td><td class="bc-supports-no bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              43</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              30</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/tag"><code>tag</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/timestamp"><code>timestamp</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              17</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/title"><code>title</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/vibrate"><code>vibrate</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-no bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              53</td><td class="bc-supports-no bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-no bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              39</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/close"><code>close</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr><tr><th scope="row"><a href="/docs/Web/API/Notification/requestPermission"><code>requestPermission</code></a></th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              46</td><td class="bc-supports-unknown bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              47</td><td class="bc-supports-no bc-browser-ie"><span class="bc-browser-name">IE</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              40</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-no bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              46</td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              40</td><td class="bc-supports-no bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-no only-icon" title="No support">
+                <span>No support</span>
+              </abbr>
+              No</td><td class="bc-supports-unknown bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td></tr></tbody></table><section class="bc-legend" id="sect10"><h3 class="offscreen" id="Legend">Legend</h3><dl><dt><span class="bc-supports-yes bc-supports">
+                <abbr class="bc-level bc-level-yes only-icon" title="Full support">
+                 <span>Full support</span>
+
+                </abbr></span></dt><dd>Full support</dd><dt><span class="bc-supports-no bc-supports">
+                <abbr class="bc-level bc-level-no only-icon" title="No support">
+                 <span>No support</span>
+
+                </abbr></span></dt><dd>No support</dd><dt><span class="bc-supports-unknown bc-supports">
+                <abbr class="bc-level bc-level-unknown only-icon" title="Compatibility unknown">
+                 <span>Compatibility unknown</span>
+
+                </abbr></span></dt><dd>Compatibility unknown</dd><dt><abbr class="only-icon" title="See implementation notes."><span>See implementation notes.</span><i class="ic-footnote"></i></abbr></dt><dd>See implementation notes.</dd><dt><abbr class="only-icon" title="Requires a vendor prefix or different name for use."><span>Requires a vendor prefix or different name for use.</span><i class="ic-prefix"></i></abbr></dt><dd>Requires a vendor prefix or different name for use.</dd></dl></section></div><p></p><p></p>
+
+<h2 id="Consultar_também">Consultar também</h2>
+
+<ul>
+ <li><a href="/en-US/Apps/Build/User_notifications">Referência das notificações do utilizador</a></li>
+ <li><a href="/en-US/Apps/Build/User_notifications/Notifying_users_via_the_Notification_and_Vibration">Notificação dos utilziadores via APIs de Notificação e Vibração</a></li>
+ <li><a href="/pt-PT/docs/Web/API/Notificação" title="The documentation about this has not yet been written; please consider contributing!"><code>Notificação</code></a></li>
+</ul>

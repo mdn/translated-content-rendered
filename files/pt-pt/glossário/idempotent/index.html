@@ -1,0 +1,46 @@
+---
+title: Idempotent
+slug: Glossário/Idempotent
+translation_of: Glossary/Idempotent
+---
+<p>Um método HTTP é <strong>idempotente</strong> se, e só se, o mesmo pedido puder ser feito mais do que uma vez, tendo sempre o mesmo resultado e deixando o servidor no mesmo estado. Por outras palavras, um método idempotente não deve ter efeitos secundários. Implementados corretamente, os métodos <a href="/pt-PT/docs/Web/HTTP/Methods/GET" title="The documentation about this has not yet been written; please consider contributing!"><code>GET</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/HEAD" title="The documentation about this has not yet been written; please consider contributing!"><code>HEAD</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/PUT" title="The documentation about this has not yet been written; please consider contributing!"><code>PUT</code></a>, and <a href="/pt-PT/docs/Web/HTTP/Methods/DELETE" title="The documentation about this has not yet been written; please consider contributing!"><code>DELETE</code></a> são <strong>idempotentes</strong>, mas não o método <a href="/pt-PT/docs/Web/HTTP/Methods/POST" title="The documentation about this has not yet been written; please consider contributing!"><code>POST</code></a>. Todos os métodos <a class="glossaryLink" href="/en-US/docs/Glossary/safe" title="safe: An HTTP method is safe if it doesn't alter the state of the server. In other words, a method is safe if it leads to a read-only operation. Several common HTTP methods are safe: GET, HEAD, or OPTIONS. All safe methods are also idempotent as well as some, but not all, unsafe methods like PUT, or DELETE.">safe</a> também são idempotentes.</p>
+
+<p>Para ser idempotente, apenas o "back-end" do servidor é considerado, sendo que o estado retornado por cada pedido pode diferir: a primeira chamada de <a href="/pt-PT/docs/Web/HTTP/Methods/DELETE" title="The documentation about this has not yet been written; please consider contributing!"><code>DELETE</code></a> deve retornar <a href="/pt-PT/docs/Web/HTTP/Status/200" title="The documentation about this has not yet been written; please consider contributing!"><code>200</code></a>, enquanto as sucessivas devem retornar <a href="/pt-PT/docs/Web/HTTP/Status/404" title="The documentation about this has not yet been written; please consider contributing!"><code>404</code></a>. Outra implicação de o <a href="/pt-PT/docs/Web/HTTP/Methods/DELETE" title="The documentation about this has not yet been written; please consider contributing!"><code>DELETE</code></a> ser idempotente é que os programadores não devem implementar APIs RESTful com a funcionalidade de <em>apagar última entrada</em> usando o método de <code>DELETE</code>.</p>
+
+<p>É de notar que a idempotência de um método não é garantida pelo servidor e algumas aplicações podem incorretamente violar a constrição de idempotência.</p>
+
+<p><code>GET /pageX HTTP/1.1</code> é idempotente. Com várias chamadas ao servidor, o cliente obtém os mesmos resultados:</p>
+
+<pre>GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+</pre>
+
+<p><code>POST /add_row HTTP/1.1</code> não é idempotente; com várias chamadas ao servidor, adiciona novas linhas:</p>
+
+<pre>POST /add_row HTTP/1.1
+POST /add_row HTTP/1.1   -&gt; Adiciona uma 2ª linha
+POST /add_row HTTP/1.1   -&gt; Adiciona uma 3ª linha
+</pre>
+
+<p><code>DELETE /idX/delete HTTP/1.1</code> é idempotente, mesmo que o estado de retorno seja diferente entre cada chamada:</p>
+
+<pre>DELETE /idX/delete HTTP/1.1   -&gt; Returns 200 se idX existir
+DELETE /idX/delete HTTP/1.1   -&gt; Returns 404 visto que idX acabou de ser apagado
+DELETE /idX/delete HTTP/1.1   -&gt; Returns 404</pre>
+
+<h2 id="Saber_mais">Saber mais</h2>
+
+<h3 id="Conhecimento_comum">Conhecimento comum</h3>
+
+<ul>
+ <li>Definição de "<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a>" na especificação de HTTP.</li>
+</ul>
+
+<h3 id="Conhecimento_técnico">Conhecimento técnico</h3>
+
+<ul>
+ <li>Alguns métodos idempotentes comuns: <a href="/pt-PT/docs/Web/HTTP/Methods/GET" title="The documentation about this has not yet been written; please consider contributing!"><code>GET</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/HEAD" title="The documentation about this has not yet been written; please consider contributing!"><code>HEAD</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/PUT" title="The documentation about this has not yet been written; please consider contributing!"><code>PUT</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/DELETE" title="The documentation about this has not yet been written; please consider contributing!"><code>DELETE</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/OPTIONS" title="The documentation about this has not yet been written; please consider contributing!"><code>OPTIONS</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/TRACE" title="The documentation about this has not yet been written; please consider contributing!"><code>TRACE</code></a></li>
+ <li>Alguns métodos não-idempotentes comuns: <a href="/pt-PT/docs/Web/HTTP/Methods/POST" title="The documentation about this has not yet been written; please consider contributing!"><code>POST</code></a>,<a href="/pt-PT/docs/Web/HTTP/Methods/PATCH" title="The documentation about this has not yet been written; please consider contributing!"><code>PATCH</code></a>, <a href="/pt-PT/docs/Web/HTTP/Methods/CONNECT" title="The documentation about this has not yet been written; please consider contributing!"><code>CONNECT</code></a></li>
+</ul>

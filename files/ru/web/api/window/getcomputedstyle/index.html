@@ -1,0 +1,209 @@
+---
+title: window.getComputedStyle()
+slug: Web/API/Window/getComputedStyle
+translation_of: Web/API/Window/getComputedStyle
+---
+<p class="summary"><span class="seoSummary">Метод <strong><code>Window.getComputedStyle()</code></strong> возвращает объект, содержащий значения всех CSS-свойств элемента, полученных после применения всех активных таблиц стилей, и завершения базовых вычислений значений, которые они могут содержать.</span> Некоторые CSS-свойства доступны через API, предоставляемые объектом, или индексацию по именам CSS-свойств.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="syntaxbox">var <em>style</em> = window.getComputedStyle(<em>element</em> [, <em>pseudoElt</em>]);
+</pre>
+
+<dl>
+ <dt><code>element</code></dt>
+ <dd><a href="/ru/docs/Web/API/Element"><code>Element</code></a>, свойства которого необходимо получить.</dd>
+ <dt><code>pseudoElt</code> <span class="optional optionalInline notecard inline">Необязательный</span></dt>
+ <dd>Строка указывающая на найденный псевдо-элемент. Опускается (или <code>null</code>) для не псевдо-элементов.</dd>
+</dl>
+
+<p>Возвращенный <code>style</code> живой <a href="/ru/docs/Web/API/CSSStyleDeclaration"><code>CSSStyleDeclaration</code></a> обьект, который обновляется автоматически когда элемент стилей изменяется.</p>
+
+<h2 id="Выводы">Выводы</h2>
+
+<p>Метод <code>Window.getComputedStyle()</code> предоставляет все значения CSS свойств элементов после применения текущей таблицы стилей или базового расчета каких-либо значений, которые могут быть.</p>
+
+<h2 id="Пример">Пример</h2>
+
+<pre class="brush: js">var elem1 = document.getElementById(&quot;elemId&quot;);
+var style = window.getComputedStyle(elem1, null);
+
+// this is equivalent:
+// var style = document.defaultView.getComputedStyle(elem1, null);
+</pre>
+
+<pre class="brush: js">&lt;style&gt;
+ #elem-container{
+   position: absolute;
+   left:     100px;
+   top:      200px;
+   height:   100px;
+ }
+&lt;/style&gt;
+
+&lt;div id=&quot;elem-container&quot;&gt;dummy&lt;/div&gt;
+&lt;div id=&quot;output&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+  function getTheStyle(){
+    var elem = document.getElementById(&quot;elem-container&quot;);
+    var theCSSprop = window.getComputedStyle(elem,null).getPropertyValue(&quot;height&quot;);
+    document.getElementById(&quot;output&quot;).innerHTML = theCSSprop;
+   }
+  getTheStyle();
+&lt;/script&gt;
+</pre>
+
+<pre class="brush: js">function dumpComputedStyles(elem,prop) {
+
+  var cs = window.getComputedStyle(elem,null);
+  if (prop) {
+    console.log(prop+&quot; : &quot;+cs.getPropertyValue(prop));
+    return;
+  }
+  var len = cs.length;
+  for (var i=0;i&lt;len;i++) {
+
+    var style = cs[i];
+    console.log(style+&quot; : &quot;+cs.getPropertyValue(style));
+  }
+
+}
+</pre>
+
+<h2 id="Описание">Описание</h2>
+
+<p>Возвращенный обьект - это такой же обьект, который возвращается из свойства элемента <a href="/ru/docs/Web/API/HTMLElement/style"><code>style</code></a>; Так или иначе, эти два обьекта имеют разные назначения. Обьект который возвращается из <code>getComputedStyle</code> только для чтения и может быть использован для инспектирования стиля элемента (включая описание из <code>&lt;style&gt;</code> элемента или внешней таблицы стилей). Обьект <code>element.style</code> следует использовать для установки стилей на специфических элементах.</p>
+
+<p>Первый аргумент должен быть элементом (вставка узлов которые не являются элементами, например <code>#text</code> выдаст ошибку).</p>
+
+<h2 id="defaultView"><code>defaultView</code></h2>
+
+<p>Во многих примерах кода, <code>getComputedStyle</code> используется из обьекта <code>document.defaultView</code>. Почти во всех случаях это не нужно, поскольку <code>getComputedStyle</code> существует в обьетке <code>window</code>. Это что-то на подобии шаблона defaultView который был нейкой прослойкой. Люди не хотели писать спецификацию для <code>window</code> и создавали <code>API</code>  которое также могло использоваться для Java. Так или иначе <a class="link-https" href="https://github.com/jquery/jquery/pull/524#issuecomment-2241183" title="https://github.com/jquery/jquery/pull/524#issuecomment-2241183">есть только один случай</a> когда метод <code>defaultView</code> должен использоваться: когда вы используете Firefox 3.6 чтобы получить доступ к вычесленным стилям.</p>
+
+<h2 id="Использования_с_псевдо-элементами">Использования с псевдо-элементами</h2>
+
+<p><code>getComputedStyle</code> может получить информацию о стилях из псевдо-элемента (например - <code>::after</code>, <code>::before</code>, <code>::marker</code>, <code>::line-marker</code> - <a class="external" href="https://www.w3.org/TR/css-pseudo-4/">спецификация</a>).</p>
+
+<pre class="brush: html">&lt;style&gt;
+ h3::after {
+   content: &apos;rocks!&apos;;
+ }
+&lt;/style&gt;
+
+&lt;h3&gt;generated content&lt;/h3&gt;
+
+&lt;script&gt;
+  var h3 = document.querySelector(&apos;h3&apos;);
+  var result = getComputedStyle(h3, &apos;:after&apos;).content;
+
+  console.log(&apos;the generated content is: &apos;, result); // возвратит &apos;rocks!&apos;
+&lt;/script&gt;
+</pre>
+
+<h2 id="Notes">Notes</h2>
+
+<p>The values returned by <code>getComputedStyle</code> are known as <a href="/ru/docs/Web/CSS/resolved_value" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>resolved values</code></a>. These are usually the same as the CSS 2.1 <a href="/ru/docs/Web/CSS/computed_value" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>computed values</code></a>, but for some older properties like <code>width</code>, <code>height</code> or <code>padding</code>, they are instead the <a href="/ru/docs/Web/CSS/used_value" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>used values</code></a>. Originally, CSS 2.0 defined the computed values to be the &quot;ready to be used&quot; final values of properties after cascading and inheritance, but CSS 2.1 redefined computed values as pre-layout, and used values as post-layout. For CSS 2.0 properties, the <code>getComputedStyle</code> function returns the old meaning of computed values, now called <strong>used values</strong>. An example of difference between pre- and post-layout values includes the resolution of percentages that represent the width or the height of an element (also known as its layout), as those will be replaced by their pixel equivalent only in the used value case.</p>
+
+<p>The returned value is, in certain known cases, expressly inaccurate by deliberate intent. In particular, to avoid the so called CSS History Leak security issue, browsers may expressly &quot;lie&quot; about the used value for a link and always return values as if a user has never visited the linked site. See <a class="external" href="http://blog.mozilla.com/security/2010/03/31/plugging-the-css-history-leak/">http://blog.mozilla.com/security/2010/03/31/plugging-the-css-history-leak/</a> and <a class="external" href="http://hacks.mozilla.org/2010/03/privacy-related-changes-coming-to-css-vistited/">http://hacks.mozilla.org/2010/03/privacy-related-changes-coming-to-css-vistited/</a> for details of the examples of how this is implemented. Most other modern browsers have applied similar changes to the application of pseudo-selector styles and the values returned by <code>getComputedStyle</code>.</p>
+
+<p>During a CSS transition, <code>getComputedStyle</code> returns the original property value in Firefox, but the final property value in WebKit.</p>
+
+<p>In Firefox, properties with the value <code>auto</code> return the used value, not the value <code>auto</code>. So if you apply <code>top:auto;</code> and <code>bottom:0</code>; on an element with <code>height:30px</code> and its containing block is <code>height:100px;</code>, upon requesting the computed style for <code>top</code>, Firefox will return <code>top:70px</code>, as <code>100px-30px=70px</code>.</p>
+
+<h2 id="Браузерная_поддержка">Браузерная поддержка</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td>9</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+  </tr>
+  <tr>
+   <td>pseudo-element support</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td>9</td>
+   <td>15</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td>WP7 Mango</td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+   <td><span style="color: #888;" title="Пожалуйста, замените этот шаблон на указание самой ранней поддерживаемой версии.">(Да)</span></td>
+  </tr>
+  <tr>
+   <td>pseudo-element support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: #f00;">Нет</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Совместимость неизвестна; пожалуйста, обновите информацию.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Спецификаци">Спецификаци</h2>
+
+<ul>
+ <li><a class="external" href="https://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSview-getComputedStyle">DOM Level 2 Style: getComputedStyle</a></li>
+ <li><a href="https://drafts.csswg.org/cssom/#dom-window-getcomputedstyle" title="https://drafts.csswg.org/cssom/#dom-window-getcomputedstyle">CSS Object Model specification</a></li>
+</ul>
+
+<h2 id="See_also" name="See_also">Смотреть также</h2>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/Window/getDefaultComputedStyle"><code>window.getDefaultComputedStyle</code></a></li>
+ <li><a href="/ru/docs/Web/CSS/resolved_value" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>resolved value</code></a></li>
+</ul>

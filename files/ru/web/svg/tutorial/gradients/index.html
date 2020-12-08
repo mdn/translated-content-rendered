@@ -1,0 +1,185 @@
+---
+title: Градиенты
+slug: Web/SVG/Tutorial/Gradients
+translation_of: Web/SVG/Tutorial/Gradients
+---
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/ru/docs/Web/SVG/Tutorial/Fills_and_Strokes" style="float: left;" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/Patterns" class="button">Следующая статья  »</a></p>
+</div>
+
+<p>Возможность создания и использования градиентов, также как заливки и обводки, более интересна, чем просто заливка или обводка.</p>
+
+<p>Есть два типа градиентов: линейный и радиальный. Вы должны присвоить градиенту атрибут <code><strong>id</strong>, </code>в противном случае на него не смогут ссылаться другие элементы внутри файла. Градиенты определяются в секции <code>defs, </code>а не в самой фигуре. Это позволяет их использовать многократно.</p>
+
+<h2 id="SVGLinearGradient" name="SVGLinearGradient">Линейный градиент (Linear Gradient)</h2>
+
+<p>Линейные градиенты изменяются вдоль прямой линии. Чтобы вставить градиент, нужно создать ноду <a href="/ru/docs/Web/SVG/Element/linearGradient" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;linearGradient&gt;</code></a> внутри секции <code>&lt;defs&gt; </code>SVG файла.</p>
+
+<h3 id="Basic_example">Basic example</h3>
+
+<pre class="brush: html notranslate">&lt;svg width=&quot;120&quot; height=&quot;240&quot; version=&quot;1.1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+      &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+        &lt;stop class=&quot;stop1&quot; offset=&quot;0%&quot;/&gt;
+        &lt;stop class=&quot;stop2&quot; offset=&quot;50%&quot;/&gt;
+        &lt;stop class=&quot;stop3&quot; offset=&quot;100%&quot;/&gt;
+      &lt;/linearGradient&gt;
+      &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;50%&quot; stop-color=&quot;black&quot; stop-opacity=&quot;0&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/linearGradient&gt;
+      &lt;style type=&quot;text/css&quot;&gt;&lt;![CDATA[
+        #rect1 { fill: url(#Gradient1); }
+        .stop1 { stop-color: red; }
+        .stop2 { stop-color: black; stop-opacity: 0; }
+        .stop3 { stop-color: blue; }
+      ]]&gt;&lt;/style&gt;
+  &lt;/defs&gt;
+
+  &lt;rect id=&quot;rect1&quot; x=&quot;10&quot; y=&quot;10&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot;/&gt;
+  &lt;rect x=&quot;10&quot; y=&quot;120&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+
+&lt;/svg&gt;</pre>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="/files/722/SVG_Linear_Gradient_Example.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="240" id="frame_SVGLinearGradient" src="https://mdn.mozillademos.org/ru/docs/Web/SVG/Tutorial/Gradients$samples/SVGLinearGradient?revision=1639294" width="120"></iframe></td></tr></tbody></table>
+
+<p>Выше находится пример линейного градиента, который применен к элементу <code>&lt;rect&gt;. </code>Внутри линейного градиента есть несколько <a href="/ru/docs/Web/SVG/Element/stop" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;stop&gt;</code></a> нод.. Эти ноды сообщают градиенту, какой цвет он должен использовать в позициях, определенных атрибутом <code>offset </code>для позиции и атрибутом <code>stop-color. </code>Это может быть задано прямо в SVG или через CSS. В целях этого примера оба метода были смешаны. Например, <em>Gradient1</em> начинается с красного цвета, изменяется до прозрачно-черного в середине и заканчивается синим цветом. Вы можете вставить столько стоп-цветов, сколько нужно, чтобы создать смесь, которая будет красивой или ужасной, как вам нужно. Границы всегда должны изменяться от 0% (или от 0, если вы хотите опустить знак %) до 100% (или 1). Повторяющиеся значения будут использовать стоп, который будет находится дальше всех по XML-дереву. Также, подобно заливке и обводке, вы можете определить атрибут <code>stop-opacity, </code>чтобы задать прозрачность в этой позиции (опять же, в FF3+ можно также использовать rgba-значения для этого).</p>
+
+<pre class="eval notranslate"> &lt;stop offset=&quot;100%&quot; stop-color=&quot;yellow&quot; stop-opacity=&quot;0.5&quot;/&gt;
+</pre>
+
+<p>Чтобы использовать градиент, мы должны сослаться на него из атрибутов объекта <code>fill/stroke</code>. Это делается таким же образом, как вы ссылаетесь на элементы в CSS, используя <code>url</code>. В этом случае, url - это просто ссылка на наш градиент, которому задан уникальный ID, &quot;<em>Gradient&quot;. </em>Чтобы добавить его, установим <code>fill=&quot;url(#Gradient)&quot;</code>. Наш объект теперь многоцветный. То же самое можно сделать с атрибутом <code>stroke</code>.</p>
+
+<p>Элемент <code>&lt;linearGradient&gt;</code> также принимает некоторые другие атрибуты, который определяют размер и внешний вид градиента. Направление градиента контролируется двумя точками, обозначенными атрибутами <code>x1, x2, y1, y2</code>. Эти атрибуты определяют линию, вдоль которой двигается градиент. По умолчанию градиент имеет горизонтальную ориентацию, но это может быть изменено с помощью этих атрибутов. Gradient2 в примере выше предназначен для создания вертикального градиента.</p>
+
+<pre class="eval notranslate"> &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+</pre>
+
+<div class="note">
+<p><strong>Замечание: </strong>Вы также можете использовать атрибут <code>xlink:href </code>для градиентов. Когда он использован, атрибуты и стопы из одного градиента могут быть включены в другой. В примере выше можно было бы не пересоздавать все точки остановки в Gradient2<strong>.</strong></p>
+
+<pre class="eval notranslate"> &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+   &lt;stop id=&quot;stop1&quot; offset=&quot;0%&quot;/&gt;
+   &lt;stop id=&quot;stop2&quot; offset=&quot;50%&quot;/&gt;
+   &lt;stop id=&quot;stop3&quot; offset=&quot;100%&quot;/&gt;
+ &lt;/linearGradient&gt;
+ &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;
+    xmlns:xlink=&quot;<a class="external" href="http://www.w3.org/1999/xlink" rel="freelink">http://www.w3.org/1999/xlink</a>&quot; xlink:href=&quot;#Gradient1&quot;/&gt;
+</pre>
+
+<p>Я включил пространство имён xlink прямо в ноду, хотя обычно вы хотели бы определить его в верхней части вашего документа. Подробнее об этом мы <a href="https://developer.mozilla.org/en-US/Web/SVG/Tutorial/Other_content_in_SVG">поговорим в разделе изображений</a>.</p>
+</div>
+
+<h2 id="Radial_Gradient" name="Radial_Gradient">Радиальные градиенты</h2>
+
+<p>Радиальные градиенты похожи на линейные, но рисуют градиент, который &quot;излучается&quot; из точки. Для создания градиента Вам необходимо добавить элемент <a href="/ru/docs/Web/SVG/Element/radialGradient" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;radialGradient&gt;</code></a> в секцию <strong>defs</strong>.</p>
+
+<h3 id="Basic_example_2">Basic example</h3>
+
+<pre class="brush: html notranslate">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;
+&lt;svg width=&quot;120&quot; height=&quot;240&quot; version=&quot;1.1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+      &lt;radialGradient id=&quot;RadialGradient1&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+      &lt;radialGradient id=&quot;RadialGradient2&quot; cx=&quot;0.25&quot; cy=&quot;0.25&quot; r=&quot;0.25&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;rect x=&quot;10&quot; y=&quot;10&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#RadialGradient1)&quot;/&gt;
+  &lt;rect x=&quot;10&quot; y=&quot;120&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#RadialGradient2)&quot;/&gt;
+
+&lt;/svg&gt;</pre>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="/files/726/SVG_Radial_Gradient_Example.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="240" id="frame_Basic_example_2" src="https://mdn.mozillademos.org/ru/docs/Web/SVG/Tutorial/Gradients$samples/Basic_example_2?revision=1639294" width="120"></iframe></td></tr></tbody></table>
+
+<p>Аттрибуты <strong>stop</strong>, используемые здесь - отвечают за то же, что и в линейных градиентах. Однако сейчас объект будет красным в центре и постепенно меняться к синему цвету, &quot;двигаясь&quot; к краям. Как и линейный градиент, элемент <code>&lt;radialGradient&gt;</code> может иметь несколько аттрибутов, описывающих его позицию и ориентацию (направленность?). Однако, в отличие от линейных градиентов, радиальные немного сложнее. Радиальные градиенты задаются двумя &quot;точками&quot;, которые определят где будут границы. Первая &quot;точка&quot; определяет окружность, где градиент заканчивается. Для этого нам потребуется центр круга, который обозначается как <strong>cx</strong> и <strong>cy</strong>, и радиус - <strong>r</strong>. Изменяя эти аттрибуты, вы можете &quot;двигать&quot; внешнюю границу градиента и менять ее размер, как показано во втором прямоугольнике выше.</p>
+
+<p>Вторая &quot;точка&quot; называется <strong>фокальной</strong> и задается аттрибутами <strong>fx</strong> и <strong>fy</strong>. В то время как первые &quot;точки&quot; указывают на внешнюю границу градиента, фокальная &quot;точка&quot; определяет где должна быть его <strong>середина</strong>. Это легко увидеть на примере.</p>
+
+<h3 id="Center_and_focal_point">Center and focal point</h3>
+
+<pre class="brush: html notranslate">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;
+
+&lt;svg width=&quot;120&quot; height=&quot;120&quot; version=&quot;1.1&quot;
+  xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+      &lt;radialGradient id=&quot;Gradient&quot;
+            cx=&quot;0.5&quot; cy=&quot;0.5&quot; r=&quot;0.5&quot; fx=&quot;0.25&quot; fy=&quot;0.25&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;rect x=&quot;10&quot; y=&quot;10&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot;
+        fill=&quot;url(#Gradient)&quot; stroke=&quot;black&quot; stroke-width=&quot;2&quot;/&gt;
+
+  &lt;circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fill=&quot;transparent&quot; stroke=&quot;white&quot; stroke-width=&quot;2&quot;/&gt;
+  &lt;circle cx=&quot;35&quot; cy=&quot;35&quot; r=&quot;2&quot; fill=&quot;white&quot; stroke=&quot;white&quot;/&gt;
+  &lt;circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;2&quot; fill=&quot;white&quot; stroke=&quot;white&quot;/&gt;
+  &lt;text x=&quot;38&quot; y=&quot;40&quot; fill=&quot;white&quot; font-family=&quot;sans-serif&quot; font-size=&quot;10pt&quot;&gt;(fx,fy)&lt;/text&gt;
+  &lt;text x=&quot;63&quot; y=&quot;63&quot; fill=&quot;white&quot; font-family=&quot;sans-serif&quot; font-size=&quot;10pt&quot;&gt;(cx,cy)&lt;/text&gt;
+
+&lt;/svg&gt;</pre>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="/files/727/SVG_Radial_Grandient_Focus_Example.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="120" id="frame_Center_and_focal_point" src="https://mdn.mozillademos.org/ru/docs/Web/SVG/Tutorial/Gradients$samples/Center_and_focal_point?revision=1639294" width="120"></iframe></td></tr></tbody></table>
+
+<p>Если фокальная точка передвинута за границы круга, то градиент будет отрисован некорректно. Поэтому фокальная точка обязательно должна быть внутри границы круга (или на самой границе). Если фокальная точка не указана, то по дефолту она совпадает с центром круга.</p>
+
+<p>Линейный и радиальный градиенты также принимают несколько аттрибутов, описывающих как они могут изменяться. Единственный аттрибут, о котором я хотел бы рассказать более подробно - это <strong><code>spreadMethod</code></strong><code>. Этот аттрибут указывает, что должно происходить, когда градиент &quot;достигает&quot; внешней границы градиента, но объект еще не заполнен. Аттрибут может принимать одно и трех значений:</code>&quot;pad&quot;, &quot;reflect&quot;, или&quot;repeat&quot;. &quot;<strong>Pad</strong>&quot; - это то что вы пока что видели: когда градиент достигает &quot;краев&quot;, финальный цвет используется для заполнения оставшейся области. &quot;Reflect&quot; - градиент продолжает &quot;двигаться&quot; в &quot;зеркальном&quot; отражении (стартовый цвет берется из 100%, а конечный из 0%). А затем снова &quot;переворачивается&quot;. И так до тех пор пока не достигнет края.</p>
+
+<h3 id="spreadMethod">spreadMethod</h3>
+
+<pre class="brush: html notranslate">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;
+
+&lt;svg width=&quot;220&quot; height=&quot;220&quot; version=&quot;1.1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+      &lt;radialGradient id=&quot;GradientPad&quot;
+            cx=&quot;0.5&quot; cy=&quot;0.5&quot; r=&quot;0.4&quot; fx=&quot;0.75&quot; fy=&quot;0.75&quot;
+            spreadMethod=&quot;pad&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+      &lt;radialGradient id=&quot;GradientRepeat&quot;
+            cx=&quot;0.5&quot; cy=&quot;0.5&quot; r=&quot;0.4&quot; fx=&quot;0.75&quot; fy=&quot;0.75&quot;
+            spreadMethod=&quot;repeat&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+      &lt;radialGradient id=&quot;GradientReflect&quot;
+            cx=&quot;0.5&quot; cy=&quot;0.5&quot; r=&quot;0.4&quot; fx=&quot;0.75&quot; fy=&quot;0.75&quot;
+            spreadMethod=&quot;reflect&quot;&gt;
+        &lt;stop offset=&quot;0%&quot; stop-color=&quot;red&quot;/&gt;
+        &lt;stop offset=&quot;100%&quot; stop-color=&quot;blue&quot;/&gt;
+      &lt;/radialGradient&gt;
+  &lt;/defs&gt;
+
+  &lt;rect x=&quot;10&quot; y=&quot;10&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#GradientPad)&quot;/&gt;
+  &lt;rect x=&quot;10&quot; y=&quot;120&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#GradientRepeat)&quot;/&gt;
+  &lt;rect x=&quot;120&quot; y=&quot;120&quot; rx=&quot;15&quot; ry=&quot;15&quot; width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(#GradientReflect)&quot;/&gt;
+
+  &lt;text x=&quot;15&quot; y=&quot;30&quot; fill=&quot;white&quot; font-family=&quot;sans-serif&quot; font-size=&quot;12pt&quot;&gt;Pad&lt;/text&gt;
+  &lt;text x=&quot;15&quot; y=&quot;140&quot; fill=&quot;white&quot; font-family=&quot;sans-serif&quot; font-size=&quot;12pt&quot;&gt;Repeat&lt;/text&gt;
+  &lt;text x=&quot;125&quot; y=&quot;140&quot; fill=&quot;white&quot; font-family=&quot;sans-serif&quot; font-size=&quot;12pt&quot;&gt;Reflect&lt;/text&gt;
+
+&lt;/svg&gt;</pre>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="/files/728/SVG_SpreadMethod_Example.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="220" id="frame_spreadMethod" src="https://mdn.mozillademos.org/ru/docs/Web/SVG/Tutorial/Gradients$samples/spreadMethod?revision=1639294" width="220"></iframe></td></tr></tbody></table>
+
+<p>У обоих типов градиентов также есть атрибут <code><strong>gradientUnits</strong></code>, который описывает систему измерений, которую Вы собираетесь использовать, когда описываете размеры или ориентацию или градиен. Данный атрибут принимает 2 возможных значения: <strong><code>userSpaceOnUse</code></strong><code> </code>или <strong><code>objectBoundingBox </code></strong>(дефолтное, показывалось во всех примерах выше). <strong><code>objectBoundingBox </code></strong>автоматически адаптирует градиент к размеру объекта, так что Вы можете указать координаты в виде значений от 0 до 1, и браузер автоматически их отпозиционирует. <strong><code>userSpaceOnUse </code></strong>позиционирует градиент в абсолютных единицах измерения, так что Вам необходимо знать где находится целевой объект, чтобы правильно применить к нему градиент. radialGradient  выше может быть переписан:</p>
+
+<pre class="eval notranslate"> &lt;radialGradient id=&quot;Gradient&quot; cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fx=&quot;35&quot; fy=&quot;35&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+</pre>
+
+<p>Вы также можете применить иную трансформацию к градиенту, используя аттрибут <strong><code>gradientTransform</code></strong>, но мы пока что <a href="/en-US/Web/SVG/Tutorial/Basic_Transformations">его не изучали</a>, я осталю это на потом.<br>
+ <br>
+ Существуют и другие предостережения для работы с <br>
+ <code>gradientUnits=&quot;objectBoundingBox&quot;</code>, когда поле ограничения объекта не является квадратным, но они довольно сложны и им придется ждать, пока кто-то другой не соизволит объяснить их.</p>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/ru/docs/Web/SVG/Tutorial/Fills_and_Strokes" style="float: left;" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/Patterns" class="button">Следующая статья  »</a></p>
+</div>

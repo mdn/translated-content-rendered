@@ -1,0 +1,135 @@
+---
+title: Worker.onmessage
+slug: Web/API/Worker/onmessage
+translation_of: Web/API/Worker/onmessage
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li><strong><a href="/ru/docs/Web/API/Worker"><code>Worker</code></a></strong></li><li class="toggle"><details open><summary>Конструктор</summary><ol><li><a href="/ru/docs/Web/API/Worker/Worker"><code>Worker()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><a href="/ru/docs/Web/API/AbstractWorker/onerror"><code>onerror</code></a> <a style="opacity: 0.5;" href="/ru/docs/Web/API/AbstractWorker/onerror$translate">[Перевести]</a></li><li><em><code>onmessage</code></em></li><li><a href="/ru/docs/Web/API/Worker/onmessageerror"><code>onmessageerror</code></a> <a style="opacity: 0.5;" href="/ru/docs/Web/API/Worker/onmessageerror$translate">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Методы</summary><ol><li><a href="/ru/docs/Web/API/Worker/postMessage"><code>postMessage()</code></a></li><li><a href="/ru/docs/Web/API/Worker/terminate"><code>terminate()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Наследование:</summary><ol><li><a href="/ru/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Похожие страницы для Web Workers API</summary><ol><li><a href="/ru/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/ru/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/ru/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/ru/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/ru/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li><li><a href="/ru/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/ru/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/ru/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section><p></p>
+
+<p>Свойство <strong><code>onmessage</code></strong>  интерфейса <a href="/ru/docs/Web/API/Worker" title="Интерфейс Worker из Web Workers API является представителем фоновой задачи, которая легко может быть создана и может передавать сообщения обратно создателю. Создание worker  - это вызов конструктора Worker() и задание скрипта, выполняемого в потоке worker."><code>Worker</code></a> представляет собой обработчик <a href="/ru/docs/Web/API/EventHandler" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>EventHandler</code></a>, который будет вызван когда произойдет событие <code><a href="/ru/docs/Web/Reference/Events/message" title="/ru/docs/Web/Reference/Events/message">message</a></code>. Тип этого события <a href="/ru/docs/Web/API/MessageEvent" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>MessageEvent</code></a> и оно будет вызвано когда worker-объект получит сообщение из выполняемого им кода (т.е из метода <a href="/ru/docs/Web/API/DedicatedWorkerGlobalScope/postMessage" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>DedicatedWorkerGlobalScope.postMessage</code></a> .</p>
+
+<div class="note">
+<p><span style="font-size: 14px; line-height: 21px;"><strong>Примечание</strong></span>: Данные события доступны в свойстве data события <code><a href="/ru/docs/Web/Reference/Events/message" title="/ru/docs/Web/Reference/Events/message">message</a></code>.</p>
+</div>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="brush: js">myWorker.onmessage = function(e) { ... }</pre>
+
+<h2 id="Пример">Пример</h2>
+
+<p>Следующий пример кода показывает создание объекта <a href="/ru/docs/Web/API/Worker" title="Интерфейс Worker из Web Workers API является представителем фоновой задачи, которая легко может быть создана и может передавать сообщения обратно создателю. Создание worker  - это вызов конструктора Worker() и задание скрипта, выполняемого в потоке worker."><code>Worker</code></a> используя конструктор <a href="/ru/docs/Web/API/Worker/Worker" title="Конструктор Worker() создает объект Worker, который выполняет скрипт по указанному URL-адресу. Этот скрипт должен подчиняться политике одного источника (same-origin policy)."><code>Worker()</code></a>. События попадают в объект, когда значение внутри поля ввода формы <code>first</code> изменяется. Обработчик onmessage указан для обработки сообщений, которые приходят назад из кода объекта в текущий контекст выполнения.</p>
+
+<pre class="brush: js">var myWorker = new Worker(&quot;worker.js&quot;);
+
+first.onchange = function() {
+  myWorker.postMessage([first.value,second.value]);
+  console.log(&apos;Сообщение, отправленное в worker-объект&apos;);
+}
+
+myWorker.onmessage = function(e) {
+  result.textContent = e.data;
+  console.log(&apos;Сообщение полученное из worker-объекта&apos;);
+}
+</pre>
+
+<p>В скрипте <code>worker.js</code>, обработчик <code>onmessage</code> используется для обработки событий, полученных из главного скрипта:</p>
+
+<pre class="brush: js">onmessage = function(e) {
+  console.log(&apos;Сообщение полученное из главного скрипта&apos;);
+  var workerResult = &apos;Результат: &apos; + (e.data[0] * e.data[1]);
+  console.log(&apos;Отправка сообщения назад в главный скрипт&apos;);
+  postMessage(workerResult);
+}</pre>
+
+<p>Посмотрите как в скрипте <code>worker.js</code> вызывается обработчик <code>onmessage</code><code>.</code> В нем присутствует только глобальное свойство <code>onmessage,</code> потому что worker-объект фактически является областью видимости (<a href="/ru/docs/Web/API/DedicatedWorkerGlobalScope" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>DedicatedWorkerGlobalScope</code></a>).</p>
+
+<p>Для полного примера смотрите наш <a href="https://github.com/mdn/simple-web-worker" class="external external-icon">Basic dedicated worker example</a> (<a href="http://mdn.github.io/simple-web-worker/" class="external external-icon">run dedicated worker</a>).</p>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарий</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://html.spec.whatwg.org/multipage/#handler-worker-onmessage" class="external" hreflang="en">HTML Living Standard<br><small lang="ru">Определение &apos;Worker.onmessage&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-Living">Живой стандарт</span></td>
+   <td>Никаких изменений из <a lang="en" title="Спецификация &apos;Unknown&apos;" class="external" hreflang="en">Unknown</a>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" class="external" hreflang="en">Unknown<br><small lang="ru">Определение &apos;Worker.onmessage&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-">Неизвестно</span></td>
+   <td>Начальное определение.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость_с_браузерами">Совместимость с браузерами</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/ru/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Настольные</a></li>
+        <li><a>Мобильные</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Функциональность</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Базовая поддержка</td>
+   <td>4</td>
+   <td>3.5</td>
+   <td>10.0</td>
+   <td>10.6</td>
+   <td>4</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Функциональность</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Базовая поддержка</td>
+   <td>4.4</td>
+   <td>3.5</td>
+   <td>1.0.1</td>
+   <td>10.0</td>
+   <td>11.5</td>
+   <td>5.1</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<p>Интерфейс <a href="/ru/docs/Web/API/Worker" title="Интерфейс Worker из Web Workers API является представителем фоновой задачи, которая легко может быть создана и может передавать сообщения обратно создателю. Создание worker  - это вызов конструктора Worker() и задание скрипта, выполняемого в потоке worker."><code>Worker</code></a>, которому принадлежит этот обработчик.</p>

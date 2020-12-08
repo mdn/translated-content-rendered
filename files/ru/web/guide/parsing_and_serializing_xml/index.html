@@ -1,0 +1,118 @@
+---
+title: Прямая и обратная обработка XML
+slug: Web/Guide/Parsing_and_serializing_XML
+translation_of: Web/Guide/Parsing_and_serializing_XML
+---
+<p>
+ <audio class="audio-for-speech"></audio>
+</p>
+
+<div class="translate-tooltip-mtz hidden">
+<div class="header">
+<div class="header-controls"></div>
+
+<div class="translate-icons"><img class="from" src=""> <img class="arrow"> <img class="to" src=""></div>
+</div>
+
+<div class="translated-text">
+<div class="words"></div>
+
+<div class="sentences"></div>
+</div>
+</div>
+
+<p>Иногда возникает необходимость в обработке <a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/XML">XML</a> и в последующей конвертации в древо <a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/DOM">DOM</a>. Или наоборот, необходимо перевести древо DOM в XML. В этой статье рассмотрим объекты платформы web для обработки XML.</p>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/XMLSerializer"><code>XMLSerializer</code></a></dt>
+ <dd>Сериализует деревья DOM, преобразуя их в строки, содержащие XML.</dd>
+ <dt><a href="/ru/docs/Web/API/DOMParser"><code>DOMParser</code></a></dt>
+ <dd>Создает дерево DOM, анализируя строку, содержащую XML, возвращая <a href="/ru/docs/Web/API/XMLDocument"><code>XMLDocument</code></a> или <a href="/ru/docs/Web/API/Document"><code>Document</code></a> в зависимости от входящих данных.</dd>
+ <dt><a href="/ru/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></dt>
+ <dd>Загружает контент из URL-адреса; Содержимое XML возвращается как объект XML <a href="/ru/docs/Web/API/Document"><code>Document</code></a> с деревом DOM, построенным из самого XML.</dd>
+ <dt><a href="/en-US/docs/Web/XPath">XPath</a></dt>
+ <dd>Технология создания строк, содержащих адреса для определенных частей документа XML, и поиска узлов XML на основе этих адресов.</dd>
+</dl>
+
+<h2 id="Создание_XML-документа">Создание XML-документа</h2>
+
+<p>Использование одного из следующих подходов для создания XML-документа (который является экземпляром <a href="/ru/docs/Web/API/Document"><code>Document</code></a>.</p>
+
+<h3 id="Parsing_строк_в_дерево_DOM">Parsing строк в дерево DOM</h3>
+
+<p>В этом примере фрагмент XML в строке преобразуется в дерево DOM с помощью <a href="/ru/docs/Web/API/DOMParser"><code>DOMParser</code></a>:</p>
+
+<div style="overflow: hidden;">
+<pre class="brush: js notranslate">var sMyString = '&lt;a id="a"&gt;&lt;b id="b"&gt;hey!&lt;/b&gt;&lt;/a&gt;';
+var oParser = new DOMParser();
+var oDOM = oParser.parseFromString(sMyString, "application/xml");
+// print the name of the root element or error message
+console.log(oDOM.documentElement.nodeName == "parsererror" ? "error while parsing" : oDOM.documentElement.nodeName);
+</pre>
+</div>
+
+<h3 id="Parsing_URL-addressable_ресурсов_в_дерево_DOM">Parsing URL-addressable ресурсов в дерево DOM</h3>
+
+<h4 id="Использование_XMLHttpRequest">Использование XMLHttpRequest</h4>
+
+<p>Вот пример кода, который считывает и анализирует XML-файл с URL-адресом в дереве DOM:</p>
+
+<pre class="brush: js notranslate">var xhr = new XMLHttpRequest();
+xhr.onload = function() {
+  dump(xhr.responseXML.documentElement.nodeName);
+}
+xhr.onerror = function() {
+  dump("Error while getting XML.");
+}
+xhr.open("GET", "example.xml");
+xhr.responseType = "document";
+xhr.send();
+</pre>
+
+<p>Значение, возвращаемое в поле <a href="/ru/docs/Web/API/XMLHttpRequest/responseXML"><code>responseXML</code></a> объекта xhr, является <a href="/ru/docs/Web/API/Document"><code>Document</code></a>, созданным путем синтаксического анализа XML.</p>
+
+<p>Если документ представляет собой <a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/HTML">HTML</a>, приведенный выше код вернет <a href="/ru/docs/Web/API/Document"><code>Document</code></a>. Если документ XML, результирующий объект на самом деле является <a href="/ru/docs/Web/API/XMLDocument"><code>XMLDocument</code></a>. Эти два типа по существу одинаковы; разница в основном историческая, хотя дифференциация имеет также некоторые практические преимущества.</p>
+
+<div class="note">
+<p>Примечание: на самом деле существует интерфейс <a href="/ru/docs/Web/API/HTMLDocument"><code>HTMLDocument</code></a>, но это не обязательно независимый тип. В некоторых браузерах это так, а в других это просто псевдоним для интерфейса документа.</p>
+</div>
+
+<h2 id="Сериализация_XML-документа">Сериализация XML-документа</h2>
+
+<p>Имея <a href="/ru/docs/Web/API/Document"><code>Document</code></a>, вы можете сериализовать дерево DOM документа обратно в XML с помощью метода <a href="/ru/docs/Web/API/XMLSerializer/serializeToString_"><code>XMLSerializer.serializeToString ()</code></a>.</p>
+
+<p>Используйте следующие подходы для сериализации содержимого XML-документа, созданного в предыдущем разделе.</p>
+
+<h3 id="Serializing_DOM_trees_to_strings">Serializing DOM trees to strings</h3>
+
+<p>Сначала создайте дерево DOM, как описано в разделе Как создать дерево DOM. В качестве альтернативы используйте дерево DOM, полученное из <a href="/ru/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a>.</p>
+
+<p>Чтобы сериализовать документ дерева DOM в текст XML, вызовите <a href="/ru/docs/Web/API/XMLSerializer/serializeToString_"><code>XMLSerializer.serializeToString ()</code></a>:</p>
+
+<pre class="brush: js notranslate">var oSerializer = new XMLSerializer();
+var sXML = oSerializer.serializeToString(doc);</pre>
+
+<h3 id="Serializing_HTML_documents">Serializing HTML documents</h3>
+
+<p>Если у вас есть модель DOM в виде HTML-документа, вы можете сериализовать ее с помощью serializeToString (), но есть более простой вариант: просто используйте свойство <a href="/ru/docs/Web/API/Element/innerHTML"><code>Element.innerHTML</code></a> (если вам нужны только потомки указанный узел) или свойство <a href="/ru/docs/Web/API/Element/outerHTML"><code>Element.outerHTML</code></a>, если вам нужен узел и все его потомки.</p>
+
+<pre class="brush: js notranslate">var docHTML = document.documentElement.innerHTML;
+</pre>
+
+<p>В результате docHTML представляет собой <a href="/ru/docs/Web/API/DOMString"><code>DOMString</code></a>, содержащий HTML-код содержимого документа; то есть содержимое элемента <a href="/ru/docs/Web/HTML/Element/body" title="HTML-элемент &lt;body> представляет собой контент (содержимое) документа HTML. В документе может быть только один элемент &lt;body>."><code>&lt;body&gt;</code></a>.</p>
+
+<p>Вы можете получить HTML, соответствующий &lt;body&gt; и его потомкам, с помощью этого кода:</p>
+
+<pre class="brush: js notranslate">var docHTML = document.documentElement.outerHTML;</pre>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a class="internal" href="/en/XPath" title="en/XPath">XPath</a></li>
+ <li><a href="/ru/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="/ru/docs/Web/API/Document"><code>Document</code></a>, <a href="/ru/docs/Web/API/XMLDocument"><code>XMLDocument</code></a>, and <a href="/ru/docs/Web/API/HTMLDocument"><code>HTMLDocument</code></a></li>
+</ul>
+
+<div id="gtx-trans" style="position: absolute; left: 118px; top: 2989.8px;">
+<div class="gtx-trans-icon"></div>
+</div>

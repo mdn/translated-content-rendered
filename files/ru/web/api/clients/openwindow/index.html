@@ -1,0 +1,91 @@
+---
+title: Clients.openWindow()
+slug: Web/API/Clients/openWindow
+tags:
+  - API
+  - Clients
+  - Experimental
+  - Method
+  - Reference
+  - Service Workers
+  - ServiceWorker
+  - openWindow
+translation_of: Web/API/Clients/openWindow
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Service_Worker_API">Service Worker API</a></strong></li><li><strong><a href="/ru/docs/Web/API/Clients"><code>Clients</code></a></strong></li><li class="toggle"><details open><summary>Методы</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Clients/claim"><code>claim()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Clients/get"><code>get()</code></a> <a href="/ru/docs/Web/API/Clients/get$translate" style="opacity: 0.5;">[Перевести]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><a href="/ru/docs/Web/API/Clients/matchAll"><code>matchAll()</code></a> <a href="/ru/docs/Web/API/Clients/matchAll$translate" style="opacity: 0.5;">[Перевести]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span><em><code>openWindow()</code></em></li></ol></details></li><li class="toggle"><details open><summary>Похожие страницы для Service Workers API</summary><ol><li><a href="/ru/docs/Web/API/Cache"><code>Cache</code></a></li><li><a href="/ru/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li><li><a href="/ru/docs/Web/API/Client"><code>Client</code></a></li><li><a href="/ru/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li><li><a href="/ru/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li><li><a href="/ru/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li><li><a href="/ru/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li><li><a href="/ru/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li><li><a href="/ru/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li><li><a href="/ru/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li><li><a href="/ru/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li><li><a href="/ru/docs/Web/API/SyncManager"><code>SyncManager</code></a></li><li><a href="/ru/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li><li><a href="/ru/docs/Web/API/WindowClient"><code>WindowClient</code></a></li></ol></details></li></ol></section></div>
+
+<p>Метод <strong><code>openWindow()</code></strong> интерфейса <a href="/ru/docs/Web/API/Clients"><code>Clients</code></a> создает новый контекст просмотра верхнего уровня и загружает заданный URL. Если вызывающий скрипт не имеет разрешения на отображение всплывающих окон, <code>openWindow()</code> выдаст <code>InvalidAccessError</code>.</p>
+
+<p>В Firefox этому методу разрешено отображать всплывающие окна только при вызове события клике по уведомлению.</p>
+
+<p>В Chrome для Android этот метод может открыть URL-адрес в существующем контексте просмотра, предоставляемым автономным веб-приложением (<a href="/en-US/docs/Web/Progressive_web_apps">standalone web app</a>), ранее добавленным на главный экран пользователя. С недавнего времени это также работает в Chrome для Windows.</p>
+
+<h2 id="Синтаксис">Синтаксис</h2>
+
+<pre class="syntaxbox notranslate">self.clients.openWindow(<em>url</em>).then(function(<em>windowClient</em>) {
+  // Do something with your WindowClient
+});</pre>
+
+<h3 id="Параметры">Параметры</h3>
+
+<dl>
+ <dt><code>url</code></dt>
+ <dd><a href="/ru/docs/Web/API/USVString"><code>USVString</code></a> - URL-адрес клиента, который вы хотите открыть. Обычно это значение должно быть URL из того же источника, что и вызывающий скрипт.</dd>
+</dl>
+
+<h3 id="Возвращаемое_значение">Возвращаемое значение</h3>
+
+<dl>
+ <dd><a href="/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>, который преобразуется в объект <a href="/ru/docs/Web/API/WindowClient"><code>WindowClient</code></a>, если URL-адрес исходит из того же источника, что и сервис-воркер, иначе <a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/Null">null value</a> .</dd>
+</dl>
+
+<h2 id="Примеры">Примеры</h2>
+
+<pre class="brush: js notranslate">// Отправить уведомление в OS, если возможно
+if (self.Notification.permission === &apos;granted&apos;) {
+  const notificationObject = {
+    body: &apos;Click here to view your messages.&apos;,
+    data: { url: self.location.origin + &apos;/some/path&apos; },
+    // data: { url: &apos;http://example.com&apos; },
+  };
+  self.registration.showNotification(&apos;You\&apos;ve got messages!&apos;, notificationObject);
+}
+
+// Слушатель события клика по уведомлению
+self.addEventListener(&apos;notificationclick&apos;, e =&gt; {
+  // Закрываем всплывающее окно с уведомлением
+  e.notification.close();
+  // Получите все клиенты Windows
+  e.waitUntil(clients.matchAll({ type: &apos;window&apos; }).then(clientsArr =&gt; {
+    // Если вкладка, соответствующая целевому URL-адресу, уже существует, сфокусируйтесь на ней;
+    const hadWindowToFocus = clientsArr.some(windowClient =&gt; windowClient.url === e.notification.data.url ? (windowClient.focus(), true) : false);
+    // В противном случае откройте новую вкладку для соответствующего URL-адреса и сфокусируйте ее.
+    if (!hadWindowToFocus) clients.openWindow(e.notification.data.url).then(windowClient =&gt; windowClient ? windowClient.focus() : null);
+  }));
+});
+</pre>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#clients-openwindow" hreflang="en" lang="en">Service Workers<br><small lang="ru">Определение &apos;Clients: openWindow&apos; в этой спецификации.</small></a></td>
+   <td><span class="spec-WD">Рабочий черновик</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Совместимость_с_браузером">Совместимость с браузером</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Clients.openWindow"></div>
+</div>

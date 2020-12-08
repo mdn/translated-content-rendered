@@ -1,0 +1,102 @@
+---
+title: SVG шрифты
+slug: Web/SVG/Tutorial/SVG_fonts
+translation_of: Web/SVG/Tutorial/SVG_fonts
+---
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ru/docs/Web/SVG/Tutorial/Filter_effects" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/SVG_Image_Tag" class="button">Следующая статья  »</a></p>
+</div><p></p>
+
+<p>Когда был написан стандарт SVG, поддержка веб-шрифтов еще не была широко распространена в браузерах. Поскольку доступ к правильному файлу шрифта имеет решающее значение для правильного отображения текста, в SVG была добавлена технология описания шрифтов. Она не совместима с другими форматами, такими как PostScript или OTF, это лишь простое средство вложения информации о глифах в SVG при визуализации.<br>
+  </p>
+
+<p class="note"><strong>SVG-шрифты корректно поддерживаются только в Safari.</strong><br>
+ Эта возможность не была реализована в Internet Explorer, она также была удалена из Chrome 38 (и Opera 25),  разработчики Mozilla отложили ее реализацию на неопределенное время, чтобы сосредоточиться на WOFF. Другие инструменты, такие как плагин Adobe SVG Viewer, Batik и частично Inkscape поддерживают встраиваемые шрифты SVG.</p>
+
+<p class="syntaxbox">Элемент <a href="/ru/docs/Web/SVG/Element/font" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font&gt;</code></a> используется для определения SVG-шрифта.</p>
+
+<h2 id="Установка_шрифта">Установка шрифта</h2>
+
+<p> </p>
+
+<p>Есть некоторые нюансы, необходимые для вставки шрифта в SVG. Давайте рассмотрим пример объявления (указанный<a href="http://www.w3.org/TR/SVG/fonts.html#FontElement"> в спецификации</a>), и объясним детали.<br>
+  </p>
+
+<pre>&lt;font id=&quot;Font1&quot; horiz-adv-x=&quot;1000&quot;&gt;
+  &lt;font-face font-family=&quot;Super Sans&quot; font-weight=&quot;bold&quot; font-style=&quot;normal&quot;
+      units-per-em=&quot;1000&quot; cap-height=&quot;600&quot; x-height=&quot;400&quot;
+      ascent=&quot;700&quot; descent=&quot;300&quot;
+      alphabetic=&quot;0&quot; mathematical=&quot;350&quot; ideographic=&quot;400&quot; hanging=&quot;500&quot;&gt;
+    &lt;font-face-src&gt;
+      &lt;font-face-name name=&quot;Super Sans Bold&quot;/&gt;
+    &lt;/font-face-src&gt;
+  &lt;/font-face&gt;
+  &lt;missing-glyph&gt;&lt;path d=&quot;M0,0h200v200h-200z&quot;/&gt;&lt;/missing-glyph&gt;
+  &lt;glyph unicode=&quot;!&quot; horiz-adv-x=&quot;300&quot;&gt;&lt;!-- Outline of exclam. pt. glyph --&gt;&lt;/glyph&gt;
+  &lt;glyph unicode=&quot;@&quot;&gt;&lt;!-- Outline of @ glyph --&gt;&lt;/glyph&gt;
+  &lt;!-- more glyphs --&gt;
+&lt;/font&gt;
+</pre>
+
+<p>Начнем с элемента <a href="/ru/docs/Web/SVG/Element/font" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font&gt;</code></a>. Он имеет атрибут <code>id</code>, который позволяет ему ссылаться через URI (см. ниже). Атрибут <code>horiz-adv-x</code> определяет, насколько широкий символ в среднем по сравнению с путями для отдельных глифов. Обычно подходит значение 1000. Существует несколько сопутствующих атрибутов, которые помогают определить ограничительные рамки. </p>
+
+<p>Элемент <a href="/ru/docs/Web/SVG/Element/font-face" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font-face&gt;</code></a> является в SVG эквивалентом объявления шрифта с помощью CSS-свойства <a href="https://developer.mozilla.org/en/CSS/@font-face">@font-face</a>. Он определяет основные свойства финального шрифта, такие как вес, стиль и т. д. В приведенном выше примере, первое и самое важное свойство, которое должно быть определено - это <code>font-family</code>, на значение которого затем можно ссылаться в свойствах CSS и SVG. Атрибуты <code>font-weight</code> и <code>font-style</code> имеют ту же цель, что и соответствующие свойства CSS. Все последующие атрибуты - это команды рендеринга для механизма компоновки шрифтов, задающие, к примеру, какая средняя высота символов направленных вверх или вниз <a href="http://en.wikipedia.org/wiki/Ascender_%28typography%29">выносных элементов</a>.</p>
+
+<p>Дочерний элемент <a href="/ru/docs/Web/SVG/Element/font-face-src" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font-face-src&gt;</code></a> соответствует свойству <code>src</code> для атрибута <code>@font-face</code> в CSS. Вы можете указать внешние источники для определения шрифтов с помощью элементов <a href="/ru/docs/Web/SVG/Element/font-face-name" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font-face-name&gt;</code></a> и <a href="/ru/docs/Web/SVG/Element/font-face-uri" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font-face-uri&gt;</code></a>. В приведенном выше примере указано, что если у рендерера имеется локальный доступный шрифт с именем «Super Sans Bold», он должен использовать его.</p>
+
+<p>Следующий элемент за <a href="/ru/docs/Web/SVG/Element/font-face-src" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;font-face-src&gt;</code></a> - это <a href="/ru/docs/Web/SVG/Element/missing-glyph" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;missing-glyph&gt;</code></a>. Он определяет, что должно отображаться, если символ в шрифте не был найден и если нет запасного варианта. Он также показывает, как создаются глифы: добавлением в него любого графического контента SVG. В нем вы можете использовать буквально любые элементы SVG, даже <a href="/ru/docs/Web/SVG/Element/filter" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;filter&gt;</code></a>, <a href="/ru/docs/Web/SVG/Element/a" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;a&gt;</code></a> или <a href="/ru/docs/Web/SVG/Element/script" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;script&gt;</code></a>. Однако для простых глифов вы можете просто добавить атрибут <code>d</code> - он определяет форму для глифа точно так же, как работают стандартные пути SVG.</p>
+
+<p>Сами глифы затем определяются элементами <a href="/ru/docs/Web/SVG/Element/glyph" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;glyph&gt;</code></a>. Наиболее важным атрибутом является <code>unicode</code>. Он определяет код кодировки unicode, представленный этим символом. Если вы указываете атрибут <code><a href="/ru/docs/Web/HTML/Global_attributes#attr-lang">lang</a></code> на глифе, вы можете дополнительно ограничить его определенными языками (представленными <code>xml:lang</code>). Вы можете использовать произвольный SVG для определения глифа, и это позволит вам создать замечательные эффекты.<br>
+ <br>
+ Есть еще два элемента, которые могут быть определены внутри шрифта: <a href="/ru/docs/Web/SVG/Element/hkern" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;hkern&gt;</code></a> и <a href="/ru/docs/Web/SVG/Element/vkern" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;vkern&gt;</code></a>. Каждый из них содержит ссылки не менее чем на два символа (атрибуты <code>u1</code> и <code>u2</code>) и атрибут <code>k</code>, который определяет, на сколько должно быть уменьшено расстояние между этими символами. Ниже показан пример инструкции размещения символов «A» и «V» на стандартном расстоянии.</p>
+
+<pre>&lt;hkern u1=&quot;A&quot; u2=&quot;V&quot; k=&quot;20&quot; /&gt;
+</pre>
+
+<h2 id="Ссылка_на_шрифт">Ссылка на шрифт</h2>
+
+<p>После того как вы описали шрифт, как показано выше, вы можете просто применить атрибут <code>font-family</code> для использования шрифта в тексте SVG: </p>
+
+<pre>&lt;font&gt;
+  &lt;font-face font-family=&quot;Super Sans&quot; /&gt;
+  &lt;!-- and so on --&gt;
+&lt;/font&gt;
+
+&lt;text font-family=&quot;Super Sans&quot;&gt;My text uses Super Sans&lt;/text&gt;
+</pre>
+
+<p>Тем не менее, вы можете объединить несколько методов для того чтобы определить как и где использовать шрифт.</p>
+
+<h3 id="Опция_использование_CSS_font-face">Опция: использование CSS @font-face</h3>
+
+<p>Вы можете использовать свойство <code>@font-face</code> для ссылки на внешние шрифты:</p>
+
+<pre>&lt;font id=&quot;Super_Sans&quot;&gt;
+  &lt;!-- and so on --&gt;
+&lt;/font&gt;
+
+&lt;style type=&quot;text/css&quot;&gt;
+@font-face {
+  font-family: &quot;Super Sans&quot;;
+  src: url(#Super_Sans);
+}
+&lt;/style&gt;
+
+&lt;text font-family=&quot;Super Sans&quot;&gt;My text uses Super Sans&lt;/text&gt;</pre>
+
+<h3 id="Опция_ссылка_на_внешний_шрифт">Опция: ссылка на внешний шрифт</h3>
+
+<p>Элемент <code>font-face-uri</code> позволяет ссылаться на внешний шрифт, следовательно, его можно использовать в нескольких местах:</p>
+
+<pre>&lt;font&gt;
+  &lt;font-face font-family=&quot;Super Sans&quot;&gt;
+    &lt;font-face-src&gt;
+      &lt;font-face-uri xlink:href=&quot;fonts.svg#Super_Sans&quot; /&gt;
+    &lt;/font-face-src&gt;
+  &lt;/font-face&gt;
+&lt;/font&gt;
+</pre>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ru/docs/Web/SVG/Tutorial/Filter_effects" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/SVG/Tutorial/SVG_Image_Tag" class="button">Следующая статья  »</a></p>
+</div><p></p>

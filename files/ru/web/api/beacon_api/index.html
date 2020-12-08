@@ -1,0 +1,53 @@
+---
+title: Beacon API
+slug: Web/API/Beacon_API
+tags:
+  - Beacon
+  - JSAPI Reference
+  - Производительность
+translation_of: Web/API/Beacon_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Beacon_API">Beacon API</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/API/Beacon_API/Using_the_Beacon_API">Using the Beacon API</a> <a href="/ru/docs/Web/API/Beacon_API/Using_the_Beacon_API$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/Navigator"><code>Navigator</code></a></li><li><a href="/ru/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span> <strong>Это экспериментальная технология</strong><br>Так как спецификация этой технологии ещё не стабилизировалась, смотрите <a href="#Browser_compatibility">таблицу совместимости</a> по поводу использования в различных браузерах. Также заметьте, что синтаксис и поведение экспериментальной технологии может измениться в будущих версиях браузеров, вслед за изменениями спецификации.</p>
+</div></div>
+
+<div></div>
+
+<p>Интерфейс <strong><code>Beacon</code></strong> используется для планирования асинхронного и неблокирующего запроса к веб-серверу. <strong><code>Beacon</code></strong> запросы используют метод HTTP POST, и обычно не требуют ответа. Запросы гарантированно будут  инициированы до того, как страница будет выгружена, и они выполняются до конца, не требуя блокирующего запроса (например <a href="/ru/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest это API, который предоставляет клиенту функциональность для обмена данными между клиентом и сервером. Данный API предоставляет простой способ получения данных по ссылке без перезагрузки страницы. Это позволяет обновлять только часть веб-страницы не прерывая пользователя.  XMLHttpRequest используется в AJAX запросах и особенно в single-page приложениях."><code>XMLHttpRequest</code></a>).</p>
+
+<p>Например, вариантом использования Beacon API может быть логирование активности или отправка аналитики на сервер.</p>
+
+<p>Пример кода интерфейсов, описанных в этом документе, включен в раздел <em><a href="/Web/API/Beacon_API/Using_the_Beacon_API">Использование Beacon API</a></em>.</p>
+
+
+
+<h2 id="Зачем_использовать_Beacon">Зачем использовать Beacon?</h2>
+
+<p>Интерфейс <code>Beacon</code> отвечает потребностям аналитического и диагностического кода, который обычно пытается отправить данные на веб-сервер перед выгрузкой документа. Отправка данных хоть на секунду раньше может привести к упущенной возможности сбора данных. В любом случае, обеспечение того, чтобы данные отправлялись во время выгрузки документа, является чем-то, что традиционно было трудным для разработчиков.</p>
+
+<p>Пользовательские браузеры обычно игнорируют асинхронные  <a href="/ru/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest это API, который предоставляет клиенту функциональность для обмена данными между клиентом и сервером. Данный API предоставляет простой способ получения данных по ссылке без перезагрузки страницы. Это позволяет обновлять только часть веб-страницы не прерывая пользователя.  XMLHttpRequest используется в AJAX запросах и особенно в single-page приложениях."><code>XMLHttpRequests</code></a> сделанные в обработчике выгрузки. Для решения этой проблемы, аналитический и диагностический код обычно создает синхронный <a href="/ru/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest это API, который предоставляет клиенту функциональность для обмена данными между клиентом и сервером. Данный API предоставляет простой способ получения данных по ссылке без перезагрузки страницы. Это позволяет обновлять только часть веб-страницы не прерывая пользователя.  XMLHttpRequest используется в AJAX запросах и особенно в single-page приложениях."><code>XMLHttpRequest</code></a> в обработчике <code><a href="/ru/docs/Web/Reference/Events/unload" title="/ru/docs/Web/Reference/Events/unload">unload</a></code> или <code><a href="/ru/docs/Web/Reference/Events/beforeunload" title="/ru/docs/Web/Reference/Events/beforeunload">beforeunload</a></code> для отправки данных. Синхронный <a href="/ru/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest это API, который предоставляет клиенту функциональность для обмена данными между клиентом и сервером. Данный API предоставляет простой способ получения данных по ссылке без перезагрузки страницы. Это позволяет обновлять только часть веб-страницы не прерывая пользователя.  XMLHttpRequest используется в AJAX запросах и особенно в single-page приложениях."><code>XMLHttpRequest</code></a> заставляет браузер отложить выгрузку документа и делает следующую навигацию более медленной. Следующая страница ничего не может сделать, чтобы избежать этого ощущения низкой производительности при загрузке страницы. </p>
+
+<p>Есть и другие методы, используемые для проверки предоставления данных. Одним из таких методов является задержка отправки данных путем создания элемента Image и установки его атрибута <code>src</code> в обработчике выгрузки. Поскольку большинство браузеров откладывают выгрузку для завершения ожидающей загрузки изображения, данные могут быть отправлены во время выгрузки. Другой метод заключается в создании неработающего цикла, который  в течение нескольких секунд будет висеть в обработчике выгрузки, чтобы задержать выгрузку и отправить данные на сервер.</p>
+
+<p>Эти методы представляют плохие шаблоны программирования, некоторые из них ненадежны и приводят к восприятию плохой производительности при загрузке страницы для следующей навигации. API-интерфейс Beacon предоставляет стандартный способ решения этих проблем.</p>
+
+<h2 id="Глобальный_контекст">Глобальный контекст</h2>
+
+<p>Интерфейс <code>Beacon API&apos;s</code> предоставляет метод <a href="/ru/docs/Web/API/Navigator/sendBeacon" title="sendBeacon() возвращает true, если браузер успешно поставил данные data в очередь отправления, в ином случае false."><code>Navigator.sendBeacon()</code></a>, который используется для отправки <em>beacon</em> данных  на сервер в <em>глобальный браузерный контекст</em>. Метод принимает два аргумента: URL и данные для отправки в запросе. Аргумент data является необязательным, и его тип может быть <a href="/ru/docs/Web/API/ArrayBufferView" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>ArrayBufferView</code></a>, <a href="/ru/docs/Web/API/Blob" title="Объект Blob представляет из себя объект наподобие файла с неизменяемыми, необработанными данными. Blob-ы представляют данные, которые могут быть не в родном формате JavaScript. Интерфейс File основан на Blob, наследует функциональность Blob и расширяет его для поддержки файлов на стороне пользователя."><code>Blob</code></a>, <a href="/ru/docs/Web/API/DOMString" title="DOMString - это UTF-16 String. Так как JavaScript уже использует такие строки, DOMString непосредственно соответствует String."><code>DOMString</code></a> или <a href="/ru/docs/Web/API/_FormData_" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code> FormData </code></a>. Если браузер успешно поставил в очередь запрос на доставку, то метод возвращает <code>true</code> либо возвращает <code>false</code> в противном случае.</p>
+
+<h2 id="Рабочий_контекст">Рабочий контекст</h2>
+
+<p>Интерфейс <code>Beacon API&apos;s</code> предоставляет метод <a href="/ru/docs/Web/API/Navigator/sendBeacon" title="sendBeacon() возвращает true, если браузер успешно поставил данные data в очередь отправления, в ином случае false."><code>Navigator.sendBeacon()</code></a>, который используется для отправки <em>beacon</em> данных на сервер из <em><a href="/ru/docs/Web/API/WorkerGlobalScope" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>worker global scope</code></a></em>. Метод принимает два аргумента: URL-адрес и данные для отправки в запросе. Аргумент <code>data</code> является необязательным, и его тип может быть <a href="/ru/docs/Web/API/ArrayBufferView" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>ArrayBufferView</code></a>, <a href="/ru/docs/Web/API/Blob" title="Объект Blob представляет из себя объект наподобие файла с неизменяемыми, необработанными данными. Blob-ы представляют данные, которые могут быть не в родном формате JavaScript. Интерфейс File основан на Blob, наследует функциональность Blob и расширяет его для поддержки файлов на стороне пользователя."><code>Blob</code></a>, <a href="/ru/docs/Web/API/DOMString" title="DOMString - это UTF-16 String. Так как JavaScript уже использует такие строки, DOMString непосредственно соответствует String."><code>DOMString</code></a>, или <a href="/ru/docs/Web/API/FormData" title="XMLHttpRequest 2 добавляет поддержку для нового интерфейса FormData. Объекты FormData позволяют вам легко конструировать наборы пар ключ-значение, представляющие поля формы и их значения, которые в дальнейшем можно отправить с помощью метода send()."><code>FormData</code></a>. Если браузер успешно поставил в очередь запрос на доставку, то метод возвращает <code>true</code> либо возвращает <code>false</code> в противном случае.</p>
+
+<h2 id="Совместимость_с_браузерами">Совместимость с браузерами</h2>
+
+<p>The <a href="/ru/docs/Web/API/Navigator/sendBeacon#Browser_compatibility" title><code>Navigator.sendBeacon().Browser_compatibility</code></a> table indicates that method has relatively broad implementation.</p>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/WorkerGlobalScope" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>WorkerGlobalScope</code></a></li>
+ <li><a href="https://w3c.github.io/beacon/">Beacon standard</a></li>
+ <li><a href="http://caniuse.com/#search=beacon">Beacon CanIUse data</a></li>
+ <li><a href="https://ehsanakhgari.org/blog/2015-04-08/intercepting-beacons-through-service-workers">Intercepting beacons through service workers</a>; Ehsan Akhgari; 2015-Apr-08</li>
+</ul>

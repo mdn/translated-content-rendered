@@ -1,0 +1,102 @@
+---
+title: Fetch API
+slug: Web/API/Fetch_API
+tags:
+  - API
+  - Fetch
+  - Response
+  - XMLHttpRequest
+  - request
+  - Главная
+  - Справка
+  - Экспериментальная
+translation_of: Web/API/Fetch_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Fetch_API">Fetch API</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/API/Fetch_API/Using_Fetch">Использование Fetch</a></li><li><a href="/ru/docs/Web/API/Fetch_API/Basic_concepts">Fetch basic concepts</a> <a href="/ru/docs/Web/API/Fetch_API/Basic_concepts$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/API/Fetch_API/Cross-global_fetch_usage">Cross-global fetch usage</a></li></ol></details></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/Body"><code>Body</code></a></li><li><a href="/ru/docs/Web/API/Headers"><code>Headers</code></a></li><li><a href="/ru/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/ru/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li><li class="toggle"><details open><summary>Методы</summary><ol><li><a href="/ru/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li></ol></details></li></ol></section>
+
+<p>Fetch API предоставляет интерфейс для получения ресурсов (в том числе по сети). Он покажется знакомым любому, кто использовал <a href="/ru/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a>, но новый API является более мощным и гибким набором функций.</p>
+
+<h2 id="Oпределения_и_использование">Oпределения и использование</h2>
+
+<p>Fetch обеспечивает обобщенное определение объектов <a href="/ru/docs/Web/API/Request"><code>Request</code></a> и <a href="/ru/docs/Web/API/Response"><code>Response</code></a> (и других вещей, связанных с сетевыми запросами). Это позволит им использоваться везде, где необходимо в будущем, в том числе и для service workers, Cache API и других подобных технологий, которые обрабатывают или изменяют запросы (requests) и ответы (responses), а так же в любых других случаях, которые могут потребовать от вас генерировать свой собственный ответ программно.</p>
+
+<p>Это также предоставляет определение в отношение таких понятий, как CORS и семантика заголовков HTTP origin, заменяя их обособленные определения где бы то ни было.</p>
+
+<p>Чтобы создать запрос и получить данные, используется метод <a href="/ru/docs/Web/API/GlobalFetch/fetch"><code>GlobalFetch.fetch</code></a>. Он реализован во множестве интерфейсов, в том числе в <a href="/ru/docs/Web/API/Window"><code>Window</code></a> и <a href="/ru/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a>. Это позволяет использовать его практически в любом контексте для получения данных.</p>
+
+<p>Метод <code>fetch()</code> принимает один обязательный аргумент —  путь к данным, которые вы хотите получить. Он возвращает promise, который разрешается в (<a href="/ru/docs/Web/API/Response"><code>Response</code></a>) независимо от того, был ли запрос удачным. Вы можете также передать во втором аргументе необязательный объект с указанием опций (см. <a href="/ru/docs/Web/API/Request"><code>Request</code></a>.)</p>
+
+<p>Как только <a href="/ru/docs/Web/API/Response"><code>Response</code></a> выполнится успешно, становятся доступными несколько методов для определения тела контента и, как его содержимое олжно быть обработано (см. <a href="/ru/docs/Web/API/Body"><code>Body</code></a>.)</p>
+
+<p>Вы можете создавать запрос и ответ непосредственно, используя конструкторы <a href="/ru/docs/Web/API/Request/Request"><code>Request()</code></a> и <a href="/ru/docs/Web/API/Response/Response"><code>Response()</code></a>, но маловероятно, что в этом есть необходимость. Напротив, более вероятно, что они будут созданы как результат работы другого API (например, <a href="/ru/docs/Web/API/FetchEvent/respondWith"><code>FetchEvent.respondWith</code></a> в service workers.)</p>
+
+<h3 id="Отличия_от_jQuery">Отличия от jQuery</h3>
+
+<p>Спецификации <code>fetch()</code> отличаются от <code>jQuery.ajax()</code> тремя основными способами:</p>
+
+<ul>
+ <li>
+  <p>Обещание, возвращенное из <code>fetch()</code>, <strong>не будет отвергнуто при статусе ошибки HTTP</strong>, даже если ответ является HTTP <code>404</code> или <code>500</code>. Вместо этого, оно будет разрешаться нормально (со статусом <code>ok</code> установленным в <code>false</code>), и будет отклоняться только при сбое в сети или если что-то помешало завершению запроса.</p>
+ </li>
+ <li>
+  <p><code>fetch() </code>может получать межсайтовые куки-файлы; таким образом вы можете установить межсайтовую сессию используя <code>fetch</code>.</p>
+ </li>
+ <li><code>fetch()</code> не будет посылать куки-файлы, если только не указано <code>credentials: &apos;same-origin&apos;</code>.</li>
+</ul>
+
+<div class="note"><strong>Заметка</strong>: узнайте больше об использовании Fetch API на <a href="/en-US/docs/Web/API/Fetch_API/Using_Fetch">Using Fetch</a> и изучите концепции на <a href="/en-US/docs/Web/API/Fetch_API/Basic_concepts">Fetch basic concepts</a>.</div>
+
+<h3 id="Прерывание_выборки">Прерывание выборки</h3>
+
+<p>Браузеры начали добавлять экспериментальную поддержку для <a href="/ru/docs/Web/API/AbortController"><code>AbortController</code></a> и <a href="/ru/docs/Web/API/AbortSignal"><code>AbortSignal</code></a> интерфейсов (aka The Abort API), которые позволяют прерывать операции, такие как Fetch и XHR, если они еще не завершены. Подробности смотрите на страницах интерфейсов.</p>
+
+<h2 id="Fetch_интерфейсы">Fetch интерфейсы</h2>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/GlobalFetch"><code>GlobalFetch</code></a></dt>
+ <dd>Содержит метод <code>fetch()</code>, используемый для получения ресурсов.</dd>
+ <dt><a href="/ru/docs/Web/API/Headers"><code>Headers</code></a></dt>
+ <dd>Представляет заголовки запроса/ответа, позволяет запрашивать данные и выполнять различные действия в зависимости от результата.</dd>
+ <dt><a href="/ru/docs/Web/API/Request"><code>Request</code></a></dt>
+ <dd>Запрашивает ресурс.</dd>
+ <dt><a href="/ru/docs/Web/API/Response"><code>Response</code></a></dt>
+ <dd>Представляет ответ на запрос.</dd>
+</dl>
+
+<h2 id="Fetch_примесь">Fetch примесь</h2>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/Body"><code>Body</code></a></dt>
+ <dd>Предоставляет методы, относящиеся к телу запроса/ответа, позволяя вам определять content-type и то, как ответ должен быть обработан.</dd>
+</dl>
+
+<h2 id="Спецификации">Спецификации</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Спецификация</th>
+   <th scope="col">Статус</th>
+   <th scope="col">Комментарий</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/" hreflang="en" lang="en" title="Спецификация &apos;Fetch&apos;">Fetch</a></td>
+   <td><span class="spec-Living">Живой стандарт</span></td>
+   <td>Изначальное определение</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Браузерная_совместимость">Браузерная совместимость</h2>
+
+<div class="bc-data" id="bcd:api.WindowOrWorkerGlobalScope.fetch"></div>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/en-US/docs/Web/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/en-US/docs/Web/HTTP">HTTP</a></li>
+ <li><a href="https://github.com/github/fetch">Fetch полифил</a></li>
+ <li><a href="/en-US/docs/Web/API/Fetch_API/Basic_concepts">Fetch базовые понятия</a></li>
+</ul>

@@ -1,0 +1,186 @@
+---
+title: Using server-sent events
+slug: Web/API/Server-sent_events/Using_server-sent_events
+translation_of: Web/API/Server-sent_events/Using_server-sent_events
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/API/Server-sent_events">Server-sent events</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/API/Server-sent_events/Using_server-sent_events">Using server-sent events</a></li></ol></details></li><li class="toggle"><details open><summary>Интерфейсы</summary><ol><li><a href="/ru/docs/Web/API/EventSource"><code>EventSource</code></a></li></ol></details></li></ol></section>
+
+<div class="summary">
+<p>Разрабатывать web-приложения, использующие <a href="/en-US/docs/Web/API/Server-sent_events">Server-Sent Events</a> намного проще, чем с использованием websockets. Нужно всего лишь немного кода на стороне сервере, чтобы переправлять события web-приложению, но клиентская часть кода для обработки этих событий работает почти точно так же, как и для любых других событий.</p>
+</div>
+
+<h2 id="Получение_событий_от_сервера">Получение событий от сервера</h2>
+
+<p>Server-Sent Event API содержится внутри интерфейса <a href="/ru/docs/Web/API/EventSource"><code>EventSource</code></a>. Чтобы открыть соединение с сервером для начала записи событий, которые он присылает, необходимо создать новый объект <code>EventSource</code>, который будет указывать на URI скрипта, который создает события. Например:</p>
+
+<pre class="brush: js notranslate">const evtSource = new EventSource(&quot;ssedemo.php&quot;);</pre>
+
+<p>Если файл с генератором событий размещен на другом домене, то должен быть создан новый объект <code>EventSource</code> в который следует передать помимо URI еще и словарь опций. Например, если предположить, что клиентский скрипт находится на <code>example.com</code>:</p>
+
+<pre class="brush: js notranslate"><code>const evtSource = new EventSource(&quot;//api.example.com/ssedemo.php&quot;, { withCredentials: true } ); </code>
+</pre>
+
+<p>Как только вы создали экземпляр <code>EventSource</code>, вы можете начать прослушивание сообщений с сервера, добавив обработчик для события <code><a href="/ru/docs/Web/Reference/Events/message" title="/ru/docs/Web/Reference/Events/message">message</a></code> :</p>
+
+<pre class="brush: js notranslate">evtSource.onmessage = function(event) {
+  const newElement = document.createElement(&quot;li&quot;);
+  const eventList = document.getElementById(&apos;list&apos;);
+
+  newElement.innerHTML = &quot;message: &quot; + event.data;
+  eventList.appendChild(newElement);
+}
+</pre>
+
+<p>Этот код прослушивает входящие сообщения (то есть уведомления от сервера, на которых нет поля <code>event</code>) и добавляет текст сообщения в список в HTML-документе.</p>
+
+<p>Вы также можете прослушивать события, используя <code>addEventListener()</code>:</p>
+
+<pre class="brush: js notranslate"><code>evtSource.addEventListener(&quot;ping&quot;, function(event) {
+  const newElement = document.createElement(&quot;li&quot;);
+  const time = JSON.parse(event.data).time;
+
+  newElement.innerHTML = &quot;ping at &quot; + time;
+  eventList.appendChild(newElement);
+});</code></pre>
+
+<p>Этот код аналогичен коду выше, за исключением того, что он будет вызываться автоматически всякий раз, когда сервер отправляет сообщение с полем <code>event</code>, установленным в «ping»; затем он парсит JSON в поле <code>data</code> и выводит эту информацию.</p>
+
+<h2 id="Отправка_событий_с_сервера">Отправка событий с сервера</h2>
+
+<p>Код на стороне сервера, который отправляет события, должен отвечать, используя MIME-тип <code>text/event-stream</code>. Каждое уведомление отправляется в виде блока текста, оканчивающегося парой новых строк (<code>\n</code>) . Подробнее о формате потока событий см.  <a href="#Event_stream_format">Event stream format</a>.</p>
+
+<p><a href="/ru/docs/%D0%A1%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C/PHP">PHP</a> код, который мы используем для примера приведен ниже:</p>
+
+<pre class="brush: php notranslate">date_default_timezone_set(&quot;America/New_York&quot;);
+header(&apos;Cache-Control: no-cache&apos;);
+header(&quot;Content-Type: text/event-stream\n\n&quot;);
+
+$counter = rand(1, 10);
+while (1) {
+  // Every second, send a &quot;ping&quot; event.
+
+  echo &quot;event: ping\n&quot;;
+  $curDate = date(DATE_ISO8601);
+  echo &apos;data: {&quot;time&quot;: &quot;&apos; . $curDate . &apos;&quot;}&apos;;
+  echo &quot;\n\n&quot;;
+
+  // Send a simple message at random intervals.
+
+  $counter--;
+
+  if (!$counter) {
+    echo &apos;data: This is a message at time &apos; . $curDate . &quot;\n\n&quot;;
+    $counter = rand(1, 10);
+  }
+
+  ob_end_flush();
+  flush();
+  sleep(1);
+}
+</pre>
+
+<p>Приведенный выше код генерирует событие каждую секунду с типом события «ping». Данные каждого события - это объект JSON, содержащий метку времени ISO 8601, соответствующую дате, когда было сгенерировано событие. Через случайные интервалы отправляется простое сообщение (без типа <code>event</code>).</p>
+
+<div class="note">
+<p><strong>Примечание</strong>: Вы можете найти полный пример, который использует код, показанный в этой статье на GitHub - см. <a href="https://github.com/mdn/dom-examples/tree/master/server-sent-events">Simple SSE demo using PHP.</a></p>
+</div>
+
+<h2 id="Обработка_ошибок">Обработка ошибок</h2>
+
+<p>Когда возникают проблемы (такие как тайм-аут ответа сети или проблемы, связанные с <a href="/en-US/docs/HTTP/Access_control_CORS" title="/en-US/docs/HTTP/Access_control_CORS">контролем доступа</a>), тогда генерируется событие <code>error</code>. Вы можете обработать это событие программно, реализовав метод <code>onerror</code> для объекта <code>EventSource</code>:</p>
+
+<pre class="brush: js notranslate">evtSource.onerror = function(error) {
+  console.error(&quot;⛔ EventSource failed: &quot;, error);
+};
+</pre>
+
+<h2 id="Закрытие_потоков_событий">Закрытие потоков событий</h2>
+
+<p>По умолчанию, если соединение между клиентом и сервером закрывается, то соединение сбрасывается. Прервать соединение можно с помощью метода <code>.close()</code>.</p>
+
+<pre class="brush: js notranslate">evtSource.close();</pre>
+
+<h2 id="Формат_потока_событий">Формат потока событий</h2>
+
+<p>Поток событий представляет из себя простой поток текста, который должен иметь кодировку <a href="https://developer.mozilla.org/en-US/docs/Glossary/UTF-8">UTF-8</a>. Сообщения в потоке событий разделяются парой символов новой строки. Двоеточие, как первый символ строки считается комментарием и игнорируется.</p>
+
+<div class="note"><strong>Примечание:</strong> Строка комментария может использоваться, чтобы предотвратить тайм-аут соединений; сервер может периодически отправлять комментарий, чтобы поддерживать соединение.</div>
+
+<p>Каждое сообщение содержит одну или более строчек текста, которые перечиляют поля этого сообщения. Каждое имеет свое имя, за которым следует двоеточие, после которого идут текстовые данные для значения этого поля. </p>
+
+<h3 id="Поля">Поля</h3>
+
+<p>Каждое полученное сообщение имеет некоторую комбинацию следующих полей, по одному на строку:</p>
+
+<dl>
+ <dt><code>event</code></dt>
+ <dd>Строка, идентифицирующая тип описанного события. Если <code>event</code> указан, то событие будет отправлено в браузер слушателю для указанного имени события. Исходный код сайта должен использовать <code>addEventListener()</code> для прослушивания именованных событий. Обработчик <code>onmessage</code> вызывается, если для сообщения не указано имя события.</dd>
+ <dt><code>data</code></dt>
+ <dd>Поле данных для сообщения. Когда <code>EventSource</code> получает несколько последовательных строк, начинающихся с <code>data:</code>, <a href="http://www.w3.org/TR/eventsource/#dispatchMessage">он объединяет их</a>, вставляя символ новой строки между каждой из них. Последние переводы строки удаляются.</dd>
+ <dt><code>id</code></dt>
+ <dd>Идентификатор события для установки значения последнего ID события для объекта <code><a href="/en/Server-sent_events/EventSource" title="en/Server-sent events/EventSource">EventSource</a></code>.</dd>
+ <dt><code>retry</code></dt>
+ <dd>Время переподключения, используемое при попытке отправить событие. Это должно быть целое число, указывающее время переподключения в миллисекундах. Если указано нецелое значение, поле игнорируется.</dd>
+</dl>
+
+<p>Другия названия полей игнорируются.</p>
+
+<div class="note"><strong>Примечание:</strong> If a line doesn&apos;t contain a colon, the entire line is treated as the field name with an empty value string.</div>
+
+<h3 id="Примеры">Примеры</h3>
+
+<h4 id="Сообщения_с_данными">Сообщения с данными</h4>
+
+<p>В следующем примере отправлено три сообщения. Первый - это просто комментарий, так как он начинается с символа двоеточия. Как упоминалось ранее, это может быть полезно в качестве подтверждения активности, если сообщения могут отправляться не регулярно.</p>
+
+<p>Второе сообщение содержит поле данных со значением «some text». Третье сообщение содержит поле данных со значением «another message \n with two lines». Обратите внимание на специальный символ новой строки в значении.</p>
+
+<pre class="brush: json notranslate">: this is a test stream
+
+data: some text
+
+data: another message
+data:
+</pre>
+
+<h4 id="Именованные_события">Именованные события</h4>
+
+<p>Данный пример отправляет именованные события. У каждого из них есть имя события, указанное в поле <code>event</code>, и поле <code>data</code>, значением которого является соответствующая строка JSON с данными, необходимыми для клиента, чтобы реагировать на событие. Поле <code>data</code> может, конечно, содержать любые строковые данные; это не обязательно должен быть JSON.</p>
+
+<pre class="brush: json notranslate">event: userconnect
+data: {&quot;username&quot;: &quot;bobby&quot;, &quot;time&quot;: &quot;02:33:48&quot;}
+
+event: usermessage
+data: {&quot;username&quot;: &quot;bobby&quot;, &quot;time&quot;: &quot;02:34:11&quot;, &quot;text&quot;: &quot;Hi everyone.&quot;}
+
+event: userdisconnect
+data: {&quot;username&quot;: &quot;bobby&quot;, &quot;time&quot;: &quot;02:34:23&quot;}
+
+event: usermessage
+data: {&quot;username&quot;: &quot;sean&quot;, &quot;time&quot;: &quot;02:34:36&quot;, &quot;text&quot;: &quot;Bye, bobby.&quot;}
+</pre>
+
+<h4 id="Смешивание_и_сопоставление">Смешивание и сопоставление</h4>
+
+<p>Вам не нужно использовать только неназванные сообщения или именованные события. Вы можете смешать их вместе в одном потоке событий.</p>
+
+<pre class="brush: json notranslate">event: userconnect
+data: {&quot;username&quot;: &quot;bobby&quot;, &quot;time&quot;: &quot;02:33:48&quot;}
+
+data: Here&apos;s a system message of some kind that will get used
+data: to accomplish some task.
+
+event: usermessage
+data: {&quot;username&quot;: &quot;bobby&quot;, &quot;time&quot;: &quot;02:34:11&quot;, &quot;text&quot;: &quot;Hi everyone.&quot;}</pre>
+
+<h2 id="Совместимость_с_браузерами">Совместимость с браузерами</h2>
+
+<div>
+<h3 id="EventSource"><code>EventSource</code></h3>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.EventSource"></div>
+</div>
+</div>
