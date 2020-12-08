@@ -1,0 +1,269 @@
+---
+title: Benutzerdefinierte Elemente
+slug: Web/Web_Components/Custom_Elements
+translation_of: Web/Web_Components/Using_custom_elements
+---
+<p>Benutzerdefinierte Elemente sind stellen die Möglichkeit bereit, benutzerdefinierte HTML-<a href="/en-US/docs/Glossary/Element">Elements</a> zu schaffen. Sie können eigenes durch JavaScript beschriebenes Verhalten und CSS-Styling haben. Sie sind Teil der <a href="/en-US/docs/Web/Web_Components">Web-Components</a>, können aber auch unabhängig von diesen benutzt werden.</p>
+
+<div class="note">
+<p><strong>Note:</strong> Benutzerdefinierte Elemente gelten erst seit Kurzem als stabil definiert und Teile des MDN weisen Dokumentation für veraltete APIs früherer Spezifikationsentwürfe auf.</p>
+</div>
+
+<p>Obwohl es bereits möglich war, benutzerdefinierte Tag-Namen wie <code>&lt;mytag&gt;</code> zu schaffen, sie mit CSS zu stylen und via JavaScript ihr Verhalten zu beschreiben, haben benutzerdefinierte Elemente ihre Daseinsberechtigung. Ihr großer Vorteil ist das Vorhandensein so genannter <em>Lebenszyklus-Reaktionen</em>, die es erlauben, Methoden zu bestimmten Momenten des &quot;Lebenszyklus&quot; des Elementes aufzurufen. So kann beispielsweise Verhalten beschrieben werden, dass ausgeführt wird, wenn das Element dem DOM hinzugefügt wird (&quot;connected&quot;), wenn es aus diesem entfernt wird (&quot;disconnected&quot;) oder sich seine Attribute ändern.</p>
+
+<p>Die Schlüsselmethode für benutzerdefinierte Elemente ist die <a href="/de/docs/Web/API/CustomElementRegistry/define" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>CustomElementRegistry.define()</code></a>-Methode, die benutzt werden kann, um ein neues benutzerdefinierte Elemente zu erschaffen. Dieses neue Element wird dann für jede seiner Instanzen diese neue Klasse anstelle des standardmäßig verwendeten <a href="/de/docs/Web/API/HTMLUnknownElement" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>HTMLUnknownElement</code></a> benutzen. Benutzerdefinierte Elemente können auch auf nativen Elementen wie  <code>&lt;button&gt;</code> basieren, indem sie folgende Syntax benutzen: <code>&lt;button is=&quot;my-button&quot;&gt;</code> Sie werden dann <em>benutzerdefinierte eingebaute Elemente </em>genannt.</p>
+
+<h2 id="Methoden_benutzerdefinierter_Elemente">Methoden benutzerdefinierter Elemente</h2>
+
+<p>Benutzerdefinierte Elemente besitzen folgende Methoden:</p>
+
+<dl>
+ <dt>constructor()</dt>
+ <dd>Wird aufgerufen, wenn eine Element erzeugt und erweitert wird.</dd>
+ <dt>connectedCallback()</dt>
+ <dd>Wird aufgerufen, wenn das Element in das Dokument eingefügt wird, auch wenn es nur der Shadow Tree ist</dd>
+ <dt>disconnectedCallback()</dt>
+ <dd>Wird aufgerufen, wenn das Element aus dem Dokument entfernt wird.</dd>
+ <dt>attributeChangedCallback(attributeName, oldValue, newValue, namespace)</dt>
+ <dd>Wird aufgerufen, wenn Attribute des Elements geändert, angefügt, entfernt oder ersetzt werden. Wird nur für <a href="#Observed_attributes">beobachtete Attribute</a> aufgerufen.</dd>
+ <dt>adoptedCallback(oldDocument, newDocument)</dt>
+ <dd>Wird aufgerufen, wenn das Element in ein neues Dokument übernommen wird.</dd>
+</dl>
+
+<h2 id="Beispiele">Beispiele</h2>
+
+<p>Benutzerdefinierte Elemente müssen die <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes"><code>class</code> Syntax</a> benutzen, die in neueren JavaScript-Versionen bereit steht.</p>
+
+<p>HTML-Datei:</p>
+
+<pre class="brush: html">Wenn unter diesem Text nichts steht, unterstützt ihr Browser keine benutzerdefinierten Elemente.
+&lt;x-product data-name=&quot;Ruby&quot; data-img=&quot;https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/ruby.png&quot; data-url=&quot;http://example.com/1&quot;&gt;&lt;/x-product&gt;
+&lt;x-product data-name=&quot;JavaScript&quot; data-img=&quot;https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/javascript.png&quot; data-url=&quot;http://example.com/2&quot;&gt;&lt;/x-product&gt;
+&lt;x-product data-name=&quot;Python&quot; data-img=&quot;https://s3-us-west-2.amazonaws.com/s.cdpn.io/4621/python.png&quot; data-url=&quot;http://example.com/3&quot;&gt;&lt;/x-product&gt;</pre>
+
+<p>JS-Datei:</p>
+
+<pre class="brush: js">// Klasse für das Element erzeugen
+class XProduct extends HTMLElement {
+  constructor() {
+    // super() muss immer als erstes im Konstruktor aufgerufen werden
+    super();
+
+    // Shadow-Root erzeugen
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Standard img-Element erzeugen und Attribute setzen
+    var img = document.createElement(&apos;img&apos;);
+    img.alt = this.getAttribute(&apos;data-name&apos;);
+    img.src = this.getAttribute(&apos;data-img&apos;);
+    img.width = &apos;150&apos;;
+    img.height = &apos;150&apos;;
+    img.className = &apos;product-img&apos;;
+
+    // Bild der Shadow-Root hinzufügen.
+    shadow.appendChild(img);
+
+    // Event-Listener zum Bild hinzufügen.
+    img.addEventListener(&apos;click&apos;, () =&gt; {
+      window.location = this.getAttribute(&apos;data-url&apos;);
+    });
+
+    // Link zum Produkt erzeugen.
+    var link = document.createElement(&apos;a&apos;);
+    link.innerText = this.getAttribute(&apos;data-name&apos;);
+    link.href = this.getAttribute(&apos;data-url&apos;);
+    link.className = &apos;product-name&apos;;
+
+    // Link der Shadow-Root hinzufügen.
+    shadow.appendChild(link);
+  }
+}
+
+// Neues Element definieren
+customElements.define(&apos;x-product&apos;, XProduct);
+</pre>
+
+<p>CSS-Datei:</p>
+
+<pre class="brush: css">body {
+  background: #F7F7F7;
+}
+
+x-product {
+  display: inline-block;
+  float: left;
+  margin: 0.5em;
+  border-radius: 3px;
+  background: #FFF;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  font-family: Helvetica, arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+x-product::slotted(.product-img) {
+  cursor: pointer;
+  background: #FFF;
+  margin: 0.5em;
+}
+
+x-product::slotted(.product-name) {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: #08C;
+  border-top: 1px solid #EEE;
+  font-weight: bold;
+  padding: 0.75em 0;
+}
+</pre>
+
+<p><a id="live_example" name="live_example">Unten kann das Live-Beispiel des obigen Codes gesehen werden:</a></p>
+
+<p><iframe src="https://mdn.mozillademos.org/de/docs/Web/Web_Components/Custom_Elements$samples/Example?revision=1310569" width="1500" class="live-sample-frame sample-code-frame" height="250" frameborder="0" id="frame_Example"></iframe></p>
+
+<h2 id="Beobachtete_Attribute">Beobachtete Attribute</h2>
+
+<p>Um benachrichtigt zu werden, wenn Attribute verändert werden, muss eine Liste von beobachteten Attributen bei der Initialisierung des Elements angelegt werden, in dem eine statische <code>observedAttributes</code> get-Methode der Klasse des Elementes hinzugefügt wird, die ein Array mit den entsprechenden Attributsnamen zurückgibt.</p>
+
+<p>JS-Datei:</p>
+
+<pre class="brush: js">class HelloElement extends HTMLElement {
+  // Das &apos;name&apos;-Attribut beobachten.
+  static get observedAttributes() {return [&apos;name&apos;]; }
+
+  // Auf Attributsänderungen reagieren.
+  attributeChangedCallback(attr, oldValue, newValue) {
+    if (attr == &apos;name&apos;) {
+      this.textContent = `Hello, ${newValue}`;
+    }
+  }
+}
+
+// Neues Element definieren
+customElements.define(&apos;hello-element&apos;, HelloElement);
+</pre>
+
+<p>HTML-Datei:</p>
+
+<pre class="brush: html">&lt;hello-element name=&quot;Anita&quot;&gt;&lt;/hello-element&gt;</pre>
+
+<p><a id="live_example" name="live_example">Unten kann das Live-Beispiel des obigen Codes gesehen werden:</a></p>
+
+<p><iframe src="https://mdn.mozillademos.org/de/docs/Web/Web_Components/Custom_Elements$samples/Observed_attributes?revision=1310569" width="750" class="live-sample-frame sample-code-frame" height="100" frameborder="0" id="frame_Observed_attributes"></iframe></p>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<p>Benutzerdefinierte Elemente sind in der folgenden Spezifikation definiert:</p>
+
+<table class="spec-table standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spezifikation</th>
+   <th scope="col">Status</th>
+   <th scope="col">Kommentar</th>
+  </tr>
+  <tr>
+   <td><a href="https://html.spec.whatwg.org/multipage/scripting.html#custom-elements">The HTML Standard: Custom elements</a></td>
+   <td>LS</td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browserkompatibilität">Browserkompatibilität</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Wir konvertieren die Kompatibilitätsdaten in ein maschinenlesbares JSON Format</a></strong>.
+            Diese Kompatibilitätstabelle liegt noch im alten Format vor,
+            denn die darin enthaltenen Daten wurden noch nicht konvertiert.
+            <strong><a href="/de/docs/MDN/Contribute/Structures/Compatibility_tables">Finde heraus wie du helfen kannst!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Firefox (Gecko)</th>
+   <th>Chrome</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Grundlegende Unterstützung</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>59.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>47.0</td>
+   <td>10.1</td>
+  </tr>
+  <tr>
+   <td>Benutzerdefinierte eingebaute Elemente</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>59.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>47.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Chrome for Android</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Grundlegende Unterstützung</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>56.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>47.0</td>
+   <td>10.1</td>
+  </tr>
+  <tr>
+   <td>Benutzerdefinierte eingebaute Elemente</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>56.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+   <td>47.0</td>
+   <td><span style="color: #f00;">Nicht unterstützt</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>1. Firefox hat eine &quot;dom.webcomponents.enabled&quot;-Eigenschaft in about:config, dennoch ist sind benutzerdefinierte Elemente nicht verfügbar, wenn diese auf <strong>true</strong> gesetzt wurde.</p>
+
+<h2 id="Related">Related</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry">The Custom Element Registry</a>
+
+  <ul>
+   <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define">define()</a></li>
+   <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/get">get()</a></li>
+   <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/whenDefined">whenDefined()</a></li>
+  </ul>
+ </li>
+</ul>
+
+<h2 id="Resources">Resources</h2>
+
+<ul>
+ <li><a href="https://developers.google.com/web/fundamentals/primers/customelements/">Custom elements v1: reusable web components - Google Developers tutorial</a></li>
+</ul>

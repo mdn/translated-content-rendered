@@ -1,0 +1,80 @@
+---
+title: Body.text()
+slug: Web/API/Body/text
+translation_of: Web/API/Body/text
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>Eigenschaften</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/body"><code>body</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methoden</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/arrayBuffer"><code>arrayBuffer()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/blob"><code>blob()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><em><code>text()</code></em></li></ol></details></li><li class="toggle"><details open><summary>Implementiert von:</summary><ol><li><a href="/de/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/de/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section></div>
+
+<p>Die Methode <strong><code>text()</code></strong> des <a href="/de/docs/Web/API/Body"><code>Body</code></a> Mixin nimmt einen <a href="/de/docs/Web/API/Response"><code>Response</code></a> Stream und liest ihn bis zum Ende. Sie gibt ein Promise zurück, welches in ein <a href="/de/docs/Web/API/USVString"><code>USVString</code></a> Objekt (Text) aufgelöst wird. Die Antwort wird <em>immer</em> mit UTF-8 dekodiert.</p>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="brush: js notranslate">response.text().then(function (text) {
+  // do something with the text response
+});</pre>
+
+<h3 id="Parameter">Parameter</h3>
+
+<p>Keine.</p>
+
+<h3 id="Rückgabewert">Rückgabewert</h3>
+
+<p>Ein Promise, welches in einen <a href="/de/docs/Web/API/USVString"><code>USVString</code></a> aufgelöst wird.</p>
+
+<h2 id="Beispiel">Beispiel</h2>
+
+<p>In unserem <a href="https://github.com/mdn/fetch-examples/tree/master/fetch-text">Beispiel für den Abruf von Text</a> (<a href="https://mdn.github.io/fetch-examples/fetch-text/">live ausführen</a>) haben wir ein <a href="/de/docs/Web/HTML/Element/article" title="Das HTML-Element &lt;article&gt; stellt eine in sich geschlossene Komposition in einem Dokument, einer Seite, Anwendung oder Website dar, die unabhängig verteilt oder wiederverwendbar sein soll (z. B. bei Syndikation), z. B. ein Forumsbeitrag, ein Zeitschriften- oder Zeitungsartikel oder ein Blogeintrag."><code>&lt;article&gt;</code></a> Element und drei Links (im Array <code>myLinks</code> gespeichert). Zuerst durchlaufen wir all diese, damit alle einen <code>onclick</code> Event Handler bekommen, der die Funktion <code>getData()</code> ausführt — der Bezeichner <code>data-page</code> des Links wird dabei als Argument übergeben — wenn einer der Links geklickt wird.</p>
+
+<p>Wenn <code>getData()</code> ausgeführt wird erstellen wie eine Anfrage mit dem <a href="/de/docs/Web/API/Request/Request"><code>Request.Request</code></a> Konstruktor und rufen dann eine <code>.txt</code> Datei ab. Wenn der Abruf erfolgreich ist lesen wir das <a href="/de/docs/Web/JavaScript/Reference/USVString"><code>USVString</code></a> (Text) Objekt aus der Antwort mit <code>text()</code> und setzen dann <a href="/de/docs/Web/API/Element/innerHTML"><code>innerHTML</code></a> des <a href="/de/docs/Web/HTML/Element/article" title="Das HTML-Element &lt;article&gt; stellt eine in sich geschlossene Komposition in einem Dokument, einer Seite, Anwendung oder Website dar, die unabhängig verteilt oder wiederverwendbar sein soll (z. B. bei Syndikation), z. B. ein Forumsbeitrag, ein Zeitschriften- oder Zeitungsartikel oder ein Blogeintrag."><code>&lt;article&gt;</code></a> Elements auf den Wert des Text-Objekts.</p>
+
+<pre class="brush: js notranslate">var myArticle = document.querySelector(&apos;article&apos;);
+var myLinks = document.querySelectorAll(&apos;ul a&apos;);
+
+for(i = 0; i &lt;= myLinks.length-1; i++) {
+  myLinks[i].onclick = function(e) {
+    e.preventDefault();
+    var linkData = e.target.getAttribute(&apos;data-page&apos;);
+    getData(linkData);
+  }
+};
+
+function getData(pageId) {
+  console.log(pageId);
+  var myRequest = new Request(pageId + &apos;.txt&apos;);
+  fetch(myRequest).then(function(response) {
+    return response.text().then(function(text) {
+      myArticle.innerHTML = text;
+    });
+  });
+}</pre>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-text" hreflang="en" lang="en">Fetch<br><small lang="de">Die Definition von &apos;text()&apos; in dieser Spezifikation.</small></a></td>
+   <td><span class="spec-Living">Lebender Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browserkompatibilität">Browserkompatibilität</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Body.text"></div>
+
+<h2 id="Siehe_auch">Siehe auch</h2>
+
+<ul>
+ <li><a href="/de/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/de/docs/Web/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/de/docs/Web/HTTP">HTTP</a></li>
+</ul>

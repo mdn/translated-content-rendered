@@ -1,0 +1,87 @@
+---
+title: Body.arrayBuffer()
+slug: Web/API/Body/arrayBuffer
+translation_of: Web/API/Body/arrayBuffer
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>Eigenschaften</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/body"><code>body</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methoden</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><em><code>arrayBuffer()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/blob"><code>blob()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/text"><code>text()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implementiert von:</summary><ol><li><a href="/de/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/de/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section></div>
+
+<p>Die Methode <strong><code>arrayBuffer()</code></strong> des <a href="/de/docs/Web/API/Body"><code>Body</code></a> Mixin nimmt einen <a href="/de/docs/Web/API/Response"><code>Response</code></a> Stream und liest ihn bis zum Ende. Sie gibt ein Promise zurück, welches in einen <a href="/de/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a> aufgelöst wird.</p>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="brush: js notranslate">response.arrayBuffer().then(function(buffer) {
+  // mach etwas mit dem Buffer
+});</pre>
+
+<h3 id="Parameter">Parameter</h3>
+
+<p>Keine.</p>
+
+<h3 id="Rückgabewert">Rückgabewert</h3>
+
+<p>Ein Promise, welches in einen <a href="/de/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a> aufgelöst wird.</p>
+
+<h2 id="Beispiel">Beispiel</h2>
+
+<p>In unserem <a href="https://mdn.github.io/fetch-examples/fetch-array-buffer/">Live-Beispiel zum Abruf eines Array Buffers</a> haben wir einen Wiedergabe-Knopf. Bei einem Klick darauf wird die Funktion <code>getData()</code> ausgeführt. Beachten Sie, dass vor der Wiedergabe die ganze Audio-Datei heruntergeladen wird. Benötigen Sie eine Wiedergabe noch während des Downloads (Streaming) ziehen Sie <a href="/de/docs/Web/API/HTMLAudioElement"><code>HTMLAudioElement</code></a> in Betracht:</p>
+
+<pre class="brush: js notranslate">new Audio(music.ogg).play()
+</pre>
+
+<p>In <code>getData()</code> erstellen wir eine neue Anfrage mit dem <a href="/de/docs/Web/API/Request/Request"><code>Request.Request</code></a> Konstruktor, um dann einen OGG Musik-Track abzurufen. Wir benutzen ebenfalls <a href="/de/docs/Web/API/AudioContext/createBufferSource"><code>AudioContext.createBufferSource</code></a> um eine Audio-Puffer-Quelle zu erstellen. Ist der Abruf erfolgreich, lesen wir mit <code>arrayBuffer()</code> einen <a href="/de/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a> aus der Antwort, dekodieren die Audiodaten mit <a href="/de/docs/Web/API/AudioContext/decodeAudioData"><code>AudioContext.decodeAudioData</code></a>, setzen die dekodierten Daten als Quelle für den Audio-Puffer fest und verbinden die Quelle mit <a href="/de/docs/Web/API/AudioContext/destination"><code>AudioContext.destination</code></a>.</p>
+
+<p>Wenn <code>getData()</code> durchgelaufen ist, starten wir die Wiedergabe mit <code>start(0)</code> und deaktivieren den Wiedergabe-Knopf, damit er nicht erneut geklickt werden kann, während die Wiedergabe läuft (was zu einem Fehler führen würde).</p>
+
+<pre class="brush: js notranslate">function getData() {
+  source = audioCtx.createBufferSource();
+
+  var myRequest = new Request(&apos;viper.ogg&apos;);
+
+  fetch(myRequest).then(function(response) {
+    return response.arrayBuffer();
+  }).then(function(buffer) {
+    audioCtx.decodeAudioData(buffer, function(decodedData) {
+      source.buffer = decodedData;
+      source.connect(audioCtx.destination);
+    });
+  });
+};
+
+// Knöpfe zum Abspielen und Anhalten verknüpfen
+
+play.onclick = function() {
+  getData();
+  source.start(0);
+  play.setAttribute(&apos;disabled&apos;, &apos;disabled&apos;);
+}</pre>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-arraybuffer" hreflang="en" lang="en">Fetch<br><small lang="de">Die Definition von &apos;arrayBuffer()&apos; in dieser Spezifikation.</small></a></td>
+   <td><span class="spec-Living">Lebender Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browserkompatibilität">Browserkompatibilität</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Body.arrayBuffer"></div>
+
+<h2 id="Siehe_auch">Siehe auch</h2>
+
+<ul>
+ <li><a href="/de/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/de/docs/Web/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/de/docs/Web/HTTP">HTTP</a></li>
+</ul>

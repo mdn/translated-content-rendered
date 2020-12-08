@@ -1,0 +1,88 @@
+---
+title: Body.body
+slug: Web/API/Body/body
+translation_of: Web/API/Body/body
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>Eigenschaften</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><em><code>body</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methoden</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/arrayBuffer"><code>arrayBuffer()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/blob"><code>blob()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/Body/text"><code>text()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implementiert von:</summary><ol><li><a href="/de/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/de/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>Dies ist eine experimentelle Technologie</strong><br>Da diese Technologie noch nicht definitiv implementiert wurde, sollte die <a href="#Browser_compatibility">Browserkompatibilität</a> beachtet werden. Es ist auch möglich, dass die Syntax in einer späteren Spezifikation noch geändert wird.</p>
+</div></div>
+
+<p>Die schreibgeschützte <strong><code>body</code></strong> Eigenschaft des <a href="/de/docs/Web/API/Body"><code>Body</code></a> Mixin ist ein einfacher Getter, der dazu benutzt wird den Inhalt des Body als <a href="/de/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> bereitzustellen.</p>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="brush: js notranslate">var stream = responseInstance.body;</pre>
+
+<h3 id="Wert">Wert</h3>
+
+<p>Ein <a href="/de/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>.</p>
+
+<h2 id="Beispiel">Beispiel</h2>
+
+<p>In unserem einfachen <a href="https://mdn.github.io/dom-examples/streams/simple-pump.html">Stream-Pump-Beispiel</a> rufen wir ein Bild ab, machen den Antwort-Stream mit <code>response.body</code> sichtbar, erstellen einen Reader mit <a href="/de/docs/Web/API/ReadableStream/getReader"><code>ReadableStream.getReader()</code></a> und reihen die Teile des Streams in einen zweiten, benutzerdefinierten, lesbaren Stream — wodurch wie eine exakte Kopie des Bilds erhalten.</p>
+
+<pre class="brush: js notranslate">const image = document.getElementById(&apos;target&apos;);
+
+// Bild holen
+fetch(&apos;./tortoise.png&apos;)
+// Body als ReadableStream abrufen
+.then(response =&gt; response.body)
+.then(body =&gt; {
+  const reader = body.getReader();
+
+  return new ReadableStream({
+    start(controller) {
+      return pump();
+
+      function pump() {
+        return reader.read().then(({ done, value }) =&gt; {
+          // Stream schließen, wenn keine weiteren Daten verarbeitet werden müssen
+          if (done) {
+            controller.close();
+            return;
+          }
+
+          // Das nächste Datenstück in unseren Ziel-Stream einreihen
+          controller.enqueue(value);
+          return pump();
+        });
+      }
+    }
+  })
+})
+.then(stream =&gt; new Response(stream))
+.then(response =&gt; response.blob())
+.then(blob =&gt; URL.createObjectURL(blob))
+.then(url =&gt; console.log(image.src = url))
+.catch(err =&gt; console.error(err));</pre>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-body" hreflang="en" lang="en">Fetch<br><small lang="de">Die Definition von &apos;body&apos; in dieser Spezifikation.</small></a></td>
+   <td><span class="spec-Living">Lebender Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browserkompatibilität">Browserkompatibilität</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Body.body"></div>
+
+<h2 id="Siehe_auch">Siehe auch</h2>
+
+<ul>
+ <li><a href="/de/docs/Web/API/Fetch_API">Fetch API</a></li>
+ <li><a href="/de/docs/Web/API/Streams_API">Streams API</a></li>
+ <li><a href="/de/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+</ul>

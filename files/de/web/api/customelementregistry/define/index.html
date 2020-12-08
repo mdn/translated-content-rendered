@@ -1,0 +1,241 @@
+---
+title: CustomElementRegistry.define()
+slug: Web/API/CustomElementRegistry/define
+tags:
+  - API
+  - CustomElementRegistry
+  - Method
+  - Reference
+  - Web Components
+  - Webkomponente
+  - benutzerdefiniert
+  - custom elements
+  - define
+translation_of: Web/API/CustomElementRegistry/define
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></strong></li><li class="toggle"><details open><summary>Methoden</summary><ol><li><em><code>define()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/de/docs/Web/API/CustomElementRegistry/get"><code>get()</code></a> <a href="/de/docs/Web/API/CustomElementRegistry/get$translate" style="opacity: 0.5;">[Übersetzen]</a></li><li><a href="/de/docs/Web/API/CustomElementRegistry/upgrade"><code>upgrade()</code></a> <a href="/de/docs/Web/API/CustomElementRegistry/upgrade$translate" style="opacity: 0.5;">[Übersetzen]</a></li><li><a href="/de/docs/Web/API/CustomElementRegistry/whenDefined"><code>whenDefined()</code></a> <a href="/de/docs/Web/API/CustomElementRegistry/whenDefined$translate" style="opacity: 0.5;">[Übersetzen]</a></li></ol></details></li></ol></section>
+
+<p>Die <code><strong>define()</strong></code> Methode der <a href="/de/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a> Schnittstelle beschreibt ein neues benutzerdefiniertes Element.</p>
+
+<p>Es gibt zwei Arten von benutzerdefinierten Elementen, die erstellt werden können:</p>
+
+<ul>
+ <li><strong>Autonomes benutzerdefiniertes Element:</strong> Eigenständige Elemente; Sie erben nicht von eingebauten HTML-Elementen.</li>
+ <li><strong>Angepasstes integriertes Element:</strong> Diese Elemente erben und erweitern eingebaute HTML-Elemente.</li>
+</ul>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="syntaxbox notranslate">customElements.define(<em>name</em>, <em>constructor</em>, <em>options</em>);
+</pre>
+
+<h3 id="Parameter">Parameter</h3>
+
+<dl>
+ <dt>name</dt>
+ <dd>Name des neuen benutzerdefinierten Elements. Beachte, dass Namen von benutzerdefinierten Elementen einen Bindestrich enthalten müssen.</dd>
+ <dt>constructor</dt>
+ <dd>Konstruktor für das neue, benutzerdefinierte Element.</dd>
+ <dt>options <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>Objekt, das steuert, wie das Element definiert ist. Eine Option wird derzeit unterstützt:
+ <ul>
+  <li><code>extends</code>: String des Namens eines integrierten Elements das erweitert werden soll. Wird verwendet um ein <em>angepasstes integriertes Element</em>  zu erzeugen<em>.</em></li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Return_value">Return value</h3>
+
+<p>Void.</p>
+
+<h3 id="Ausnahmebehandlung">Ausnahmebehandlung</h3>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Exception</th>
+   <th scope="col">Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>NotSupportedError</code></td>
+   <td>
+    <p>Das <a href="/de/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a> enthält bereits einen Eintrag mit dem gleichen Namen oder dem gleichen Konstruktor (oder ist auf andere Weise bereits definiert), oder <code>extends</code> ist angegeben und es ist ein <a href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name">gültiger benutzerdefinierter Elementname</a> oder <code>extends</code> ist angegeben, aber das Element, das es zu erweitern versucht, ist ein unbekanntes Element.</p>
+   </td>
+  </tr>
+  <tr>
+   <td><code>SyntaxError</code></td>
+   <td>Der angegebene Name ist kein <a href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name">gültiger benutzerdefinierter Elementname</a>.</td>
+  </tr>
+  <tr>
+   <td><code>TypeError</code></td>
+   <td>Der referenzierte Konstruktor ist kein Konstruktor.</td>
+  </tr>
+ </tbody>
+</table>
+
+<div class="note">
+<p><strong>Hinweis</strong>: Du wirst oftmals  <code>NotSupportedError</code>s geworfen bekommen, die so erscheinen als würde <code>define()</code> fehlschlagen, aber stattdessen wahrscheinlich ein Problem mit {domxref(&quot;Element.attachShadow()&quot;)}} sind.</p>
+</div>
+
+<h2 id="Beispiele">Beispiele</h2>
+
+<h3 id="Autonomes_benutzerdefiniertes_Element">Autonomes benutzerdefiniertes Element</h3>
+
+<p>Der folgende Code entstammt dem <a href="https://github.com/mdn/web-components-examples/tree/master/popup-info-box-web-component">popup-info-box-web-component</a> Beispiel (<a href="https://mdn.github.io/web-components-examples/popup-info-box-web-component/">siehe Live</a>).</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class PopUpInfo extends HTMLElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create spans
+    var wrapper = document.createElement(&apos;span&apos;);
+    wrapper.setAttribute(&apos;class&apos;,&apos;wrapper&apos;);
+    var icon = document.createElement(&apos;span&apos;);
+    icon.setAttribute(&apos;class&apos;,&apos;icon&apos;);
+    icon.setAttribute(&apos;tabindex&apos;, 0);
+    var info = document.createElement(&apos;span&apos;);
+    info.setAttribute(&apos;class&apos;,&apos;info&apos;);
+
+    // Take attribute content and put it inside the info span
+    var text = this.getAttribute(&apos;text&apos;);
+    info.textContent = text;
+
+    // Insert icon
+    var imgUrl;
+    if(this.hasAttribute(&apos;img&apos;)) {
+      imgUrl = this.getAttribute(&apos;img&apos;);
+    } else {
+      imgUrl = &apos;img/default.png&apos;;
+    }
+    var img = document.createElement(&apos;img&apos;);
+    img.src = imgUrl;
+    icon.appendChild(img);
+
+    // Create some CSS to apply to the shadow dom
+    var style = document.createElement(&apos;style&apos;);
+
+    style.textContent = &apos;.wrapper {&apos; +
+                           &apos;position: relative;&apos; +
+                        &apos;}&apos; +
+
+                         &apos;.info {&apos; +
+                            &apos;font-size: 0.8rem;&apos; +
+                            &apos;width: 200px;&apos; +
+                            &apos;display: inline-block;&apos; +
+                            &apos;border: 1px solid black;&apos; +
+                            &apos;padding: 10px;&apos; +
+                            &apos;background: white;&apos; +
+                            &apos;border-radius: 10px;&apos; +
+                            &apos;opacity: 0;&apos; +
+                            &apos;transition: 0.6s all;&apos; +
+                            &apos;position: absolute;&apos; +
+                            &apos;bottom: 20px;&apos; +
+                            &apos;left: 10px;&apos; +
+                            &apos;z-index: 3;&apos; +
+                          &apos;}&apos; +
+
+                          &apos;img {&apos; +
+                            &apos;width: 1.2rem&apos; +
+                          &apos;}&apos; +
+
+                          &apos;.icon:hover + .info, .icon:focus + .info {&apos; +
+                            &apos;opacity: 1;&apos; +
+                          &apos;}&apos;;
+
+    // attach the created elements to the shadow dom
+
+    shadow.appendChild(style);
+    shadow.appendChild(wrapper);
+    wrapper.appendChild(icon);
+    wrapper.appendChild(info);
+  }
+}
+
+// Define the new element
+customElements.define(&apos;popup-info&apos;, PopUpInfo);
+</pre>
+
+<pre class="brush: html notranslate">&lt;popup-info img=&quot;img/alt.png&quot; text=&quot;Your card validation code (CVC) is an extra
+                                    security feature — it is the last 3 or 4
+                                    numbers on the back of your card.&quot;&gt;</pre>
+
+<div class="note">
+<p><strong>Hinweis</strong>: Konstruktoren für autonome benutzerdefinierte Elemente müssen <a href="/de/docs/Web/API/HTMLElement"><code>HTMLElement</code></a> extenden.</p>
+</div>
+
+<h3 id="Benutzerdefiniertes_integriertes_Element">Benutzerdefiniertes integriertes Element</h3>
+
+<p>Der folgende Code entstammt dem <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> Beispiel (<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">siehe Live</a>).</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // count words in element&apos;s parent element
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create text node and add word count to it
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // Append it to the shadow root
+    shadow.appendChild(text);
+
+
+    // Update count when element content changes
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// Define the new element
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<pre class="brush: html notranslate">&lt;p is=&quot;word-count&quot;&gt;&lt;/p&gt;</pre>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spezifikation</th>
+   <th scope="col">Status</th>
+   <th scope="col">Kommentar</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#dom-customelementregistry-define" hreflang="en" lang="en">HTML Living Standard<br><small lang="de">Die Definition von &apos;customElements.define()&apos; in dieser Spezifikation.</small></a></td>
+   <td><span class="spec-Living">Lebender Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browserkompatibilität">Browserkompatibilität</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry.define"></div>
+</div>

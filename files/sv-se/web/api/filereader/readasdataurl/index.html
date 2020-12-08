@@ -1,0 +1,124 @@
+---
+title: FileReader.readAsDataURL()
+slug: Web/API/FileReader/readAsDataURL
+translation_of: Web/API/FileReader/readAsDataURL
+---
+<p>Metoden <code>readAsDataURL</code> används för att läsa innehållet i en specificerad <a href="/sv-SE/docs/Web/API/Blob"><code>Blob</code></a> eller <a href="/sv-SE/docs/Web/API/File"><code>File</code></a>. När läsningen har slutförts, så blir <a href="/sv-SE/docs/Web/API/FileReader/readyState"><code>readyState</code></a> <code>DONE</code>, och <code><a href="/sv-SE/docs/Web/Reference/Events/loadend" title="/sv-SE/docs/Web/Reference/Events/loadend">loadend</a></code> utlöses. Vid den tidpunkten så innehåller attributet <a href="/sv-SE/docs/Web/API/FileReader/result"><code>result</code></a> datan som en <a href="/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">data: URL</a> som representerar filens data som en base64-kodad textsträng.</p>
+
+<div class="note">
+<p><strong>Märk:</strong> filens <a href="/sv-SE/docs/Web/API/FileReader/result"><code>result</code></a> resulterar i en textsträng som ej direkt kan avkodas som Base64. För att få ut bara en Base64-kodad textsträng, måste du ta bort <code>data:*/*;base64,</code> från textsträngen.</p>
+</div>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="syntaxbox notranslate"><em>instanceOfFileReader</em>.readAsDataURL(blob);</pre>
+
+<h3 id="Parametrar">Parametrar</h3>
+
+<dl>
+ <dt><code>blob</code></dt>
+ <dd>Den <a href="/sv-SE/docs/Web/API/Blob"><code>Blob</code></a> eller <a href="/sv-SE/docs/Web/API/File"><code>File</code></a> som ska läsas från.</dd>
+</dl>
+
+<h2 id="Exempel">Exempel</h2>
+
+<h3 id="HTML">HTML</h3>
+
+<pre class="brush: html notranslate">&lt;input type=&quot;file&quot; onchange=&quot;previewFile()&quot;&gt;&lt;br&gt;
+&lt;img src=&quot;&quot; height=&quot;200&quot; alt=&quot;Image preview...&quot;&gt;</pre>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<pre class="brush: js notranslate">function previewFile() {
+  var preview = document.querySelector(&apos;img&apos;);
+  var file    = document.querySelector(&apos;input[type=file]&apos;).files[0];
+  var reader  = new FileReader();
+
+  reader.addEventListener(&quot;load&quot;, function () {
+    preview.src = reader.result;
+  }, false);
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}</pre>
+
+<h3 id="Live_Result">Live Result</h3>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="240" id="frame_Example" src="https://mdn.mozillademos.org/sv-SE/docs/Web/API/FileReader/readAsDataURL$samples/Example?revision=1479377" width="100%"></iframe></p>
+
+<h2 id="Exempel_-_läsa_flera_filer">Exempel - läsa flera filer</h2>
+
+<h3 id="HTML_2">HTML</h3>
+
+<pre class="brush: html notranslate">&lt;input id=&quot;browse&quot; type=&quot;file&quot; onchange=&quot;previewFiles()&quot; multiple&gt;
+&lt;div id=&quot;preview&quot;&gt;&lt;/div&gt;</pre>
+
+<h3 id="JavaScript_2">JavaScript</h3>
+
+<pre class="brush: js notranslate">function previewFiles() {
+
+  var preview = document.querySelector(&apos;#preview&apos;);
+  var files   = document.querySelector(&apos;input[type=file]&apos;).files;
+
+  function readAndPreview(file) {
+
+    // Se till att `file.name` matchar våra fil-extensions kriteria
+    if ( /\.(jpe?g|png|gif)$/i.test(file.name) ) {
+      var reader = new FileReader();
+
+      reader.addEventListener(&quot;load&quot;, function () {
+        var image = new Image();
+        image.height = 100;
+        image.title = file.name;
+        image.src = this.result;
+        preview.appendChild( image );
+      }, false);
+
+      reader.readAsDataURL(file);
+    }
+
+  }
+
+  if (files) {
+    [].forEach.call(files, readAndPreview);
+  }
+
+}
+</pre>
+
+<div class="note"><strong>Märk:</strong> Konstruktorn för <a href="/en-US/docs/Web/API/FileReader"><code>FileReader()</code></a> stöddes inte av Internet Explorer i versionerna innan 10. För en full kompatibilitetskod kan du gärna gå till <a class="internal" href="https://mdn.mozillademos.org/files/3699/crossbrowser_image_preview.html" title="crossbrowser_image_preview.html">crossbrowser möjlig lösning för bild förhandsvisning</a>. Se också <a href="https://mdn.mozillademos.org/files/3698/image_upload_preview.html">detta kraftfullare exempel</a>.</div>
+
+<h2 id="Specifikationer">Specifikationer</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specifikation</th>
+   <th scope="col">Status</th>
+   <th scope="col">Kommentar</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/FileAPI/#FileReader-interface" hreflang="en" lang="en">File API<br><small lang="sv-SE">The definition of &apos;FileReader&apos; in that specification.</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Första definitionen</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Webbläsar_kompatibilitet">Webbläsar kompatibilitet</h2>
+
+<div class="hidden">Tabellen med kompatibilitet på denna sida är genererad från strukturerad data. Om du skulle vilja bidra till denna data, vänligen gå till <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> och skicka en pull-request till oss.</div>
+
+<div class="bc-data" id="bcd:api.FileReader.readAsDataURL"></div>
+
+<h2 id="Se_även">Se även</h2>
+
+<ul>
+ <li><a href="/sv-SE/docs/Web/API/FileReader"><code>FileReader</code></a></li>
+ <li><a href="/sv-SE/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a></li>
+</ul>
+
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/sv-SE/docs/Web/API/FileReader"><code>FileReader</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><a href="/sv-SE/docs/Web/API/FileReader/FileReader"><code>FileReader()</code></a> <a href="/sv-SE/docs/Web/API/FileReader/FileReader$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Properties</summary><ol><li><a href="/sv-SE/docs/Web/API/FileReader/error"><code>error</code></a> <a href="/sv-SE/docs/Web/API/FileReader/error$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/onabort"><code>onabort</code></a> <a href="/sv-SE/docs/Web/API/FileReader/onabort$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/onload"><code>onload</code></a> <a href="/sv-SE/docs/Web/API/FileReader/onload$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/readyState"><code>readyState</code></a> <a href="/sv-SE/docs/Web/API/FileReader/readyState$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/result"><code>result</code></a> <a href="/sv-SE/docs/Web/API/FileReader/result$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Methods</summary><ol><li><a href="/sv-SE/docs/Web/API/FileReader/abort"><code>abort()</code></a> <a href="/sv-SE/docs/Web/API/FileReader/abort$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/readAsArrayBuffer"><code>readAsArrayBuffer()</code></a> <a href="/sv-SE/docs/Web/API/FileReader/readAsArrayBuffer$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/readAsBinaryString"><code>readAsBinaryString()</code></a> <a href="/sv-SE/docs/Web/API/FileReader/readAsBinaryString$translate" style="opacity: 0.5;">[Translate]</a></li><li><em><code>readAsDataURL()</code></em></li><li><a href="/sv-SE/docs/Web/API/FileReader/readAsText"><code>readAsText()</code></a> <a href="/sv-SE/docs/Web/API/FileReader/readAsText$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/sv-SE/docs/Web/API/FileReader/abort_event"><code>abort</code></a> <a href="/sv-SE/docs/Web/API/FileReader/abort_event$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/error_event"><code>error</code></a> <a href="/sv-SE/docs/Web/API/FileReader/error_event$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/load_event"><code>load</code></a> <a href="/sv-SE/docs/Web/API/FileReader/load_event$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/loadend_event"><code>loadend</code></a> <a href="/sv-SE/docs/Web/API/FileReader/loadend_event$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/loadstart_event"><code>loadstart</code></a> <a href="/sv-SE/docs/Web/API/FileReader/loadstart_event$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/sv-SE/docs/Web/API/FileReader/progress_event"><code>progress</code></a> <a href="/sv-SE/docs/Web/API/FileReader/progress_event$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Inheritance:</summary><ol><li><a href="/sv-SE/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for File API</summary><ol><li><a href="/sv-SE/docs/Web/API/Blob"><code>Blob</code></a></li><li><a href="/sv-SE/docs/Web/API/File"><code>File</code></a></li><li><a href="/sv-SE/docs/Web/API/FileList"><code>FileList</code></a></li><li><a href="/sv-SE/docs/Web/API/FileReaderSync"><code>FileReaderSync</code></a></li></ol></details></li></ol></section></div>

@@ -1,0 +1,92 @@
+---
+title: Battery Status API
+slug: Web/API/Battery_Status_API
+translation_of: Web/API/Battery_Status_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/API/Battery_Status_API">Battery Status API</a></strong></li><li class="toggle"><details open><summary>Handbuch</summary><ol><li><a href="/de/docs/Web/Apps/Build/gather_and_modify_data/retrieving_battery_status_information">Retrieving Battery status information</a> <a href="/de/docs/Web/Apps/Build/gather_and_modify_data/retrieving_battery_status_information$translate" style="opacity: 0.5;">[Übersetzen]</a></li></ol></details></li><li class="toggle"><details open><summary>Schnittstellen</summary><ol><li><a href="/de/docs/Web/API/BatteryManager"><code>BatteryManager</code></a></li></ol></details></li><li class="toggle"><details open><summary>Eigenschaften</summary><ol><li><a href="/de/docs/Web/API/Navigator/battery"><code>Navigator.battery</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methoden</summary><ol><li><a href="/de/docs/Web/API/Navigator/getBattery"><code>Navigator.getBattery()</code></a></li></ol></details></li></ol></section><div class="obsolete obsoleteHeader notecard"><p><strong>Veraltet</strong><br>Dieses Feature ist veraltet. Obwohl es in manchen Browsern immer noch funktioniert, wird von seiner Benutzung abgeraten, da es jederzeit entfernt werden kann. Es sollte daher nicht mehr verwendet werden.</p></div>
+
+<p>Die <strong>Battery Status API</strong>, oder kurz <strong>Battery API</strong>, stellt Informationen über den Ladezustand der Systembatterie zur Verfügung. Diese Informationen können zur Anpassung der Ressourcennutzung verwendet werden. Wenn nur noch wenig Energie zur Verfügung steht, sollten unnötige Operationen eingestellt werden, damit die Laufzeit erhöht wird. Oder aber der Zustand gespeichert werden, damit ein Datenverlust verhindert werden kann.</p>
+
+<p>Die Battery Status API erweitert  <a href="/de/docs/Web/API/Window/navigator"><code>window.navigator</code></a> mit einer Methode  <a href="/de/docs/Web/API/Navigator/getBattery"><code>navigator.getBattery()</code></a>, die ein Promise mit einem  <a href="/de/docs/Web/API/BatteryManager"><code>BatteryManager</code></a> Objekt liefert, sowie einigen Nachrichten zum Überwachen des Batteriestatus.</p>
+
+<h2 id="Beispiel">Beispiel</h2>
+
+<p>In diesem Beispiel wird der Ladezustand (Netz, ladend, etc.) und Änderungen des Batterieniveaus und der Zeit überwacht. Dies erfolgt durch Überwachen der Events:  <code><a href="/de/docs/Web/Reference/Events/chargingchange" title="/de/docs/Web/Reference/Events/chargingchange">chargingchange</a></code>, <code><a href="/de/docs/Web/Reference/Events/levelchange" title="/de/docs/Web/Reference/Events/levelchange">levelchange</a></code> und <code><a href="/de/docs/Web/Reference/Events/chargingtimechange" title="/de/docs/Web/Reference/Events/chargingtimechange">chargingtimechange</a></code>, <code><a href="/de/docs/Web/Reference/Events/dischargingtimechange" title="/de/docs/Web/Reference/Events/dischargingtimechange">dischargingtimechange</a></code>.</p>
+
+<pre class="brush: js; notranslate">navigator.getBattery().then(function(battery) {
+  function updateAllBatteryInfo(){
+    updateChargeInfo();
+    updateLevelInfo();
+    updateChargingInfo();
+    updateDischargingInfo();
+  }
+  updateAllBatteryInfo();
+
+  battery.addEventListener(&apos;chargingchange&apos;, function(){
+    updateChargeInfo();
+  });
+  function updateChargeInfo(){
+    console.log(&quot;Battery charging? &quot;
+                + (battery.charging ? &quot;Yes&quot; : &quot;No&quot;));
+  }
+
+  battery.addEventListener(&apos;levelchange&apos;, function(){
+    updateLevelInfo();
+  });
+  function updateLevelInfo(){
+    console.log(&quot;Battery level: &quot;
+                + battery.level * 100 + &quot;%&quot;);
+  }
+
+  battery.addEventListener(&apos;chargingtimechange&apos;, function(){
+    updateChargingInfo();
+  });
+  function updateChargingInfo(){
+    console.log(&quot;Battery charging time: &quot;
+                 + battery.chargingTime + &quot; seconds&quot;);
+  }
+
+  battery.addEventListener(&apos;dischargingtimechange&apos;, function(){
+    updateDischargingInfo();
+  });
+  function updateDischargingInfo(){
+    console.log(&quot;Battery discharging time: &quot;
+                 + battery.dischargingTime + &quot; seconds&quot;);
+  }
+
+});
+</pre>
+
+<p>Siehe auch die <a class="external" href="http://www.w3.org/TR/battery-status/#examples">Beispiel in der Spezifikation</a>.</p>
+
+<h2 id="Spezifikationen">Spezifikationen</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Spezifikation</th>
+   <th scope="col">Status</th>
+   <th scope="col">Kommentar</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/battery/" hreflang="en" lang="en" title="Die &apos;Battery Status API&apos; Spezifikation">Battery Status API</a></td>
+   <td><span class="spec-CR">Anwärter Empfehlung</span></td>
+   <td>Initiale Definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Kompatibilität">Browser Kompatibilität</h2>
+
+<div class="hidden">Die Kompatibilitätstabelle auf dieser Seite wird aus strukturierten Daten generiert. Beteiligung ist über <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> möglich, bitte schickt uns einen &quot;pull request&quot; Anfrage.</div>
+
+<div class="bc-data" id="bcd:api.BatteryManager"></div>
+
+<h2 id="Siehe_auch">Siehe auch</h2>
+
+<ul>
+ <li><a href="/en-US/Apps/Build/gather_and_modify_data/retrieving_battery_status_information">Batterie Statusinformationen abrufen - Beispiel und Artikel</a></li>
+ <li><a class="external" href="http://hacks.mozilla.org/2012/02/using-the-battery-api-part-of-webapi/">Hacks blog post - Nutzung der Battery API</a></li>
+</ul>
