@@ -1,0 +1,150 @@
+---
+title: '@keyframes'
+slug: Web/CSS/@keyframes
+tags:
+  - CSS
+  - 动画
+  - 参考
+translation_of: Web/CSS/@keyframes
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/Reference">CSS 参考</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Tips">CSS Animations tips and tricks</a></li><li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Detecting_CSS_animation_support">检测CSS动画的支持性</a></li><li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations">使用 CSS 动画</a></li></ol></details></li><li class="toggle"><details open><summary>At-Rules</summary><ol><li><em><code>@keyframes</code></em></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation"><code>animation</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-delay"><code>animation-delay</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-direction"><code>animation-direction</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-duration"><code>animation-duration</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-fill-mode"><code>animation-fill-mode</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-iteration-count"><code>animation-iteration-count</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-name"><code>animation-name</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-play-state"><code>animation-play-state</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-timing-function"><code>animation-timing-function</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary">关键帧 <strong><code>@keyframes</code></strong> <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/At-rule">at-rule</a> 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。</span>和 <a href="/zh-CN/docs/Web/CSS/CSS_Transitions">转换 transition</a> 相比，关键帧 keyframes 可以控制动画序列的中间步骤。</p>
+
+<pre class="brush: css no-line-numbers notranslate"><code>@keyframes slidein {
+  from {
+    </code>transform: translateX(0%); <code>
+  }
+
+  to {
+    </code>transform: translateX(100%);<code>
+  }
+}</code></pre>
+
+<p>JavaScript 可以通过 CSS对象模型的 <a href="/zh-CN/docs/Web/API/CSSKeyframesRule"><code>CSSKeyframesRule</code></a> 接口来访问 <code>@keyframes</code>。</p>
+
+<p>要使用关键帧, 先创建一个带名称的 <code>@keyframes</code> 规则，以便后续使用 <a href="/zh-CN/docs/Web/CSS/animation-name" title="使用简写属性animation可以很方便地同时设置所有的动画属性。"><code>animation-name</code></a> 属性将动画同其关键帧声明匹配。每个 <code>@keyframes</code> 规则包含多个关键帧，也就是一段样式块语句，每个关键帧有一个百分比值作为名称，代表在动画进行中，在哪个阶段触发这个帧所包含的样式。</p>
+
+<p>可以按任意顺序列出关键帧百分比；它们将按照其应该发生的顺序来处理。</p>
+
+<h3 id="让关键帧序列生效">让关键帧序列生效</h3>
+
+<p>如果一个关键帧规则没有指定动画的开始或结束状态（也就是，<code>0%</code>/<code>from</code> 和<code>100%</code>/<code>to</code>，浏览器将使用元素的现有样式作为起始/结束状态。这可以用来从初始状态开始元素动画，最终返回初始状态。</p>
+
+<p>如果在关键帧的样式中使用了不能用作动画的属性，那么这些属性会被忽略掉，支持动画的属性仍然是有效的，不受波及。</p>
+
+<h3 id="重复定义">重复定义</h3>
+
+<p>如果多个关键帧使用同一个名称，以最后一次定义的为准。 <code>@keyframes</code> 不存在层叠样式(cascade)的情况，所以动画在一个时刻（阶段）只会使用一个的关键帧的数据。</p>
+
+<p>如果一个@keyframes 内的关键帧的百分比存在重复的情况，则@keyframes规则中该百分比的所有关键帧都将用于该帧。如果多个关键帧指定了相同的百分比值，则@keyframes规则内是可以使用层叠样式的。</p>
+
+<h3 id="属性个数不定">属性个数不定</h3>
+
+<p>如果一个关键帧中没有出现其他关键帧中的属性，那么这个属性将使用插值（不能使用插值的属性除外，这些属性会被忽略掉）。例如：</p>
+
+<pre class="brush: css notranslate">@keyframes identifier {
+  0% { top: 0; left: 0; }
+  30% { top: 50px; }
+  68%, 72% { left: 50px; }
+  100% { top: 100px; left: 100%; }
+}
+</pre>
+
+<p>例子中，<a href="/zh-CN/docs/Web/CSS/top" title="top样式属性定义了定位元素的上外边距边界与其包含块上边界之间的偏移，非定位元素设置此属性无效。"><code>top</code></a> 属性分别出现在关键帧 <code>0%</code>、<code>30%</code> 和 <code>100%</code> 的中，而 <a href="/zh-CN/docs/Web/CSS/left" title="CSS left属性定义了定位元素的左外边距边界与其包含块左边界之间的偏移，非定位元素设置此属性无效。"><code>left</code></a> 属性分别出现在关键帧 <code>0%</code>、<code>68%</code>、<code>72%</code> 和 <code>100%</code> 中。</p>
+
+<h3 id="同一关键帧中的相同属性被重复定义">同一关键帧中的相同属性被重复定义</h3>
+
+<p>如果某一个关键帧出现了重复的定义，且重复的关键帧中的 CSS 属性值不同，则以最后一次定义的属性为准。例如：</p>
+
+<pre class="brush: css notranslate">@keyframes identifier {
+  0% { top: 0; }
+  50% { top: 30px; left: 20px; }
+  50% { top: 10px; }
+  100% { top: 0; }
+}
+</pre>
+
+<p>上面这个例子中，<code>50%</code> 关键帧中分别最后设置的属性 <code>top: 10px</code> 和 <code>left: 20px</code> 是有效的，但是其他的属性会被忽略。</p>
+
+<p>  Firefox 14 开始支持层叠 keyframes。</p>
+
+<h3 id="关键帧中的_!important">关键帧中的 <code>!important</code></h3>
+
+<p>关键帧中出现的 <code>!important</code> 将会被忽略。</p>
+
+<pre class="brush: css notranslate">@keyframes important1 {
+  from { margin-top: 50px; }
+  50%  { margin-top: 150px !important; } /* 忽略 */
+  to   { margin-top: 100px; }
+}
+
+@keyframes important2 {
+  from { margin-top: 50px;
+         margin-bottom: 100px; }
+  to   { margin-top: 150px !important; /* 忽略 */
+         margin-bottom: 50px; }
+}
+</pre>
+
+<h2 id="语法">语法</h2>
+
+<h3 id="取值">取值</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/CSS/custom-ident" title="&lt;custom-ident&gt; 指用户自定义字符串标识符。一种CSS 数据类型；要区分大小写，值不能有任何歧义。"><code>custom-ident</code></a></dt>
+ <dd>帧列表的名称。名称必须符合 CSS 语法中对标识符的定义。</dd>
+ <dt><code>from</code></dt>
+ <dd>等价于 <code>0%</code>。</dd>
+ <dt><code>to</code></dt>
+ <dd>等价于 <code>100%</code>。</dd>
+ <dt><a href="/zh-CN/docs/Web/CSS/percentage" title="CSS 数据类型 &lt;percentage&gt; 表述一个百分比值。许多 CSS 属性 可以取百分比值，经常用以根据父对象来确定大小。百分比值由一个&lt;number&gt;具体数值后跟着%符号构成. 就像其它在css里的单位一样，在%和数值之间是不允许有空格的。"><code>&lt;percentage&gt;</code></a></dt>
+ <dd>动画序列中触发关键帧的时间点，使用百分值来表示。</dd>
+ <dt>
+ <h3 id="形式化语法">形式化语法</h3>
+
+ <pre class="notranslate">@keyframes <a href="#keyframes-name">&lt;keyframes-name&gt;</a> {
+  <a href="#keyframe-block-list">&lt;keyframe-block-list&gt;</a>
+}<p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframes-name">&lt;keyframes-name&gt;</span> = <a href="/zh-CN/docs/Web/CSS/custom-ident" title="&lt;custom-ident&gt; 指用户自定义字符串标识符。一种CSS 数据类型；要区分大小写，值不能有任何歧义。">&lt;custom-ident&gt;</a> <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="/zh-CN/docs/Web/CSS/string" title="&lt;string&gt; 数据类型是由包含在英文双引号（&quot;）或英文单引号（&apos;）中的任意数量的Unicode字符组成。">&lt;string&gt;</a><br><span id="keyframe-block-list">&lt;keyframe-block-list&gt;</span> = <a href="#keyframe-block">&lt;keyframe-block&gt;</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Plus_()" title="Plus: the entity may occur one or several times">+</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframe-block">&lt;keyframe-block&gt;</span> = <a href="#keyframe-selector">&lt;keyframe-selector&gt;</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Hash_mark_()" title="Hash mark: the entity is repeated one or several times, each occurence separated by a comma">#</a> {
+  &lt;declaration-list&gt;
+}</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframe-selector">&lt;keyframe-selector&gt;</span> = from <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> to <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="/zh-CN/docs/Web/CSS/percentage" title="CSS 数据类型 &lt;percentage&gt; 表述一个百分比值。许多 CSS 属性 可以取百分比值，经常用以根据父对象来确定大小。百分比值由一个&lt;number&gt;具体数值后跟着%符号构成. 就像其它在css里的单位一样，在%和数值之间是不允许有空格的。">&lt;percentage&gt;</a></code></p></pre>
+ </dt>
+</dl>
+
+<h2 id="示例">示例</h2>
+
+<p>参见<a href="/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations" title="en/CSS/CSS_animations">使用 CSS 动画</a>。</p>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">备注</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-animations/#keyframes" hreflang="en" lang="en">CSS Animations<br><small lang="zh-CN">@keyframes</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">浏览器兼容性</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<div class="bc-data" id="bcd:css.at-rules.keyframes"></div>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations">使用 CSS 动画</a></li>
+ <li><a href="/zh-CN/docs/Web/API/AnimationEvent"><code>AnimationEvent</code></a></li>
+</ul>

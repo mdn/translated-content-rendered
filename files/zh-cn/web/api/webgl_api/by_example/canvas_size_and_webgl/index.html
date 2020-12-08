@@ -1,0 +1,84 @@
+---
+title: Canvas size and WebGL
+slug: Web/API/WebGL_API/By_example/Canvas_size_and_WebGL
+translation_of: Web/API/WebGL_API/By_example/Canvas_size_and_WebGL
+---
+<div></div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Learn/WebGL/By_example/Basic_scissoring" class="button">« 上一页</a><a href="/zh-CN/docs/Learn/WebGL/By_example/Boilerplate_1" class="button">下一页  »</a></p>
+</div><p></p>
+
+<div class="summary">
+<p><span class="seoSummary">此WebGL案例将探究设置（或不设置）Canvas属性的宽高值在浏览器中显示的影响。</span></p>
+</div>
+
+<div id="canvas-size-and-webgl">
+<p><iframe src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/WebGL_API/By_example/Canvas_size_and_WebGL$samples/canvas-size-and-webgl-source?revision=1437323" width="660" class="live-sample-frame sample-code-frame" height="180" frameborder="0" id="frame_canvas-size-and-webgl-source"></iframe></p>
+
+<div id="canvas-size-and-webgl-intro">
+<h3 id="canvas属性值大小对WebGL渲染的作用">canvas属性值大小对WebGL渲染的作用</h3>
+
+<p>使用 <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/scissor" title="此页面仍未被本地化, 期待您的翻译!"><code>scissor()</code></a> 和 <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/clear" title="WebGL API 的 WebGLRenderingContext.clear() 方法使用预设值来清空缓冲。"><code>clear()</code></a> 我们可以观察到canvas属性大小是如何影响WebGL绘图展示的。</p>
+
+<p>第一个canvas元素通过css样式定义了元素的大小，之后通过javascript获取该元素的 <a href="/zh-CN/docs/Web/API/Element/clientWidth" title="只读属性"><code>clientWidth</code></a> 和<a href="/zh-CN/docs/Web/API/Element/clientHeight" title="这个属性是只读属性，对于没有定义CSS或者内联布局盒子的元素为0，否则，它是元素内部的高度(单位像素)，包含内边距，但不包括水平滚动条、边框和外边距。"><code>clientHeight</code></a> 值，并分别赋值给元素的  <a href="/zh-CN/docs/Web/API/HTMLCanvasElement/width" title="HTMLCanvasElement.width 属性是一个对应 &lt;canvas&gt; 元素 CSS 像素 width 的正整数. 当这个属性没有指定时, 或者被赋予一个不合法的值, 比如一个负值, 默认使用 300."><code>width</code></a> 和<a href="/zh-CN/docs/Web/API/HTMLCanvasElement/height" title="HTMLCanvasElement.height 属性是一个正整数 ，使用了&lt;canvas&gt; 元素的HTML 属性height来反映该元素高度的 CSS 像素值。当该属性没有被定义，或被定义为一个无效值（如负值）时， 将使用150作为它的默认值。"><code>height</code></a>。</p>
+
+<p>相反的，第二个canvas元素并没有这样做，canvas内部对象的<a href="/zh-CN/docs/Web/API/HTMLCanvasElement/width" title="HTMLCanvasElement.width 属性是一个对应 &lt;canvas&gt; 元素 CSS 像素 width 的正整数. 当这个属性没有指定时, 或者被赋予一个不合法的值, 比如一个负值, 默认使用 300."><code>width</code></a> 和 <a href="/zh-CN/docs/Web/API/HTMLCanvasElement/height" title="HTMLCanvasElement.height 属性是一个正整数 ，使用了&lt;canvas&gt; 元素的HTML 属性height来反映该元素高度的 CSS 像素值。当该属性没有被定义，或被定义为一个无效值（如负值）时， 将使用150作为它的默认值。"><code>height</code></a> 属性值仍然是默认值，这样导致在浏览器中实际画布大小是不同的。</p>
+
+<p>使用 <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/scissor" title="此页面仍未被本地化, 期待您的翻译!"><code>scissor()</code></a> 和<a href="/zh-CN/docs/Web/API/WebGLRenderingContext/clear" title="WebGL API 的 WebGLRenderingContext.clear() 方法使用预设值来清空缓冲。"><code>clear()</code></a>在canvas中绘制矩形的效果是清晰可见的，在第一个canvas中，通过指定位置和像素大小，可以得到我们想要的效果，但是在第二个canvas中，这个矩形的位置、大小都是错误展示的。</p>
+</div>
+
+<div id="canvas-size-and-webgl-source">
+<pre class="brush: html">&lt;p&gt;Compare the two canvases.&lt;/p&gt;
+&lt;canvas&gt;Your browser does not seem to support
+    HTML5 canvas.&lt;/canvas&gt;
+&lt;canvas&gt;Your browser does not seem to support
+    HTML5 canvas.&lt;/canvas&gt;
+</pre>
+
+<pre class="brush: css">body {
+  text-align : center;
+}
+canvas {
+  display : inline-block;
+  width : 120px;
+  height : 80px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+</pre>
+
+<pre class="brush: js">window.addEventListener(&quot;load&quot;, function() {
+  &quot;use strict&quot;
+  var firstCanvas = document.getElementsByTagName(&quot;canvas&quot;)[0],
+    secondCanvas = document.getElementsByTagName(&quot;canvas&quot;)[1];
+  firstCanvas.width = firstCanvas.clientWidth;
+  firstCanvas.height = firstCanvas.clientHeight;
+  [firstCanvas, secondCanvas].forEach(function(canvas) {
+    var gl = canvas.getContext(&quot;webgl&quot;)
+      || canvas.getContext(&quot;experimental-webgl&quot;);
+    if (!gl) {
+      document.querySelector(&quot;p&quot;).innerHTML =
+        &quot;Failed to get WebGL context. &quot;
+        + &quot;Your browser or device may not support WebGL.&quot;;
+      return;
+    }
+    gl.viewport(0, 0,
+      gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(30, 10, 60, 60);
+    gl.clearColor(1.0, 1.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  });
+}, false);
+</pre>
+
+<p>The source code of this example is also available on <a href="https://github.com/idofilin/webgl-by-example/tree/master/canvas-size-and-webgl">GitHub</a>.</p>
+</div>
+</div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Learn/WebGL/By_example/Basic_scissoring" class="button">« 上一页</a><a href="/zh-CN/docs/Learn/WebGL/By_example/Boilerplate_1" class="button">下一页  »</a></p>
+</div><p></p>

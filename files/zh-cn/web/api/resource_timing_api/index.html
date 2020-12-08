@@ -1,0 +1,76 @@
+---
+title: Resource Timing API
+slug: Web/API/Resource_Timing_API
+translation_of: Web/API/Resource_Timing_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Resource_Timing_API">Resource Timing API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/Resource_Timing_API/Using_the_Resource_Timing_API">Using the Resource Timing API</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section></div>
+
+<div> </div>
+
+<div>通过<strong><code>Resource Timing API</code></strong>可以获取和分析应用资源加载的详细网络计时数据, 应用程序可以</div>
+
+<div>使用时间度量标准来确定加载特定资源所需要的时间, 比如 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequest</code></a>, <a href="/zh-CN/docs/Web/SVG/Element/SVG" title="思考下下面的svg图片（代表意大利国旗）："><code>&lt;SVG&gt;</code></a>, 图片, 或者脚本.</div>
+
+<div> </div>
+
+<p><code><strong>Resource Timing API</strong></code>为网络事件(如重定向的开始和结束事件, DNS查找的开始和结束事件, 请求开始, 响应开始和结束时间等)生成有高分辨率时间戳( <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp" title="DOMHighResTimeStamp 是一个double类型，用于存储时间值。该值可以是离散的时间点或两个离散时间点之间的时间差。T单位为毫秒 ms (milliseconds) ，应准确至5微秒 µs (microseconds)。但是，如果浏览器无法提供准确到5微秒的时间值(例如,由于硬件或软件的限制), 浏览器可以以毫秒为单位的精确到毫秒的时间表示该值。">high-resolution timestamps</a> )的资源加载时间线, 并提供了资源大小和资源类型.</p>
+
+<p>本文档是Resource Timing API的概述. 更多详细信息, 请查阅每个接口的参考说明, <a href="/Web/API/Resource_Timing/Using_Resource_Timing">Using Resource Timing</a> 和 <a href="#See_Also">附录</a> 的参考链接. 有关资源时序处理模型的图示，请参阅 <a href="https://w3c.github.io/resource-timing/#process">resource timing phases</a> .</p>
+
+<p class="note"><code>PerformanceResourceTiming</code> 接口只统计<a href="/zh-CN/docs/Web/API/PerformanceEntry" title="PerformanceEntry 对象代表了 performance 时间列表中的单个 metric 数据. 每一个 performance entry 都可以在应用运行过程中通过手动构建 mark 或者 measure (例如调用 mark() 方法) 生成. 此外, Performance entries 在资源加载的时候，也会被动生成（例如图片、script、css等资源加载）">performance entries</a> 中 <a href="/zh-CN/docs/Web/API/PerformanceEntry/entryType" title="The entryType  返回一个代表performance metric 类型的DOMString , 例如被performance.mark(&quot;begin&quot;) 所创建的entry 的entryType 就是 &quot;mark&quot;. 此属性只读."><code>entryType</code></a> 为&quot;<code>resource</code>&quot;类型的 <a href="/zh-CN/docs/Web/API/PerformanceEntry" title="PerformanceEntry 对象代表了 performance 时间列表中的单个 metric 数据. 每一个 performance entry 都可以在应用运行过程中通过手动构建 mark 或者 measure (例如调用 mark() 方法) 生成. 此外, Performance entries 在资源加载的时候，也会被动生成（例如图片、script、css等资源加载）"><code>PerformanceEntry</code></a></p>
+
+<h2 id="高分辨率时间戳">高分辨率时间戳</h2>
+
+<p>一些 <code><strong>Resource Timing</strong></code> 属性返回高分辨率时间戳, 顾名思义, 代表了高分辨率的时间点. 高分辨率时间戳类型是<code><a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp" title="DOMHighResTimeStamp 是一个double类型，用于存储时间值。该值可以是离散的时间点或两个离散时间点之间的时间差。T单位为毫秒 ms (milliseconds) ，应准确至5微秒 µs (microseconds)。但是，如果浏览器无法提供准确到5微秒的时间值(例如,由于硬件或软件的限制), 浏览器可以以毫秒为单位的精确到毫秒的时间表示该值。"><code>DOMHighResTimeStamp</code></a></code>, 用双精度数字(double)表示, 它的值是一个离散的时间点或者两个离散时间点之间的时间差.</p>
+
+<p><code>DOMHighResTimeStamp</code>的单位是毫秒(ms), 并且应该可以准确到 5 微秒(µs). 但是, 如果浏览器无法以提供精确到5微秒的时间值(如软硬件限制), 则可以将该值表示为以毫秒为单位的精确到毫秒的时间。</p>
+
+<h2 id="资源载入时间戳">资源载入时间戳</h2>
+
+<p>应用程序可以获得用于加载资源的各个阶段的时间戳. 处理模型中的第一个属性是 <a href="/zh-CN/docs/Web/API/PerformanceEntry/startTime" title="此页面仍未被本地化, 期待您的翻译!"><code>startTime</code></a> , 它在资源加载过程开始之前立即返回时间. <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/fetchStart" title="此页面仍未被本地化, 期待您的翻译!"><code>fetchStart</code></a> 跟踪和重定向处理(如果适用)，并在DNS查找之前进行. 下个阶段是<a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/connectStart" title="此页面仍未被本地化, 期待您的翻译!"><code>connectStart</code></a> 和 <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/connectEnd" title="此页面仍未被本地化, 期待您的翻译!"><code>connectEnd</code></a> 分别是开始连接到服务器和连接建立完成的时间戳. 最后三个按顺序分别是: <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/requestStart" title="此页面仍未被本地化, 期待您的翻译!"><code>requestStart</code></a> - 在浏览器开始向服务器请求资源时; <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/responseStart" title="此页面仍未被本地化, 期待您的翻译!"><code>responseStart</code></a> - 资源请求首包返回时; and <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/responseEnd" title="此页面仍未被本地化, 期待您的翻译!"><code>responseEnd</code></a> - 资源全部接收完成时. 如果资源是通过安全连接加载的 <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/secureConnectionStart" title="此页面仍未被本地化, 期待您的翻译!"><code>secureConnectionStart</code></a> 的值将会在connectStart和connectEnd之间.</p>
+
+<div class="note">
+<p>当 <a href="/en-US/docs/Glossary/CORS" class="glossaryLink" title="CORS: CORS (Cross-Origin Resource Sharing) is a system, consisting of transmitting HTTP headers, that determines whether browsers block frontend JavaScript code from accessing responses for cross-origin requests.">CORS</a> 生效时, 除非服务器的访问策略允许共享这些值，否则这些值中的许多将返回为零. 这需要提供资源的服务器发送 <code>Timing-Allow-Origin</code> HTTP 响应头并且指定origin[s]来源才能允许获取这些被限制的时间戳 .</p>
+
+<p>在非web页面本身的域名下，这些属性在默认都会返回0值 : <code>redirectStart</code>, <code>redirectEnd</code>, <code>domainLookupStart</code>, <code>domainLookupEnd</code>, <code>connectStart</code>, <code>connectEnd</code>, <code>secureConnectionStart</code>, <code>requestStart</code>, 和 <code>responseStart</code>.</p>
+</div>
+
+<p>The <code><a href="/zh-CN/docs/Web/API/PerformanceResourceTiming" title="此页面仍未被本地化, 期待您的翻译!"><code>PerformanceResourceTiming</code></a></code> interface also includes several network timing properties. The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/redirectStart" title="此页面仍未被本地化, 期待您的翻译!"><code>redirectStart</code></a> and <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/redirectEnd" title="此页面仍未被本地化, 期待您的翻译!"><code>redirectEnd</code></a> properties return <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp" title="DOMHighResTimeStamp 是一个double类型，用于存储时间值。该值可以是离散的时间点或两个离散时间点之间的时间差。T单位为毫秒 ms (milliseconds) ，应准确至5微秒 µs (microseconds)。但是，如果浏览器无法提供准确到5微秒的时间值(例如,由于硬件或软件的限制), 浏览器可以以毫秒为单位的精确到毫秒的时间表示该值。"><code>timestamps</code></a> for redirect start and end times, respectively. Likewise, the The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/domainLookupStart" title="此页面仍未被本地化, 期待您的翻译!"><code>domainLookupStart</code></a> and <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/domainLookupEnd" title="此页面仍未被本地化, 期待您的翻译!"><code>domainLookupEnd</code></a> properties return <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp" title="DOMHighResTimeStamp 是一个double类型，用于存储时间值。该值可以是离散的时间点或两个离散时间点之间的时间差。T单位为毫秒 ms (milliseconds) ，应准确至5微秒 µs (microseconds)。但是，如果浏览器无法提供准确到5微秒的时间值(例如,由于硬件或软件的限制), 浏览器可以以毫秒为单位的精确到毫秒的时间表示该值。"><code>timestamps</code></a> for DNS lookup start and end times, respectively.</p>
+
+<p><em>This would be a nice place to have a diagram showing the relationships between these segments of the resource loading time.</em></p>
+
+<h2 id="Resource_size">Resource size</h2>
+
+<p> <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming" title="此页面仍未被本地化, 期待您的翻译!"><code>PerformanceResourceTiming</code></a>接口有三个属性用来获取一个资源的数据大小。 <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/transferSize" title="此页面仍未被本地化, 期待您的翻译!"><code>transferSize</code></a> 属性返回所获得的资源大小，包含响应头加上响应体。</p>
+
+<p>The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/encodedBodySize" title="此页面仍未被本地化, 期待您的翻译!"><code>encodedBodySize</code></a> property returns the size (in octets) received from the fetch (HTTP or cache), of the <em>payload body</em>, <strong>before</strong> removing any applied content-codings. <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/decodedBodySize" title="此页面仍未被本地化, 期待您的翻译!"><code>decodedBodySize</code></a> returns the size (in octets) received from the fetch (HTTP or cache) of the <em>message body</em>, <strong>after</strong> removing any applied content-codings.</p>
+
+<h2 id="Other_properties">Other properties</h2>
+
+<p>The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/nextHopProtocol" title="此页面仍未被本地化, 期待您的翻译!"><code>nextHopProtocol</code></a> property returns the <em>network protocol</em> used to fetch the resource.</p>
+
+<p>The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/initiatorType" title="此页面仍未被本地化, 期待您的翻译!"><code>initiatorType</code></a> property returns the <em>type</em> of resource that initiated the performance entry such as &quot;<code>css</code>&quot; for a CSS resource, &quot;<code>xmlhttprequest</code>&quot; for an XMLHttpRequest and &quot;<code>img</code>&quot; for an image (such as a JPEG).</p>
+
+<p>If the current context is a <a href="/zh-CN/docs/Web/API/Worker" title="运行者 Worker 接口是Web Workers API 的一部分，代表一个后台任务，它容易被创建并向创建者发回消息。创建一个运行者只要简单的调用Worker()构造函数，指定一个脚本，在工作线程中执行。"><code>worker</code></a>, the <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/workerStart" title="此页面仍未被本地化, 期待您的翻译!"><code>workerStart</code></a> property can be used to obtain a <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp" title="DOMHighResTimeStamp 是一个double类型，用于存储时间值。该值可以是离散的时间点或两个离散时间点之间的时间差。T单位为毫秒 ms (milliseconds) ，应准确至5微秒 µs (microseconds)。但是，如果浏览器无法提供准确到5微秒的时间值(例如,由于硬件或软件的限制), 浏览器可以以毫秒为单位的精确到毫秒的时间表示该值。"><code>DOMHighResTimeStamp</code></a> when the worker was started.</p>
+
+<h2 id="Methods">Methods</h2>
+
+<p>The Resource Timing API includes two methods that extend the <a href="/zh-CN/docs/Web/API/Performance" title="Performance 接口可以获取到当前页面中与性能相关的信息。它是 High Resolution Time API 的一部分，同时也融合了 Performance Timeline API、Navigation Timing API、 User Timing API 和 Resource Timing API。"><code>Performance</code></a> interface. The <a href="/zh-CN/docs/Web/API/Performance/clearResourceTimings" title="此页面仍未被本地化, 期待您的翻译!"><code>clearResourceTimings()</code></a> method removes all &quot;<code>resource</code>&quot; type performance entries from the browser&apos;s <em>resource</em> performance entry buffer. The <a href="/zh-CN/docs/Web/API/Performance/setResourceTimingBufferSize" title="此页面仍未被本地化, 期待您的翻译!"><code>setResourceTimingBufferSize()</code></a> method sets the resource performance entry buffer size to the specified number of resource <a href="/zh-CN/docs/Web/API/PerformanceEntry" title="PerformanceEntry 对象代表了 performance 时间列表中的单个 metric 数据. 每一个 performance entry 都可以在应用运行过程中通过手动构建 mark 或者 measure (例如调用 mark() 方法) 生成. 此外, Performance entries 在资源加载的时候，也会被动生成（例如图片、script、css等资源加载）"><code>performance entries</code></a>.</p>
+
+<p>The <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming" title="此页面仍未被本地化, 期待您的翻译!"><code>PerformanceResourceTiming</code></a> interface&apos;s <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming/toJSON" title="此页面仍未被本地化, 期待您的翻译!"><code>toJSON()</code></a> method returns a JSON serialization of a &quot;<code>resource</code>&quot; type <a href="/zh-CN/docs/Web/API/PerformanceEntry" title="PerformanceEntry 对象代表了 performance 时间列表中的单个 metric 数据. 每一个 performance entry 都可以在应用运行过程中通过手动构建 mark 或者 measure (例如调用 mark() 方法) 生成. 此外, Performance entries 在资源加载的时候，也会被动生成（例如图片、script、css等资源加载）"><code>performance entry</code></a>.</p>
+
+<h2 id="Implementation_status">Implementation status</h2>
+
+<p>As shown in the <a href="/zh-CN/docs/Web/API/PerformanceResourceTiming" title="此页面仍未被本地化, 期待您的翻译!"><code>PerformanceResourceTiming</code></a> interface&apos;s <a href="/Web/API/PerformanceResourceTiming#Browser_compatibility">Browser Compatibility</a> table, most of these interfaces are broadly implemented by desktop browsers. However, note that some properties have little to no implementation so see each property&apos;s &quot;Browser compatibility&quot; section for more specific interoperability data.</p>
+
+<p>To test your browser&apos;s support for these interfaces, run the <code><a href="https://mdn.github.io/dom-examples/performance-apis/perf-api-support.html">perf-api-support</a></code> application.</p>
+
+<h2 id="附录">附录</h2>
+
+<ul>
+ <li><a href="https://w3c.github.io/resource-timing/">Resource Timing Standard</a>; W3C Editor&apos;s Draft</li>
+ <li><a href="http://caniuse.com/#search=resource-timing">CanIUse data</a></li>
+ <li><a href="http://www.stevesouders.com/blog/2014/08/21/resource-timing-practical-tips/">Resource Timing practical tips</a>; Steve Souders; 2014 August 21</li>
+ <li><a href="http://googledevelopers.blogspot.ca/2013/12/measuring-network-performance-with.html">Measuring network performance with Resource Timing API</a>; Ilya Grigorik; 2013 December 11</li>
+ <li><a href="http://siusin.github.io/perf-timing-primer/">A Primer for Web Performance Timing APIs</a>; Xiaoqian Wu; W3C Editor&apos;s Draft</li>
+</ul>

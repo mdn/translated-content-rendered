@@ -1,0 +1,295 @@
+---
+title: Cache
+slug: Web/API/Cache
+tags:
+  - API
+  - Cache
+  - Offline
+  - Service Workers
+  - Storage
+translation_of: Web/API/Cache
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Service_Worker_API">Service Worker API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/Cache"><code>Cache</code></a></strong></li><li class="toggle"><details open><summary>方法</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/add"><code>add()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/addAll"><code>addAll()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/delete"><code>delete()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/keys"><code>keys()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/match"><code>match()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/matchAll"><code>matchAll()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Cache/put"><code>put()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Service Workers API</summary><ol><li><a href="/zh-CN/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li><li><a href="/zh-CN/docs/Web/API/Client"><code>Client</code></a></li><li><a href="/zh-CN/docs/Web/API/Clients"><code>Clients</code></a></li><li><a href="/zh-CN/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncManager"><code>SyncManager</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/WindowClient"><code>WindowClient</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div>
+
+<p><strong><code>Cache</code></strong> 接口为缓存的 <code><a href="http://fetch.spec.whatwg.org/#request">Request</a></code> / <code><a href="http://fetch.spec.whatwg.org/#response">Response</a> </code> 对象对提供存储机制，例如，作为<a href="/zh-CN/docs/Web/API/ServiceWorker" title="一个ServiceWorker对象在 ServiceWorkerRegistration.active 属性和 ServiceWorkerContainer.controller 属性中可用 — 这是一个激活并在控制页面的service worker(service worker成功注册,被控页面已经重新加载完毕.)"><code>ServiceWorker</code></a> 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用.</p>
+
+<p>一个域可以有多个命名 Cache 对象。你需要在你的脚本 (例如，在 <a href="/zh-CN/docs/Web/API/ServiceWorker" title="一个ServiceWorker对象在 ServiceWorkerRegistration.active 属性和 ServiceWorkerContainer.controller 属性中可用 — 这是一个激活并在控制页面的service worker(service worker成功注册,被控页面已经重新加载完毕.)"><code>ServiceWorker</code></a> 中)中处理缓存更新的方式。除非明确地更新缓存，否则缓存将不会被更新；除非删除，否则缓存数据不会过期。使用 <a href="/zh-CN/docs/Web/API/CacheStorage/open" title="CacheStorage  open() 方法返回一个resolve为匹配 cacheName 的 Cache 对象的 Promise ."><code>CacheStorage.open(cacheName)</code></a> 打开一个Cache 对象，再使用 Cache 对象的方法去处理缓存.</p>
+
+<p>你需要定期地清理缓存条目，因为每个浏览器都硬性限制了一个域下缓存数据的大小。缓存配额使用估算值，可以使用 <a href="/zh-CN/docs/Web/API/StorageEstimate" title="StorageEstimate 提供对你的域名或Web app的数据存储空间总量和已用量的估计值,该对象实例由StorageManager的estimate() 方法返回的Promise返回."><code>StorageEstimate</code></a> API 获得。浏览器尽其所能去管理磁盘空间，但它有可能删除一个域下的缓存数据。浏览器要么自动删除特定域的全部缓存，要么全部保留。确保按名称安装版本缓存，并仅从可以安全操作的脚本版本中使用缓存。查看 <a href="/en-US/docs/Web/API/ServiceWorker_API/Using_Service_Workers#Deleting_old_caches">Deleting old caches</a> 获取更多信息.</p>
+
+<div class="note">
+<p><strong>Note</strong>: <a href="/zh-CN/docs/Web/API/Cache/put" title="Cache 接口的  put() 方法 允许将键/值对添加到当前的 Cache 对象中.通常，你只想 "><code>Cache.put</code></a>, <a href="/zh-CN/docs/Web/API/Cache/add" title="Cache接口的 add()方法接受一个URL作为参数，请求参数指定的URL，并将返回的response对象添加到给定的cache中。 add() 方法在功能上等同于以下代码:"><code>Cache.add</code></a>和<a href="/zh-CN/docs/Web/API/Cache/addAll" title="Cache 接口的 addAll() 方法接受一个URL数组，检索它们，并将生成的response对象添加到给定的缓存中。 在检索期间创建的request对象成为存储的response操作的key。"><code>Cache.addAll</code></a>只能在<code>GET</code>请求下使用。</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Initial Cache implementations (in both Blink and Gecko) resolve <a href="/zh-CN/docs/Web/API/Cache/add" title="Cache接口的 add()方法接受一个URL作为参数，请求参数指定的URL，并将返回的response对象添加到给定的cache中。 add() 方法在功能上等同于以下代码:"><code>Cache.add</code></a>, <a href="/zh-CN/docs/Web/API/Cache/addAll" title="Cache 接口的 addAll() 方法接受一个URL数组，检索它们，并将生成的response对象添加到给定的缓存中。 在检索期间创建的request对象成为存储的response操作的key。"><code>Cache.addAll</code></a>, and <a href="/zh-CN/docs/Web/API/Cache/put" title="Cache 接口的  put() 方法 允许将键/值对添加到当前的 Cache 对象中.通常，你只想 "><code>Cache.put</code></a> promises when the response body is fully written to storage.  More recent spec versions have newer language stating that the browser can resolve the promise as soon as the entry is recorded in the database even if the response body is still streaming in.</p>
+</div>
+
+<div class="note">
+<p><strong>Note:</strong> 自Chrome 46版本起，Cache API只保存安全来源的请求，即那些通过HTTPS服务的请求。</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: The key matching algorithm depends on the <a href="https://www.fastly.com/blog/best-practices-for-using-the-vary-header">VARY header</a> in the value. So matching a new key requires looking at both key and value for entries in the Cache.</p>
+</div>
+
+<div class="note">
+<p><strong>Note:</strong> Cache API不支持HTTP缓存头。</p>
+</div>
+
+<h2 id="方法">方法</h2>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/match" title="Cache 接口的 match() 方法, 返回一个 Promise 解析为(resolve to)与 Cache 对象中的第一个匹配请求相关联的Response 。如果没有找到匹配，Promise 解析为 undefined。"><code>Cache.match(request, options)</code></a></dt>
+ <dd>返回一个 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a>对象，resolve的结果是跟 <a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a> 对象匹配的第一个已经缓存的请求。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/matchAll" title="Cache 接口的 matchAll() 方法返回一个 Promise ，其 resolve 为 Cache 对象中所有匹配请求的数组。"><code>Cache.matchAll(request, options)</code></a></dt>
+ <dd>返回一个<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a> 对象，resolve的结果是跟<a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a>对象匹配的所有请求组成的数组。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/add" title="Cache接口的 add()方法接受一个URL作为参数，请求参数指定的URL，并将返回的response对象添加到给定的cache中。 add() 方法在功能上等同于以下代码:"><code>Cache.add(request)</code></a></dt>
+ <dd>抓取这个URL, 检索并把返回的response对象添加到给定的Cache对象.这在功能上等同于调用 fetch(), 然后使用 Cache.put() 将response添加到cache中.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/addAll" title="Cache 接口的 addAll() 方法接受一个URL数组，检索它们，并将生成的response对象添加到给定的缓存中。 在检索期间创建的request对象成为存储的response操作的key。"><code>Cache.addAll(requests)</code></a></dt>
+ <dd>抓取一个URL数组，检索并把返回的response对象添加到给定的Cache对象。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/put" title="Cache 接口的  put() 方法 允许将键/值对添加到当前的 Cache 对象中.通常，你只想 "><code>Cache.put(request, response)</code></a></dt>
+ <dd>同时抓取一个请求及其响应，并将其添加到给定的cache。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/delete" title="Cache 接口的 delete() 方法查询request为key的 Cache 条目，如果找到，则删除该 Cache 条目并返回resolve为true的 Promise 。 如果没有找到，则返回resolve为false的 Promise 。"><code>Cache.delete(request, options)</code></a></dt>
+ <dd>搜索key值为request的<a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a> 条目。如果找到，则删除该<a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a> 条目，并且返回一个resolve为true的<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a>对象；如果未找到，则返回一个resolve为false的<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a>对象。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Cache/keys" title="Cache 接口的 keys() 方法返回一个 Promise ，这个 Promise 将解析为一个Cache 键的数组。"><code>Cache.keys(request, options)</code></a></dt>
+ <dd>返回一个<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a>对象，resolve的结果是<a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a>对象key值组成的数组。</dd>
+</dl>
+
+<h2 id="示例">示例</h2>
+
+<p>此代码段来自 <a href="https://github.com/GoogleChrome/samples/blob/gh-pages/service-worker/selective-caching/service-worker.js">service worker selective caching sample</a>. (请参阅 <a href="https://googlechrome.github.io/samples/service-worker/selective-caching/">selective caching live</a>) 。该代码使用<a href="/zh-CN/docs/Web/API/CacheStorage/open" title="CacheStorage  open() 方法返回一个resolve为匹配 cacheName 的 Cache 对象的 Promise ."><code>CacheStorage.open(cacheName)</code></a> 打开任何具有以<code>font/开始的</code>Content-Type头的<a href="/zh-CN/docs/Web/API/Cache" title="Cache 接口为缓存的 Request / Response  对象对提供存储机制，例如，作为ServiceWorker 生命周期的一部分。请注意，Cache 接口像 workers 一样，是暴露在 window 作用域下的。尽管它被定义在 service worker 的标准中,  但是它不必一定要配合 service worker 使用."><code>Cache</code></a>对象。</p>
+
+<p>代码然后使用<a href="/zh-CN/docs/Web/API/Cache/match" title="Cache 接口的 match() 方法, 返回一个 Promise 解析为(resolve to)与 Cache 对象中的第一个匹配请求相关联的Response 。如果没有找到匹配，Promise 解析为 undefined。"><code>Cache.match(request, options)</code></a>查看缓存中是否已经有一个匹配的font，如果是，则返回它。 如果没有匹配的字体，代码将通过网络获取字体，并使用 <a href="/zh-CN/docs/Web/API/Cache/put" title="Cache 接口的  put() 方法 允许将键/值对添加到当前的 Cache 对象中.通常，你只想 "><code>Cache.put(request, response)</code></a>来缓存获取的资源。</p>
+
+<p>代码处理从<a href="/zh-CN/docs/Web/API/Globalfetch/fetch" title="此页面仍未被本地化, 期待您的翻译!"><code>fetch()</code></a> 操作抛出的异常。 请注意，HTTP错误响应（例如404）不会触发异常。 它将返回一个具有相应错误代码集的正常响应对象。</p>
+
+<p>该代码片段还展示了服务工作线程使用的缓存版本控制的最佳实践。 虽然在这个例子中只有一个缓存，但同样的方法可用于多个缓存。 它将缓存的速记标识符映射到特定的版本化缓存名称。 代码还会删除命名不在CURRENT_CACHES中的所有缓存。</p>
+
+<div class="note"><strong>注意:</strong> 在Chrome中，请访问chrome://inspect/#service-workers ，然后单击注册的服务工作线程下面的“inspect”链接，查看 <a href="https://github.com/GoogleChrome/samples/blob/gh-pages/service-worker/selective-caching/service-worker.js">service-worker.js</a> 脚本正在执行的各种操作的日志记录。</div>
+
+<pre class="brush: js">var CACHE_VERSION = 1;
+
+// 简写标识符映射到特定版本的缓存。
+var CURRENT_CACHES = {
+  font: &apos;font-cache-v&apos; + CACHE_VERSION
+};
+
+self.addEventListener(&apos;activate&apos;, function(event) {
+  var expectedCacheNames = Object.keys(CURRENT_CACHES).map(function(key) {
+    return CURRENT_CACHES[key];
+  });
+
+  // 在promise成功完成之前，活跃的worker不会被视作已激活。
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (expectedCacheNames.indexOf(cacheName) == -1) {
+            console.log(&apos;Deleting out of date cache:&apos;, cacheName);
+
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+self.addEventListener(&apos;fetch&apos;, function(event) {
+  console.log(&apos;Handling fetch event for&apos;, event.request.url);
+
+  event.respondWith(
+
+    // 打开以&apos;font&apos;开头的Cache对象。
+    caches.open(CURRENT_CACHES[&apos;font&apos;]).then(function(cache) {
+      return cache.match(event.request).then(function(response) {
+        if (response) {
+          console.log(&apos; Found response in cache:&apos;, response);
+
+          return response;
+        }
+      }).catch(function(error) {
+
+        // 处理match()或fetch()引起的异常。
+        console.error(&apos;  Error in fetch handler:&apos;, error);
+
+        throw error;
+      });
+    })
+  );
+});</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#cache" hreflang="en" lang="en">Service Workers<br><small lang="zh-CN">Cache</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/39" title="Released on 2015-06-30.">39</a> (39)<sup>[1]</sup></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>24</td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>add()</td>
+   <td>44.0</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><sup>[1]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>addAll()</td>
+   <td>46.0</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><sup>[1]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>matchAll()</td>
+   <td>47.0</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><sup>[1]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Require HTTPS for <code>add()</code>, <code>addAll()</code>, and <code>put()</code></td>
+   <td>46.0</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><sup>[1]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>39.0 (39)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td>add()</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>44.0</td>
+  </tr>
+  <tr>
+   <td>addAll()</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>46.0</td>
+  </tr>
+  <tr>
+   <td>matchAll()</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>46.0</td>
+  </tr>
+  <tr>
+   <td>Require HTTPS for <code>add()</code>, <code>addAll()</code>, and <code>put()</code></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>46.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Service workers (and <a href="/en-US/docs/Web/API/Push_API">Push</a>) have been disabled in the <a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 Extended Support Release</a> (ESR.)</p>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker_API/Using_Service_Workers">Using Service Workers</a></li>
+ <li><a class="external external-icon" href="https://github.com/mdn/sw-test">Service workers basic code example</a></li>
+ <li><a class="external external-icon" href="https://jakearchibald.github.io/isserviceworkerready/">Is ServiceWorker ready?</a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promise</code></a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers">Using web workers</a></li>
+</ul>

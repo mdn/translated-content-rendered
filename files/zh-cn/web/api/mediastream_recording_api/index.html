@@ -1,0 +1,239 @@
+---
+title: MediaStream Recording API
+slug: Web/API/MediaStream_Recording_API
+tags:
+  - API
+  - Audio
+  - Media
+  - Media Capture and Streams
+  - MediaStream Recording
+  - MediaStream Recording API
+  - NeedsTranslation
+  - Overview
+  - Reference
+  - TopicStub
+  - Video
+translation_of: Web/API/MediaStream_Recording_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/MediaStream_Recording_API">MediaStream Recording API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">使用MediaStream的录制API</a></li><li><a href="/zh-CN/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element">Recording a media element</a> <a href="/zh-CN/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$translate" style="opacity: 0.5;">[我来译!]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a></li><li><a href="/zh-CN/docs/Web/API/MediaRecorderErrorEvent"><code>MediaRecorderErrorEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/BlobEvent"><code>BlobEvent</code></a></li></ol></details></li></ol></section></div>
+
+<div><span class="seoSummary"><strong>MediaStream Recording API </strong>有时简称为<em>Media Recording API</em> 或者 <em>MediaRecorder API</em>, 与 <a href="/en-US/docs/Web/API/Media_Streams_API">Media Capture and Streams API</a> 和 <a href="/en-US/docs/Web/API/WebRTC_API">WebRTC API</a> 密切相关. MediaStream Recording API 使得捕获通过 <a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a> 或者<a href="/zh-CN/docs/Web/API/HTMLMediaElement"><code>HTMLMediaElement</code></a> 对象产生的用于分析、加工或者保存到硬盘的数据成为可能. 它也非常容易让人们使用.</span></div>
+
+<h2 id="基本概念">基本概念</h2>
+
+<p>MediaStream Recording API 由一个主接口<a href="/zh-CN/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a>组成，这个接口负责的所有工作是从<a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a>获取数据并将其传递给你进行处理。数据通过一系列<code><a href="/zh-CN/docs/Web/Reference/Events/dataavailable" title="/zh-CN/docs/Web/Reference/Events/dataavailable">dataavailable</a></code>事件传递，这些数据已经成为你创建 <code>MediaRecorder</code> 时所声明的格式。然后，您可以进一步处理数据，或者根据需要将其写入文件。</p>
+
+<h3 id="录制过程概述">录制过程概述</h3>
+
+<p>记录一个流的过程是非常容易的:</p>
+
+<ol>
+ <li>建立一个 <a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a>或者<a href="/zh-CN/docs/Web/API/HTMLMediaElement"><code>HTMLMediaElement</code></a> (以 <a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio&gt; 元素用于在文档中嵌入音频内容。 &lt;audio&gt; 元素可以包含一个或多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source&gt; 元素来进行描述：浏览器将会选择最合适的一个来使用。也可以使用 MediaStream 将这个元素用于流式媒体。"><code>&lt;audio&gt;</code></a> 或 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 元素的形式) 来充当媒体数据的源.</li>
+ <li>创建一个 <a href="/zh-CN/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> 对象, 指定源以及任何有需求的的选项 (比如容器的 MIME 类型或它轨道所需的比特率).</li>
+ <li>给 <code><a href="/zh-CN/docs/Web/Reference/Events/dataavailable" title="/zh-CN/docs/Web/Reference/Events/dataavailable">dataavailable</a></code> 事件设置<a href="/zh-CN/docs/Web/API/MediaRecorder/ondataavailable"><code>MediaRecorder.ondataavailable</code></a> 事件处理函数; 会在数据可利用时候调用.</li>
+ <li>一旦媒体源播放，你已经准备好录制，使用 <a href="/zh-CN/docs/Web/API/MediaRecorder/start"><code>MediaRecorder.start()</code></a> 开始录制.</li>
+ <li><code><a href="/zh-CN/docs/Web/Reference/Events/dataavailable" title="/zh-CN/docs/Web/Reference/Events/dataavailable">dataavailable</a></code> 事件处理函数正如你所愿的在每次数据准备好时调用; 这个事件有一个值为包含媒体数据的<a href="/zh-CN/docs/Web/API/Blob"><code>Blob</code></a> 类型的 <code>data</code> 属性. 你可以强制 <code>dataavailable</code> 事件发生, 因此会给你传递最新的声音以至于可以让你过滤、保存或者做一些其他的事情。</li>
+ <li>当源媒体停止播放时候，录制自动结束.</li>
+ <li>你可以随时结束录制通过使用 <a href="/zh-CN/docs/Web/API/MediaRecorder/stop"><code>MediaRecorder.stop()</code></a>.</li>
+</ol>
+
+<div class="note">
+<p><strong>注意:</strong> 单单使用包含已经录制好媒体切片的<a href="/zh-CN/docs/Web/API/Blob"><code>Blob</code></a>s 将大可不能单独播放. 媒体在重放之前需要重新组装 .</p>
+</div>
+
+<p>如果在录制过程中出错, <code><a href="/zh-CN/docs/Web/Reference/Events/error" title="/zh-CN/docs/Web/Reference/Events/error">error</a></code> 事件将会传给<code>MediaRecorder</code>. 你可以设置<a href="/zh-CN/docs/Web/API/MediaRecorder/onerror"><code>onerror</code></a>去监听 <code>error</code> 事件.</p>
+
+<p>例子中，我们使用Canvas 作为<a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a>的源，在9秒后停止录音.</p>
+
+<pre class="brush: js notranslate">var canvas = document.querySelector(&quot;canvas&quot;);
+
+// Optional frames per second argument.
+var stream = canvas.captureStream(25);
+var recordedChunks = [];
+
+console.log(stream);
+var options = { mimeType: &quot;video/webm; codecs=vp9&quot; };
+mediaRecorder = new MediaRecorder(stream, options);
+
+mediaRecorder.ondataavailable = handleDataAvailable;
+mediaRecorder.start();
+
+function handleDataAvailable(event) {
+  console.log(&quot;data-available&quot;);
+  if (event.data.size &gt; 0) {
+    recordedChunks.push(event.data);
+    console.log(recordedChunks);
+    download();
+  } else {
+    // ...
+  }
+}
+function download() {
+  var blob = new Blob(recordedChunks, {
+    type: &quot;video/webm&quot;
+  });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement(&quot;a&quot;);
+  document.body.appendChild(a);
+  a.style = &quot;display: none&quot;;
+  a.href = url;
+  a.download = &quot;test.webm&quot;;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// demo: to download after 9sec
+setTimeout(event =&gt; {
+  console.log(&quot;stopping&quot;);
+  mediaRecorder.stop();
+}, 9000);</pre>
+
+<h3 id="检查_and_控制记录器的状态">检查 and 控制记录器的状态</h3>
+
+<p>你也可以使用 <code>MediaRecorder</code> 对象的属性去决定录制过程的状态, 用 <a href="/zh-CN/docs/Web/API/MediaRecorder/pause"><code>pause()</code></a> 和 <a href="/zh-CN/docs/Web/API/MediaRecorder/resume"><code>resume()</code></a> 方法暂停或者继续媒体源的录制.</p>
+
+<p>如果你需要检查一个特殊的MIME类型是否被支持，使用<a href="/zh-CN/docs/Web/API/MediaRecorder/isTypeSupported"><code>MediaRecorder.isTypeSupported()</code></a>.</p>
+
+<h3 id="检查潜在的输入源">检查潜在的输入源</h3>
+
+<p>如果你的目标是记录摄像头或麦克风输入,您可能希望在构建 <code>MediaRecorder</code> 之前检查可用的输入设备. 这时，你需要调用 <a href="/zh-CN/docs/Web/API/MediaDevices/enumerateDevices"><code>navigator.mediaDevices.enumerateDevices()</code></a> 来得到可使用的媒体设备. 你可以检查此列表，发现潜在的设备，甚至在有需要的时候过滤掉设备.</p>
+
+<p>在这块代码中, <code>enumerateDevices()</code> 被用来检查可利用的设备,找到那些音频输入设备, 创建<a href="/zh-CN/docs/Web/HTML/Element/option" title="HTML元素 &lt;option&gt;  用于定义在 &lt;select&gt;,  &lt;optgroup&gt; 或 &lt;datalist&gt; 元素中包含的项。&lt;option&gt; 可以在弹出窗口和 HTML 文档中的其他项目列表中表示菜单项。"><code>&lt;option&gt;</code></a> 元素，之后添加到<a href="/zh-CN/docs/Web/HTML/Element/select" title="HTML &lt;select&gt; 元素表示一个提供选项菜单的控件："><code>&lt;select&gt;</code></a>元素，代表输入源选择器 .</p>
+
+<pre class="brush: js notranslate">navigator.mediaDevices.enumerateDevices()
+.then(function(devices) {
+  devices.forEach(function(device) {
+    let menu = document.getElementById(&quot;inputdevices&quot;);
+    if (device.kind == &quot;audioinput&quot;) {
+      let item = document.createElement(&quot;option&quot;);
+      item.innerHTML = device.label;
+      item.value = device.deviceId;
+      menu.appendChild(item);
+    }
+  });
+});</pre>
+
+<p>类似的代码可以用来让用户限制他们希望使用的设备。</p>
+
+<h3 id="更多信息">更多信息</h3>
+
+<p>更多关于MediaStream Recording API 的使用, 查看 <a href="/en-US/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Using the MediaStream Recording API</a>, 这个显示了如何使用API来记录音频剪辑. 另一篇文章, <a href="/en-US/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element">Recording a media element</a>, 介绍了如何从 <a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio&gt; 元素用于在文档中嵌入音频内容。 &lt;audio&gt; 元素可以包含一个或多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source&gt; 元素来进行描述：浏览器将会选择最合适的一个来使用。也可以使用 MediaStream 将这个元素用于流式媒体。"><code>&lt;audio&gt;</code></a> 或<a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 元素 接收信息流和如何使用接收到的信息流（这个案例中，接收、存到硬盘）。 </p>
+
+<h2 id="参考">参考</h2>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/BlobEvent"><code>BlobEvent</code></a></dt>
+ <dd>Each time a chunk of media data is finished being recorded, it&apos;s delivered to consumers in <a href="/zh-CN/docs/Web/API/Blob"><code>Blob</code></a> form using a <a href="/zh-CN/docs/Web/API/BlobEvent"><code>BlobEvent</code></a> of type <code>dataavailable</code>.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a></dt>
+ <dd>The primary interface that implements the MediaStream Recording API.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/MediaRecorderErrorEvent"><code>MediaRecorderErrorEvent</code></a></dt>
+ <dd>The interface that represents errors thrown by the MediaStream Recording API. Its <a href="/zh-CN/docs/Web/API/MediaRecorderErrorEvent/error"><code>error</code></a> property is a <a href="/zh-CN/docs/Web/API/DOMException"><code>DOMException</code></a> that specifies that error occurred.</dd>
+</dl>
+
+<h2 id="说明">说明</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/mediacapture-record/#MediaRecorderAPI" hreflang="en" lang="en" title="MediaStream Recording">MediaStream Recording</a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器支持情况">浏览器支持情况</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Microsoft Edge</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>47.0</td>
+   <td><a href="/en-US/Firefox/Releases/25" title="Released on 2013-10-29.">25.0</a> (25.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>47.0</td>
+   <td><a href="/en-US/Firefox/Releases/25" title="Released on 2013-10-29.">25.0</a> (25.0)</td>
+   <td>1.3<sup>[1]</sup></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>47.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] The initial Firefox OS implementation only supported audio recording.</p>
+
+<p>[2] To use <a href="/zh-CN/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> in Chrome 47 and 48, enable <strong>experimental Web Platform features</strong> from the <code>chrome://flags</code> page.</p>
+
+<p>[3] Audio recording works in Chrome 49 and above; Chrome 47 and 48 only support video recording.</p>
+
+<h2 id="参阅">参阅</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Using the MediaStream Recording API</a></li>
+ <li><a href="/en-US/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element">Recording a media element</a></li>
+ <li><a href="https://simpl.info/mediarecorder/">simpl.info MediaStream Recording demo</a>, by <a href="https://twitter.com/sw12">Sam Dutton</a></li>
+ <li><a href="/zh-CN/docs/Web/API/Navigator/mediaDevices/getUserMedia"><code>navigator.mediaDevices.getUserMedia()</code></a></li>
+ <li><a href="https://addpipe.com/blog/mediarecorder-api/">HTML5’s Media Recorder API in Action on Chrome and Firefox</a></li>
+ <li><a href="https://github.com/ai/audio-recorder-polyfill">MediaRecorder polyfill</a> for Safari and Edge</li>
+ <li><a href="https://github.com/chrisjohndigital/TutorRoom">TutorRoom</a>: HTML5 video capture/playback/download using getUserMedia and the MediaRecorder API (<a href="https://github.com/chrisjohndigital/TutorRoom">source on GitHub</a>)</li>
+ <li><a href="https://www.fingerspell.org/">FingerSpell</a>: Sign Language Fingerspelling practice using getUserMedia and the MediaRecorder API to create and download recordings, MediaRecorder API supported desktop browsers only <a href="https://github.com/chrisjohndigital/CameraCaptureJS">(source on GitHub</a>)</li>
+ <li><a href="http://codepen.io/anon/pen/gpmPzm">Simple video recording demo</a></li>
+ <li><a href="https://quickblox.github.io/javascript-media-recorder/sample/">Advanced media stream recorder sample</a></li>
+ <li><a href="https://github.com/chrisjohndigital/OpenLang">OpenLang</a>: HTML5 video language lab web application using MediaDevices and the MediaStream Recording API for video recording (<a href="https://github.com/chrisjohndigital/OpenLang">source on GitHub</a>)</li>
+</ul>

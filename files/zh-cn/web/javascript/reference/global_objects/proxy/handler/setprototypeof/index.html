@@ -1,0 +1,124 @@
+---
+title: handler.setPrototypeOf()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/handler/setPrototypeOf
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/setPrototypeOf
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects">JavaScript 标准库</a></strong></li><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p><strong><code>handler.setPrototypeOf()</code></strong> 方法主要用来拦截 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a>.</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js notranslate">var p = new Proxy(target, {
+  setPrototypeOf: function(target, prototype) {
+  }
+});
+</pre>
+
+<h3 id="参数">参数</h3>
+
+<p>以下参数传递给 <code>setPrototypeOf</code> 方法. </p>
+
+<dl>
+ <dt><code>target</code></dt>
+ <dd>被拦截目标对象.</dd>
+ <dt><code>prototype</code></dt>
+ <dd>对象新原型或为<code>null</code>.</dd>
+</dl>
+
+<h3 id="返回值">返回值</h3>
+
+<p>如果成功修改了<code>[[Prototype]]</code>, <code>setPrototypeOf</code> 方法返回 <code>true</code>,否则返回 <code>false</code>.</p>
+
+<h2 id="描述">描述</h2>
+
+<p>这个 <code><strong>handler.setPrototypeOf</strong></code> 方法用于拦截 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a>.</p>
+
+<h3 id="拦截">拦截</h3>
+
+<p>这个方法可以拦截以下操作:</p>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/setPrototypeOf"><code>Reflect.setPrototypeOf()</code></a></li>
+</ul>
+
+<h3 id="Invariants">Invariants</h3>
+
+<p>如果违反了下列规则，则proxy将抛出一个<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a>:</p>
+
+<ul>
+ <li><code><font face="Open Sans, arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">如果 </span></font>target</code> 不可扩展, 原型参数必须与<code>Object.getPrototypeOf(target)</code> 的值相同.</li>
+</ul>
+
+<h2 id="示例">示例</h2>
+
+<p>如果你不想为你的对象设置一个新的原型，你的handler&apos;s的<code>setPrototypeOf</code>方法可以返回false，也可以抛出异常。</p>
+
+<p>The former approach means that any operation that performs such mutation, that throws an exception on failure to mutate, will have to create the exception itself.  For example, <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a> will create and throw a <code>TypeError</code> itself.  If the mutation is performed by an operation that <em>doesn&apos;t</em> ordinarily throw in case of failure, such as <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/setPrototypeOf"><code>Reflect.setPrototypeOf()</code></a>, no exception will be thrown.</p>
+
+<pre class="brush: js notranslate">var handlerReturnsFalse = {
+    setPrototypeOf(target, newProto) {
+        return false;
+    }
+};
+
+var newProto = {}, target = {};
+
+var p1 = new Proxy(target, handlerReturnsFalse);
+Object.setPrototypeOf(p1, newProto); // throws a TypeError
+Reflect.setPrototypeOf(p1, newProto); // returns false
+</pre>
+
+<p>The latter approach will cause <em>any</em> operation that attempts to mutate, to throw.  This approach is required if you want even non-throwing operations to throw on failure, or you want to throw a custom exception value.</p>
+
+<pre class="brush: js notranslate">var handlerThrows = {
+    setPrototypeOf(target, newProto) {
+        throw new Error(&apos;custom error&apos;);
+    }
+};
+
+var newProto = {}, target = {};
+
+var p2 = new Proxy(target, handlerThrows);
+Object.setPrototypeOf(p2, newProto); // throws new Error(&quot;custom error&quot;)
+Reflect.setPrototypeOf(p2, newProto); // throws new Error(&quot;custom error&quot;)</pre>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-setprototypeof-v" hreflang="en" lang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="zh-CN">[[SetPrototypeOf]]</small></a></td>
+   <td><span class="spec-Standard">Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-setprototypeof-v" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="zh-CN">[[SetPrototypeOf]]</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.setPrototypeOf"></div>
+</div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/setPrototypeOf"><code>Reflect.setPrototypeOf()</code></a></li>
+</ul>

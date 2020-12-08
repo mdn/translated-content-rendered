@@ -1,0 +1,91 @@
+---
+title: File drag and drop
+slug: Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+translation_of: Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop">File drag and drop</a></li><li><a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations">Drag Operations</a></li><li><a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items">Dragging and Dropping Multiple Items</a> <a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types">推荐拖动类型</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/DataTransfer"><code>DataTransfer</code></a></li><li><a href="/zh-CN/docs/Web/API/DataTransferItem"><code>DataTransferItem</code></a></li><li><a href="/zh-CN/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a></li><li><a href="/zh-CN/docs/Web/API/DragEvent"><code>DragEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-CN/docs/Web/API/HTMLElement/drag_event"><code>HTMLElement</code>: <code>drag</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragend_event"><code>HTMLElement</code>: <code>dragend</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragenter_event"><code>HTMLElement</code>: <code>dragenter</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragexit_event"><code>HTMLElement</code>: <code>dragexit</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragleave_event"><code>HTMLElement</code>: <code>dragleave</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragover_event"><code>HTMLElement</code>: <code>dragover</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/dragstart_event"><code>HTMLElement</code>: <code>dragstart</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLElement/drop_event"><code>HTMLElement</code>: <code>drop</code></a></li></ol></details></li></ol></section>
+
+<p>HTML拖放接口使得web应用能够在网页中拖放文件。这篇文档介绍了web应用如何接受从底层平台的文件管理器拖动一个或多个文件到网页的操作。</p>
+
+<p>拖放的主要步骤是为 <code><a href="/zh-CN/docs/Web/Reference/Events/drop" title="/zh-CN/docs/Web/Reference/Events/drop">drop</a></code> 事件定义一个<em>释放区</em>(释放文件的目标元素)和为<code><a href="/zh-CN/docs/Web/Reference/Events/dragover" title="/zh-CN/docs/Web/Reference/Events/dragover">dragover</a></code>事件定义一个事件处理程序。下面描述了这些步骤，包括示例程序片段。完整的源码在<a href="https://github.com/mdn/dom-examples/tree/master/drag-and-drop">MDN&apos;s drag-and-drop repository</a> (欢迎提交pull requests和/或issues).</p>
+
+<p class="note">注意: <a href="/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API" title="HTML 拖放（Drag and Drop）接口使应用程序能够在Firefox和其他浏览器中使用拖放功能。"><code>HTML drag and drop</code></a>定义了两套不同的API来支持拖放文件。一个<a href="/zh-CN/docs/Web/API/DataTransfer" title="在进行拖放操作时，DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。它可以保存一项或多项数据、一种或者多种数据类型。关于拖放的更多信息，请参见 Drag and Drop."><code>DataTransfer</code></a>接口和另一个<a href="/zh-CN/docs/Web/API/DataTransferItem" title="DataTransferItem 描述了一个拖拽项。在一个拖拽操作中，每一个 drag event 都有一个dataTransfer 属性，它包含一个存有拖拽数据的 list ，其中每一项都是一个 DataTransferItem 。"><code>DataTransferItem</code></a>与<a href="/zh-CN/docs/Web/API/DataTransferItemList" title="DataTransferItemList 对象是一组代表被拖动项的DataTransferItem 对象的列表。在拖动操作期间，每个DragEvent 都有一个 dataTransfer 属性，该属性是 DataTransferItemList."><code>DataTransferItemList</code></a>接口。这个示例介绍了这两种API的用法(没有使用任何Gecko专用的接口)。</p>
+
+<h2 id="定义拖放区域">定义拖放区域</h2>
+
+<p>触发 <code><a href="/zh-CN/docs/Web/Reference/Events/drop" title="/zh-CN/docs/Web/Reference/Events/drop">drop</a></code> 事件的目标元素需要一个<a href="/zh-CN/docs/Web/API/GlobalEventHandlers/ondrop" title="下面这个示例演示了 ondrop 属性的用法来指定 drop 事件的处理函数。"><code>ondrop</code></a> 事件处理函数 。下面这一段代码以一个 <a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，"><code>&lt;div&gt;</code></a> 元素为例展示了这些工作是如何完成的：</p>
+
+<pre class="brush: html">&lt;div id=&quot;drop_zone&quot; ondrop=&quot;dropHandler(event);&quot;&gt;
+  &lt;p&gt;Drag one or more files to this Drop Zone ...&lt;/p&gt;
+&lt;/div&gt;</pre>
+
+<p>一般来说，在实际应用中需要定义一个 <code><a href="/zh-CN/docs/Web/Reference/Events/dragover" title="/zh-CN/docs/Web/Reference/Events/dragover">dragover</a></code> 事件的处理函数并在其中加入关闭浏览器默认拖放行为的代码。你需要定义一个 <a href="/zh-CN/docs/Web/API/GlobalEventHandlers/ondragover" title="此页面仍未被本地化, 期待您的翻译!"><code>ondragover</code></a> 事件处理函数：</p>
+
+<pre class="brush: html">&lt;div id=&quot;drop_zone&quot; ondrop=&quot;dropHandler(event);&quot; ondragover=&quot;dragOverHandler(event);&quot;&gt;
+  &lt;p&gt;Drag one or more files to this Drop Zone ...&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>最后，在实际应用中可能需要给实现释放文件的元素加些样式来从视觉上向使用者说明这是一个有效释放区域。在这个示例中，实现释放文件的元素将使用如下样式：</p>
+
+<pre class="brush: css">#drop_zone {
+  border: 5px solid blue;
+  width:  200px;
+  height: 100px;
+}
+</pre>
+
+<div class="note">
+<p>注意当执行将文件拖入浏览器的操作时操作系统并不会触发 <code>dragstart</code> 和 <code>dragend</code> 事件。</p>
+</div>
+
+<h2 id="执行释放事件">执行释放事件</h2>
+
+<p>当用户释放文件时 <code><a href="/zh-CN/docs/Web/Reference/Events/drop" title="/zh-CN/docs/Web/Reference/Events/drop">drop</a></code> 事件将会被触发。在下面的 drop 处理函数中，如果浏览器支持 <a href="/zh-CN/docs/Web/API/DataTransferItemList" title="DataTransferItemList 对象是一组代表被拖动项的DataTransferItem 对象的列表。在拖动操作期间，每个DragEvent 都有一个 dataTransfer 属性，该属性是 DataTransferItemList."><code>DataTransferItemList</code></a> 接口，则可以使用 <a href="/zh-CN/docs/Web/API/DataTransferItem/getAsFile" title="如果DataTransferItem是一个文件, 那 DataTransferItem.getAsFile()  方法将返回拖拽项数据的 File 对象. 如果拖拽项的数据不是一个文件，则返回 null."><code>getAsFile()</code></a> 来获取每个文件；否则使用 <a href="/zh-CN/docs/Web/API/DataTransfer" title="在进行拖放操作时，DataTransfer 对象用来保存，通过拖放动作，拖动到浏览器的数据。它可以保存一项或多项数据、一种或者多种数据类型。关于拖放的更多信息，请参见 Drag and Drop."><code>DataTransfer</code></a> 接口的 <a href="/zh-CN/docs/Web/API/DataTransfer/files" title="DataTransfer.files属性在拖动操作中表示文件列表。如果操作不包含文件，则此列表为空。"><code>files</code></a> 属性来获取每个文件。</p>
+
+<p>这个示例展示了如何讲每个被拖动的文件的名字输出到控制台。在实际应用中可能会用到 <a href="/zh-CN/docs/Web/API/File" title="文件（File）接口提供有关文件的信息，并允许网页中的 JavaScript 访问其内容。"><code>File API</code></a> 来处理一个文件。</p>
+
+<p>注意在这个例子中，任何被拖动的非文件内容都会被忽略。</p>
+
+<pre class="brush: js">function dropHandler(ev) {
+  console.log(&apos;File(s) dropped&apos;);
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+    // Use DataTransferItemList interface to access the file(s)
+    for (var i = 0; i &lt; ev.dataTransfer.items.length; i++) {
+      // If dropped items aren&apos;t files, reject them
+      if (ev.dataTransfer.items[i].kind === &apos;file&apos;) {
+        var file = ev.dataTransfer.items[i].getAsFile();
+        console.log(&apos;... file[&apos; + i + &apos;].name = &apos; + file.name);
+      }
+    }
+  } else {
+    // Use DataTransfer interface to access the file(s)
+    for (var i = 0; i &lt; ev.dataTransfer.files.length; i++) {
+      console.log(&apos;... file[&apos; + i + &apos;].name = &apos; + ev.dataTransfer.files[i].name);
+    }
+  }
+}</pre>
+
+<h2 id="阻止浏览器的默认释放行为">阻止浏览器的默认释放行为</h2>
+
+<p>下面的 <code><a href="/zh-CN/docs/Web/Reference/Events/dragover" title="/zh-CN/docs/Web/Reference/Events/dragover">dragover</a></code> 事件处理函数调用  <a href="/zh-CN/docs/Web/API/Event/preventDefault" title="Event 接口的 preventDefault()方法，告诉user agent：如果此事件没有被显式处理，那么它默认的动作也会照常执行。此事件还是继续传播，除非碰到事件侦听器调用stopPropagation() 或stopImmediatePropagation()，才停止传播。"><code>preventDefault()</code></a> 来关闭浏览器的默认拖动和释放行为。</p>
+
+<pre class="brush: js">function dragOverHandler(ev) {
+  console.log(&apos;File(s) in drop zone&apos;);
+
+  // Prevent default behavior (Prevent file from being opened)
+  ev.preventDefault();
+}
+</pre>
+
+<h2 id="See_also" name="See_also">参见</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></li>
+ <li><a class="internal" href="/Web/Guide/HTML/Drag_operations" title="Drag Operations">Drag Operations</a></li>
+ <li><a href="https://html.spec.whatwg.org/multipage/interaction.html#dnd" title="Drag and Drop Standard">HTML5 Living Standard: Drag and Drop</a></li>
+</ul>

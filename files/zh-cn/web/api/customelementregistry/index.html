@@ -1,0 +1,92 @@
+---
+title: CustomElementRegistry
+slug: Web/API/CustomElementRegistry
+tags:
+  - API
+  - CustomElementRegistry
+  - Interface
+  - Web Components
+translation_of: Web/API/CustomElementRegistry
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/Web_Components/Using_custom_elements">使用 custom elements</a></li><li><a href="/zh-CN/docs/Web/Web_Components/Using_shadow_DOM">使用 shadow DOM</a></li><li><a href="/zh-CN/docs/Web/Web_Components/Using_templates_and_slots">使用 templates and slots</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/zh-CN/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/zh-CN/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/zh-CN/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/zh-CN/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/zh-CN/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/zh-CN/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/zh-CN/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/zh-CN/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/zh-CN/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<p><strong><code>CustomElementRegistry</code></strong>接口提供注册自定义元素和查询已注册元素的方法。要获取它的实例，请使用 <a href="/zh-CN/docs/Web/API/Window/customElements"><code>window.customElements</code></a>属性。</p>
+
+<h2 id="方法">方法</h2>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a></dt>
+ <dd>定义一个新的<a href="/zh-CN/docs/Web/Web_Components/Custom_Elements">自定义元素</a>。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/CustomElementRegistry/get"><code>CustomElementRegistry.get()</code></a></dt>
+ <dd>返回指定自定义元素的构造函数，如果未定义自定义元素，则返回<code>undefined</code>。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/CustomElementRegistry/upgrade"><code>CustomElementRegistry.upgrade()</code></a></dt>
+ <dd>Upgrades a custom element directly, even before it is connected to its shadow root.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/CustomElementRegistry/whenDefined"><code>CustomElementRegistry.whenDefined()</code></a></dt>
+ <dd>返回当使用给定名称定义自定义元素时将会执行的 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>promise</code></a>。（如果已经定义了这样一个自定义元素，那么立即执行返回的 promise。）</dd>
+</dl>
+
+<h2 id="示例">示例</h2>
+
+<p>以下代码来自我们的 <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> 示例（<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">see it live also</a>）。 请注意我们如何使用 <a href="/zh-CN/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> 方法在创建其类后定义自定义元素。</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // count words in element&apos;s parent element
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create text node and add word count to it
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // Append it to the shadow root
+    shadow.appendChild(text);
+
+
+    // Update count when element content changes
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// Define the new element
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">备注</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#customelementregistry" hreflang="en" lang="en">HTML Living Standard<br><small lang="zh-CN">CustomElementRegistry</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry"></div>

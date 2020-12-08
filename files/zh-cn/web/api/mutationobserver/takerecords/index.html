@@ -1,0 +1,81 @@
+---
+title: MutationObserver.takeRecords()
+slug: Web/API/MutationObserver/takeRecords
+translation_of: Web/API/MutationObserver/takeRecords
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/MutationObserver"><code>MutationObserver</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><a href="/zh-CN/docs/Web/API/MutationObserver/MutationObserver"><code>MutationObserver()</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/MutationObserver/disconnect"><code>disconnect()</code></a></li><li><a href="/zh-CN/docs/Web/API/MutationObserver/observe"><code>observe()</code></a></li><li><em><code>takeRecords()</code></em></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary"><a href="/zh-CN/docs/Web/API/MutationObserver"><code>MutationObserver</code></a> 的 <code><strong>takeRecords()</strong></code> 方法返回已检测到但尚未由观察者的回调函数处理的所有匹配DOM更改的列表，使变更队列保持为空。</span> 此方法最常见的使用场景是在断开观察者之前立即获取所有未处理的更改记录，以便在停止观察者时可以处理任何未处理的更改。</p>
+
+<ul>
+</ul>
+
+<h2 id="语法">语法</h2>
+
+<pre class="syntaxbox notranslate"><em>mutationRecords</em> = <em>mutationObserver</em>.takeRecords()
+</pre>
+
+<h3 id="参数">参数</h3>
+
+<p>无。</p>
+
+<h3 id="返回值">返回值</h3>
+
+<p>返回一个<a href="/zh-CN/docs/Web/API/MutationRecord"><code>MutationRecord</code></a> 对象列表，每个对象都描述了应用于DOM树某部分的一次改动。</p>
+
+<div class="note">
+<p><strong>注意:</strong> 调用<code>takeRecords()</code>后，已发生但未传递给回调的变更队列将保留为空。</p>
+</div>
+
+<h2 id="示例">示例</h2>
+
+<p>下面的示例展示了在断开观察者之前如何通过调用<code>takeRecords()</code>来处理任何未传递的<a href="/zh-CN/docs/Web/API/MutationRecord"><code>MutationRecord</code></a>。</p>
+
+<pre class="brush: js; highlight:[12-18] notranslate">var targetNode = document.querySelector(&quot;#someElement&quot;);
+var observerOptions = {
+  childList: true,
+  attributes: true
+}
+
+var observer = new MutationObserver(callback);
+observer.observe(targetNode, observerOptions);
+
+/* ...later, when it&apos;s time to stop observing... */
+
+/* handle any still-pending mutations */
+
+var mutations = observer.takeRecords();
+
+if (mutations) {
+  callback(mutations);
+}
+
+observer.disconnect();
+</pre>
+
+<p>代码中第12-17行抓取了所有未处理的变更记录，然后调用回调，并将变更记录列表传递给回调，以保证所有变更记录都被处理。这是在调用<a href="/zh-CN/docs/Web/API/MutationObserver/disconnect"><code>disconnect()</code></a>之前完成的，以便停止观察DOM。 </p>
+
+<h2 id="Specifications" name="Specifications">规范</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">批注</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#dom-mutationobserver-takerecords" hreflang="en" lang="en">DOM<br><small lang="zh-CN">MutationObserver.takeRecords()</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.MutationObserver.takeRecords"></div>

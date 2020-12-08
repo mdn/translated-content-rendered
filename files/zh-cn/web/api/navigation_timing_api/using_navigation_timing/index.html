@@ -1,0 +1,120 @@
+---
+title: Using Navigation Timing
+slug: Web/API/Navigation_timing_API/Using_Navigation_Timing
+tags:
+  - Navigation Timing
+  - Navigation Timing API
+  - Optimization
+  - Performance
+translation_of: Web/API/Navigation_timing_API/Using_Navigation_Timing
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Navigation_timing_API">Navigation timing API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/Navigation_timing_API/Using_Navigation_Timing">Using Navigation Timing</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceNavigation"><code>PerformanceNavigation</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceNavigationTiming"><code>PerformanceNavigationTiming</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section>
+
+<p>Navigation Timing 接口使你可以轻松获取详细且高度准确的计时信息，以帮助从你的网站代码或资源隔离出性能问题。与其他工具或库不同，Navigation Timing 接口使你可以收集这些只有浏览器才能提供的信息，其准确性要比其他技术大大提高。它还具有能够提供用户所感知的计时信息而不是与用户体验无关的数据的优势。</p>
+
+<h2 id="收集计时信息">收集计时信息</h2>
+
+<p>使用该API就像使用<a href="/zh-CN/docs/Web/API/Window/performance"><code>window.performance</code></a>获取<a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a>对象并在返回的对象中查找所需内容一样简单。比如，为了测量页面的感知到的加载时间：</p>
+
+<pre>window.addEventListener(&quot;load&quot;, function() {
+  let now = new Date().getTime();
+  let loadingTime = now - performance.timing.navigationStart;
+
+  document.querySelector(&quot;.output&quot;).innerText =
+        loadingTime + &quot; ms&quot;;
+}, false);</pre>
+
+<p>在发生<code><a href="/zh-CN/docs/Web/Reference/Events/load" title="/zh-CN/docs/Web/Reference/Events/load">load</a></code>事件时执行的该代码从当前时间中减去浏览器导航开始时记录的时间(<a href="/zh-CN/docs/Web/API/PerformanceTiming/navigationStart"><code>performance.timing.navigationStart</code></a>)，并通过将该信息插入到元素中，输出到屏幕。</p>
+
+<div class="hidden">
+<h4 id="HTML">HTML</h4>
+
+<pre>&lt;div class=&quot;output&quot;&gt;
+&lt;/div&gt;</pre>
+
+<h4 id="CSS">CSS</h4>
+
+<pre>.output {
+  border: 1px solid #bbb;
+  font: 16px &quot;Open Sans&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+}</pre>
+</div>
+
+<p>结合适当的HTML和CSS，结果就是：</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="80" id="frame_Collecting_timing_information" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Navigation_timing_API/Using_Navigation_Timing$samples/Collecting_timing_information?revision=1615996" width="500"></iframe></p>
+
+<p>列出的值适用于上面展示了示例的<a href="/zh-CN/docs/Web/HTML/Element/iframe" title="browsing context"><code>&lt;iframe&gt;</code></a>。</p>
+
+<p>你可以在<a href="/zh-CN/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a>中查找可用的计时值的列表，请参见<a href="/zh-CN/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a>接口的“<a href="https://wiki.developer.mozilla.org/zh-CN/docs/Web/API/PerformanceTiming">属性</a>”部分。</p>
+
+<h2 id="确定导航类型">确定导航类型</h2>
+
+<p>为了将从 <a href="/zh-CN/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a>获取到的计时信息放入正确的观点，你需要更多地了解发生了哪种加载操作。特别是你需要知道：</p>
+
+<ul>
+ <li>这是加载还是重新加载？</li>
+ <li>这是历史的导航还是前进或后退？</li>
+ <li>完成导航需要多少个（如果有）重定向？</li>
+</ul>
+
+<p>此信息由<a href="/zh-CN/docs/Web/API/Performance/navigation"><code>Performance.navigation</code></a>属性提供，该属性返回包含所需信息的<a href="/zh-CN/docs/Web/API/PerformanceNavigation"><code>PerformanceNavigation</code></a>对象。</p>
+
+<p>让我们将此信息添加到上面的示例中。 新代码如下所示：</p>
+
+<pre>window.addEventListener(&quot;load&quot;, function() {
+  let now = new Date().getTime();
+  let loadingTime = now - performance.timing.navigationStart;
+
+  output = &quot;Load time: &quot; + loadingTime + &quot; ms&lt;br/&gt;&quot;;
+  output += &quot;Navigation type: &quot;;
+
+  switch(performance.navigation.type) {
+      case PerformanceNavigation.TYPE_NAVIGATE:
+        output += &quot;Navigation&quot;;
+      break;
+    case PerformanceNavigation.TYPE_RELOAD:
+        output += &quot;Reload&quot;;
+      break;
+    case PerformanceNavigation.TYPE_BACK_FORWARD:
+        output += &quot;History&quot;;
+      break;
+    default:
+        output += &quot;Unknown&quot;;
+      break;
+  }
+
+  output += &quot;&lt;br/&gt;Redirects: &quot; +
+      performance.navigation.redirectCount;
+  document.querySelector(&quot;.output&quot;).innerHTML = output;
+}, false);</pre>
+
+<p>这通过查看<code>performance.navigation</code>对象的内容来修改了前面的示例。<a href="/zh-CN/docs/Web/API/PerformanceNavigation/type"><code>performance.navigation.type</code></a>指示发生了哪种加载操作：导航，重新加载或浏览器历史记录的切换。我们还从<a href="/zh-CN/docs/Web/API/PerformanceNavigation/redirectCount"><code>performance.navigation.redirectCount</code></a>获取导航期间发生的重定向次数。就像以前的页面加载时间一样，此信息通过插入到具有<code>&quot;output&quot;</code>类的元素中输出到屏幕上。</p>
+
+<div class="hidden">
+<h4 id="HTML_2">HTML</h4>
+
+<pre>&lt;div class=&quot;output&quot;&gt;
+&lt;/div&gt;</pre>
+
+<h4 id="CSS_2">CSS</h4>
+
+<pre>.output {
+  border: 1px solid #bbb;
+  font: 16px &quot;Open Sans&quot;, &quot;Helvetica&quot;, &quot;Arial&quot;, sans-serif;
+}</pre>
+</div>
+
+<p>使用此代码后，结果如下所示：</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="120" id="frame_Determining_navigation_type" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Navigation_timing_API/Using_Navigation_Timing$samples/Determining_navigation_type?revision=1615996" width="500"></iframe></p>
+
+<p>列出的值适用于展示示例的 <a href="/zh-CN/docs/Web/HTML/Element/iframe" title="browsing context"><code>&lt;iframe&gt;</code></a> 。</p>
+
+<h2 id="也可以看看">也可以看看</h2>
+
+<ul>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API">Navigation Timing API</a></li>
+ <li><a href="/zh-CN/docs/Web/API/Window/performance"><code>window.performance</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a>, <a href="/zh-CN/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a>, and <a href="/zh-CN/docs/Web/API/PerformanceNavigation"><code>PerformanceNavigation</code></a></li>
+</ul>

@@ -1,0 +1,382 @@
+---
+title: IDBFactory.open
+slug: Web/API/IDBFactory/open
+translation_of: Web/API/IDBFactory/open
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/IDBFactory"><code>IDBFactory</code></a></strong></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/IDBFactory/cmp"><code>cmp()</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/API/IDBFactory/cmp$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/API/IDBFactory/deleteDatabase"><code>deleteDatabase()</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/API/IDBFactory/deleteDatabase$translate">[我来译!]</a></li><li><em><code>open</code></em></li></ol></details></li></ol></section><p></p>
+<div class="summary">
+ <p><strong><code>IDBFactory.open</code></strong> 方法用于<a href="/en-US/docs/IndexedDB#gloss_database_connection">打开一个数据库连接</a>。本方法立即返回一个 <a href="/zh-CN/docs/Web/API/IDBOpenDBRequest" title="Also inherits methods from its parents IDBRequest and EventTarget."><code>IDBOpenDBRequest</code></a> 对象，但打开数据库的操作是异步执行的。</p>
+</div>
+<p>连接数据库在一个单独的线程中进行，包括以下几个步骤：</p>
+<ol>
+ <li>指定数据库已经存在时：
+  <ul>
+   <li>等待 <a href="/zh-CN/docs/Web/API/Versionchange" title="此页面仍未被本地化, 期待您的翻译!"><code>versionchange</code></a> 操作完成。</li>
+   <li>如果数据库已计划删除，那等着删除完成。</li>
+  </ul>
+ </li>
+ <li>如果已有数据库版本高于给定的 <code>version，中止操作并返回</code>类型为 <code style="font-size: 14px;">VersionError 的</code> <code>DOMError</code> 。</li>
+ <li>如果已有数据库版本低于给定的 <code>version，触发一个</code> <code>versionchange</code> 操作。</li>
+ <li>如果数据库不存在，创建指定名称的数据库，将版本号设置为给定版本，如果给定版本号，则设置为1，and no object stores.</li>
+ <li>创建数据库连接。</li>
+</ol>
+<p>如果操作成功执行，将触发 <code>success</code> 事件 on the request object that is returned from this method, with its <code>result</code> attribute set to the new <a href="/zh-CN/docs/Web/API/IDBDatabase" title="继承自: EventTarget"><code>IDBDatabase</code></a> object for the connection.</p>
+<p>If an error occurs while the database connection is being opened, then an <a href="/en-US/docs/IndexedDB/IDBErrorEvent">error event</a> is fired on the request object returned from this method.</p>
+<h2 id="Syntax">Syntax</h2>
+<p>For the current standard:</p>
+<pre class="syntaxbox"><span class="idlInterface" id="idl-def-IDBFactory"><span class="idlMethod"> <span class="idlMethType"><a href="https://dvcs.w3.org/hg/IndexedDB/raw-file/tip/Overview.html#idl-def-IDBOpenDBRequest" class="idlType"><code>IDBOpenDBRequest</code></a></span> <span class="idlMethName"><a href="https://dvcs.w3.org/hg/IndexedDB/raw-file/tip/Overview.html#widl-IDBFactory-open-IDBOpenDBRequest-DOMString-name-unsigned-long-long-version">open</a></span> (<span class="idlParam"><span class="idlParamType">DOMString</span> <span class="idlParamName">name</span></span>, <span class="idlParam">[<span class="extAttr">EnforceRange</span>] optional <span class="idlParamType">unsigned long long</span> <span class="idlParamName">version</span></span>);</span></span></pre>
+<p>For the experimental version with <code>options</code> (see below):</p>
+<pre class="syntaxbox"><span class="idlInterface"><span class="idlMethod">IDBOpenDBRequest open (DOMString name, optional IDBOpenDBOptions options);</span></span></pre>
+<h2 id="示例">示例</h2>
+<p>For the current standard:</p>
+<pre class="brush: js">var request = window.indexedDB.open(&quot;toDoList&quot;, 4);</pre>
+<p>For the experimental version with <code>options</code> (see below):</p>
+<pre class="brush:js;"><code>var request = window.indexedDB.open(&quot;toDoList&quot;, {version: 4, storage: &quot;temporary&quot;});</code></pre>
+<h2 id="参数">参数</h2>
+<dl>
+ <dt>
+  name</dt>
+ <dd>
+  数据库名称</dd>
+ <dt>
+  version</dt>
+ <dd>
+  指定数据库版本，当你想要更改数据库格式（比如增加对象存储，非增加记录），必须指定更高版本，通过 <span style="font-family: &apos;Courier New&apos;, &apos;Andale Mono&apos;, monospace; line-height: normal;">versionchange 来更改</span></dd>
+ <dt>
+  options (version and storage) <span class="nonstandardBadge notecard inline" title="This API has not been standardized."><span class="badgeText">非标准</span></span></dt>
+ <dd>
+  In Gecko, since <a href="/en-US/Firefox/Releases/26">version 26</a>, you can include an <code>options</code> object as a parameter of <a href="/zh-CN/docs/Web/API/IDBFactory/open" title="连接数据库在一个单独的线程中进行，包括以下几个步骤："><code>IDBFactory.open</code></a> that contains the <code>version</code> number of the database, plus a storage value that specifies whether you want to use <code>permanent</code> (the default value) storage for the IndexedDB, or <code>temporary</code> storage (aka shared pool.) See <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=785884" title="FIXED: Implement support for temporary storage (aka shared pool)">bug 785884</a> for more details. This is a non-standard feature that we are looking to standardise sometime in the future.</dd>
+</dl>
+<div class="note">
+ <p><strong>Note</strong>: Data in temporary storage persists until the global limit for the pool is reached. The global limit calculation is relatively complex, but we are considering changing it (see  <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=968272" title="FIXED: use less conservative temporary storage policy in QuotaManager">bug 968272</a>). When the global limit is reached, then data for the least recently used origin is deleted. There&apos;s also a group limit (eTLD+1 group/domain) which is currently 20% of the global limit. All requets that would exceed the group limit are just rejected.</p>
+</div>
+<h2 id="返回">返回</h2>
+<dl>
+ <dt>
+  <a href="/zh-CN/docs/Web/API/IDBOpenDBRequest" title="Also inherits methods from its parents IDBRequest and EventTarget."><code>IDBOpenDBRequest</code></a></dt>
+ <dd>
+  The request object on which subsequent events related to this request are fired.</dd>
+</dl>
+<h2 id="Exceptions">Exceptions</h2>
+<p>This method may raise a <a href="/zh-CN/docs/Web/API/DOMException" title=" DOMException 接口代表由于调用方法或访问一个web  API 属性时的异常事件."><code>DOMException</code></a> with a <a href="/en-US/docs/DOM/DOMError">DOMError</a> of the following types:</p>
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Exception</th>
+   <th scope="col">描述</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>TypeError</code></td>
+   <td>The value of version is zero or a negative number or not a number.</td>
+  </tr>
+ </tbody>
+</table>
+<h2 id="Specifications">Specifications</h2>
+<p></p><table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://www.w3.org/TR/IndexedDB/#idl-def-IDBFactory" class="external" hreflang="en">Indexed Database API<br><small lang="en-US">The definition of &apos;IDBFactory&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://w3c.github.io/IndexedDB/#factory-interface" class="external" hreflang="en">Indexed Database API 2.0<br><small lang="en-US">The definition of &apos;IDBFactory&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table><p></p>
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+<p></p><div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<p></p><div class="bc-data"><a href="https://github.com/mdn/browser-compat-data" class="bc-github-link">Update compatibility data on GitHub</a><table class="bc-table bc-table-web"><thead><tr class="bc-platforms"><td></td><th colspan="6" class="bc-platform-desktop"><span>Desktop</span></th><th colspan="7" class="bc-platform-mobile"><span>Mobile</span></th></tr><tr class="bc-browsers"><td></td><th class="bc-browser-chrome"><span class="bc-head-txt-label bc-head-icon-chrome">Chrome</span></th><th class="bc-browser-edge"><span class="bc-head-txt-label bc-head-icon-edge">Edge</span></th><th class="bc-browser-firefox"><span class="bc-head-txt-label bc-head-icon-firefox">Firefox</span></th><th class="bc-browser-ie"><span class="bc-head-txt-label bc-head-icon-ie">Internet Explorer</span></th><th class="bc-browser-opera"><span class="bc-head-txt-label bc-head-icon-opera">Opera</span></th><th class="bc-browser-safari"><span class="bc-head-txt-label bc-head-icon-safari">Safari</span></th><th class="bc-browser-webview_android"><span class="bc-head-txt-label bc-head-icon-webview_android">Android webview</span></th><th class="bc-browser-chrome_android"><span class="bc-head-txt-label bc-head-icon-chrome_android">Chrome for Android</span></th><th class="bc-browser-edge_mobile"><span class="bc-head-txt-label bc-head-icon-edge_mobile">Edge Mobile</span></th><th class="bc-browser-firefox_android"><span class="bc-head-txt-label bc-head-icon-firefox_android">Firefox for Android</span></th><th class="bc-browser-opera_android"><span class="bc-head-txt-label bc-head-icon-opera_android">Opera for Android</span></th><th class="bc-browser-safari_ios"><span class="bc-head-txt-label bc-head-icon-safari_ios">Safari on iOS</span></th><th class="bc-browser-samsunginternet_android"><span class="bc-head-txt-label bc-head-icon-samsunginternet_android">Samsung Internet</span></th></tr></thead><tbody><tr><th scope="row">Basic support</th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div><section class="bc-history" id="sect1"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>23 — 57<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div><section class="bc-history" id="sect2"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>10 — 16<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-yes bc-browser-ie bc-has-history"><span class="bc-browser-name">IE</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div><section class="bc-history" id="sect3"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div></dt><dd><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> partial</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              15</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              7</td><td class="bc-supports-yes bc-browser-webview_android bc-has-history"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div><section class="bc-history" id="sect4"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>? — 57<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-chrome_android bc-has-history"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25<div class="bc-icons"></div><section class="bc-history" id="sect5"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>25 — 57<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-unknown bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              8</td><td class="bc-supports-yes bc-browser-samsunginternet_android bc-has-history"><span class="bc-browser-name">Samsung Internet Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div><section class="bc-history" id="sect6"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>? — 7.0<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td></tr><tr><th scope="row">Available in workers</th><td class="bc-supports-yes bc-browser-chrome"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              37</td><td class="bc-supports-unknown bc-browser-ie"><span class="bc-browser-name">IE</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-webview_android"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              37</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-unknown bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr title="Compatibility unknown; please update this.">
+                ?
+              </abbr></td><td class="bc-supports-yes bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td></tr><tr><th scope="row"><a href="/docs/Web/API/IDBFactory/cmp"><code>cmp</code></a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div><section class="bc-history" id="sect7"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>23 — 24<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              12</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div><section class="bc-history" id="sect8"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>10 — 16<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-yes bc-browser-ie bc-has-history"><span class="bc-browser-name">IE</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div><section class="bc-history" id="sect9"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div></dt><dd><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> partial</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              15</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              7</td><td class="bc-supports-yes bc-browser-webview_android bc-has-history"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div><section class="bc-history" id="sect10"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>? — ?<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-yes bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              8</td><td class="bc-supports-yes bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td></tr><tr><th scope="row"><a href="/docs/Web/API/IDBFactory/deleteDatabase"><code>deleteDatabase</code></a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div><section class="bc-history" id="sect11"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>23 — 24<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              12</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div><section class="bc-history" id="sect12"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>10 — 16<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-yes bc-browser-ie bc-has-history"><span class="bc-browser-name">IE</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div><section class="bc-history" id="sect13"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div></dt><dd><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> partial</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              15</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              7</td><td class="bc-supports-yes bc-browser-webview_android bc-has-history"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div><section class="bc-history" id="sect14"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>? — ?<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-yes bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              8</td><td class="bc-supports-yes bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td></tr><tr><th scope="row"><a href="/docs/Web/API/IDBFactory/open"><code>open</code></a></th><td class="bc-supports-yes bc-browser-chrome bc-has-history"><span class="bc-browser-name">Chrome</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div><section class="bc-history" id="sect15"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              24<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>23 — 24<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-edge"><span class="bc-browser-name">Edge</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              12</td><td class="bc-supports-yes bc-browser-firefox bc-has-history"><span class="bc-browser-name">Firefox</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div><section class="bc-history" id="sect16"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              16<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>10 — 16<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: moz"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: moz</dd></dl></section></td><td class="bc-supports-yes bc-browser-ie bc-has-history"><span class="bc-browser-name">IE</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div><section class="bc-history" id="sect17"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              10<div class="bc-icons"><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> </div></dt><dd><abbr class="only-icon" title="See implementation notes"><span>Notes</span><i class="ic-footnote"></i></abbr> partial</dd></dl></section></td><td class="bc-supports-yes bc-browser-opera"><span class="bc-browser-name">Opera</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              15</td><td class="bc-supports-yes bc-browser-safari"><span class="bc-browser-name">Safari</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              7</td><td class="bc-supports-yes bc-browser-webview_android bc-has-history"><span class="bc-browser-name">WebView Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div><section class="bc-history" id="sect18"><dl><dt class="bc-supports-yes bc-supports"><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes<div class="bc-icons"></div></dt><dd></dd><dt class="bc-supports-no bc-supports"><abbr class="bc-level-no only-icon" title="No support">
+              <span>No support</span>
+            </abbr>? — ?<div class="bc-icons"><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> </div></dt><dd><abbr class="only-icon" title="Implemented with the vendor prefix: webkit"><span>Prefixed</span><i class="ic-prefix"></i></abbr> Implemented with the vendor prefix: webkit</dd></dl></section></td><td class="bc-supports-yes bc-browser-chrome_android"><span class="bc-browser-name">Chrome Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              25</td><td class="bc-supports-yes bc-browser-edge_mobile"><span class="bc-browser-name">Edge Mobile</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td><td class="bc-supports-yes bc-browser-firefox_android"><span class="bc-browser-name">Firefox Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-opera_android"><span class="bc-browser-name">Opera Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              22</td><td class="bc-supports-yes bc-browser-safari_ios"><span class="bc-browser-name">Safari iOS</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              8</td><td class="bc-supports-yes bc-browser-samsunginternet_android"><span class="bc-browser-name">Samsung Internet Android</span><abbr class="bc-level-yes only-icon" title="Full support">
+                <span>Full support</span>
+              </abbr>
+              Yes</td></tr></tbody></table><section class="bc-legend" id="sect19"><h3 class="offscreen" id="Legend">Legend</h3><dl><dt><span class="bc-supports-yes bc-supports">
+                <abbr class="bc-level bc-level-yes only-icon" title="Full support">
+                 <span>Full support</span>
+
+                </abbr></span></dt><dd>Full support</dd><dt><span class="bc-supports-unknown bc-supports">
+                <abbr class="bc-level bc-level-unknown only-icon" title="Compatibility unknown">
+                 <span>Compatibility unknown</span>
+
+                </abbr></span></dt><dd>Compatibility unknown</dd><dt><abbr class="only-icon" title="See implementation notes."><span>See implementation notes.</span><i class="ic-footnote"></i></abbr></dt><dd>See implementation notes.</dd><dt><abbr class="only-icon" title="Requires a vendor prefix or different name for use."><span>Requires a vendor prefix or different name for use.</span><i class="ic-prefix"></i></abbr></dt><dd>Requires a vendor prefix or different name for use.</dd></dl></section></div><p></p>
+</div><p></p>

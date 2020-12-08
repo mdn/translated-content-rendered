@@ -1,0 +1,86 @@
+---
+title: Body.body
+slug: Web/API/Body/body
+translation_of: Web/API/Body/body
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><em><code>body</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/arrayBuffer"><code>arrayBuffer()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/blob"><code>blob()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Body/text"><code>text()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implemented by:</summary><ol><li><a href="/zh-CN/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/zh-CN/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section></div>
+
+<p><a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a> mixin的只读getter属性 <strong><code>body</code></strong> 用于暴露其body内容的<a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>（流读取）。</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js notranslate">var stream = responseInstance.body;</pre>
+
+<h3 id="Value">Value</h3>
+
+<p>一个 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>.</p>
+
+<h2 id="例程">例程</h2>
+
+<p>在我们的 <a href="https://mdn.github.io/dom-examples/streams/simple-pump.html">simple stream pump</a> 例程中我们fetch一个图片地址，使用<code>response.body</code>暴露响应的流，用<a href="/zh-CN/docs/Web/API/Body/getReader"><code>ReadableStream.getReader()</code></a>创建一个读取器，然后将其置入第二个自定义读取流中——有效的创建了一个完全相同的图片副本。</p>
+
+<pre class="brush: js notranslate">const image = document.getElementById(&apos;target&apos;);
+
+// 请求原始图片
+fetch(&apos;./tortoise.png&apos;)
+// 取出body
+.then(response =&gt; response.body)
+.then(body =&gt; {
+  const reader = body.getReader();
+
+  return new ReadableStream({
+    start(controller) {
+      return pump();
+
+      function pump() {
+        return reader.read().then(({ done, value }) =&gt; {
+          // 读不到更多数据就关闭流
+          if (done) {
+            controller.close();
+            return;
+          }
+
+          // 将下一个数据块置入流中
+          controller.enqueue(value);
+          return pump();
+        });
+      }
+    }
+  })
+})
+.then(stream =&gt; new Response(stream))
+.then(response =&gt; response.blob())
+.then(blob =&gt; URL.createObjectURL(blob))
+.then(url =&gt; console.log(image.src = url))
+.catch(err =&gt; console.error(err));</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">备注</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-body" hreflang="en" lang="en">Fetch<br><small lang="zh-CN">body</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="bc-data" id="bcd:api.Body.body"></div></div>
+
+<p> </p>
+
+<h2 id="相关链接">相关链接</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Fetch_API">Fetch API</a></li>
+ <li><a href="/en-US/docs/Web/API/Streams_API">Streams API</a></li>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+</ul>

@@ -1,0 +1,112 @@
+---
+title: Debugging Firefox for Android with WebIDE
+slug: Tools/Remote_Debugging/Debugging_Firefox_for_Android_with_WebIDE_clone
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li class="toggle">
+      <details>
+        <summary>核心工具</summary>
+        <ol>
+          <li><a href="/zh-CN/docs/Tools/Page_Inspector">页面检查器</a></li>
+          <li><a href="/zh-CN/docs/Tools/Web_Console">Web Console</a></li>
+          <li><a href="/zh-CN/docs/Tools/Debugger">JavaScript Debugger</a></li>
+          <li><a href="/zh-CN/docs/Tools/Network_Monitor">网络监视器</a></li>
+          <li><a href="/zh-CN/docs/Tools/Performance">性能</a></li>
+          <li><a href="/zh-CN/docs/Tools/Responsive_Design_Mode">响应式设计模式</a></li>
+          <li><a href="/zh-CN/docs/Tools/Accessibility_inspector">Accessibility Inspector</a></li>
+          <li><a href="/zh-CN/docs/Tools/Tips">提示</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>更多工具</summary>
+        <ol>
+          <li><a href="/zh-CN/docs/Tools/Memory">内存</a></li>
+          <li><a href="/zh-CN/docs/Tools/Storage_Inspector">存储检查器</a></li>
+          <li><a href="/zh-CN/docs/Tools/DOM_Property_Viewer">DOM属性查看器</a></li>
+          <li><a href="/zh-CN/docs/Tools/GCLI">开发者工具栏</a></li>
+          <li><a href="/zh-CN/docs/Tools/Eyedropper">页面取色器</a></li>
+          <li><a href="/zh-CN/docs/Tools/Taking_screenshots">截图</a></li>
+          <li><a href="/zh-CN/docs/Tools/Scratchpad">便笺</a></li>
+          <li><a href="/zh-CN/docs/Tools/Style_Editor">样式编辑器</a></li>
+          <li><a href="/zh-CN/docs/Tools/Shader_Editor">Shader Editor</a></li>
+          <li><a href="/zh-CN/docs/Tools/Web_Audio_Editor">Web Audio Editor</a></li>
+          <li><a href="/zh-CN/docs/Tools/Rulers">Rulers</a></li>
+          <li><a href="/zh-CN/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+          <li><a href="/zh-CN/docs/Tools/View_source">View Source</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>连接到devtools</summary>
+        <ol>
+          <li><a href="/zh-CN/docs/Tools/about:debugging">关于：调试</a></li>
+          <li><a href="https://developer.mozilla.org/zh-CN/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">连接到Android的Firefox</a></li>
+          <li><a href="https://developer.mozilla.org/zh-CN/docs/Tools/Working_with_iframes">连接到iframes</a></li>
+          <li><a href="https://developer.mozilla.org/zh-CN/docs/Tools/Valence">连接到其他浏览器</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>在浏览器调试</summary>
+        <ol>
+          <li><a href="/zh-CN/docs/Tools/Browser_Console">浏览器控制台</a></li>
+          <li><a href="/zh-CN/docs/Tools/Browser_Toolbox">浏览器工具箱</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>扩展devtools</summary>
+        <ol>
+          <li><a href="/zh-CN/docs/Tools/Adding_a_panel_to_the_toolbox">添加一个面板到工具箱</a></li>
+          <li><a href="/zh-CN/docs/Tools/Example_add-ons">devtools附加组件实例</a></li>
+          <li><a href="https://wiki.mozilla.org/Remote_Debugging_Protocol">远程调试协议</a></li>
+          <li><a href="https://wiki.mozilla.org/Remote_Debugging_Protocol_Stream_Transport">Stream Transport</a></li>
+          <li><a href="/zh-CN/docs/Tools/Editor">源码编辑器</a></li>
+          <li><a href="/zh-CN/docs/Tools/Debugger-API">Debugger 接口</a></li>
+          <li><a href="/zh-CN/docs/Tools/Web_Console/Custom_output">Web Console自定义输出</a></li>
+        </ol>
+      </details>
+    </li>
+    <li><a href="/zh-CN/docs/Tools/Settings">设置</a></li>
+    <li><a href="/zh-CN/docs/Tools/Release_notes">说明</a></li>
+  </ol>
+</section></div><p>This article describes how to connect the <a href="/en-US/docs/Tools">Firefox Developer Tools</a> to Firefox for Android from Firefox 36 onwards.</p>
+<p>It's been possible for a long time to connect the Firefox Developer Tools to Firefox for Android so you can debug your mobile website. Until now, though, this was a fairly complex and error-prone process. From Firefox 36 we've made the process much simpler: in particular, you don't need to deal directly with the <a href="http://developer.android.com/tools/help/adb.html">adb</a> tool at all. Now you connect using  <a href="/en-US/docs/Tools/WebIDE">WebIDE</a>, which takes care of setting up adb behind the scenes.</p>
+<div class="note">
+ <p>For this to work, you need at least Firefox 36 on the desktop and Firefox 35 on the mobile device. If you need to use an earlier version, see the older instructions for <a href="/en-US/docs/Tools/Remote_Debugging/Firefox_for_Android">connecting the developer tools to Firefox for Android</a>.</p>
+</div>
+<p> </p>
+<p><img src="https://mdn.mozillademos.org/files/9011/remote-debugging-overview-fx36.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>This guide's split into two parts: the first part, "Prerequisites" covers stuff you only need to do once, while the second part, "Connecting", covers stuff you need to do each time you connect the device.</p>
+<h2 id="Prerequisites">Prerequisites</h2>
+<p>First, you'll need:</p>
+<ul>
+ <li>a desktop or laptop computer with Firefox 36 or higher running on it</li>
+ <li>an Android device <a href="https://support.mozilla.org/en-US/kb/will-firefox-work-my-mobile-device" class="external external-icon" title="https://support.mozilla.org/en-US/kb/will-firefox-work-my-mobile-device">capable of running Firefox for Android</a> with Firefox for Android 35 or higher running on it</li>
+ <li>a USB cable to connect the two devices</li>
+</ul>
+<h3 id="ADB_Helper">ADB Helper</h3>
+<p>Your desktop Firefox also needs to have the ADB Helper add-on, version 0.7.1 or higher. This should be installed for you automatically the first time you open WebIDE. To check the version, type <code>about:addons</code> into the browser's address bar and you should see ADB listed.</p>
+<p>If you don't have ADB Helper version 0.7.1 or higher, select "Manage Extra Components" from the "Projects" menu, and you'll see the "Extra Components" window, which will contain an entry for ADB Helper:</p>
+<p><img src="https://mdn.mozillademos.org/files/9021/extra-components.png" alt="" style="display: block; margin-left: auto; margin-right: auto;">Click "uninstall" then "install", and you should now have the latest version.</p>
+<h3 id="Setting_up_the_Android_device">Setting up the Android device</h3>
+<p>First, enable USB debugging by following <a href="http://developer.android.com/guide/developing/device.html#setting-up" class="external external-icon" title="http://developer.android.com/guide/developing/device.html#setting-up">steps 2 and 3 of this link only</a>.</p>
+<p>Next, enable remote debugging in Firefox for Android. Open the browser, open its menu, select "Settings", then "Developer tools" (on some Android devices you may need to select "More" to see the "Settings" option). Check the "Remote debugging" box:</p>
+<p><img src="https://mdn.mozillademos.org/files/5829/remote-debugging-device-enable.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>The browser might display a notification reminding you to set up port forwarding, which you can ignore.</p>
+<h2 id="Connecting">Connecting</h2>
+<p>Connect the Android device to the desktop with the USB cable, open <a href="/en-US/docs/Tools/WebIDE">WebIDE</a>, and open the <a href="/en-US/docs/Tools/WebIDE#Setting_up_runtimes">"Runtimes" menu</a>. You will see Firefox for Android listed as a debugging target under "USB DEVICES":</p>
+<p><img src="https://mdn.mozillademos.org/files/9013/remote-debugging-android-runtime.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Select it. On the Android device, you'll now see a warning message:</p>
+<p><img src="https://mdn.mozillademos.org/files/9031/incoming-warning.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Click OK. Now click the "Open App" menu in WebIDE. You'll see a list of all the tabs open on the device:</p>
+<p><img src="https://mdn.mozillademos.org/files/9015/remote-debugging-android-open-tabs.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Select a tab to attach the developer tools to it:</p>
+<p><img src="https://mdn.mozillademos.org/files/9029/remote-debugging-android-attached.png" alt="" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Now you should be able to use all the Firefox developer tools that support remote debugging. See the page on <a href="/en-US/docs/Tools/Remote_Debugging">remote debugging</a> for more details.</p>

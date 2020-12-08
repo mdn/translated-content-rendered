@@ -1,0 +1,183 @@
+---
+title: 组合 Compositing
+slug: Web/API/Canvas_API/Tutorial/Compositing
+tags:
+  - Canvas
+  - Graphics
+  - HTML
+  - HTML5
+  - Intermediate
+  - Totorial
+translation_of: Web/API/Canvas_API/Tutorial/Compositing
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas 教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_usage">基本用法</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">绘制形状</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">添加样式和颜色</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_text">绘制文本</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Using_images">使用图片</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations">变形</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing">合成与裁剪</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations">基本动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">高级动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">像素操作</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">点击区域和无障碍访问</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">canvas 的优化</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Finale">终极</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>示例</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/A_basic_ray-caster">一个基本的光线投射例子</a></li>
+        <li><a href="/zh-CN/Add-ons/Code_snippets/Canvas">Canvas 代码片段</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">在 canvas 中操作视频</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>接口</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span> <a href="/zh-CN/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/MDN">文档:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>常用页面列表</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/tag/Canvas">拥有 &quot;Canvas&quot; 标签的页面</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>贡献</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/MDN/Doc_status/API/Canvas">Canvas 文档翻译状态</a></li>
+        <li><a href="/zh-CN/docs/MDN">MDN 项目</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">下一页  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>在<a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Transformations">之前的例子</a>里面，我们总是将一个图形画在另一个之上，对于其他更多的情况，仅仅这样是远远不够的。比如，对合成的图形来说，绘制顺序会有限制。不过，我们可以利用 <code>globalCompositeOperation</code> 属性来改变这种状况。此外, <code>clip</code>属性允许我们隐藏不想看到的部分图形。</p>
+</div>
+
+<h2 id="globalCompositeOperation" name="globalCompositeOperation"><code>globalCompositeOperation</code></h2>
+
+<p>我们不仅可以在已有图形后面再画新图形，还可以用来遮盖指定区域，清除画布中的某些部分（清除区域不仅限于矩形，像<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/clearRect" title="The CanvasRenderingContext2D.clearRect() 是 Canvas 2D API 设置指定矩形区域内（以 点 (x, y) 为起点，范围是(width, height) ）所有像素变成透明，并擦除之前绘制的所有内容的方法。"><code>clearRect()</code></a>方法做的那样）以及更多其他操作。</p>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation" title="Canvas 2D API的 CanvasRenderingContext2D.globalCompositeOperation  属性设置要在绘制新形状时应用的合成操作的类型，其中type是用于标识要使用的合成或混合模式操作的字符串。"><code>globalCompositeOperation = type</code></a></dt>
+ <dd>这个属性设定了在画新图形时采用的遮盖策略，其值是一个标识12种遮盖方式的字符串。</dd>
+</dl>
+
+<p>查看下面<a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing/Example">Compositing 示例</a>的代码。</p>
+
+<p><iframe src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing/Example$samples/%E5%90%88%E6%88%90%E7%A4%BA%E4%BE%8B?revision=1423891" width="750" height="6750" frameborder="0" id="frame_合成示例" class="live-sample-frame sample-code-frame"></iframe></p>
+
+<h2 id="Clipping_paths" name="Clipping_paths">裁切路径</h2>
+
+<p><img src="https://mdn.mozillademos.org/files/209/Canvas_clipping_path.png" alt style="float: right;" class="internal">裁切路径和普通的 canvas 图形差不多，不同的是它的作用是遮罩，用来隐藏不需要的部分。如右图所示。红边五角星就是裁切路径，所有在路径以外的部分都不会在 canvas 上绘制出来。</p>
+
+<p>如果和上面介绍的 <code>globalCompositeOperation</code> 属性作一比较，它可以实现与 <code>source-in</code> 和 <code>source-atop</code>差不多的效果。最重要的区别是裁切路径不会在 canvas 上绘制东西，而且它永远不受新图形的影响。这些特性使得它在特定区域里绘制图形时相当好用。</p>
+
+<p>在 <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes" title="Web/Guide/HTML/Canvas_tutorial/Drawing_shapes#Drawing_paths">绘制图形</a> 一章中，我只介绍了 <code>stroke</code> 和 <code>fill</code> 方法，这里介绍第三个方法<code>clip</code>。</p>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/clip" title="CanvasRenderingContext2D.clip() 是 Canvas 2D API 将当前创建的路径设置为当前剪切路径的方法。"><code>clip()</code></a></dt>
+ <dd>将当前正在构建的路径转换为当前的裁剪路径。</dd>
+</dl>
+
+<p>我们使用 <code>clip()</code>方法来创建一个新的裁切路径。</p>
+
+<p>默认情况下，canvas 有一个与它自身一样大的裁切路径（也就是没有裁切效果）。</p>
+
+<h3 id="A_clip_example" name="A_clip_example"><code>clip</code> 的例子</h3>
+
+<p>这个例子，我会用一个圆形的裁切路径来限制随机星星的绘制区域。</p>
+
+<pre class="brush: js;highlight[9]">function draw() {
+  var ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+  ctx.fillRect(0,0,150,150);
+  ctx.translate(75,75);
+
+  // Create a circular clipping path
+  ctx.beginPath();
+  ctx.arc(0,0,60,0,Math.PI*2,true);
+  ctx.clip();
+
+  // draw background
+  var lingrad = ctx.createLinearGradient(0,-75,0,75);
+  lingrad.addColorStop(0, &apos;#232256&apos;);
+  lingrad.addColorStop(1, &apos;#143778&apos;);
+
+  ctx.fillStyle = lingrad;
+  ctx.fillRect(-75,-75,150,150);
+
+  // draw stars
+  for (var j=1;j&lt;50;j++){
+    ctx.save();
+    ctx.fillStyle = &apos;#fff&apos;;
+    ctx.translate(75-Math.floor(Math.random()*150),
+                  75-Math.floor(Math.random()*150));
+    drawStar(ctx,Math.floor(Math.random()*4)+2);
+    ctx.restore();
+  }
+
+}
+function drawStar(ctx,r){
+  ctx.save();
+  ctx.beginPath()
+  ctx.moveTo(r,0);
+  for (var i=0;i&lt;9;i++){
+    ctx.rotate(Math.PI/5);
+    if(i%2 == 0) {
+      ctx.lineTo((r/0.525731)*0.200811,0);
+    } else {
+      ctx.lineTo(r,0);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+</pre>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js">draw();</pre>
+</div>
+
+<p>首先，我画了一个与 canvas 一样大小的黑色方形作为背景，然后移动原点至中心点。然后用 <code>clip</code> 方法创建一个弧形的裁切路径。裁切路径也属于 canvas 状态的一部分，可以被保存起来。如果我们在创建新裁切路径时想保留原来的裁切路径，我们需要做的就是保存一下 canvas 的状态。</p>
+
+<p>裁切路径创建之后所有出现在它里面的东西才会画出来。在画线性渐变时我们就会注意到这点。然后会绘制出50 颗随机位置分布（经过缩放）的星星，当然也只有在裁切路径里面的星星才会绘制出来。</p>
+
+<p></p><table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img src="https://mdn.mozillademos.org/files/208/Canvas_clip.png" alt class="internal"></td><td><iframe src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing$samples/A_clip_example?revision=1423891" width="180" height="180" frameborder="0" id="frame_A_clip_example" class="live-sample-frame sample-code-frame"></iframe></td></tr></tbody></table><p></p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">下一页  »</a></p>
+</div><p></p>

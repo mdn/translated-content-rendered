@@ -1,0 +1,169 @@
+---
+title: 加载和运行WebAssembly代码
+slug: WebAssembly/Loading_and_running
+tags:
+  - Fetch
+  - WebAssembly
+  - XMLHttpRequest
+  - 字节码
+translation_of: WebAssembly/Loading_and_running
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="open"><a href="/zh-CN/docs/WebAssembly"><strong>WebAssembly home page</strong></a>
+  </li><li class="toggle">
+    <details open>
+      <summary>Tutorials</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/WebAssembly/Concepts">WebAssembly concepts</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/C_to_wasm">Compiling from C/C++ to WebAssembly</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Rust_to_wasm">Compiling from Rust to WebAssembly</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Using_the_JavaScript_API">Using the WebAssembly JavaScript API</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Understanding_the_text_format">Understanding WebAssembly text format</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Text_format_to_wasm">Converting WebAssembly text format to wasm</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Loading_and_running">Loading and running WebAssembly code</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Caching_modules">Caching compiled WebAssembly modules</a></li>
+        <li><a href="/zh-CN/docs/WebAssembly/Exported_functions">Exported WebAssembly functions</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Object reference</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly"><code>WebAssembly</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module"><code>WebAssembly.Module</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global"><code>WebAssembly.Global</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance"><code>WebAssembly.Instance</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory"><code>WebAssembly.Memory</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Table"><code>WebAssembly.Table</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/CompileError"><code>WebAssembly.CompileError</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/LinkError"><code>WebAssembly.LinkError</code></a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/RuntimeError"><code>WebAssembly.RuntimeError</code></a></li>
+      </ol>
+    </details>
+  </li>
+</ol>
+
+</section></div>
+
+<p class="summary">为了在JavaScript中使用WebAssembly，在编译/实例化之前，你首先需要把模块放入内存。比如，通过<a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a>或<a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch</a>，模块将会被初始化为带类型数组；不过，将来会开发更多的方式。本文提供了一篇关于获取WebAssembly字节码的不同机制以及如何编译/实例化并运行它的参考。</p>
+
+<h2 id="这里的主题是什么？">这里的主题是什么？</h2>
+
+<p>WebAssembly还没有和&lt;script type=&apos;module&apos;&gt;或ES6的import语句集成，也就是说，当前还没有内置的方式让浏览器为你获取模块。当前唯一的方式就是创建一个包含你的WebAssembly模块二进制代码的 <a href="/zh-CN/docs/Web/API/ArrayBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>ArrayBuffer</code></a> 并且使用<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate" title="WebAssembly.instantiate() 是编译和实例化 WebAssembly 代码的主要方法.  这个方法有两个重载方式:"><code>WebAssembly.instantiate()</code></a>编译它。这与new Function(string)类似，除了使用一个包含了WebAssembly源代码的数组缓存替换掉包含了JavaScript源代码的字符串。</p>
+
+<p>那么，我们该如何获取这些字节并存入到一个数组缓存并编译它呢？下面进行解释。</p>
+
+<h2 id="使用Fetch">使用Fetch</h2>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch</a>是一个用来获取网络资源的方便现代的API。</p>
+
+<p>假设网络上有一个叫做simple.wasm的WebAssembly模块：</p>
+
+<ul>
+ <li>我们可以使用<a href="https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch()</a>全局函数来轻松地获取它，该函数返回一个可以解析为<a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">Response</a>对象的promise。</li>
+ <li>我们可以使用<a href="https://developer.mozilla.org/en-US/docs/Web/API/Body/arrayBuffer">arrayBuffer()</a>函数把响应（response）转换为带类型数组，该函数返回一个可以解析为带类型数组的promise。</li>
+ <li>最后，我们使用<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate" title="WebAssembly.instantiate() 是编译和实例化 WebAssembly 代码的主要方法.  这个方法有两个重载方式:"><code>WebAssembly.instantiate()</code></a>函数一步实现编译和实例化带类型数组。</li>
+</ul>
+
+<p>代码块看起来像这样：</p>
+
+<pre class="brush: js">fetch(&apos;module.wasm&apos;).then(response =&gt;
+  response.arrayBuffer()
+).then(bytes =&gt;
+  WebAssembly.instantiate(bytes, importObject)
+).then(results =&gt; {
+  // Do something with the compiled results!
+});</pre>
+
+<h3 id="顺便说一下instantiate()重载">顺便说一下instantiate()重载</h3>
+
+<p><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate" title="WebAssembly.instantiate() 是编译和实例化 WebAssembly 代码的主要方法.  这个方法有两个重载方式:"><code>WebAssembly.instantiate()</code></a>函数有两种重载形式——一种是前面展示的那样，接受待编译的字节码作为参数并且返回一个promise并且该promise可以解析为一个包含已编译的模块对象及其实例的对象。</p>
+
+<pre class="brush: js">{
+  module : Module // 新编译的WebAssembly.Module对象，
+  instance : Instance // 新的模块对象实例
+}</pre>
+
+<div class="note">
+<p><strong>注</strong>： 通常，我们只关心实例，但是，当我们想缓存模块，使用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/postMessage">postMessage()</a>与另外一个worker或window共享模块或者只是创建更多的实例的时候，拥有模块对象是很有用的。</p>
+</div>
+
+<div class="note">
+<p><strong>注</strong>： 这二种重载形式接受一个<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module">WebAssembly.Module</a>对象作为参数，并且返回一个包含了一个实例对象的promise。参考<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate#Second_overload_example">第二种重载示例</a>。</p>
+</div>
+
+<h3 id="获取及实例化的实用函数">获取及实例化的实用函数</h3>
+
+<p>上面的代码样式可以工作，但是，每次都重新编写它们就显得啰嗦了，特别是当你想要加载多个模块的时候。为了简单起见，我们创建了一个叫做fetchAndInstantiate()的实用函数，它在后台工作并返回一个promise。你可以在<a href="https://github.com/mdn/webassembly-examples/blob/master/wasm-utils.js">wasm-utils.js</a>中找到这个函数。它看起来像这样：</p>
+
+<pre class="brush: js">function fetchAndInstantiate(url, importObject) {
+  return fetch(url).then(response =&gt;
+    response.arrayBuffer()
+  ).then(bytes =&gt;
+    WebAssembly.instantiate(bytes, importObject)
+  ).then(results =&gt;
+    results.instance
+  );
+}</pre>
+
+<p>把这个函数加入到HTML中，你就可以使用一行简单代码做到获取和实例化WebAssembly模块并且得到一个实例。</p>
+
+<pre class="brush: js">fetchAndInstantiate(&apos;module.wasm&apos;, importObject).then(function(instance) {
+  ...
+})</pre>
+
+<div class="note">
+<p><strong>注</strong>： 在我们的文档中，你可以看到许多这么用的例子（例如，参考<a href="https://mdn.github.io/webassembly-examples/js-api-examples/">index.html</a>）——这是我们推荐的加载模块的标准方式。</p>
+</div>
+
+<h3 id="运行你的WebAssembly代码">运行你的WebAssembly代码</h3>
+
+<p>一旦在JavaScript中得到了可用的WebAssembly实例，你就可以开始使用那些通过 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance/exports" title="此页面仍未被本地化, 期待您的翻译!"><code>WebAssembly.Instance.exports</code></a> 属性导出的特性了。你的代码可能看起来像这样：</p>
+
+<pre class="brush: js">fetchAndInstantiate(&apos;myModule.wasm&apos;, importObject).then(function(instance) {
+  // 调用导出函数：
+  instance.exports.exported_func();
+
+  // 或者获取导出内存的缓存内容：
+  var i32 = new Uint32Array(instance.exports.memory.buffer);
+
+  // 或者获取导出表格中的元素：
+  var table = instance.exports.table;
+  console.log(table.get(0)());
+})</pre>
+
+<div class="note">
+<p><strong>注</strong>：关于从WebAssembly模块导出是如何工作的更多信息，请阅读使<a href="https://developer.mozilla.org/en-US/docs/WebAssembly/Using_the_JavaScript_API">用WebAssembly的JavaScript API</a>和<a href="https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format">理解WebAssembly文本格式</a>。</p>
+</div>
+
+<h2 id="使用XMLHttpRequest">使用XMLHttpRequest</h2>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a>在一定程度上而言要比Fetch老旧一些，但是，仍然可以很好地被用来获取带类型数组。仍然假设我们的模块叫做simple.wasm：</p>
+
+<ol>
+ <li>创建一个 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequest()</code></a> 实例，然后使用它的<a href="/zh-CN/docs/Web/API/XMLHttpRequest/open" title="XMLHttpRequest.open() 方法初始化一个请求。该方法要从JavaScript代码使用；从原生代码初始化一个请求，使用openRequest()替代。"><code>open()</code></a> 方法来开启一个请求——设置请求方法为GET并且声明我们想要获取的文件路径。</li>
+ <li>关键之处在于使用<a href="/zh-CN/docs/Web/API/XMLHttpRequest/responseType" title="XMLHttpRequest.responseType 属性是一个枚举类型的属性，返回响应数据的类型。它允许我们手动的设置返回数据的类型。如果我们将它设置为一个空字符串，它将使用默认的&quot;text&quot;类型。"><code>responseType</code></a>属性设置响应类型为&apos;arraybuffer&apos;。</li>
+ <li>接下来使用<a href="/zh-CN/docs/Web/API/XMLHttpRequest/send" title="XMLHttpRequest.send() 方法用于发送 HTTP 请求。如果是异步请求（默认为异步请求），则此方法会在请求发送后立即返回；如果是同步请求，则此方法直到响应到达后才会返回。XMLHttpRequest.send() 方法接受一个可选的参数，其作为请求主体；如果请求方法是 GET 或者 HEAD，则应将请求主体设置为 null。"><code>XMLHttpRequest.send()</code></a>发送请求。</li>
+ <li>当响应已经完成下载之后，我们使用<a href="/zh-CN/docs/Web/API/XMLHttpRequest/onload" title="此页面仍未被本地化, 期待您的翻译!"><code>onload</code></a>事件处理器来调用一个函数——在这个函数中，我们从<a href="/zh-CN/docs/Web/API/XMLHttpRequest/response" title="The XMLHttpRequest response 属性返回响应的正文。返回的类型可以是 ArrayBuffer 、 Blob 、 Document 、 JavaScript Object 或 DOMString 。 这取决于 responseType 属性。"><code>response</code></a>属性中得到数组缓存然后就像使用Fetch那样把它传递给<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate" title="WebAssembly.instantiate() 是编译和实例化 WebAssembly 代码的主要方法.  这个方法有两个重载方式:"><code>WebAssembly.instantiate()</code></a> 。</li>
+</ol>
+
+<p>最终代码看起来像这样：</p>
+
+<pre class="brush: js">request = new XMLHttpRequest();
+request.open(&apos;GET&apos;, &apos;simple.wasm&apos;);
+request.responseType = &apos;arraybuffer&apos;;
+request.send();
+
+request.onload = function() {
+  var bytes = request.response;
+  WebAssembly.instantiate(bytes, importObject).then(results =&gt; {
+    results.instance.exports.exported_func();
+  });
+};</pre>
+
+<div class="note">
+<p><strong>注</strong>：你可以在<a href="https://mdn.github.io/webassembly-examples/js-api-examples/xhr-wasm.html">xhr-wasm.html</a>看到实际使用的例子。</p>
+</div>

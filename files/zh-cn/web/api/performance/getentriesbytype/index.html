@@ -1,0 +1,115 @@
+---
+title: performance.getEntriesByType()
+slug: Web/API/Performance/getEntriesByType
+tags:
+  - ZH
+translation_of: Web/API/Performance/getEntriesByType
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Performance_Timeline">Performance Timeline</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/API/Performance/navigation"><code>navigation</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/onresourcetimingbufferfull"><code>onresourcetimingbufferfull</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Performance/timeOrigin"><code>timeOrigin</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/API/Performance/timing"><code>timing</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/Performance/clearMarks"><code>clearMarks()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/clearMeasures"><code>clearMeasures()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/clearResourceTimings"><code>clearResourceTimings()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/getEntries"><code>getEntries()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/getEntriesByName"><code>getEntriesByName()</code></a></li><li><em><code>getEntriesByType()</code></em></li><li><a href="/zh-CN/docs/Web/API/Performance/mark"><code>mark()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/measure"><code>measure()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/now"><code>now()</code></a></li><li><a href="/zh-CN/docs/Web/API/Performance/setResourceTimingBufferSize"><code>setResourceTimingBufferSize()</code></a> <a href="/zh-CN/docs/Web/API/Performance/setResourceTimingBufferSize$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/API/Performance/toJSON"><code>toJSON()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-CN/docs/Web/API/Performance/resourcetimingbufferfull_event"><code>resourcetimingbufferfull</code></a> <a href="/zh-CN/docs/Web/API/Performance/resourcetimingbufferfull_event$translate" style="opacity: 0.5;">[我来译!]</a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Performance Timeline API</summary><ol><li><a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceObserverEntryList"><code>PerformanceObserverEntryList</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a></li><li><a href="/zh-CN/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section></div>
+
+<div><strong><code>getEntriesByType()</code></strong>  方法返回给定类型的 <a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a> 列表</div>
+
+<p>The list&apos;s members (<em>entries</em>) can be created by making performance <em>marks</em> or <em>measures</em> (for example by calling the <a href="/zh-CN/docs/Web/API/Performance/mark"><code>mark()</code></a> method) at explicit points in time.</p>
+
+<div class="note notecard"><strong>Note:</strong> 此特性在 <a href="/zh-CN/docs/Web/API/Web_Workers_API">Web Worker</a> 中可用。</div>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="syntaxbox notranslate"><em>entries</em> = window.performance.getEntriesByType(type);
+</pre>
+
+<h3 id="Arguments">Arguments</h3>
+
+<dl>
+ <dt>type</dt>
+ <dd>The type of entry to retrieve such as &quot;<code>mark</code>&quot;. The valid entry types are listed in <a href="/zh-CN/docs/Web/API/PerformanceEntry/entryType"><code>PerformanceEntry.entryType</code></a>.</dd>
+</dl>
+
+<h3 id="Return_Value" name="Return_Value">Return value</h3>
+
+<dl>
+ <dt>entries</dt>
+ <dd>A list of <a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a> objects that have the specified <code>type</code>. The items will be in chronological order based on the entries&apos; <a href="/zh-CN/docs/Web/API/PerformanceEntry/startTime"><code>startTime</code></a>. If no objects have the specified <code>type</code>, or no argument is provided, an empty list is returned.</dd>
+</dl>
+
+<h2 id="Example">Example</h2>
+
+<pre class="brush: js notranslate">function usePerformanceEntryMethods() {
+  log(&quot;PerformanceEntry tests ...&quot;);
+
+  if (performance.mark === undefined) {
+    log(&quot;... performance.mark Not supported&quot;);
+    return;
+  }
+
+  // Create some performance entries via the mark() method
+  performance.mark(&quot;Begin&quot;);
+  doWork(50000);
+  performance.mark(&quot;End&quot;);
+  performance.mark(&quot;Begin&quot;);
+  doWork(100000);
+  performance.mark(&quot;End&quot;);
+  doWork(200000);
+  performance.mark(&quot;End&quot;);
+
+  // Use getEntries() to iterate through the each entry
+  var p = performance.getEntries();
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;Entry[&quot; + i + &quot;]&quot;);
+    checkPerformanceEntry(p[i]);
+  }
+
+  // Use getEntries(name, entryType) to get specific entries
+  p = performance.getEntries({name : &quot;Begin&quot;, entryType: &quot;mark&quot;});
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;Begin[&quot; + i + &quot;]&quot;);
+    checkPerformanceEntry(p[i]);
+  }
+
+  // Use getEntriesByType() to get all &quot;mark&quot; entries
+  p = performance.getEntriesByType(&quot;mark&quot;);
+  for (var i=0; i &lt; p.length; i++) {
+    log (&quot;Mark only entry[&quot; + i + &quot;]: name = &quot; + p[i].name +
+         &quot;; startTime = &quot; + p[i].startTime +
+         &quot;; duration  = &quot; + p[i].duration);
+  }
+
+  // Use getEntriesByName() to get all &quot;mark&quot; entries named &quot;Begin&quot;
+  p = performance.getEntriesByName(&quot;Begin&quot;, &quot;mark&quot;);
+  for (var i=0; i &lt; p.length; i++) {
+    log (&quot;Mark and Begin entry[&quot; + i + &quot;]: name = &quot; + p[i].name +
+         &quot;; startTime = &quot; + p[i].startTime +
+         &quot;; duration  = &quot; + p[i].duration);
+  }
+}
+</pre>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/performance-timeline/#dom-performance-getentriesbytype" hreflang="en" lang="en">Performance Timeline Level 2<br><small lang="zh-CN">getEntriesByType()</small></a></td>
+   <td><span class="spec-CR">Candidate Recommendation</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/performance-timeline/#dom-performance-getentriesbytype" hreflang="en" lang="en">Performance Timeline<br><small lang="zh-CN">getEntriesByType()</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Performance.getEntriesByType"></div>
+</div>

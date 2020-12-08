@@ -1,0 +1,147 @@
+---
+title: Streams API
+slug: Web/API/Streams_API
+translation_of: Web/API/Streams_API
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Streams_API">Streams API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/Streams_API"><code>Streams_API</code></a></strong></li><li class="toggle"><details open><summary>Related pages for Streams</summary><ol><li><a href="/zh-CN/docs/Web/API/Body/body"><code>Body.body</code></a></li><li><a href="/zh-CN/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></li><li><a href="/zh-CN/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></li><li><a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></li><li><a href="/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li><li><a href="/zh-CN/docs/Web/API/WritableStream"><code>WritableStream</code></a></li><li><a href="/zh-CN/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></li><li><a href="/zh-CN/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">Streams API允许JavaScript以编程的方式访问通过网络接收的数据流，并根据开发人员的需要处理它们。</p>
+
+<h2 id="概念和用法">概念和用法</h2>
+
+<p>流将你希望通过网络接收的资源拆分成小块，然后按位处理它。这正是浏览器在接收用于显示web页面的资源时做的事情——视频缓冲区和更多的内容可以逐渐播放，有时候随着内容的加载，你可以看到图像逐渐地显示。</p>
+
+<p>但曾经这些对于JavaScript是不可用的。以前，如果我们想要处理某种资源（如视频、文本文件等），我们必须下载完整的文件，等待它反序列化成适当的格式，然后在完整地接收到所有的内容后再进行处理。</p>
+
+<p>随着流在JavaScript中的使用，一切发生了改变——只要原始数据在客户端可用，你就可以使用JavaScript 按位处理它，而不再需要缓冲区、字符串或blob。</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/15817/Concept.png" style="display: block; height: 382px; margin: 0px auto; width: 1000px;"></p>
+
+<p>还有更多的优点——你可以检测流何时开始或结束，将流链接在一起，根据需要处理错误和取消流，并对流的读取速度做出反应。</p>
+
+<p>流的基础应用围绕着使响应可以被流处理展开。例如，一个成功的 <a href="/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch request</a> 响应 <a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a> 会暴露为 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>，之后你就可以使用 <a href="/zh-CN/docs/Web/API/ReadableStream/getReader"><code>ReadableStream.getReader()</code></a> 建立的 reader 读取它，使用 <a href="/zh-CN/docs/Web/API/ReadableStream/cancel"><code>ReadableStream.cancel()</code></a> 取消它等等。</p>
+
+<p>更复杂的应用包括使用 <a href="/zh-CN/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a> 创建你自己的流，比如在 <a href="/en-US/docs/Web/API/Service_Worker_API">service worker</a> 中处理数据。</p>
+
+<p>你还可以使用 <a href="/zh-CN/docs/Web/API/WritableStream"><code>WritableStream</code></a> 将数据写入流中。</p>
+
+<div class="note">
+<p><strong>注意：</strong>你可以在这些文章中找到关于流理论的更多细节和实践 — <a href="/en-US/docs/Web/API/Streams_API/Concepts">Streams API concepts</a>, <a href="/en-US/docs/Web/API/Streams_API/Using_readable_streams">Using readable streams</a>，以及 <a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">Using writable streams</a>。</p>
+</div>
+
+<h2 id="Stream_接口">Stream 接口</h2>
+
+<h3 id="Readable_streams">Readable streams</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></dt>
+ <dd>表示数据的可读流。用于处理 <a href="/en-US/docs/Web/API/Fetch_API">Fetch API</a> 返回的响应，或者开发者自定义的流（例如通过 <a href="/zh-CN/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a> 构造的流）。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></dt>
+ <dd>表示默认阅读器，用于阅读来自网络的数据流（例如 fetch 请求）。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></dt>
+ <dd>表示控制器，用于控制 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> 的状态及内部队列。默认的控制器用于处理非字节流。</dd>
+</dl>
+
+<h3 id="Writable_streams">Writable streams</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/WritableStream"><code>WritableStream</code></a></dt>
+ <dd>提供了将流写入目标这个过程的标准抽象表示，称为 sink。内置了背压和队列机制。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></dt>
+ <dd>表示默认写入器，用于将小块的数据写入可写流中。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></dt>
+ <dd>表示控制器，用于控制 <a href="/zh-CN/docs/Web/API/WritableStream"><code>WritableStream</code></a> 的状态。当创建一个 <code>WritableStream</code> 时，对应的 <code>WritableStreamDefaultController</code> 实例会被提供给底层的 sink 供其操作。</dd>
+</dl>
+
+<h3 id="流相关的_API_及操作">流相关的 API 及操作</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></dt>
+ <dd>提供建立流时所需的内置字节队列策略。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></dt>
+ <dd>提供建立流时所需的块计数队列策略。</dd>
+</dl>
+
+<h3 id="扩展">扩展</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/Request"><code>Request</code></a></dt>
+ <dd>当构造一个新的 <code>Request</code> 对象后，你可以给它的 <code>RequestInit</code> 中的 <code>body</code> 属性传入一个 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>。这个 <code>Request</code> 对象就可以被传入 <a href="/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a> 中，开始接收流。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a></dt>
+ <dd>一个成功的 <a href="/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch request</a> 响应 <a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a> 会默认暴露为 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>，从而可以采用相应的阅读器来处理等。</dd>
+</dl>
+
+<h3 id="字节流相关接口">字节流相关接口</h3>
+
+<div class="warning notecard">
+<p><strong>重要：</strong>下面的 API 并没有在所有浏览器中都实现，关于规范细节是否处于完成状态可供实现还存在疑问。它们可能随时会改变。</p>
+</div>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></dt>
+ <dd>表示 BYOB（&quot;bring your own buffer&quot;）阅读器，用于阅读开发者提供的流数据（如自定义的 <a href="/zh-CN/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a>）。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></dt>
+ <dd>表示控制器，用于控制 <a href="/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> 的状态及内部队列。字节控制器用于处理字节流。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></dt>
+ <dd>表示 <a href="/zh-CN/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a> 中的 BYOB pull request。</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>We have created a directory of examples to go along with the Streams API documentation — see <a href="https://github.com/mdn/dom-examples/tree/master/streams">mdn/dom-examples/streams</a>. The examples are as follows:</p>
+
+<ul>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-pump/">Simple stream pump</a>: This example shows how to consume a ReadableStream and pass its data to another.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/grayscale-png/">Grayscale a PNG</a>: This example shows how a ReadableStream of a PNG can be turned into grayscale.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-random-stream/">Simple random stream</a>: This example shows how to use a custom stream to generate random strings, enqueue them as chunks, and then read them back out again.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-tee-example/">Simple tee example</a>: This example extends the Simple random stream example, showing how a stream can be teed and both resulting streams can be read independently.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-writer/">Simple writer</a>: This example shows how to to write to a writable stream, then decode the stream and write the contents to the UI.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/png-transform-stream/">Unpack chunks of a PNG</a>: This example shows how <a href="https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/pipeThrough"><code>pipeThrough()</code></a> can be used to transform a ReadableStream into a stream of other data types by transforming a data of a PNG file into a stream of PNG chunks.</li>
+</ul>
+
+<p>Examples from other developers:</p>
+
+<ul>
+ <li><a href="https://fetch-progress.anthum.com/">Progress Indicators with Streams, Service Workers, &amp; Fetch</a>.</li>
+</ul>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://streams.spec.whatwg.org/" hreflang="en" lang="en" title="Streams">Streams</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<h3 id="ReadableStream">ReadableStream</h3>
+
+<div class="bc-data" id="bcd:api.ReadableStream"></div>
+
+<h3 id="WritableStream">WritableStream</h3>
+
+<div class="bc-data" id="bcd:api.WritableStream"></div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Concepts">Streams API concepts</a></li>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Using_readable_streams">Using readable streams</a></li>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">Using writable streams</a></li>
+</ul>

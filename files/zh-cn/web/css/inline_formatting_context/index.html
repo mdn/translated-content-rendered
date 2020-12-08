@@ -1,0 +1,58 @@
+---
+title: 行内格式化上下文（Inline formatting context）
+slug: Web/CSS/Inline_formatting_context
+translation_of: Web/CSS/Inline_formatting_context
+---
+<p>这篇文章将解释什么是行内格式化上下文（Inline formatting context）</p>
+
+<h2 id="核心概念">核心概念</h2>
+
+<p>行内格式化上下文是一个网页的渲染结果的一部分。其中，各行内框（inline boxes）一个接一个地排列，其排列顺序根据书写模式（writing-mode）的设置来决定：</p>
+
+<ul>
+ <li>对于水平书写模式，各个框从左边开始水平地排列</li>
+ <li>对于垂直书写模式，各个框从顶部开始水平地排列</li>
+</ul>
+
+<p>在下面给出的例子中，带黑色边框的两个(<a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，在不使用CSS的情况下，其对内容或布局没有任何影响。"><code>&lt;div&gt;</code></a>)元素组成了一个<a href="/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">块级格式化上下文（block formatting context）</a>，其中的每一个单词都参与一个行内格式化上下文中。水平书写模式下的各个框水平地排列，垂直书写模式下的各个框垂直地排列。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="720" src="https://mdn.github.io/css-examples/inline-formatting/inline.html" width="100%"></iframe></p>
+
+<p>各个框组成了一行，而该行位于一个称为“行框（line box）”的矩形区域之中。该行框的大小将足以包含该行中所有的行内框（inline boxes）；如果一行的空间不够，将在行内方向上新开一行。因此，一个段落实际上是一系列行框的集合，这些行框在块的方向上排列。</p>
+
+<p>一个行内框（inline box）被分割到多行中时， margins, borders, 以及 padding 的设定均不会在断裂处生效。 下例中有一个 (<a href="/zh-CN/docs/Web/HTML/Element/span" title="此页面仍未被本地化, 期待您的翻译!"><code>&lt;span&gt;</code></a>) 元素，它包裹了一系列单词，占据了两行。可以看见在断裂处，<code>&lt;span&gt;</code> 的 border 同样发生了断裂。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="720" src="https://mdn.github.io/css-examples/inline-formatting/break.html" width="100%"></iframe></p>
+
+<p>Margins, borders, 以及 padding 的设置，在行的方向上是生效的。在下例中，可以看见行内元素 <code>&lt;span&gt;</code> 的 margin， border 以及 padding 是被加上了的。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="920" src="https://mdn.github.io/css-examples/inline-formatting/mbp.html" width="100%"></iframe></p>
+
+<div class="note notecard">
+<p><strong>注意</strong>: 此处使用了 logical, flow-relative properties — <a href="/zh-CN/docs/Web/CSS/padding-inline-start" title="The padding-inline-start CSS property defines the logical inline start padding of an element, which maps to a physical padding depending on the element&apos;s writing mode, directionality, and text orientation. It corresponds to the padding-top, padding-right, padding-bottom, or padding-left property depending on the values defined for writing-mode, direction, and text-orientation."><code>padding-inline-start</code></a> ，而不是 <a href="/zh-CN/docs/Web/CSS/padding-left" title="此页面仍未被本地化, 期待您的翻译!"><code>padding-left</code></a> — so that they work in the inline dimension whether the text is horizontal or vertical. Read more about these properties in <a href="/en-US/docs/Web/CSS/CSS_Logical_Properties">Logical Properties and Values</a>.</p>
+</div>
+
+<h2 id="在块的方向上对齐">在块的方向上对齐</h2>
+
+<p>行内框（Inline boxes）可使用<a href="/zh-CN/docs/Web/CSS/vertical-align" title="CSS 的属性 vertical-align 用来指定行内元素（inline）或表格单元格（table-cell）元素的垂直对齐方式。"><code>vertical-align</code></a>属性，以不同的方式在块的方向上进行对齐（因此在垂直书写模式下，<code>vertical-align</code> 中的“vertical”根本是名不副实——此时行内框将在水平方向上进行对齐）。 下例中， 字号较大的文本使得第一个句子的行框变大，因此 <code>vertical-align</code> 能让行内框（inline boxes）分布于上侧或下侧。例子里用的值是 <code>top</code>, 可以试试 <code>middle</code>, <code>bottom</code>, 或 <code>baseline</code> 这些值。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="920" src="https://mdn.github.io/css-examples/inline-formatting/align.html" width="100%"></iframe></p>
+
+<h2 id="在行内方向上对齐">在行内方向上对齐</h2>
+
+<p>如果行内方向上还有额外空间，那么 <a href="/zh-CN/docs/Web/CSS/text-align" title="text-align CSS属性定义行内内容（例如文字）如何相对它的块父元素对齐。text-align 并不控制块元素自己的对齐，只控制它的行内内容的对齐。"><code>text-align</code></a> 可用于将各行内框（inline boxes）在行框（line box）内对齐。 可以试试把 <code>text-align</code> 的值改成 <code>end</code> 。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="920" src="https://mdn.github.io/css-examples/inline-formatting/text-align.html" width="100%"></iframe></p>
+
+<h2 id="浮动造成的效果">浮动造成的效果</h2>
+
+<p>在行内方向上，各行框（Line Boxes ）通常具有相同的尺寸，即在水平书写模式下，它们有同样的宽度；在垂直书写模式下，它们有同样的高度。但是，如果同一个块格式化上下文中存在一个 <a href="/zh-CN/docs/Web/CSS/float" title="此页面仍未被本地化, 期待您的翻译!"><code>float</code></a>，则这个浮动元素将导致包裹了它的各行框变短。</p>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="720" src="https://mdn.github.io/css-examples/flow/formatting-contexts/float.html" width="100%"></iframe></p>
+
+<h2 id="另见">另见</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/Guide/CSS/Block_formatting_context">Block formatting context</a></li>
+ <li><a href="/en-US/docs/Web/CSS/Visual_formatting_model">Visual Formatting Model</a></li>
+</ul>

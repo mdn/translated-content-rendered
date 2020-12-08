@@ -1,0 +1,70 @@
+---
+title: Fetch 基本概念
+slug: Web/API/Fetch_API/Basic_concepts
+translation_of: Web/API/Fetch_API/Basic_concepts
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Fetch_API">Fetch API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/Fetch_API/Cross-global_fetch_usage">Cross-global fetch usage</a></li><li><a href="/zh-CN/docs/Web/API/Fetch_API/Basic_concepts">Fetch 基本概念</a></li><li><a href="/zh-CN/docs/Web/API/Fetch_API/Using_Fetch">使用 Fetch</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/Body"><code>Body</code></a></li><li><a href="/zh-CN/docs/Web/API/Headers"><code>Headers</code></a></li><li><a href="/zh-CN/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/zh-CN/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li></ol></details></li></ol></section><div class="draft notecard">
+    <p><strong>草案</strong><br>
+    本页尚未完工.</p>
+
+</div><p></p>
+
+<div class="summary">
+<p><a href="/en-US/docs/Web/API/Fetch_API">Fetch</a> 是一个现代的概念, 等同于 <a href="/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a>。它提供了许多与XMLHttpRequest相同的功能，但被设计成更具可扩展性和高效性。本文介绍了 Fetch API的一些基本概念。</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: 这篇文章可能还需要修改。如果你觉得有的概念可以解释的更好，<span lang="zh-CN" class="short_text" id="result_box"><span>让人们在<a href="https://discourse.mozilla-community.org/c/mdn">MDN论坛</a>上知道</span></span>，或 <a href="https://wiki.mozilla.org/IRC">Mozilla IRC</a> (#mdn room)。</p>
+</div>
+
+<h2 id="简而言之">简而言之</h2>
+
+<p>Fetch 的核心在于对 HTTP 接口的抽象，包括 <a href="/zh-CN/docs/Web/API/Request" title="你可以使用  Request.Request() ?构造函数创建一个Request 对象，但是你可能会遇到一个 Request 对象作为其它 API 的操作被返回，比如一个 service worker的FetchEvent.request。"><code>Request</code></a>，<a href="/zh-CN/docs/Web/API/Response" title="Fetch API 的Response接口呈现了对一次请求的响应数据"><code>Response</code></a>，<a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a>，<a href="/zh-CN/docs/Web/API/Body" title="Fetch API 中的 Body mixin 代表 代表响应/请求的正文，允许你声明其内容类型是什么以及应该如何处理。"><code>Body</code></a>，以及用于初始化异步请求的 <a href="/zh-CN/docs/Web/API/GlobalFetch/fetch" title="此页面仍未被本地化, 期待您的翻译!"><code>global fetch</code></a>。得益于 JavaScript 实现的这些抽象好的 HTTP 模块，其他接口能够很方便的使用这些功能。</p>
+
+<p><a href="/en-US/docs/Web/API/ServiceWorker_API">Service Workers</a> 是大量使用Fetch的API的一个示例。</p>
+
+<p>除此之外，Fetch 还利用到了请求的异步特性——它是基于 <a href="/zh-CN/docs/Web/JavaScript/Reference/Promise-based" title="此页面仍未被本地化, 期待您的翻译!"><code>Promise</code></a> 的。</p>
+
+<h2 id="Guard">Guard</h2>
+
+<p>Guard 是 <a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a> 对象的特性，基于不同的情况，它可以有以下取值：<code>immutable、</code><code>request<font face="Open Sans, Arial, sans-serif">、</font></code><code>request-no-cors<font face="Open Sans, Arial, sans-serif">、</font></code><code>response 或<font face="Open Sans, Arial, sans-serif"> </font></code><code>none。</code></p>
+
+<p>当使用 <a href="/zh-CN/docs/Web/API/Headers/Headers" title="使用Headers() 构造方法创建一个新的Headers 对象."><code>Headers()</code></a> <a href="/en-US/docs/Glossary/constructor" class="glossaryLink" title="constructor: A constructor belongs to a particular class object that is instantiated. The constructor initializes this object and can provide access to its private information. The concept of a constructor can be applied to most object-oriented programming languages. Essentially, a constructor in JavaScript is usually declared at the instance of a class.">constructor</a> 创建一个新的 <a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a> 对象的时候，它的 guard 被设置成 <code>none（默认值）。当创建 </code><a href="/zh-CN/docs/Web/API/Request" title="你可以使用  Request.Request() ?构造函数创建一个Request 对象，但是你可能会遇到一个 Request 对象作为其它 API 的操作被返回，比如一个 service worker的FetchEvent.request。"><code>Request</code></a> 或 <a href="/zh-CN/docs/Web/API/Response" title="Fetch API 的Response接口呈现了对一次请求的响应数据"><code>Response</code></a> 对象的时候，它将拥有一个按照以下规则实现的与之关联的 <a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a> 对象：</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="row">新对象的类型</th>
+   <th scope="col">创建时的构造函数</th>
+   <th scope="col">关联的 <a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a> 对象的 guard</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td rowspan="2"><a href="/zh-CN/docs/Web/API/Request" title="你可以使用  Request.Request() ?构造函数创建一个Request 对象，但是你可能会遇到一个 Request 对象作为其它 API 的操作被返回，比如一个 service worker的FetchEvent.request。"><code>Request</code></a></td>
+   <td><a href="/zh-CN/docs/Web/API/Request/Request" title="Request() 构造器创建一个新的Request 对象。"><code>Request()</code></a></td>
+   <td><code>request</code></td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/Request/Request" title="Request() 构造器创建一个新的Request 对象。"><code>Request()</code></a>，<a href="/zh-CN/docs/Web/API/Request/mode" title="Request 接口的 mode 只读属性包含请求的模式 (e.g., cors, no-cors, cors-with-forced-preflight, same-origin, or navigate.) 这用于确定跨域请求是否导致有效的响应，以及响应的哪些属性是可读的："><code>mode</code></a> 设置成 <code>no-cors</code></td>
+   <td><code>request-no-cors</code></td>
+  </tr>
+  <tr>
+   <td rowspan="2"><a href="/zh-CN/docs/Web/API/Response" title="Fetch API 的Response接口呈现了对一次请求的响应数据"><code>Response</code></a></td>
+   <td><a href="/zh-CN/docs/Web/API/Response/Response" title="Response() 构造函数创建了一个新的  Response 对象."><code>Response()</code></a></td>
+   <td><code>response</code></td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/Response/error" title="此页面仍未被本地化, 期待您的翻译!"><code>error()</code></a> 或 <a href="/zh-CN/docs/Web/API/Response/redirect" title="此页面仍未被本地化, 期待您的翻译!"><code>redirect()</code></a> 方法</td>
+   <td><code>immutable</code></td>
+  </tr>
+ </tbody>
+</table>
+
+<p>头信息的 guard 会影响 <a href="/zh-CN/docs/Web/API/Headers/set" title="此页面仍未被本地化, 期待您的翻译!"><code>set()</code></a>、<a href="/zh-CN/docs/Web/API/Headers/delete" title="delete() 方法可以从Headers对象中删除指定header."><code>delete()</code></a> 和 <a href="/zh-CN/docs/Web/API/Headers/append" title="append()方法可以给现有的header添加一个值, 或者添加一个未存在的header并赋值."><code>append()</code></a> 方法。如果你试图修改 guard 是 <code>immutable 的 </code><a href="/zh-CN/docs/Web/API/Headers" title="Fetch API 的 Headers 接口允许您对HTTP请求和响应头执行各种操作。 这些操作包括检索，设置，添加和删除。 一个Headers对象具有关联的头列表，它最初为空，由零个或多个键值对组成。你可以使用 append() 方法添加 之类的方法添加到此(参见 Examples)。在该接口的所有方法中，标题名称由不区分大小写的字节序列匹配。"><code>Headers</code></a> 对象，那么会抛出一个 <code>TypeError。以下情况则不会抛出错误：</code></p>
+
+<ul>
+ <li>guard 是 <code title>request</code> 并且头信息中的 <var>name</var> 不是 <a href="/en-US/docs/Glossary/forbidden_header_name" class="glossaryLink" title="forbidden header name: A forbidden header name is the name of any HTTP header that cannot be modified programmatically; specifically, an HTTP request header name (in contrast with a Forbidden response header name).">forbidden header name</a></li>
+ <li>guard 是 <code title>request-no-cors</code> 并且头信息中的 <var>name</var>/<var>value</var> 是 <a href="/en-US/docs/Glossary/simple_header" class="glossaryLink" title="simple header: A simple header (or CORS-safelisted request header) is one of the following HTTP headers:">simple header</a></li>
+ <li>guard 是 <code title>response</code> 并且头信息中的 <var>name</var> 不是 <a href="/en-US/docs/Glossary/forbidden_response_header_name" class="glossaryLink" title="forbidden response header name: A forbidden response header name is an HTTP header name (either `Set-Cookie` or `Set-Cookie2`) that cannot be modified programmatically.">forbidden response header name</a></li>
+</ul>

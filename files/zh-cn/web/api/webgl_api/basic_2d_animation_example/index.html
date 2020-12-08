@@ -1,0 +1,394 @@
+---
+title: 一个 2D WebGL 动画的基础示例
+slug: Web/API/WebGL_API/Basic_2D_animation_example
+tags:
+  - 测试翻译
+translation_of: Web/API/WebGL_API/Basic_2D_animation_example
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/API/WebGL_API"><strong>WebGL API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>WebGL tutorial</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL">Getting started with WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context">Adding 2D content to a WebGL context</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Using_shaders_to_apply_color_in_WebGL">Using shaders to apply color in WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Animating_objects_with_WebGL">Animating objects with WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Creating_3D_objects_using_WebGL">Creating 3D objects using WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL">Using textures in WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL">Lighting in WebGL</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL">Animating textures in WebGL</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples and articles</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Matrix_math_for_the_web">Matrix math for the web</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/WebGL_model_view_projection">WebGL model view projection</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/WebGL_best_practices">WebGL best practices</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Using_Extensions">Using WebGL extensions</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/Basic_2D_animation_example">A basic 2D WebGL animation example</a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL_API/By_example">WebGL by example</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/WebGLRenderingContext"><code>WebGLRenderingContext</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGL2RenderingContext"><code>WebGL2RenderingContext</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLActiveInfo"><code>WebGLActiveInfo</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLBuffer"><code>WebGLBuffer</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLContextEvent"><code>WebGLContextEvent</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLFramebuffer"><code>WebGLFramebuffer</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLQuery"><code>WebGLQuery</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLRenderbuffer"><code>WebGLRenderbuffer</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLSampler"><code>WebGLSampler</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLShader"><code>WebGLShader</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLShaderPrecisionFormat"><code>WebGLShaderPrecisionFormat</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLSync"><code>WebGLSync</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLTexture"><code>WebGLTexture</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLTransformFeedback"><code>WebGLTransformFeedback</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLUniformLocation"><code>WebGLUniformLocation</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/WebGLVertexArrayObject"><code>WebGLVertexArrayObject</code></a></li>
+      </ol>
+    </details>
+  </li>
+
+  <li><strong><a href="/zh-CN/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/tag/WebGL">Pages tagged &quot;WebGL&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/MDN/Doc_status/API/WebGL">WebGL doc status</a></li>
+        <li><a href="/zh-CN/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<div id="live-sample">
+<p>在这个WebGL示例中，我们创建一个画布，并在其中使用WebGL渲染旋转正方形。我们用来表示场景的坐标系与画布的坐标系相同。也就是说，（0, 0）这个坐标在左上角，右下角是坐标在（600, 460）。</p>
+
+<h2 id="Vertex_shader">Vertex shader</h2>
+
+<p>首先，让我们看一下顶点着色器。它的工作如同以往，是将我们用于场景的坐标转换为剪贴空间的坐标（即系统中的（0，0）位于上下文的中心，每个轴从-1.0扩展到1.0，而不管上下文的实际大小）。</p>
+
+<pre class="brush: html">&lt;script id=&quot;vertex-shader&quot; type=&quot;x-shader/x-vertex&quot;&gt;
+  attribute vec2 aVertexPosition;
+
+  uniform vec2 uScalingFactor;
+  uniform vec2 uRotationVector;
+
+  void main() {
+    vec2 rotatedPosition = vec2(
+      aVertexPosition.x * uRotationVector.y +
+            aVertexPosition.y * uRotationVector.x,
+      aVertexPosition.y * uRotationVector.y -
+            aVertexPosition.x * uRotationVector.x
+    );
+
+    gl_Position = vec4(rotatedPosition * uScalingFactor, 0.0, 1.0);
+  }
+&lt;/script&gt;</pre>
+
+<p dir="ltr" id="tw-target-text">主程序与我们共享属性aVertexPosition，它是顶点在其使用的任何坐标系中的位置。我们需要转换这些值，以便位置的两个组件都在-1.0到1.0的范围内。通过乘以基于上下文宽高比的缩放因子，可以很容易地完成此操作。我们很快就会看到这个计算。</p>
+
+<p>我们也可以通过一次变换来旋转这个图形。 The rotated position of the vertex is computed by applying the rotation vector, found in the uniform <code>uRotationVector</code>, that&apos;s been computed by the JavaScript code.</p>
+
+<p>Then the final position is computed by multiplying the rotated position by the scaling vector provided by the JavaScript code in <code>uScalingFactor</code>. The values of <code>z</code> and <code>w</code> are fixed at 0.0 and 1.0, respectively, since we&apos;re drawing in 2D.</p>
+
+<p>The standard WebGL global <code>gl_Position</code> is then set to the transformed and rotated vertex&apos;s position.</p>
+
+<h2 id="Fragment_shader">Fragment shader</h2>
+
+<p>Next comes the fragment shader. Its role is to return the color of each pixel in the shape being rendered. Since we&apos;re drawing a solid, untextured object with no lighting applied, this is exceptionally simple:</p>
+
+<pre class="brush: html">&lt;script id=&quot;fragment-shader&quot; type=&quot;x-shader/x-fragment&quot;&gt;
+  #ifdef GL_ES
+    precision highp float;
+  #endif
+
+  uniform vec4 uGlobalColor;
+
+  void main() {
+    gl_FragColor = uGlobalColor;
+  }
+&lt;/script&gt;</pre>
+
+<p>This starts by specifying the precision of the <code>float</code> type, as required. Then we set the global <code>gl_FragColor</code> to the value of the uniform <code>uGlobalColor</code>, which is set by the JavaScript code to the color being used to draw the square.</p>
+
+<h2 id="HTML">HTML</h2>
+
+<p>The HTML consists solely of the <a href="/zh-CN/docs/Web/HTML/Element/canvas" title="&lt;canvas&gt;元素可被用来通过脚本（通常是JavaScript）绘制图形。比如,它可以被用来绘制图形,制作图片集合,甚至用来实现动画效果。你可以(也应该)在元素标签内写入可提供替代的的代码内容，这些内容将会在在旧的、不支持&lt;canvas&gt;元素的浏览器或是禁用了JavaScript的浏览器内渲染并展现。"><code>&lt;canvas&gt;</code></a> that we&apos;ll obtain a WebGL context on.</p>
+
+<pre class="brush: html">&lt;canvas id=&quot;glcanvas&quot; width=&quot;600&quot; height=&quot;460&quot;&gt;
+  Oh no! Your browser doesn&apos;t support canvas!
+&lt;/canvas&gt;</pre>
+
+<h2 id="JavaScript">JavaScript</h2>
+
+<h3 id="Globals_and_initialization">Globals and initialization</h3>
+
+<p>First, the global variables. We won&apos;t discuss these here; instead, we&apos;ll talk about them as they&apos;re used in the code to come.</p>
+
+<pre class="brush: js">let gl = null;
+let glCanvas = null;
+
+// Aspect ratio and coordinate system
+// details
+
+let aspectRatio;
+let currentRotation = [0, 1];
+let currentScale = [1.0, 1.0];
+
+// Vertex information
+
+let vertexArray;
+let vertexBuffer;
+let vertexNumComponents;
+let vertexCount;
+
+// Rendering data shared with the
+// scalers.
+
+let uScalingFactor;
+let uGlobalColor;
+let uRotationVector;
+let aVertexPosition;
+
+// Animation timing
+
+let previousTime = 0.0;
+let degreesPerSecond = 90.0;
+</pre>
+
+<p>Initializing the program is handled through a <code><a href="/zh-CN/docs/Web/Reference/Events/load" title="/zh-CN/docs/Web/Reference/Events/load">load</a></code> event handler called <code>startup()</code>:</p>
+
+<pre class="brush: js">window.addEventListener(&quot;load&quot;, startup, false);
+
+function startup() {
+  glCanvas = document.getElementById(&quot;glcanvas&quot;);
+  gl = glCanvas.getContext(&quot;webgl&quot;);
+
+  const shaderSet = [
+    {
+      type: gl.VERTEX_SHADER,
+      id: &quot;vertex-shader&quot;
+    },
+    {
+      type: gl.FRAGMENT_SHADER,
+      id: &quot;fragment-shader&quot;
+    }
+  ];
+
+  shaderProgram = buildShaderProgram(shaderSet);
+
+  aspectRatio = glCanvas.width/glCanvas.height;
+  currentRotation = [0, 1];
+  currentScale = [1.0, aspectRatio];
+
+  vertexArray = new Float32Array([
+      -0.5, 0.5, 0.5, 0.5, 0.5, -0.5,
+      -0.5, 0.5, 0.5, -0.5, -0.5, -0.5
+  ]);
+
+  vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
+
+  vertexNumComponents = 2;
+  vertexCount = vertexArray.length/vertexNumComponents;
+
+  currentAngle = 0.0;
+  rotationRate = 6;
+
+  animateScene();
+}</pre>
+
+<p>After getting the WebGL context, <code>gl</code>, we need to begin by building the shader program. Here, we&apos;re using code designed to let us add multiple shaders to our program quite easily. The array <code>shaderSet</code> contains a list of objects, each describing one shader function to be compiled into the program. Each function has a type (one of <code>gl.VERTEX_SHADER</code> or <code>gl.FRAGMENT_SHADER</code>) and an ID (the ID of the <a href="/zh-CN/docs/Web/HTML/Element/script" title="HTML &lt;script&gt; 元素用于嵌入或引用可执行脚本。"><code>&lt;script&gt;</code></a> element containing the shader&apos;s code).</p>
+
+<p>The shader set is passed into the function <code>buildShaderProgram()</code>, which returns the compiled and linked shader program.  We&apos;ll look at how this works next.</p>
+
+<p>Once the shader program is built, we compute the aspect ratio of our context by dividing its width by its height. Then we set the current rotation vector for the animation to <code>[0, 1]</code>, and the scaling vector to <code>[1.0, aspectRatio]</code>. The scaling vector, as we saw in the vertex shader, is used to scale the coordinates to fit the -1.0 to 1.0 range.</p>
+
+<p>The array of vertices is created next, as a <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float32Array" title="Float32Array 类型数组代表的是平台字节顺序为32位的浮点数型数组(对应于 C 浮点数据类型) 。 如果需要控制字节顺序， 使用 DataView 替代。其内容初始化为0。一旦建立起来，你可以使用这个对象的方法对其元素进行操作，或者使用标准数组索引语法 (使用方括号)。"><code>Float32Array</code></a> with six coordinates (three 2D vertices) per triangle to be drawn, for a total of 12 values.</p>
+
+<p>As you can see, we&apos;re using a coordinate system of -1.0 to 1.0 for each axis. Why, you may ask, do we need to do any adjustments at all? This is simply because our context is not square. We&apos;re using a context that&apos;s 600 pixels wide and 460 tall. Each of those dimensions is mapped to the range -1.0 to 1.0. Since the two axes aren&apos;t the same length, if we don&apos;t adjust the values of one of the two axes, the square will get stretched out in one direction or the other. So we need to normalize these values.</p>
+
+<p>Once the vertex array has been created, we create a new GL buffer to contain them by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/createBuffer" title="WebGL API 下的 WebGLRenderingContext.createBuffer() 方法可创建并初始化一个用于储存顶点数据或着色数据的WebGLBuffer对象"><code>gl.createBuffer()</code></a>. We bind the standard WebGL array buffer reference to that by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/bindBuffer" title="WebGL API的WebGLRenderingContext.bindBuffer()方法将给定的WebGLBuffer绑定到目标。"><code>gl.bindBuffer()</code></a> and then copy the vertex data into the buffer using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/bufferData" title="WebGL API 的WebGLRenderingContext.bufferData()方法创建并初始化了Buffer对象的数据存储区。"><code>gl.bufferData()</code></a>. The usage hint <code>gl.STATIC_DRAW</code> is specified, telling WebGL that the data will be set only one time and never modified, but will be used repeatedly. This lets WebGL consider any optimizations it can apply that may improve performance based on that information.</p>
+
+<p>With the vertex data now provided to WebGL, we set <code>vertexNumComponents</code> to the number of components in each vertex (2, since they&apos;re 2D vertexes) and <code>vertexCount</code> to the number of vertexes in the vertex list.</p>
+
+<p>Then the current rotation angle (in degrees) is set to 0.0, since we haven&apos;t performed any rotation yet, and the rotation speed (in degrees per screen refresh period, typically 60 FPS) is set to 6.</p>
+
+<p>Finally, <code>animateScene()</code> is called to render the first frame and schedule the rendering of the next frame of the animation.</p>
+
+<h3 id="Compiling_and_linking_the_shader_program">Compiling and linking the shader program</h3>
+
+<h4 id="Constructing_and_linking_the_program">Constructing and linking the program</h4>
+
+<p>The <code>buildShaderProgram()</code> function accepts as input an array of objects describing a set of shader functions to be compiled and linked into the shader program and returns the shader program after it&apos;s been built and linked.</p>
+
+<pre class="brush: js">function buildShaderProgram(shaderInfo) {
+  let program = gl.createProgram();
+
+  shaderInfo.forEach(function(desc) {
+    let shader = compileShader(desc.id, desc.type);
+
+    if (shader) {
+      gl.attachShader(program, shader);
+    }
+  });
+
+  gl.linkProgram(program)
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.log(&quot;Error linking shader program:&quot;);
+    console.log(gl.getProgramInfoLog(program));
+  }
+
+  return program;
+}</pre>
+
+<p>First, <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/createProgram" title="WebGL API  的 WebGLRenderingContext.createProgram() 方法用于创建和初始化一个 WebGLProgram 对象。"><code>gl.createProgram()</code></a> is called to create a new, empty, GLSL program.</p>
+
+<p>Then, for each shader in the specified list of shaders, we call a <code>compileShader()</code> function to compile it, passing into it the ID and type of the shader function to build. Each of those objects includes, as mentioned before, the ID of the <code>&lt;script&gt;</code> element the shader code is found in and the type of shader it is. The compiled shader is attached to the shader program by passing it into <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/attachShader" title="WebGL API  的 WebGLRenderingContext.attachShader() 方法负责往 WebGLProgram 添加一个片段或者顶点着色器。"><code>gl.attachShader()</code></a>.</p>
+
+<div class="note">
+<p>We could go a step farther here, actually, and look at the value of the <code>&lt;script&gt;</code> element&apos;s <code>type</code> attribute to determine the shader type.</p>
+</div>
+
+<p>Once all of the shaders are compiled, the program is linked using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/linkProgram" title="WebGL API的WebGLRenderingContext.linkProgram() 方法链接一个给定的WebGLProgram 到已附着的顶点着色器和片段着色器。"><code>gl.linkProgram()</code></a>.</p>
+
+<p>If an error occurrs while linking the program, the error message is logged to console.</p>
+
+<p>Finally, the compiled program is returned to the caller.</p>
+
+<h4 id="Compiling_an_individual_shader">Compiling an individual shader</h4>
+
+<p>The <code>compileShader()</code> function, below, is called by <code>buildShaderProgram()</code> to compile a single shader.</p>
+
+<pre class="brush: js">function compileShader(id, type) {
+  let code = document.getElementById(id).firstChild.nodeValue;
+  let shader = gl.createShader(type);
+
+  gl.shaderSource(shader, code);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.log(`Error compiling ${type === gl.VERTEX_SHADER ? &quot;vertex&quot; : &quot;fragment&quot;} shader:`);
+    console.log(gl.getShaderInfoLog(shader));
+  }
+  return shader;
+}</pre>
+
+<p>The code is fetched from the HTML document by obtaining the value of the text node contained within the <a href="/zh-CN/docs/Web/HTML/Element/script" title="HTML &lt;script&gt; 元素用于嵌入或引用可执行脚本。"><code>&lt;script&gt;</code></a> element with the specified ID. Then a new shader of the specified type is created using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/createShader" title="WebGLRenderingContext.createShader() 用于创建一个 WebGLShader 着色器对象，该对象可以使用 WebGLRenderingContext.shaderSource() 和 WebGLRenderingContext.compileShader() 方法配置着色器代码."><code>gl.createShader()</code></a>.</p>
+
+<p>The source code is sent into the new shader by passing it into <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/shaderSource" title="WebGL API 中的 WebGLRenderingContext.shaderSource() 方法用于设置 WebGLShader 着色器（顶点着色器及片元着色器）的GLSL程序代码。"><code>gl.shaderSource()</code></a>, and then the shader is compiled using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/compileShader" title="The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out https://github.com/mdn/browser-compat-data and send us a pull request."><code>gl.compileShader()</code></a></p>
+
+<p>Compile errors are logged to the console. Note the use of a <a href="/en-US/docs/Web/JavaScript/Reference/Template_literals">template literal</a> string to insert the correct shader type string into the message that gets generated. The actual error details are obtained by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/getShaderInfoLog" title="此页面仍未被本地化, 期待您的翻译!"><code>gl.getShaderInfoLog()</code></a>.</p>
+
+<p>Finally, the compiled shader is returned to the caller (which is the <code>buildShaderProgram()</code> function.</p>
+
+<h3 id="Drawing_and_animating_the_scene">Drawing and animating the scene</h3>
+
+<p>The <code>animateScene()</code> function is called to render each animation frame.</p>
+
+<pre class="brush: js">function animateScene() {
+  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+  gl.clearColor(0.8, 0.9, 1.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  let radians = currentAngle * Math.PI / 180.0;
+  currentRotation[0] = Math.sin(radians);
+  currentRotation[1] = Math.cos(radians);
+
+  gl.useProgram(shaderProgram);
+
+  uScalingFactor =
+      gl.getUniformLocation(shaderProgram, &quot;uScalingFactor&quot;);
+  uGlobalColor =
+      gl.getUniformLocation(shaderProgram, &quot;uGlobalColor&quot;);
+  uRotationVector =
+      gl.getUniformLocation(shaderProgram, &quot;uRotationVector&quot;);
+
+  gl.uniform2fv(uScalingFactor, currentScale);
+  gl.uniform2fv(uRotationVector, currentRotation);
+  gl.uniform4fv(uGlobalColor, [0.1, 0.7, 0.2, 1.0]);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
+  aVertexPosition =
+      gl.getAttribLocation(shaderProgram, &quot;aVertexPosition&quot;);
+
+  gl.enableVertexAttribArray(aVertexPosition);
+  gl.vertexAttribPointer(aVertexPosition, vertexNumComponents,
+        gl.FLOAT, false, 0, 0);
+
+  gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
+
+  window.requestAnimationFrame(function(currentTime) {
+    let deltaAngle = ((currentTime - previousTime) / 1000.0)
+          * degreesPerSecond;
+
+    currentAngle = (currentAngle + deltaAngle) % 360;
+
+    previousTime = currentTime;
+    animateScene();
+  });
+}</pre>
+
+<p>The first thing that needs to be done in order to draw a frame of the animation is to clear the background to the desired color. In this case, we set the viewport based on the size of the <a href="/zh-CN/docs/Web/HTML/Element/canvas" title="&lt;canvas&gt;元素可被用来通过脚本（通常是JavaScript）绘制图形。比如,它可以被用来绘制图形,制作图片集合,甚至用来实现动画效果。你可以(也应该)在元素标签内写入可提供替代的的代码内容，这些内容将会在在旧的、不支持&lt;canvas&gt;元素的浏览器或是禁用了JavaScript的浏览器内渲染并展现。"><code>&lt;canvas&gt;</code></a>, call <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/clearColor" title="WebGL API 的 WebGLRenderingContext.clearColor() 方法用于设置清空颜色缓冲时的颜色值。"><code>clearColor()</code></a> to set the color to use when clearing content, then we clear the buffer with <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/clear" title="WebGL API 的 WebGLRenderingContext.clear() 方法使用预设值来清空缓冲。"><code>clear()</code></a>.</p>
+
+<p>Next, the current rotation vector is computed by converting the current rotation in degrees (<code>currentAngle</code>) into <a href="https://zh.wikipedia.org/wiki/radians" title="radians">radians</a>, then setting the first component of the rotation vector to the <a href="https://zh.wikipedia.org/wiki/sine" title="sine">sine</a> of that value and the second component to the <a href="https://zh.wikipedia.org/wiki/cosine" title="cosine">cosine</a>. The <code>currentRotation</code> vector is now the location of the point on the <a href="https://zh.wikipedia.org/wiki/unit circle" title="unit circle">unit circle</a> located at the angle <code>currentAngle</code>.</p>
+
+<p><a href="/zh-CN/docs/Web/API/WebGLRenderingContext/useProgram" title="WebGLRenderingContext.useProgram() 方法将定义好的WebGLProgram 对象添加到当前的渲染状态中。"><code>useProgram()</code></a> is called to activate the GLSL shading program we established previously. Then we obtain the locations of each of the uniforms used to share information between the JavaScript code and the shaders (with <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/getUniformLocation" title="此页面仍未被本地化, 期待您的翻译!"><code>getUniformLocation()</code></a>).</p>
+
+<p>The uniform named <code>uScalingFactor</code> is set to the <code>currentScale</code> value previously computed; this, as you may recall, is the value used to adjust the coordinate system based on the aspect ratio of the context. This is done using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/uniform2fv" title="此页面仍未被本地化, 期待您的翻译!"><code>uniform2fv()</code></a> (since this is a 2-value floating-point vector).</p>
+
+<p><code>uRotationVector</code> is set to the current rotation vector (<code>currentRotation)</code>, also using <code>uniform2fv()</code>.</p>
+
+<p><code>uGlobalColor</code> is set using <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/uniform4fv" title="此页面仍未被本地化, 期待您的翻译!"><code>uniform4fv()</code></a> to the color we wish to use when drawing the square. This is a 4-component floating-point vector (one component each for red, green, blue, and alpha).</p>
+
+<p>Now that that&apos;s all out of the way, we can set up the vertex buffer and draw our shape, first, the buffer of vertexes that will be used to draw the triangles of the shape is set by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/bindBuffer" title="WebGL API的WebGLRenderingContext.bindBuffer()方法将给定的WebGLBuffer绑定到目标。"><code>bindBuffer()</code></a>. Then the vertex position attribute&apos;s index is obtained from the shader program by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/getAttribLocation" title="WebGLRenderingContext.getAttribLocation() 方法返回了给定WebGLProgram对象中某属性的下标指向位置。"><code>getAttribLocation()</code></a>.</p>
+
+<p>With the index of the vertex position attribute now available in <code>aVertexPosition</code>, we call <code>enableVertexAttribArray()</code> to enable the position attribute so it can be used by the shader program (in particular, by the vertex shader).</p>
+
+<p>Then the vertex buffer is bound to the <code>aVertexPosition</code> attribute by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/vertexAttribPointer" title="The WebGLRenderingContext.vertexAttribPointer() method of the WebGL API binds the buffer currently bound to gl.ARRAY_BUFFER to a generic vertex attribute of the current vertex buffer object and specifies its layout.
+ 告诉显卡从当前绑定的缓冲区（bindBuffer()指定的缓冲区）中读取顶点数据"><code>vertexAttribPointer()</code></a>. This step is not obvious, since this binding is almost a side effect. But as a result, accessing <code>aVertexPosition</code> now obtains data from the vertex buffer.</p>
+
+<p>With the association in place between the vertex buffer for our shape and the <code>aVertexPosition</code> attribute used to deliver vertexes one by one into the vertex shader, we&apos;re ready to draw the shape by calling <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/drawArrays" title="WebGL API 中的WebGLRenderingContext.drawArrays()方法用于从向量数组中绘制图元。"><code>drawArrays()</code></a>.</p>
+
+<p>At this point, the frame has been drawn. All that&apos;s left to do is to schedule to draw the next one. That&apos;s done here by calling <a href="/zh-CN/docs/Web/API/Window/requestAnimationFrame" title="window.requestAnimationFrame() 告诉浏览器——你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行"><code>requestAnimationFrame()</code></a>, which asks that a callback function be executed the next time the browser is ready to update the screen.</p>
+
+<p>Our <code>requestAnimationFrame()</code> callback receives as input a single parameter, <code>currentTime</code>, which specifies the time at which the frame drawing began. We use that and the saved time at which the last frame was drawn, <code>previousTime</code>, along with the number of degrees per second the square should rotate (<code>degreesPerSecond</code>) to calculate the new value of <code>currentAngle</code>. Then the value of <code>previousTime</code> is updated and we call <code>animateScene()</code> to draw the next frame (and in turn schedule the next frame to be drawn, ad infinitum).</p>
+</div>
+
+<h2 id="Result">Result</h2>
+
+<p>This is a pretty simple example, since it&apos;s just drawing one simple object, but the concepts used here extend to much more complex animations.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="500" id="frame_live-sample" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/WebGL_API/Basic_2D_animation_example$samples/live-sample?revision=1582395" width="660"></iframe></p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/WebGL_API">WebGL API</a></li>
+ <li><a href="/en-US/docs/Web/API/WebGL_API/Tutorial">WebGL tutorial</a></li>
+</ul>

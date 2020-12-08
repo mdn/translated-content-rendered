@@ -1,0 +1,582 @@
+---
+title: JavaScript modules 模块
+slug: Web/JavaScript/Guide/Modules
+tags:
+  - JavaScript
+  - 导入
+  - 导出
+  - 指南
+  - 模块
+translation_of: Web/JavaScript/Guide/Modules
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/zh-CN/docs/Web/JavaScript/Tutorials"><strong>教程:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>快速入门</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript 基础知识</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>JavaScript 指南</summary>
+      <ol>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types">Grammar and types</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Control flow and error handling</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Loops_and_iteration">Loops and iteration</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Functions">Functions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions and operators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Numbers_and_dates">Numbers and dates</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Text_formatting">Text formatting</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions">Regular expressions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Indexed_collections">Indexed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Keyed_collections">Keyed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects">Working with objects</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Details of the object model</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Iterators_and_generators">Iterators and generators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Meta_programming">Meta programming</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>中级教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/A_re-introduction_to_JavaScript">深入 JavaScript</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Equality_comparisons_and_sameness">如何正确判断相等性</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>高级</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">继承和原型链</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Typed_arrays">JavaScript 类型化数组</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Memory_Management">内存管理</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/EventLoop">Concurrency model and Event Loop</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference">引用:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>内置对象</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>表达式和运算符</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E5%8A%A0">相加运算符 (+)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Addition_assignment">加法赋值 (+=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Assignment">赋值运算符(=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E6%8C%89%E4%BD%8D%E4%B8%8E">按位与 (&amp;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">按位与赋值(&amp;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">按位非 (~)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">Bitwise OR assignment (|=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">按位异或赋值 (^=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Comma_Operator">逗号操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">条件运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E8%87%AA%E5%87%8F">自减 (--)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">解构赋值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division_assignment">Division assignment (/=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E7%AD%89">相等（==）</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function">函数表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than">大于运算符 (&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">大于或等于</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Grouping">圆括号运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Increment">自增 (++)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift">左移 (&lt;&lt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">小于或等于</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E9%80%BB%E8%BE%91%E5%92%8C">逻辑与(&amp;&amp;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_NOT">Logical NOT (!)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR (||)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">逻辑空赋值 (??=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication">乘法 (*)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">空值合并运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer">对象初始化</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">运算符优先级</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%AF%E9%80%89%E9%93%BE">可选链操作符</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%AE%A1%E9%81%93%E6%93%8D%E4%BD%9C%E7%AC%A6">管道操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Property_Accessors">属性访问器</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%96%E4%BD%99">取余 (%)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift">Right shift (&gt;&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax">展开语法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_equality">Strict equality (===)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_inequality">严格不相等 (!==)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_negation">Unary negation (-)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/async%E5%85%81%E8%AE%B8%E5%A3%B0%E6%98%8E%E4%B8%80%E4%B8%AA%E5%87%BD%E6%95%B0%E4%B8%BA%E4%B8%80%E4%B8%AA%E5%8C%85%E5%90%AB%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E7%9A%84%E5%87%BD%E6%95%B0">async function expression</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/class">类表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete">delete 操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function*">function* 表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/in">in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new">new 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/void">void 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>语句和声明</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function">async函数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/block">block</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/Empty">empty</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function">function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/var">var 描述</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>函数</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions">箭头函数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Default_parameters">默认参数值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Method_definitions">方法的定义</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">剩余参数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/arguments">Arguments 对象</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/get">getter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/set">setter</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Private_class_fields">类私有域</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Class_elements">类元素</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/constructor">构造方法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">X.prototype.y called on incompatible type</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/%E4%B8%8D%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>更多</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript 知识概要</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Lexical_grammar">词法文法</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">属性的可枚举性和所有权</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">切换到严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Template_literals">模板字符串</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">已废弃的特性</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section><div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/JavaScript/Guide/Meta_programming" style="float: left;" class="button">« 上一页</a><br></p>
+</div></div>
+
+<p>这篇指南会给你入门 Javascript 模块的全部信息。</p>
+
+<h2 id="模块化的背景">模块化的背景</h2>
+
+<p>Javascript 程序本来很小——在早期，它们大多被用来执行独立的脚本任务，在你的 web 页面需要的地方提供一定交互，所以一般不需要多大的脚本。过了几年，我们现在有了运行大量 Javascript 脚本的复杂程序，还有一些被用在其他环境（例如 <a href="/en-US/docs/Glossary/Node.js">Node.js</a>）。</p>
+
+<p>因此，近年来，有必要开始考虑提供一种<u>将 JavaScript 程序拆分为可按需导入的单独模块</u>的机制。Node.js 已经提供这个能力很长时间了，还有很多的 Javascript 库和框架 已经开始了模块的使用（例如， <a href="https://en.wikipedia.org/wiki/CommonJS">CommonJS</a> 和基于 <a href="https://github.com/amdjs/amdjs-api/blob/master/AMD.md">AMD</a> 的其他模块系统 如 <a href="https://requirejs.org/">RequireJS</a>, 以及最新的 <a href="https://webpack.github.io/">Webpack</a> 和 <a href="https://babeljs.io/">Babel</a>）。</p>
+
+<p>好消息是，最新的浏览器开始原生支持模块功能了，这是本文要重点讲述的。这会是一个好事情 — 浏览器能够最优化加载模块，使它比使用库更有效率：使用库通常需要做额外的客户端处理。</p>
+
+<h2 id="浏览器支持">浏览器支持</h2>
+
+<p>使用JavaScript 模块依赖于<code>import</code>和 <code>export</code>，浏览器兼容性如下（绿色方框中的数字对应相应平台上支持该功能的发布版本）：</p>
+
+<h3 id="import">import</h3>
+
+<div class="bc-data" id="bcd:javascript.statements.import"></div>
+
+<h3 id="export">export</h3>
+
+<div class="bc-data" id="bcd:javascript.statements.export"></div>
+
+<h2 id="介绍一个例子">介绍一个例子</h2>
+
+<p>为了演示模块的使用，我们创建了一个 <a href="https://github.com/mdn/js-examples/tree/master/modules">simple set of examples</a> ，你可以在Github上找到。这个例子演示了一个简单的模块的集合用来在web页面上创建了一个<a href="/zh-CN/docs/Web/HTML/Element/canvas" title="&lt;canvas&gt;元素可被用来通过JavaScript（Canvas API 或 WebGL API）绘制图形及图形动画。"><code>&lt;canvas&gt;</code></a> 标签,在canvas上绘制 (并记录有关的信息) 不同形状。</p>
+
+<p>这的确有点简单，但是保持足够简单能够清晰地演示模块。</p>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 如果你想去下载这个例子在本地运行，你需要通过本地web 服务器去运行。</p>
+</div>
+
+<h2 id="基本的示例文件的结构">基本的示例文件的结构</h2>
+
+<p>在我们的第一个例子 (see <a href="https://github.com/mdn/js-examples/tree/master/modules/basic-modules">basic-modules</a>) 文件结构如下:</p>
+
+<pre class="notranslate">index.html
+main.mjs
+modules/
+    canvas.mjs
+    square.mjs</pre>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 在这个指南的全部示例项目的文件结构是基本相同的； 需要熟悉上面的内容</p>
+</div>
+
+<p>modules 目录下的两个模块的描述如下:</p>
+
+<ul>
+ <li><code>canvas.mjs</code> — 包含与设置画布相关的功能:
+
+  <ul>
+   <li><code>create()</code> —在指定ID的包装器<a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，在不使用CSS的情况下，其对内容或布局没有任何影响。"><code>&lt;div&gt;</code></a>内创建指定<code>width</code> 和<code>height</code> 的画布，该ID本身附加在指定的父元素内。 返回包含画布的2D上下文和包装器ID的对象。</li>
+   <li><code>createReportList()</code> — 创建一个附加在指定包装器元素内的无序列表，该列表可用于将报告数据输出到。 返回列表的ID。</li>
+  </ul>
+ </li>
+ <li><code>square.mjs</code> — 包含:
+  <ul>
+   <li><code>name</code> — 包含字符串&apos;square&apos;的常量。</li>
+   <li><code>draw()</code> — 在指定画布上绘制一个正方形，具有指定的大小，位置和颜色。 返回包含正方形大小，位置和颜色的对象。</li>
+   <li><code>reportArea()</code> — 在给定长度的情况下，将正方形区域写入特定报告列表。</li>
+   <li><code>reportPerimeter()</code> — 在给定长度的情况下，将正方形的周长写入特定的报告列表。</li>
+  </ul>
+ </li>
+</ul>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 在原生JavaScript模块中, 扩展名 <code>.mjs</code> 非常重要，因为使用 MIME-type 为<code>javascript/esm</code> 来导入文件(其他的JavaScript 兼容 MIME-type 像 <code>application/javascript</code> 也可以), 它避免了严格的 MIME 类型检查错误，像 &quot;The server responded with a non-JavaScript MIME type&quot;. 除此之外,  <code>.mjs</code> 的扩展名很明了(比如这个就是一个模块，而不是一个传统 JavaScript文件)，还能够和其他工具互相适用. 看这个 <a href="https://v8.dev/features/modules#mjs">Google&apos;s note for further details</a>.</p>
+</div>
+
+<h2 id=".mjs_与_.js"><code>.mjs</code> 与 <code>.js</code></h2>
+
+<p>纵观此文，我们使用 <code>.js</code> 扩展名的模块文件，但在其它一些文章中，你可能会看到 <code>.mjs</code> 扩展名的使用。<a href="https://v8.dev/features/modules#mjs">V8推荐了这样的做法</a>，比如有下列理由：</p>
+
+<ul>
+ <li>比较清晰，这可以指出哪些文件是模块，哪些是常规的 JavaScript。</li>
+ <li>这能保证你的模块可以被运行时环境和构建工具识别，比如  <a href="https://nodejs.org/api/esm.html#esm_enabling">Node.js</a> 和 <a href="https://babeljs.io/docs/en/options#sourcetype">Babel</a>。</li>
+</ul>
+
+<p>但是我们决定继续使用 <code>.js</code> 扩展名，未来可能会更改。为了使模块可以在浏览器中正常地工作，你需要确保你的服务器能够正常地处理 <code>Content-Type</code> 头，其应该包含 Javascript 的MIME 类型  <code>text/javascript</code>。如果没有这么做，你可能会得到 一个严格 MIME 类型检查错误：“The server responded with a non-JavaScript MIME type （服务器返回了非 JavaScript MIME 类型）”，并且浏览器会拒绝执行相应的 JavaScript 代码。多数服务器可以正确地处理 <code>.js</code> 文件的类型，但是 <code>.mjs</code> 还不行。已经可以正常响应 <code>.mjs</code> 的服务器有 <a href="https://pages.github.com/">GitHub 页面</a> 和 Node.js 的 <code><a href="https://github.com/http-party/http-server#readme">http-server</a></code>。</p>
+
+<p> 如果你已经在使用相应的环境了，那么一切正常。或者如果你还没有，但你知道你在做什么（比如你可以配置服务器以为 <code>.mjs</code> 设置正确的 <code>Content-Type</code>）。但如果你不能控制提供服务，或者用于公开文件发布的服务器，这可能会导致混乱。</p>
+
+<p>为了学习和保证代码的可移植的目的，我们建议使用 <code>.js</code>。</p>
+
+<p>如果你认为使用 <code>.mjs</code> 仅用于模块带来的清晰性非常重要，但不想引入上面描述的相应问题，你可以仅在开发过程中使用 <code>.mjs</code>，而在构建过程中将其转换为 <code>.js</code>。</p>
+
+<p>另注意：</p>
+
+<ul>
+ <li>一些工具不支持 <code>.mjs</code>，比如 <a href="https://www.typescriptlang.org/">TypeScript</a>。</li>
+ <li><code>&lt;script type=&quot;module&quot;&gt;</code> 属性用于指示引入的模块，你会在下面看到。</li>
+</ul>
+
+<h2 id="导出模块的功能">导出模块的功能</h2>
+
+<p>为了获得模块的功能要做的第一件事是把它们导出来。使用 <code><a href="/en-US/docs/Web/JavaScript/Reference/Statements/export">export</a></code> 语句来完成。</p>
+
+<p>最简单的方法是把它（指上面的export语句）放到你想要导出的项前面，比如：</p>
+
+<pre class="brush: js notranslate">export const name = &apos;square&apos;;
+
+export function draw(ctx, length, x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, length, length);
+
+  return {
+    length: length,
+    x: x,
+    y: y,
+    color: color
+  };
+}</pre>
+
+<p>你能够导出函数，<code>var</code><font face="Arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">，</span></font><code>let</code><font face="Arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">，</span></font><code>const</code>, 和等会会看到的类。export要放在最外层；比如你不能够在函数内使用<code>export</code>。</p>
+
+<p>一个更方便的方法导出所有你想要导出的模块的方法是在模块文件的末尾使用一个export 语句， 语句是用花括号括起来的用逗号分割的列表。比如：</p>
+
+<pre class="brush: js notranslate">export { name, draw, reportArea, reportPerimeter };</pre>
+
+<h2 id="导入功能到你的脚本">导入功能到你的脚本</h2>
+
+<p>你想在模块外面使用一些功能，那你就需要导入他们才能使用。最简单的就像下面这样的：</p>
+
+<pre class="notranslate">import { name, draw, reportArea, reportPerimeter } from &apos;/js-examples/modules/basic-modules/modules/square.mjs&apos;;</pre>
+
+<p>使用 <code><a href="/en-US/docs/Web/JavaScript/Reference/Statements/import">import</a></code> 语句，然后你被花括号包围的用逗号分隔的你想导入的功能列表，然后是关键字from，然后是模块文件的路径。模块文件的路径是相对于站点根目录的相对路径，对于我们的<code>basic-modules</code> 应该是<code> /js-examples/modules/basic-modules</code>。</p>
+
+<p>当然，我们写的路径有一点不同---我们使用点语法意味 “当前路径”，跟随着包含我们想要找的文件的路径。这比每次都要写下整个相对路径要好得多，因为它更短，使得URL 可移植 ---如果在站点层中你把它移动到不同的路径下面仍然能够工作。<span style="background-color: #fff3d4; color: #333333; display: inline !important; float: none; font-family: x-locale-heading-primary,zillaslab,Palatino,&quot;Palatino Linotype&quot;,x-locale-heading-secondary,serif; font-size: 16px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; white-space: normal;">（修订版 1889482）</span></p>
+
+<p>那么看看例子吧：</p>
+
+<pre class="notranslate">/js/examples/modules/basic-modules/modules/square.mjs</pre>
+
+<p>变成了</p>
+
+<pre class="notranslate">./modules/square.mjs</pre>
+
+<p>你可以在<code><a href="https://github.com/mdn/js-examples/blob/master/modules/basic-modules/main.js">main.mjs</a></code>中看到这些。</p>
+
+<div class="note notecard">
+<p><strong>Note</strong>:在一些模块系统中你可以忽略文件扩展名（比如<code>&apos;/model/squre&apos;</code> .这在原生JavaScript 模块系统中不工作。<s>此外，记住你需要包含最前面的正斜杠。  </s> <span style="background-color: #fff3d4; color: #333333; display: inline !important; float: none; font-family: x-locale-heading-primary,zillaslab,Palatino,&quot;Palatino Linotype&quot;,x-locale-heading-secondary,serif; font-size: 16px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; white-space: normal;">（修订版 1889482）</span></p>
+</div>
+
+<p>因为你导入了这些功能到你的脚本文件，你可以像定义在相同的文件中的一样去使用它。下面展示的是在 <code>main.mjs</code> 中的import 语句下面的内容。</p>
+
+<pre class="brush: js notranslate">let myCanvas = create(&apos;myCanvas&apos;, document.body, 480, 320);
+let reportList = createReportList(myCanvas.id);
+
+let square1 = draw(myCanvas.ctx, 50, 50, 100, &apos;blue&apos;);
+reportArea(square1.length, reportList);
+reportPerimeter(square1.length, reportList);
+</pre>
+
+<h2 id="应用模块到你的HTML">应用模块到你的HTML</h2>
+
+<p>现在我们只需要将main.mjs模块应用到我们的HTML页面。 这与我们将常规脚本应用于页面的方式非常相似，但有一些显着的差异。</p>
+
+<p>首先，你需要把 <code>type=&quot;module&quot;</code> 放到 <a href="/zh-CN/docs/Web/HTML/Element/script" title="该元素包含全局属性。"><code>&lt;script&gt;</code></a> 标签中, 来声明这个脚本是一个模块:</p>
+
+<pre class="notranslate">&lt;script type=&quot;module&quot; src=&quot;main.mjs&quot;&gt;&lt;/script&gt;</pre>
+
+<p>你导入模块功能的脚本基本是作为顶级模块。 如果省略它，Firefox就会给出错误“SyntaxError: import declarations may only appear at top level of a module。</p>
+
+<p>你只能在模块内部使用 <code>import</code> 和<code>export</code> 语句 ；不是普通脚本文件。</p>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 您还可以将模块导入内部脚本，只要包含 <code>type=&quot;module&quot;</code>，例如 <code>&lt;script type=&quot;module&quot;&gt; //include script here &lt;/script&gt;</code>.</p>
+</div>
+
+<h2 id="其他模块与标准脚本的不同">其他模块与标准脚本的不同</h2>
+
+<ul>
+ <li>你需要注意本地测试 —  如果你通过本地加载Html 文件 (比如一个 <code>file://</code> 路径的文件), 你将会遇到 CORS 错误，因为Javascript 模块安全性需要。你需要通过一个服务器来测试。</li>
+ <li>另请注意，您可能会从模块内部定义的脚本部分获得不同的行为，而不是标准脚本。 这是因为模块自动使用严格模式。</li>
+ <li>加载一个模块脚本时不需要使用 <code>defer</code> 属性 (see <a href="/en-US/docs/Web/HTML/Element/script#Attributes"><code>&lt;script&gt;</code> attributes</a>) 模块会自动延迟加载。</li>
+ <li>最后一个但不是不重要，你需要明白模块功能导入到单独的脚本文件的范围 — 他们无法在全局获得。因此，你只能在导入这些功能的脚本文件中使用他们，你也无法通过Javascript console 中获取到他们，比如，在DevTools 中你仍然能够获取到语法错误，但是你可能无法像你想的那样使用一些debug 技术 </li>
+</ul>
+
+<h2 id="默认导出_versus_命名导出">默认导出 versus 命名导出</h2>
+
+<p>到目前为止我们导出的功能都是由<strong>named exports</strong> 组成— 每个项目（无论是函数，常量等）在导出时都由其名称引用，并且该名称也用于在导入时引用它。</p>
+
+<p>还有一种导出类型叫做 <strong>default export</strong> —这样可以很容易地使模块提供默认功能，并且还可以帮助JavaScript模块与现有的CommonJS和AMD模块系统进行互操作（正如<a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6 In Depth: Modules</a> by Jason Orendorff的模块中所解释的那样;搜索“默认导出”“）。</p>
+
+<p>看个例子来解释它如何工作。在我们的基本模块<code>square.mjs</code>中，您可以找到一个名为<code>randomSquare()</code>的函数，它创建一个具有随机颜色，大小和位置的正方形。我们想作为默认导出，所以在文件的底部我们这样写 ：</p>
+
+<pre class="brush: js notranslate">export default randomSquare;</pre>
+
+<p>注意，不要大括号。</p>
+
+<p>我们可以把 <code>export default</code> 放到函数前面，定义它为一个匿名函数，像这样：</p>
+
+<pre class="brush: js notranslate">export default function(ctx) {
+  ...
+}</pre>
+
+<p>在我们的<code>main.mjs</code> 文件中，我们使用以下行导入默认函数：</p>
+
+<pre class="brush: js notranslate">import randomSquare from &apos;./modules/square.mjs&apos;;</pre>
+
+<p>同样，没有大括号，因为每个模块只允许有一个默认导出, 我们知道 <code>randomSquare</code> 就是需要的那个。上面的那一行相当于下面的缩写：</p>
+
+<pre class="brush: js notranslate">import {default as randomSquare} from &apos;./modules/square.mjs&apos;;</pre>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 重命名导出项的as语法在下面的<a href="#Renaming_imports_and_exports">Renaming imports and exports</a>部分中进行了说明。</p>
+</div>
+
+<h2 id="避免命名冲突">避免命名冲突</h2>
+
+<p>到目前为止，我们的canvas 图形绘制模块看起来工作的很好。但是如果我们添加一个绘制其他形状的比如圆形或者矩形的模块会发生什么？这些形状可能会有相关的函数比如 <code>draw()</code>、<code>reportArea()</code>，等等；如果我们用相同的名字导入不同的函数到顶级模块文件中，我们会收到冲突和错误。</p>
+
+<p>幸运的是，有很多方法来避免。我们将会在下一个节看到。</p>
+
+<h2 id="重命名导出与导入">重命名导出与导入</h2>
+
+<p>在你的 <code>import</code> 和 <code>export</code> 语句的大括号中，可以使用 <code>as</code> 关键字跟一个新的名字，来改变你在顶级模块中将要使用的功能的标识名字。因此，例如，以下两者都会做同样的工作，尽管方式略有不同：</p>
+
+<pre class="brush: js notranslate">// inside module.mjs
+export {
+  function1 as newFunctionName,
+  function2 as anotherNewFunctionName
+};
+
+// inside main.mjs
+import { newFunctionName, anotherNewFunctionName } from &apos;/modules/module.mjs&apos;;</pre>
+
+<pre class="brush: js notranslate">// inside module.mjs
+export { function1, function2 };
+
+// inside main.mjs
+import { function1 as newFunctionName,
+         function2 as anotherNewFunctionName } from &apos;/modules/module.mjs&apos;;</pre>
+
+<p>让我们看一个真实的例子。在我们的<a href="https://github.com/mdn/js-examples/tree/master/modules/renaming">重命名</a>目录中，您将看到与上一个示例中相同的模块系统，除了我们添加了<code>circle.mjs</code>和<code>triangle.mjs</code>模块以绘制和报告圆和三角形。</p>
+
+<p>在每个模块中，我们都有<code>export</code> 相同名称的功能，因此每个模块底部都有相同的导出语句：</p>
+
+<pre class="brush: js notranslate">export { name, draw, reportArea, reportPerimeter };</pre>
+
+<p>将它们导入<code>main.mjs</code>时，如果我们尝试使用</p>
+
+<pre class="brush: js notranslate">import { name, draw, reportArea, reportPerimeter } from &apos;./modules/square.mjs&apos;;
+import { name, draw, reportArea, reportPerimeter } from &apos;./modules/circle.mjs&apos;;
+import { name, draw, reportArea, reportPerimeter } from &apos;./modules/triangle.mjs&apos;;</pre>
+
+<p>浏览器会抛出一个错误，例如“SyntaxError: redeclaration of import name”（Firefox）。</p>
+
+<p>相反，我们需要重命名导入，使它们是唯一的：</p>
+
+<pre class="brush: js notranslate">import { name as squareName,
+         draw as drawSquare,
+         reportArea as reportSquareArea,
+         reportPerimeter as reportSquarePerimeter } from &apos;./modules/square.mjs&apos;;
+
+import { name as circleName,
+         draw as drawCircle,
+         reportArea as reportCircleArea,
+         reportPerimeter as reportCirclePerimeter } from &apos;./modules/circle.mjs&apos;;
+
+import { name as triangleName,
+        draw as drawTriangle,
+        reportArea as reportTriangleArea,
+        reportPerimeter as reportTrianglePerimeter } from &apos;./modules/triangle.mjs&apos;;</pre>
+
+<p>请注意，您可以在模块文件中解决问题，例如</p>
+
+<pre class="brush: js notranslate">// in square.mjs
+export { name as squareName,
+         draw as drawSquare,
+         reportArea as reportSquareArea,
+         reportPerimeter as reportSquarePerimeter };</pre>
+
+<pre class="brush: js notranslate">// in main.mjs
+import { squareName, drawSquare, reportSquareArea, reportSquarePerimeter } from &apos;/js-examples/modules/renaming/modules/square.mjs&apos;;</pre>
+
+<p>它也会起作用。 你使用什么样的风格取决于你，但是单独保留模块代码并在导入中进行更改可能更有意义。 当您从没有任何控制权的第三方模块导入时，这尤其有意义。</p>
+
+<h2 id="创建模块对象">创建模块对象</h2>
+
+<p>上面的方法工作的挺好，但是有一点点混乱、亢长。一个更好的解决方是，导入每一个模块功能到一个模块功能对象上。可以使用以下语法形式：</p>
+
+<pre class="brush: js notranslate">import * as Module from &apos;/modules/module.mjs&apos;;</pre>
+
+<p>这将获取<code>module.mjs</code>中所有可用的导出，并使它们可以作为对象模块的成员使用，从而有效地为其提供自己的命名空间。 例如：</p>
+
+<pre class="brush: js notranslate">Module.function1()
+Module.function2()
+etc.</pre>
+
+<p>再次，让我们看一个真实的例子。如果您转到我们的<a href="https://github.com/mdn/js-examples/tree/master/modules/module-objects">module-objects</a>目录，您将再次看到相同的示例，但利用上述的新语法进行重写。在模块中，导出都是以下简单形式：</p>
+
+<pre class="brush: js notranslate">export { name, draw, reportArea, reportPerimeter };</pre>
+
+<p>另一方面，导入看起来像这样：</p>
+
+<pre class="brush: js notranslate">import * as Canvas from &apos;./modules/canvas.mjs&apos;;
+
+import * as Square from &apos;/./modules/square.mjs&apos;;
+import * as Circle from &apos;./modules/circle.mjs&apos;;
+import * as Triangle from &apos;./modules/triangle.mjs&apos;;</pre>
+
+<p>在每种情况下，您现在可以访问指定对象名称下面的模块导入</p>
+
+<pre class="brush: js notranslate">let square1 = Square.draw(myCanvas.ctx, 50, 50, 100, &apos;blue&apos;);
+Square.reportArea(square1.length, reportList);
+Square.reportPerimeter(square1.length, reportList);</pre>
+
+<p>因此，您现在可以像以前一样编写代码（只要您在需要时包含对象名称），并且导入更加整洁。</p>
+
+<h2 id="模块与类（class）">模块与类（class）</h2>
+
+<p>正如我们之前提到的那样，您还可以导出和导入类; 这是避免代码冲突的另一种选择，如果您已经以面向对象的方式编写了模块代码，那么它尤其有用。</p>
+
+<p>您可以在我们的<a href="https://github.com/mdn/js-examples/tree/master/modules/classes">classes</a> 目录中看到使用ES类重写的形状绘制模块的示例。 例如，<code><a href="https://github.com/mdn/js-examples/blob/master/modules/classes/modules/square.js">square.mjs</a></code> 文件现在包含单个类中的所有功能：</p>
+
+<pre class="brush: js notranslate">class Square {
+  constructor(ctx, listId, length, x, y, color) {
+    ...
+  }
+
+  draw() {
+    ...
+  }
+
+  ...
+}</pre>
+
+<p>然后我们导出：</p>
+
+<pre class="brush: js notranslate">export { Square };</pre>
+
+<p>在<code><a href="https://github.com/mdn/js-examples/blob/master/modules/classes/main.js">main.mjs</a></code>中，我们像这样导入它：</p>
+
+<pre class="brush: js notranslate">import { Square } from &apos;./modules/square.mjs&apos;;</pre>
+
+<p>然后使用该类绘制我们的方块：</p>
+
+<pre class="brush: js notranslate">let square1 = new Square(myCanvas.ctx, myCanvas.listId, 50, 50, 100, &apos;blue&apos;);
+square1.draw();
+square1.reportArea();
+square1.reportPerimeter();</pre>
+
+<h2 id="合并模块">合并模块</h2>
+
+<p>有时你会想要将模块聚合在一起。 您可能有多个级别的依赖项，您希望简化事物，将多个子模块组合到一个父模块中。 这可以使用父模块中以下表单的导出语法：</p>
+
+<pre class="brush: js notranslate">export * from &apos;x.mjs&apos;
+export { name } from &apos;x.mjs&apos;</pre>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 这实际上是导入后跟导出的简写，即“我导入模块<code>x.mjs</code>，然后重新导出部分或全部导出”。</p>
+</div>
+
+<p>有关示例，请参阅我们的<a href="https://github.com/mdn/js-examples/tree/master/modules/module-aggregation">module-aggregation</a>。 在这个例子中（基于我们之前的类示例），我们有一个名为<code>shapes.mjs</code>的额外模块，它将<code>circle.mjs</code>，<code>square.mjs</code>和<code>riangle.mjs</code>中的所有功能聚合在一起。 我们还将子模块移动到名为shapes的modules目录中的子目录中。 所以模块结构现在是这样的：</p>
+
+<pre class="notranslate">modules/
+  canvas.mjs
+  shapes.mjs
+  shapes/
+    circle.mjs
+    square.mjs
+    triangle.mjs</pre>
+
+<p>在每个子模块中，输出具有相同的形式，例如，</p>
+
+<pre class="brush: js notranslate">export { Square };</pre>
+
+<p>接下来是聚合部分。 在<code><a href="https://github.com/mdn/js-examples/blob/master/modules/module-aggregation/modules/shapes.js">shapes.mjs</a></code>里面，我们包括以下几行：</p>
+
+<pre class="brush: js notranslate">export { Square } from &apos;/js-examples/modules/module-aggregation/modules/shapes/square.mjs&apos;;
+export { Triangle } from &apos;/js-examples/modules/module-aggregation/modules/shapes/triangle.mjs&apos;;
+export { Circle } from &apos;/js-examples/modules/module-aggregation/modules/shapes/circle.mjs&apos;;</pre>
+
+<p>它们从各个子模块中获取导出，并有效地从<code>shapes.mjs</code>模块中获取它们。</p>
+
+<div class="note notecard">
+<p><strong>Note</strong>: 即使<code>shapes.mjs</code>文件位于modules目录中，我们仍然需要相对于模块根目录编写这些URL，因此需要<code>/modules/</code>。 这是使用JavaScript模块时混淆的常见原因。</p>
+</div>
+
+<div class="note notecard">
+<p><strong>Note</strong>: <code>shapes.mjs</code>中引用的导出基本上通过文件重定向，并且实际上并不存在，因此您将无法在同一文件中编写任何有用的相关代码。</p>
+</div>
+
+<p>所以现在在<code>main.mjs</code> 文件中，我们可以通过替换来访问所有三个模块类</p>
+
+<pre class="brush: js notranslate">import { Square } from &apos;./modules/square.mjs&apos;;
+import { Circle } from &apos;./modules/circle.mjs&apos;;
+import { Triangle } from &apos;./modules/triangle.mjs&apos;;</pre>
+
+<p>使用以下单行：</p>
+
+<pre class="brush: js notranslate">import { Square, Circle, Triangle } from &apos;./modules/shapes.mjs&apos;;</pre>
+
+<h2 id="动态加载模块">动态加载模块</h2>
+
+<p>浏览器中可用的JavaScript模块功能的最新部分是动态模块加载。 这允许您仅在需要时动态加载模块，而不必预先加载所有模块。 这有一些明显的性能优势; 让我们继续阅读，看看它是如何工作的。</p>
+
+<p>这个新功能允许您将<code>import()</code>作为函数调用，将其作为参数传递给模块的路径。 它返回一个 <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">promise</a>，它用一个模块对象来实现（参见<a href="#Creating_a_module_object">Creating a module object</a>），让你可以访问该对象的导出，例如</p>
+
+<pre class="brush: js notranslate">import(&apos;/modules/myModule.mjs&apos;)
+  .then((module) =&gt; {
+    // Do something with the module.
+  });</pre>
+
+<p>我们来看一个例子。 在<a href="https://github.com/mdn/js-examples/tree/master/modules/dynamic-module-imports">dynamic-module-imports</a> 目录中，我们有另一个基于类示例的示例。 但是这次我们在示例加载时没有在画布上绘制任何东西。 相反，我们包括三个按钮 - “圆形”，“方形”和“三角形” - 按下时，动态加载所需的模块，然后使用它来绘制相关的形状。</p>
+
+<p>在这个例子中，我们只对<a href="https://github.com/mdn/js-examples/blob/master/modules/dynamic-module-imports/index.html">index.html</a> 和<a href="https://github.com/mdn/js-examples/blob/master/modules/dynamic-module-imports/main.js">main.mjs</a>文件进行了更改 - 模块导出保持与以前相同。</p>
+
+<p>在<code>main.mjs</code>中，我们使用<code><a href="/en-US/docs/Web/API/Document/querySelector">document.querySelector()</a></code>调用获取了对每个按钮的引用，例如：</p>
+
+<pre class="brush: js notranslate">let squareBtn = document.querySelector(&apos;.square&apos;);</pre>
+
+<p>然后，我们为每个按钮附加一个事件监听器，以便在按下时，相关模块被动态加载并用于绘制形状：</p>
+
+<pre class="brush: js notranslate">squareBtn.addEventListener(&apos;click&apos;, () =&gt; {
+  import(&apos;/js-examples/modules/dynamic-module-imports/modules/square.mjs&apos;).then((Module) =&gt; {
+    let square1 = new Module.Square(myCanvas.ctx, myCanvas.listId, 50, 50, 100, &apos;blue&apos;);
+    square1.draw();
+    square1.reportArea();
+    square1.reportPerimeter();
+  })
+});</pre>
+
+<p>请注意，由于promise履行会返回一个模块对象，因此该类成为对象的子特征，因此我们现在需要使用 <code>Module</code>访问构造函数。 在它之前，例如 <code>Module.Square( ... )</code>。</p>
+
+<h2 id="故障排除">故障排除</h2>
+
+<p>如果为了你的模块有问题，这里有一些提示有可能帮助到你。如果你发现更多的内容欢迎添加进来！</p>
+
+<ul>
+ <li>在前面已经提到了，在这里再重申一次： <code>.mjs</code> 后缀的文件需要以 MIME-type 为 <code>javascript/esm</code> 来加载(或者其他的JavaScript 兼容的 MIME-type ，比如 <code>application/javascript</code>), 否则，你会一个严格的 MIME 类型检查错误，像是这样的 &quot;The server responded with a non-JavaScript MIME type&quot;.</li>
+ <li>如果你尝试用本地文件加载HTML 文件 (i.e. with a <code>file://</code> URL), 由于JavaScript 模块的安全性要求，你会遇到CORS 错误。你需要通过服务器来做你的测试。GitHub pages is ideal as it also serves <code>.mjs</code> files with the correct MIME type.</li>
+ <li>因为<code>.mjs</code> 是一个相当新的文件后缀, 一些操作系统可能无法识别，或者尝试把它替换成别的。比如，我们发现macOS悄悄地该我们的 <code>.mjs</code> 后缀的文件后面添加上 <code>.js</code>  然后自动隐藏这个后缀。所以我们的文件实际上都是 <code>x.mjs.js</code>. 当我们关闭自动隐藏文件后缀名，让它去接受认可 <code>.mjs</code>。问题解决。</li>
+</ul>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="https://developers.google.com/web/fundamentals/primers/modules#mjs">Using JavaScript modules on the web</a>, by Addy Osmani and Mathias Bynens</li>
+ <li><a href="https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/">ES modules: A cartoon deep-dive</a>, Hacks blog post by Lin Clark</li>
+ <li><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6 in Depth: Modules</a>, Hacks blog post by Jason Orendorff</li>
+ <li>Axel Rauschmayer&apos;s book <a href="http://exploringjs.com/es6/ch_modules.html">Exploring JS: Modules</a></li>
+</ul>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/JavaScript/Guide/Meta_programming" style="float: left;" class="button">« 上一页</a><br></p>
+</div>

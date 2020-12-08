@@ -1,0 +1,80 @@
+---
+title: AuthenticatorResponse.clientDataJSON
+slug: Web/API/AuthenticatorResponse/clientDataJSON
+translation_of: Web/API/AuthenticatorResponse/clientDataJSON
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Web_Authentication_API">Web Authentication API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/AuthenticatorResponse"><code>AuthenticatorResponse</code></a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><em><code>clientDataJSON</code></em></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Web Authentication API</summary><ol><li><a href="/zh-CN/docs/Web/API/AuthenticatorAssertionResponse"><code>AuthenticatorAssertionResponse</code></a></li><li><a href="/zh-CN/docs/Web/API/AuthenticatorAttestationResponse"><code>AuthenticatorAttestationResponse</code></a></li><li><a href="/zh-CN/docs/Web/API/CredentialsContainer"><code>CredentialsContainer</code></a></li><li><a href="/zh-CN/docs/Web/API/PublicKeyCredential"><code>PublicKeyCredential</code></a></li></ol></details></li></ol></section><div class="secureContexts notecard"><p><strong>Secure context</strong><br>This feature is available only in <a href="/zh-CN/docs/Web/Security/Secure_Contexts">secure contexts</a> (HTTPS), in some or all <a href="#Browser_compatibility">supporting browsers</a>.</p></div>
+
+<p>The <strong><code>clientDataJSON</code></strong> property of the <a href="/zh-CN/docs/Web/API/AuthenticatorResponse"><code>AuthenticatorResponse</code></a> interface stores a <a href="/en-US/docs/Learn/JavaScript/Objects/JSON">JSON</a> string in an <a href="/zh-CN/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a>, representing the client data that was passed to <a href="/zh-CN/docs/Web/API/CredentialsContainer/create"><code>CredentialsContainer.create()</code></a> or <a href="/zh-CN/docs/Web/API/CredentialsContainer/get"><code>CredentialsContainer.get()</code></a>. This property is only accessed on one of the child objects of <code>AuthenticatorResponse</code>, specifically <a href="/zh-CN/docs/Web/API/AuthenticatorAttestationResponse"><code>AuthenticatorAttestationResponse</code></a> or <a href="/zh-CN/docs/Web/API/AuthenticatorAssertionResponse"><code>AuthenticatorAssertionResponse</code></a>.</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="syntaxbox notranslate">var arrayBuffer = AuthenticatorAttestationResponse.clientDataJSON;
+var arrayBuffer = AuthenticatorAssertionResponse.clientDataJSON;
+</pre>
+
+<h3 id="Value">Value</h3>
+
+<p>An <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a>.</p>
+
+<h2 id="属性">属性</h2>
+
+<p>After the <code>clientDataJSON</code> object is converted from an <code>ArrayBuffer</code> to a JavaScript object, it will have the following properties:</p>
+
+<dl>
+ <dt><code>type</code></dt>
+ <dd>A string which is either <code>&quot;webauthn.get&quot;</code> when an existing credential is retrieved or <code>&quot;webauthn.create&quot;</code> when a new credential is created.</dd>
+ <dt><code>challenge</code></dt>
+ <dd>The <a href="/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding">base64url</a> encoded version of the cryptographic challenge sent from the relying party&apos;s server. The original value is passed via <a href="/zh-CN/docs/Web/API/PublicKeyCredentialRequestOptions/challenge"><code>PublicKeyCredentialRequestOptions.challenge</code></a> or <a href="/zh-CN/docs/Web/API/PublicKeyCredentialCreationOptions/challenge"><code>PublicKeyCredentialCreationOptions.challenge</code></a>.</dd>
+ <dt><code>origin</code></dt>
+ <dd>The fully qualified origin of the requester which has been given by the client/browser to the authenticator. We should expect the <a href="/en-US/docs/Web/API/PublicKeyCredentialRequestOptions/rpId">relying party&apos;s id</a> to be a suffix of this value.</dd>
+ <dt><code>tokenBindingId</code> <span class="optional optionalInline notecard inline">可选</span></dt>
+ <dd>
+ <p>An object describing the state of <a href="https://tools.ietf.org/html/rfc8471">the token binding protocol</a> for the communication with the relying party. It has two properties:</p>
+
+ <ul>
+  <li><code>status</code>: A string which is either <code>&quot;supported&quot;</code> which indicates the client support token binding but did not negotiate with the relying party or <code>&quot;present&quot;</code> when token binding was used already</li>
+  <li><code>id</code>: A <a href="/zh-CN/docs/Web/API/DOMString"><code>DOMString</code></a> which is the <a href="/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding">base64url</a> encoding of the token binding ID which was used for the communication.</li>
+ </ul>
+
+ <p>Should this property be absent, it would indicate that the client does not support token binding.</p>
+ </dd>
+</dl>
+
+<h2 id="示例">示例</h2>
+
+<pre class="brush: js notranslate">function arrayBufferToStr(buf) {
+    return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+
+// pk is a PublicKeyCredential that is the result of a create() or get() Promise
+var clientDataStr = arrayBufferToStr(pk.clientDataJSON);
+var clientDataObj = JSON.parse(clientDataStr);
+
+console.log(clientDataObj.type);      // &quot;webauthn.create&quot; or &quot;webauthn.get&quot;
+console.log(clientDataObj.challenge); // base64 encoded String containing the original challenge
+console.log(clientDataObj.origin);    // the window.origin
+</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webauthn/#dom-authenticatorresponse-clientdatajson" hreflang="en" lang="en">Web Authentication: An API for accessing Public Key Credentials Level 1<br><small lang="zh-CN">clientDataJSON</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.AuthenticatorResponse.clientDataJSON"></div>

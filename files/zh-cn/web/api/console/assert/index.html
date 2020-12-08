@@ -1,0 +1,102 @@
+---
+title: Console.assert()
+slug: Web/API/Console/assert
+tags:
+  - console
+translation_of: Web/API/console/assert
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Console_API">Console API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/Console"><code>Console</code></a></strong></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/Console/assert"><code>assert()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/clear"><code>clear()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/count"><code>count()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/countReset"><code>countReset()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/debug"><code>debug()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/dir"><code>dir</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/dirxml"><code>dirxml()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/error"><code>error()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/group"><code>group</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/groupCollapsed"><code>groupCollapsed</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/groupEnd"><code>groupEnd()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/info"><code>info()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/log"><code>log</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/API/Console/profile"><code>profile()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/API/Console/profileEnd"><code>profileEnd()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/table"><code>table()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/time"><code>time</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/timeEnd"><code>timeEnd()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/timeLog"><code>timeLog()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/API/Console/timeStamp"><code>timeStamp()</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/trace"><code>trace</code></a></li><li><a href="/zh-CN/docs/Web/API/Console/warn"><code>warn()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Console API</summary><ol><li><a href="/zh-CN/docs/Web/API/Window/console"><code>Window.console</code></a></li><li><a href="/zh-CN/docs/Web/API/WorkerGlobalScope/console"><code>WorkerGlobalScope.console</code></a></li></ol></details></li></ol></section></div>
+
+<p>如果断言为false，则将一个错误消息写入控制台。如果断言是 <code>true</code>，没有任何反应。</p>
+
+<div class="note notecard"><strong>Note:</strong> 此特性在 <a href="/zh-CN/docs/Web/API/Web_Workers_API">Web Worker</a> 中可用。</div>
+
+<div>
+<p><code>console.assert()</code>方法在Node.js中的实现和浏览器中可用的<code>console.assert()</code>方法实现是不同的。在浏览器中当<code>console.assert()</code>方法接受到一个值为假断言的时候，会向控制台输出传入的内容，但是并不会中断代码的执行，而在Node.js v10.0.0之前，一个值为假的断言也将会导致一个<code>AssertionError</code>被抛出，使得代码执行被打断。v10.0.0修复了此差异，所以现在<code>console.assert()</code>在Node 和浏览器中执行行为相同 。</p>
+</div>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js notranslate">console.assert(<em>assertion</em>, <em>obj1</em> [, <em>obj2</em>, ..., <em>objN</em>]);
+console.assert(<em>assertion</em>, <em>msg</em> [, <em>subst1</em>, ..., <em>substN</em>]); // c-like message formatting</pre>
+
+<h3 id="参数">参数</h3>
+
+<dl>
+ <dt><code>assertion</code></dt>
+ <dd>一个布尔表达式。如果assertion为假，消息将会被输出到控制台之中。</dd>
+ <dt><code>obj1</code> ... <code>objN</code></dt>
+ <dd>被用来输出的Javascript对象列表，最后输出的字符串是各个对象依次拼接的结果。</dd>
+ <dt><code>msg</code></dt>
+ <dd>一个包含零个或多个子串的Javascript字符串。</dd>
+ <dt><code>subst1</code> ... <code>substN</code></dt>
+ <dd>各个消息作为字串的Javascript对象。这个参数可以让你能够控制输出的格式。</dd>
+</dl>
+
+<h2 id="案例">案例</h2>
+
+<p>下面的代码示例演示了JavaScript对象的使用:</p>
+
+<pre class="brush: js notranslate">const errorMsg = &apos;the # is not even&apos;;
+for (let number = 2; number &lt;= 5; number += 1) {
+    console.log(&apos;the # is &apos; + number);
+    console.assert(number % 2 === 0, {number: number, errorMsg: errorMsg});
+    // 或者使用 ES2015 对象简写:
+    // console.assert(number % 2 === 0, {number, errorMsg});
+}
+// 输出:
+// the # is 2
+// the # is 3
+// Assertion failed: {number: 3, errorMsg: &quot;the # is not even&quot;}
+// the # is 4
+// the # is 5
+// Assertion failed: {number: 5, errorMsg: &quot;the # is not even&quot;}</pre>
+
+<p>请注意, 你可以在大多数浏览器中使用 console.log 进行格式化输出</p>
+
+<pre class="brush: js notranslate">console.log(&apos;the word is %s try number %d&apos;, &apos;foo&apos;, 123);
+// 输出: the word is foo try number 123</pre>
+
+<p><code><font face="Arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">但是 </span></font>console.assert</code> 在不同浏览器中可能获得不同的效果:</p>
+
+<pre class="brush: js notranslate">console.assert(false, &apos;the word is %s&apos;, &apos;foo&apos;);
+// correct output in Node (e.g. v8.10.0) and some browsers
+//     (e.g. Firefox v60.0.2):
+// Assertion failed: the word is foo
+// incorrect output in some browsers
+//     (e.g. Chrome v67.0.3396.87):
+// Assertion failed: the word is %s foo</pre>
+
+<p>有关详细信息，请参阅 <a href="/zh-CN/docs/Web/API/Console"><code>console</code></a> 文档中的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Console#%E8%BE%93%E5%87%BA%E6%96%87%E6%9C%AC%E5%88%B0%E6%8E%A7%E5%88%B6%E5%8F%B0">输出文本到控制台</a>。</p>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://console.spec.whatwg.org/#consoleassertexpression-object" hreflang="en" lang="en">Console API<br><small lang="zh-CN">console.assert()</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div class="bc-data" id="bcd:api.Console.assert"></div>
+
+<h2 id="相关链接">相关链接</h2>
+
+<ul>
+ <li><a href="https://console.spec.whatwg.org/#assert-condition-data">WHATWG Console Standard: console.assert</a></li>
+ <li><a href="http://www.opera.com/dragonfly/documentation/console/">Opera Dragonfly documentation: Console</a></li>
+ <li><a href="http://msdn.microsoft.com/library/gg589530">MSDN: Using the F12 Tools Console to View Errors and Status</a></li>
+ <li><a href="https://developer.chrome.com/devtools/docs/console#assertions">Chrome Developer Tools: Using the Console</a></li>
+</ul>

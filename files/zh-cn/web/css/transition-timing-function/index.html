@@ -1,0 +1,645 @@
+---
+title: transition-timing-function
+slug: Web/CSS/transition-timing-function
+translation_of: Web/CSS/transition-timing-function
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/Reference">CSS 参考</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/CSS_Transitions">CSS Transitions</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions">使用 CSS transitions</a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/CSS/timing-function"><code>&lt;timing-function&gt;</code></a></li><li><a href="/zh-CN/docs/Web/CSS/transition"><code>transition</code></a></li><li><a href="/zh-CN/docs/Web/CSS/transition-delay"><code>transition-delay</code></a></li><li><a href="/zh-CN/docs/Web/CSS/transition-duration"><code>transition-duration</code></a></li><li><a href="/zh-CN/docs/Web/CSS/transition-property"><code>transition-property</code></a></li><li><em><code>transition-timing-function</code></em></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div><p></p>
+
+<h2 id="概述">概述</h2>
+
+<p>CSS属性受到 <a href="/en-US/docs/CSS/Tutorials/Using_CSS_transitions" title="en/CSS/CSS transitions">transition effect</a>的影响，会产生不断变化的中间值，而 <a href="/en-US/docs/CSS" title="/en-US/docs/CSS">CSS</a> <code>transition-timing-function</code> 属性用来描述这个中间值是怎样计算的。实质上，通过这个函数会建立一条加速度曲线，因此在整个transition变化过程中，变化速度可以不断改变。</p>
+
+<p>这条加速度曲线被<a href="/zh-CN/docs/Web/CSS/timing-function" title="&lt;timing-function&gt; CSS 数据类型表示一个数学函数，它描述了在一个过渡或动画中一维数值的改变速度。这实质上让你可以自己定义一个加速度曲线，以便动画的速度在动画的过程中可以进行改变。这些函数通常被称为缓动函数。"><code>&lt;timing-function&gt;</code></a>所定义，之后作用到每个CSS属性的过渡. </p>
+
+<p>你可以规定多个timing function,通过使用 <a href="/zh-CN/docs/Web/CSS/transition-property" title="transition-property 指定应用过渡属性的名称。"><code>transition-property</code></a>属性，可以根据主列表(transition property的列表)给每个CSS属性应用相应的timing function.如果timing function的个数比主列表中数量少，缺少的值被设置为初始值（ease） 。如果timing function比主列表要多，timing function函数列表会被截断至合适的大小。这两种情况下声明的CSS属性都是有效的。</p>
+
+<p></p><table class="properties"><tbody><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/initial_value">初始值</a></th><td><code>ease</code></td></tr><tr><th scope="row">适用元素</th><td>all elements, <a href="/zh-CN/docs/Web/CSS/::before" title="常通过 content 属性来为一个元素添加修饰性的内容。此元素默认为行内元素。"><code>::before</code></a> and <a href="/zh-CN/docs/Web/CSS/::after" title="CSS伪元素::after用来创建一个伪元素，作为已选中元素的最后一个子元素。通常会配合content属性来为该元素添加装饰内容。这个虚拟元素默认是行内元素。"><code>::after</code></a> <a href="/en-US/docs/Web/CSS/Pseudo-elements">pseudo-elements</a></td></tr><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/inheritance">是否是继承属性</a></th><td>否</td></tr><tr><th scope="row">适用媒体</th><td>interactive</td></tr><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/computed_value">计算值</a></th><td>as specified</td></tr><tr><th scope="row">Animation type</th><td>discrete</td></tr><tr><th scope="row">正规顺序</th><td>the unique non-ambiguous order defined by the formal grammar</td></tr></tbody></table><p></p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="twopartsyntaxbox"><a href="/en-US/docs/CSS/Value_definition_syntax" title="CSS/Value_definition_syntax">Formal syntax</a>: <a href="/zh-CN/docs/Web/CSS/timing-function" title="Possible values: cubic-bezier(), steps(), linear, ease, ease-in, ease-out, east-in-out, step-start-step-end">&lt;timing-function&gt;</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Hash_mark_()" title="Hash mark: the entity is repeated one or several times, each occurence separated by a comma">#</a><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="timing-function">&lt;timing-function&gt;</span> = linear <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#cubic-bezier-timing-function">&lt;cubic-bezier-timing-function&gt;</a> <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#step-timing-function">&lt;step-timing-function&gt;</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="cubic-bezier-timing-function">&lt;cubic-bezier-timing-function&gt;</span> = ease <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ease-in <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ease-out <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ease-in-out <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> cubic-bezier(<a href="/zh-CN/docs/Web/CSS/number" title="&lt;数字&gt; CSS 数据类型代表一个数字，可为整数或小数。它的语法扩展了&lt;integer&gt;的数据值。要表示一个小数则加上小数部分 -- “.&quot;后跟一或多为十进制数字--到任何&lt;integer&gt;数据值。像&lt;integer&gt;数据类型一样，&lt;number&gt;没有任何单位，并不是一个CSS尺寸。">&lt;number&gt;</a>, <a href="/zh-CN/docs/Web/CSS/number" title="&lt;数字&gt; CSS 数据类型代表一个数字，可为整数或小数。它的语法扩展了&lt;integer&gt;的数据值。要表示一个小数则加上小数部分 -- “.&quot;后跟一或多为十进制数字--到任何&lt;integer&gt;数据值。像&lt;integer&gt;数据类型一样，&lt;number&gt;没有任何单位，并不是一个CSS尺寸。">&lt;number&gt;</a>, <a href="/zh-CN/docs/Web/CSS/number" title="&lt;数字&gt; CSS 数据类型代表一个数字，可为整数或小数。它的语法扩展了&lt;integer&gt;的数据值。要表示一个小数则加上小数部分 -- “.&quot;后跟一或多为十进制数字--到任何&lt;integer&gt;数据值。像&lt;integer&gt;数据类型一样，&lt;number&gt;没有任何单位，并不是一个CSS尺寸。">&lt;number&gt;</a>, <a href="/zh-CN/docs/Web/CSS/number" title="&lt;数字&gt; CSS 数据类型代表一个数字，可为整数或小数。它的语法扩展了&lt;integer&gt;的数据值。要表示一个小数则加上小数部分 -- “.&quot;后跟一或多为十进制数字--到任何&lt;integer&gt;数据值。像&lt;integer&gt;数据类型一样，&lt;number&gt;没有任何单位，并不是一个CSS尺寸。">&lt;number&gt;</a>)<br><span id="step-timing-function">&lt;step-timing-function&gt;</span> = step-start <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> step-end <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> steps(<a href="/zh-CN/docs/Web/CSS/integer" title="The &lt;integer&gt; CSS data type is a special type of number that represents a whole number, whether positive or negative. Integers can be used in numerous CSS properties, such as column-count, counter-increment, grid-column, grid-row, and z-index.">&lt;integer&gt;</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a>, <a href="#step-position">&lt;step-position&gt;</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/zh-CN/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a>)</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="step-position">&lt;step-position&gt;</span> = jump-start <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> jump-end <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> jump-none <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> jump-both <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> start <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> end</code></p>
+</pre>
+
+<pre>transition-timing-function: ease
+transition-timing-function: ease-in
+transition-timing-function: ease-out
+transition-timing-function: ease-in-out
+transition-timing-function: linear
+transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1)
+transition-timing-function: step-start
+transition-timing-function: step-end
+transition-timing-function: steps(4, end)
+
+transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1.0, 0.1)
+
+transition-timing-function: inherit
+</pre>
+
+<h3 id="值">值</h3>
+
+<dl>
+ <dt><code>&lt;timing-function&gt;</code></dt>
+ <dd>通过<a href="/zh-CN/docs/Web/CSS/transition-property" title="transition-property 指定应用过渡属性的名称。"><code>transition-property</code></a>中定义被过渡属性，每个 <a href="/zh-CN/docs/Web/CSS/timing-function" title="&lt;timing-function&gt; CSS 数据类型表示一个数学函数，它描述了在一个过渡或动画中一维数值的改变速度。这实质上让你可以自己定义一个加速度曲线，以便动画的速度在动画的过程中可以进行改变。这些函数通常被称为缓动函数。"><code>&lt;timing-function&gt;</code></a>的值代表与这个属性相对应的timing function.</dd>
+</dl>
+
+<h2 id="示例">示例</h2>
+
+<div>
+<div id="ttf_ease">
+<p><code>transition-timing-function: ease</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_ease" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_ease?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_easein" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: ease-in</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+     -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-in;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-in;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-in;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-in;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_easein" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_easein?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_easeout" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: ease-out</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-out;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-out;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_easeout" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_easeout?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_easeinout" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: ease-in-out</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-in-out;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_easeinout" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_easeinout?revision=1513372" width="275"></iframe></div>
+</div>
+</div>
+
+<div id="ttf_linear" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: linear</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: linear;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: linear;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_linear" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_linear?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_stepstart" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: step-start</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: step-start;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: step-start;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: step-start;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: step-start;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_stepstart" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_stepstart?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_stepend" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: step-end</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: step-end;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: step-end;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: step-end;
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: step-end;
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_stepend" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_stepend?revision=1513372" width="275"></iframe></div>
+</div>
+
+<div id="ttf_step4end" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+<p><code>transition-timing-function: steps(4, end)</code></p>
+
+<div style="display: none;">
+<pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+<pre class="brush:css;">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: steps(4, end);
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: steps(4, end);
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration:2s;
+    -webkit-transition-timing-function: steps(4, end);
+    transition-property: width height background-color font-size left top color;
+    transition-duration:2s;
+    transition-timing-function: steps(4, end);
+}
+</pre>
+
+<pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+</div>
+
+<div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_step4end" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/transition-timing-function$samples/ttf_step4end?revision=1513372" width="275"></iframe></div>
+</div>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-transitions/#transition-timing-function" hreflang="en" lang="en">CSS Transitions<br><small lang="zh-CN">transition-timing-function</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><a href="/en-US/Firefox/Releases/4" title="Released on 2011-03-22.">4.0</a> (2.0)<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><br>
+    <a href="/en-US/Firefox/Releases/16" title="Released on 2012-10-09.">16.0</a> (16.0)</td>
+   <td>10</td>
+   <td>11.6<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-o&apos; as this browser considers it experimental">-o</a></span><br>
+    12.10 <a href="http://my.opera.com/ODIN/blog/2012/08/03/a-hot-opera-12-50-summer-time-snapshot" title="http://my.opera.com/ODIN/blog/2012/08/03/a-hot-opera-12-50-summer-time-snapshot">#</a></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td>4.0 (2.0)<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><br>
+    16.0 (16.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+ <li><a href="/en-US/docs/CSS/Using_CSS_transitions" title="en/CSS/CSS transitions">Using CSS transitions</a></li>
+ <li><a href="/zh-CN/docs/Web/API/TransitionEvent" title="TransitonEvent 接口指那些提供了与 transition 有关信息的事件。"><code>TransitionEvent</code></a></li>
+</ul>

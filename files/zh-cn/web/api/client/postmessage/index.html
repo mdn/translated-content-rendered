@@ -1,0 +1,147 @@
+---
+title: Client.postMessage()
+slug: Web/API/Client/postMessage
+translation_of: Web/API/Client/postMessage
+---
+<p></p><div class="experimental indicator-warning notecard">
+    <p><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Client"><code>Client</code></a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Client/frameType"><code>frameType</code></a> <a href="/zh-CN/docs/Web/API/Client/frameType$translate" style="opacity: 0.5;">[我来译!]</a></li><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Client/id"><code>id</code></a> <a href="/zh-CN/docs/Web/API/Client/id$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/API/Client/type"><code>type</code></a> <a href="/zh-CN/docs/Web/API/Client/type$translate" style="opacity: 0.5;">[我来译!]</a></li><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/API/Client/url"><code>url</code></a> <a href="/zh-CN/docs/Web/API/Client/url$translate" style="opacity: 0.5;">[我来译!]</a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><em><code>postMessage()</code></em></li></ol></details></li></ol></section><p></p>
+
+<p class="summary"><a href="/zh-CN/docs/Web/API/Client" title="Client 接口表示一个可执行的上下文，如Worker或SharedWorker。Window 客户端由更具体的WindowClient表示。 你可以从Clients.matchAll() 和Clients.get()等方法获取Client/WindowClient对象。"><code>Client</code></a> 接口的 <code><strong>Client.postMessage()</strong></code> 方法允许一个service worker客户端向一个  <a href="/zh-CN/docs/Web/API/ServiceWorker" title="一个ServiceWorker对象在 ServiceWorkerRegistration.active 属性和 ServiceWorkerContainer.controller 属性中可用 — 这是一个激活并在控制页面的service worker(service worker成功注册,被控页面已经重新加载完毕.)"><code>ServiceWorker</code></a>发送一个消息，会触发service worker的message事件，通过监听这个事件，可以获取这个消息。</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js">Client.postMessage(message[, transfer]);</pre>
+
+<h3 id="返回">返回</h3>
+
+<p>Void.</p>
+
+<h3 id="参数">参数</h3>
+
+<dl>
+ <dt><code>message</code></dt>
+ <dd>发送给service worker的消息内容。</dd>
+ <dt><code>transfer <span class="optional optionalInline notecard inline">可选</span></code></dt>
+ <dd>可转移的对象，例如对端口的引用。</dd>
+</dl>
+
+<h2 id="例子">例子</h2>
+
+<p>从 service worker 向 client 发送消息：</p>
+
+<pre class="brush: js line-numbers language-js"><code class="language-js"><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&apos;fetch&apos;</span><span class="punctuation token">,</span> <span class="parameter token">event</span> <span class="operator token">=&gt;</span> <span class="punctuation token">{</span>
+  event<span class="punctuation token">.</span><span class="function token">waitUntil</span><span class="punctuation token">(</span><span class="keyword token">async</span> <span class="keyword token">function</span><span class="punctuation token">(</span><span class="punctuation token">)</span> <span class="punctuation token">{</span>
+    <span class="comment token">// Exit early if we don&apos;t have access to the client.</span>
+    <span class="comment token">// Eg, if it&apos;s cross-origin.</span>
+    <span class="keyword token">if</span> <span class="punctuation token">(</span><span class="operator token">!</span>event<span class="punctuation token">.</span>clientId<span class="punctuation token">)</span> <span class="keyword token">return</span><span class="punctuation token">;</span>
+
+    <span class="comment token">// Get the client.</span>
+    <span class="keyword token">const</span> client <span class="operator token">=</span> <span class="keyword token">await</span> clients<span class="punctuation token">.</span><span class="function token">get</span><span class="punctuation token">(</span>event<span class="punctuation token">.</span>clientId<span class="punctuation token">)</span><span class="punctuation token">;</span>
+    <span class="comment token">// Exit early if we don&apos;t get the client.</span>
+    <span class="comment token">// Eg, if it closed.</span>
+    <span class="keyword token">if</span> <span class="punctuation token">(</span><span class="operator token">!</span>client<span class="punctuation token">)</span> <span class="keyword token">return</span><span class="punctuation token">;</span>
+
+    <span class="comment token">// Send a message to the client.</span>
+    client<span class="punctuation token">.</span><span class="function token">postMessage</span><span class="punctuation token">(</span><span class="punctuation token">{</span>
+      msg<span class="punctuation token">:</span> <span class="string token">&quot;Hey I just got a fetch from you!&quot;</span><span class="punctuation token">,</span>
+      url<span class="punctuation token">:</span> event<span class="punctuation token">.</span>request<span class="punctuation token">.</span>url
+    <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+
+  <span class="punctuation token">}</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+<span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p><span class="punctuation token">接收message:</span></p>
+
+<pre class="brush: js line-numbers language-js"><code class="language-js">navigator<span class="punctuation token">.</span>serviceWorker<span class="punctuation token">.</span><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&apos;message&apos;</span><span class="punctuation token">,</span> <span class="parameter token">event</span> <span class="operator token">=&gt;</span> <span class="punctuation token">{</span>
+  console<span class="punctuation token">.</span><span class="function token">log</span><span class="punctuation token">(</span>event<span class="punctuation token">.</span>data<span class="punctuation token">.</span>msg<span class="punctuation token">,</span> event<span class="punctuation token">.</span>data<span class="punctuation token">.</span>url<span class="punctuation token">)</span><span class="punctuation token">;</span>
+<span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code> </pre>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#client-postmessage-method" hreflang="en" lang="en">Service Workers<br><small lang="zh-CN">postMessage()</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>45.0<sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/44" title="Released on 2016-01-26.">44.0</a> (44.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>44.0 (44.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>45.0 [1]</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<ul>
+ <li>[1] Behind a flag in Chrome 40 through 44.</li>
+ <li>[2] Service workers (and <a href="/en-US/docs/Web/API/Push_API">Push</a>) have been disabled in the <a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 &amp; 52 Extended Support Releases</a> (ESR.)</li>
+</ul>

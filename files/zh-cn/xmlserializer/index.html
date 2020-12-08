@@ -1,0 +1,92 @@
+---
+title: XMLSerializer
+slug: XMLSerializer
+tags:
+  - DOM Parsing
+  - XML
+  - XMLSerializer
+  - construct
+  - conversion
+translation_of: Web/API/XMLSerializer
+---
+<div dir="ltr" style="text-align: left;"><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/XMLSerializer"><code>XMLSerializer</code></a></strong></li></ol></section></div>
+
+<div dir="ltr" id="result_box" style="text-align: left;"><code>XMLSerializer</code>接口提供<a href="/zh-CN/docs/Web/API/XMLSerializer/serializeToString"><code>serializeToString()</code></a> 方法来构建一个代表 <a href="/zh-CN/docs/Glossary/DOM">DOM</a> 树的XML字符串。</div>
+
+<h2 id="Methods" name="Methods">方法</h2>
+
+<dl>
+ <dt id="serializeToString"><a href="/zh-CN/docs/Web/API/XMLSerializer/serializeToString"><code>serializeToString()</code></a></dt>
+ <dd>返回DOM子树序列化后的字符串。</dd>
+ <dt id="serializeToStream"><a href="/zh-CN/docs/Web/API/XMLSerializer/serializeToStream"><code>serializeToStream()</code></a> <span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></dt>
+ <dd>将指定元素的每个子树按照特定的字符集序列化成字节流。</dd>
+</dl>
+
+<h2 id="Examples" name="Examples">示例</h2>
+
+<h3 id="把_XML_序列化为字符串">把 XML 序列化为字符串</h3>
+
+<p>首先，最基本的例子是将整个 document 对象序列化为一个 XML 字符串。</p>
+
+<pre class="brush: js notranslate"> var s = new XMLSerializer();
+ var d = document;
+ var str = s.serializeToString(d);
+ saveXML(str);</pre>
+
+<p>这里新建了一个 <code>XMLSerializer</code> 对象实例, 然后将待序列化的 <a href="/zh-CN/docs/Web/API/Document"><code>Document</code></a> 对象实例传入返回等价 XML 的 <a href="/zh-CN/docs/Web/API/XMLSerializer/serializeToString"><code>serializeToString()</code></a> 方法。</p>
+
+<h3 id="向一个基于_XML_的_DOM_对象中">向一个基于 XML 的 DOM 对象中</h3>
+
+<p>本例使用 {domxref(&quot;Element.insertAdjacentHTML()&quot;)}} 方法将一个新的 DOM <a href="/zh-CN/docs/Web/API/Node"><code>Node</code></a> 插入 基于序列化 <a href="/zh-CN/docs/Web/API/Document"><code>Document</code></a> 对象创建的 XML 中。</p>
+
+<div class="note">
+<p><strong>注意:</strong> 在真实场景下，你通常应该通过调用 <a href="/zh-CN/docs/Web/API/Document/importNode"><code>importNode()</code></a> 方法将新节点加入 DOM 中, 然后通过调用以下方法将目标节点添加到 DOM 树:</p>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/Document"><code>Document</code></a> 和 <a href="/zh-CN/docs/Web/API/Element"><code>Element</code></a> 方法 <a href="/zh-CN/docs/Web/API/ParentNode/append"><code>append()</code></a> 和 <a href="/zh-CN/docs/Web/API/ParentNode/prepend"><code>prepend()</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/ChildNode/replaceWith"><code>Node.replaceWith()</code></a> 方法(替换现有节点)</li>
+ <li><a href="/zh-CN/docs/Web/API/Document/insertAdjacentElement"><code>Document.insertAdjacentElement()</code></a> 和 <a href="/zh-CN/docs/Web/API/Element/insertAdjacentElement"><code>Element.insertAdjacentElement()</code></a> 方法.</li>
+</ul>
+</div>
+
+<p>因为<code>insertAdjacentHTML()</code> 的第二个参数是一个字符串而不是 <code>Node</code> 节点对象, 所以这里先要使用 <code>XMLSerializer</code> 将节点转换为字符串.</p>
+
+<pre class="brush: js notranslate">var inp = document.createElement(&apos;input&apos;);
+var XMLS = new XMLSerializer();
+var inp_xmls = XMLS.serializeToString(inp); // 先将一个 DOM 节点转换为字符串。
+
+// 将新建的节点添加到 DOM 中。
+document.body.insertAdjacentHTML(&apos;afterbegin&apos;, inp_xmls);</pre>
+
+<p>以上代码通过调用 <a href="/zh-CN/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a> 方法新建一个 {HTMLElement(&quot;input&quot;)}} 对象 , 然后通过 <a href="/zh-CN/docs/Web/API/XMLSerializer/serializeToString"><code>serializeToString()</code></a> 方法将该对象序列化为 XML.</p>
+
+<p>做完以上工作之后, 使用 <code>insertAdjacentHTML()</code> 方法将 <code>&lt;input&gt;</code> 元素加入 DOM.</p>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/DOM-Parsing/#the-xmlserializer-interface" hreflang="en" lang="en">DOM Parsing and Serialization<br><small lang="zh-CN">XMLSerializer</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">浏览器兼容性</h2>
+
+<div><div class="bc-data" id="bcd:api.XMLSerializer"></div></div>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/en-US/Parsing_and_serializing_XML" title="en-US/Parsing_and_serializing_XML">Parsing and serializing XML</a></li>
+ <li><a href="/zh-CN/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/DOMParser"><code>DOMParser</code></a></li>
+</ul>

@@ -1,0 +1,56 @@
+---
+title: Beacon API
+slug: Web/API/Beacon_API
+tags:
+  - SDK
+  - user behavior tracker
+  - user tracker
+  - 同步请求
+  - 埋点
+  - 数据分析
+  - 规范
+translation_of: Web/API/Beacon_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Beacon_API">Beacon API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/Beacon_API/Using_the_Beacon_API">Using the Beacon API</a> <a href="/zh-CN/docs/Web/API/Beacon_API/Using_the_Beacon_API$translate" style="opacity: 0.5;">[我来译!]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/Navigator"><code>Navigator</code></a></li><li><a href="/zh-CN/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div>
+
+<p><strong><code>Beacon</code></strong> 接口用于将异步和非阻塞请求发送到服务器。信标（Beacon ）请求使用HTTP协议中的POST方法，请求通常不需要响应。这个请求被保证在，页面的<strong>unload</strong>状态从发起到完成之前，被发送。而并不需要一个阻塞请求，例如 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequest</code></a> 。</p>
+
+<p>Beacon API 的示例用例是记录活动并向服务器发送分析数据。</p>
+
+<p>本文档中描述的接口的示例代码包含在<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Beacon_API/Using_the_Beacon_API
+">使用信标API</a>中。</p>
+
+<h2 id="为什么是信标？">为什么是信标？</h2>
+
+<p><code>Beacon</code> 接口满足了分析和诊断代码的需要，这些代码通常会尝试在卸载文档之前将数据发送到 web服务器。发送数据的任何过早时机都可能导致错失收集数据的机会。但是，确保在卸载文档期间发送数据是开发人员难以做到的。</p>
+
+<p>用户代理通常会忽略卸载文档处理程序中的异步 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequests</code></a> 请求。若要解决此问题，为了分析和诊断代码，通常会在 <code><a href="/zh-CN/docs/Web/Reference/Events/unload" title="/zh-CN/docs/Web/Reference/Events/unload">unload</a></code> 事件或 <code><a href="/zh-CN/docs/Web/Reference/Events/beforeunload" title="/zh-CN/docs/Web/Reference/Events/beforeunload">beforeunload</a></code> 事件中创建同步 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequest</code></a> 请求以提交数据。同步 <a href="/zh-CN/docs/Web/API/XMLHttpRequest" title="使用XMLHttpRequest (XHR)对象可以与服务器交互。您可以从URL获取数据，而无需让整个的页面刷新。这使得Web页面可以只更新页面的局部，而不影响用户的操作。XMLHttpRequest在 Ajax 编程中被大量使用。"><code>XMLHttpRequest</code></a> 请求强制浏览器延迟卸载文档，并使下一个页面跳转看起来较慢。下一页面没有任何办法来避免这种页面加载性能不佳的感觉。</p>
+
+<p>其他技术也可以用来确保提交数据。其中一种技术是通过创建 Image 元素并在卸载文档处理程序中设置其 <code>src</code> 属性来延迟卸载以提交数据。由于大多数用户代理会延迟文档卸载，以完成挂起的图片加载，因此可以在卸载过程中提交数据。另一种方法是在卸载处理程序中创建一个无操作循环，花费数秒以延迟卸载并将数据提交到服务器。</p>
+
+<p>但是上述技术不仅代表了较差的编码模式，其中一些还是不可靠的，会导致下一个导航的页面加载性能较差的感觉。信标 API 提供了解决这些问题的标准方法。</p>
+
+<h2 id="全局环境">全局环境</h2>
+
+<p><code>Beacon</code> <span class="tlid-translation translation" lang="zh-CN"><span title>API 的 </span></span> <a href="/zh-CN/docs/Web/API/Navigator/sendBeacon" title="navigator.sendBeacon() 方法可用于通过HTTP将少量数据异步传输到Web服务器。"><code>Navigator.sendBeacon()</code></a> <span class="tlid-translation translation" lang="zh-CN"><span title>方法用于在<em>全局浏览上下文</em>中向服务器发送<em>数据信标</em>。该方法有两个参数，URL和要在请求中发送的数据data。</span><span title>data参数是可选的，其类型可以是 </span></span><a href="/zh-CN/docs/Web/API/ArrayBufferView" title="此页面仍未被本地化, 期待您的翻译!"><code>ArrayBufferView</code></a>、<a href="/zh-CN/docs/Web/API/Blob" title="Blob 对象表示一个不可变、原始数据的类文件对象。Blob 表示的不一定是JavaScript原生格式的数据。File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。"><code>Blob</code></a><span class="tlid-translation translation" lang="zh-CN"><span title>、</span></span><a href="/zh-CN/docs/Web/API/DOMString" title="DOMString 是一个UTF-16字符串。由于JavaScript已经使用了这样的字符串，所以DOMString 直接映射到 一个String。"><code>DOMString</code></a> <span class="tlid-translation translation" lang="zh-CN"><span title>或</span></span><a href="/zh-CN/docs/Web/API/FormData" title="FormData 接口提供了一种表示表单数据的键值对的构造方式，经过它的数据可以使用 XMLHttpRequest.send() 方法送出，本接口和此方法都相当简单直接。如果送出时的编码类型被设为 &quot;multipart/form-data&quot;，它会使用和表单一样的格式。"><code>FormData</code></a><span class="tlid-translation translation" lang="zh-CN"><span title>。</span><span title>如果浏览器成功的以队列形式排列了用于传递的请求，则该方法返回“</span></span><code>true</code><span class="tlid-translation translation" lang="zh-CN"><span title>”，否则返回“</span></span><code>false</code><span class="tlid-translation translation" lang="zh-CN"><span title>”。</span></span></p>
+
+<h2 id="生产环境">生产环境</h2>
+
+<p><code>Beacon</code><span class="tlid-translation translation" lang="zh-CN"><span title> API的</span></span> <a href="/zh-CN/docs/Web/API/WorkerNavigator/sendBeacon" title="此页面仍未被本地化, 期待您的翻译!"><code>WorkerNavigator.sendBeacon()</code></a> <span class="tlid-translation translation" lang="zh-CN"><span title> 方法用于从</span></span> <em><a href="/zh-CN/docs/Web/API/WorkerGlobalScope" title="Web Workers API  的 WorkerGlobalScope 接口 是一个代表了任何 scope of worker的接口. Workers 没有浏览内容; 这个 scope 包含的信息总是通过 Window objects传递 — 比如 event handlers, the console or the associated WorkerNavigator object.每个 WorkerGlobalScope 都有自己的事件循环."><code>worker global scope</code></a></em> <span class="tlid-translation translation" lang="zh-CN"><span title>向服务器发送<em>数据信标</em>。该方法有两个参数，URL和要在请求中发送的数据data。</span><span title>data参数是可选的，其类型可以是</span></span> <a href="/zh-CN/docs/Web/API/ArrayBufferView" title="此页面仍未被本地化, 期待您的翻译!"><code>ArrayBufferView</code></a>、<a href="/zh-CN/docs/Web/API/Blob" title="Blob 对象表示一个不可变、原始数据的类文件对象。Blob 表示的不一定是JavaScript原生格式的数据。File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。"><code>Blob</code></a>、<a href="/zh-CN/docs/Web/API/DOMString" title="DOMString 是一个UTF-16字符串。由于JavaScript已经使用了这样的字符串，所以DOMString 直接映射到 一个String。"><code>DOMString</code></a> 或 <a href="/zh-CN/docs/Web/API/FormData" title="FormData 接口提供了一种表示表单数据的键值对的构造方式，经过它的数据可以使用 XMLHttpRequest.send() 方法送出，本接口和此方法都相当简单直接。如果送出时的编码类型被设为 &quot;multipart/form-data&quot;，它会使用和表单一样的格式。"><code>FormData</code></a><span class="tlid-translation translation" lang="zh-CN"><span title>。如果浏览器成功的以队列形式排列了用于传递的请求，则该方法返回“</span></span><code>true</code><span class="tlid-translation translation" lang="zh-CN"><span title>”，否则返回“</span></span><code>false</code><span class="tlid-translation translation" lang="zh-CN"><span title>”。</span></span></p>
+
+<h2 id="浏览器兼容性"><span class="tlid-translation translation" lang="zh-CN"><span title>浏览器兼容性</span></span></h2>
+
+<p><a href="/zh-CN/docs/Web/API/Navigator/sendBeacon#Browser_compatibility" title><code>Navigator.sendBeacon().Browser_compatibility</code></a><span class="tlid-translation translation" lang="zh-CN"><span title>表说明了该方法具有相对广泛地实现。但是，</span></span><a href="/zh-CN/docs/Web/API/WorkerNavigator/sendBeacon#Browser_compatibility" title><code>WorkerNavigator.sendBeacon().Browser_compatibility</code></a><span class="tlid-translation translation" lang="zh-CN"><span title>数据显示该方法没有被实现。</span></span></p>
+
+<h2 id="相关知识">相关知识</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/WorkerGlobalScope" title="Web Workers API  的 WorkerGlobalScope 接口 是一个代表了任何 scope of worker的接口. Workers 没有浏览内容; 这个 scope 包含的信息总是通过 Window objects传递 — 比如 event handlers, the console or the associated WorkerNavigator object.每个 WorkerGlobalScope 都有自己的事件循环."><code>WorkerGlobalScope</code></a></li>
+ <li><a href="https://w3c.github.io/beacon/">信标标准（Beacon standard）</a></li>
+ <li><a href="http://caniuse.com/#search=beacon">信标 CanIUse 数据</a></li>
+ <li><a href="https://ehsanakhgari.org/blog/2015-04-08/intercepting-beacons-through-service-workers">通过服务程序拦截信标</a>（Intercepting beacons through service workers）; Ehsan Akhgari; 2015-Apr-08</li>
+ <li><a href="https://webkit.org/blog/8821/link-click-analytics-and-privacy/">https://webkit.org/blog/8821/link-click-analytics-and-privacy/</a></li>
+ <li><a href="https://davidwalsh.name/ping-attribute">https://davidwalsh.name/ping-attribute</a></li>
+</ul>

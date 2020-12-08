@@ -1,0 +1,108 @@
+---
+title: 结构化克隆算法
+slug: Web/Guide/API/DOM/The_structured_clone_algorithm
+tags:
+  - DOM
+  - HTML5
+  - 结构化克隆算法
+translation_of: Web/API/Web_Workers_API/Structured_clone_algorithm
+---
+<p>结构化克隆算法是<a href="http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#safe-passing-of-structured-data">由HTML5规范定义</a>的用于复制复杂JavaScript对象的算法。通过来自 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker">Workers</a>的 <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage" title="en/JavaScript/Reference/Global Objects/Error">postMessage()</a> </code>或使用 <a href="https://developer.mozilla.org/en-US/docs/Glossary/IndexedDB">IndexedDB</a> 存储对象时在内部使用。它通过递归输入对象来构建克隆，同时保持先前访问过的引用的映射，以避免无限遍历循环。</p>
+
+<h2 id="结构化克隆所不能做到的">结构化克隆所不能做到的</h2>
+
+<ul>
+ <li><code><a href="/cn/JavaScript/Reference/Global_Objects/Error">Error</a></code> 以及 <code><a href="/cn/JavaScript/Reference/Global_Objects/Function">Function</a></code> 对象是不能被结构化克隆算法复制的；如果你尝试这样子去做，这会导致抛出 <code>DATA_CLONE_ERR</code> 的异常。</li>
+ <li>企图去克隆 DOM 节点同样会抛出 <code>DATA_CLONE_ERROR</code> 异常。</li>
+ <li>对象的某些特定参数也不会被保留
+  <ul>
+   <li><code><a href="/cn/JavaScript/Reference/Global_Objects/RegExp">RegExp</a> </code>对象的 <code>lastIndex</code> 字段不会被保留</li>
+   <li>属性描述符，setters 以及 getters（以及其他类似元数据的功能）同样不会被复制。例如，如果一个对象用属性描述符标记为 read-only，它将会被复制为 read-write，因为这是默认的情况下。</li>
+   <li>原形链上的属性也不会被追踪以及复制。</li>
+  </ul>
+ </li>
+</ul>
+
+<h2 id="支持的类型">支持的类型</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">对象类型</th>
+   <th scope="col">注意</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Data_structures#原始值">所有的原始类型</a></td>
+   <td>symbols 除外</td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a> 对象</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>String 对象</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></td>
+   <td><code>lastIndex</code> 字段不会被保留。</td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/Blob" title="Blob 对象表示一个不可变、原始数据的类文件对象。Blob 表示的不一定是JavaScript原生格式的数据。File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。"><code>Blob</code></a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/File" title="文件(File) 接口提供有关文件的信息，并允许网页中的 JavaScript 访问其内容。"><code>File</code></a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/FileList" title="一个FileList对象通常来自于一个HTML input元素的files属性,你可以通过这个对象访问到用户所选择的文件.该类型的对象还有可能来自用户的拖放操作,查看DataTransfer对象了解详情."><code>FileList</code></a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/ArrayBuffer">ArrayBuffer</a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/ArrayBufferView">ArrayBufferView</a></td>
+   <td>这基本上意味着所有的 <a href="/zh-CN/docs/Web/JavaScript/Typed_arrays">类型化数组</a> ，如 Int32Array 等。</td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/API/ImageData" title="ImageData 接口描述 &lt;canvas> 元素的一个隐含像素数据的区域。使用 ImageData() 构造函数创建或者使用和 canvas 在一起的 CanvasRenderingContext2D 对象的创建方法： createImageData() 和 getImageData()。也可以使用 putImageData() 设置 canvas 的一部分。"><code>ImageData</code></a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></td>
+   <td>仅包括普通对象（如对象字面量）</td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="相关链接">相关链接</h2>
+
+<ul>
+ <li><a href="http://www.w3.org/TR/html5/infrastructure.html#safe-passing-of-structured-data" title="http://www.w3.org/TR/html5/common-dom-interfaces.html#safe-passing-of-structured-data">HTML5 Specification: Safe passing of structured data</a></li>
+ <li><a href="/zh-CN/docs/Web/API/Window/history" title="Window.history是一个只读属性，用来获取History 对象的引用，History 对象提供了操作浏览器会话历史（浏览器地址栏中访问的页面，以及当前页面中通过框架加载的页面）的接口。"><code>window.history</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/Window/postMessage" title="window.postMessage() 方法可以安全地实现跨源通信。通常，对于两个不同页面的脚本，只有当执行它们的页面位于具有相同的协议（通常为https），端口号（443为https的默认值），以及主机  (两个页面的模数 Document.domain设置为相同的值) 时，这两个脚本才能相互通信。window.postMessage() 方法提供了一种受控机制来规避此限制，只要正确的使用，这种方法就很安全。"><code>window.postMessage()</code></a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API">Web Workers</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Components.utils.cloneInto">Components.utils.cloneInto</a></li>
+</ul>

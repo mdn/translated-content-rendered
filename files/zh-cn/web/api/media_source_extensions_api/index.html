@@ -1,0 +1,163 @@
+---
+title: Media Source Extensions API
+slug: Web/API/Media_Source_Extensions_API
+translation_of: Web/API/Media_Source_Extensions_API
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Media_Source_Extensions_API">Media Source Extensions API</a></strong></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/MediaSource"><code>MediaSource</code></a></li><li><a href="/zh-CN/docs/Web/API/SourceBuffer"><code>SourceBuffer</code></a></li><li><a href="/zh-CN/docs/Web/API/SourceBufferList"><code>SourceBufferList</code></a></li><li><a href="/zh-CN/docs/Web/API/VideoPlaybackQuality"><code>VideoPlaybackQuality</code></a></li><li><a href="/zh-CN/docs/Web/API/TrackDefault"><code>TrackDefault</code></a></li><li><a href="/zh-CN/docs/Web/API/TrackDefaultList"><code>TrackDefaultList</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/VideoTrack/sourceBuffer"><code>VideoTrack.sourceBuffer</code></a></li><li><a href="/zh-CN/docs/Web/API/TextTrack/sourceBuffer"><code>TextTrack.sourceBuffer</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/HTMLVideoElement/getVideoPlaybackQuality"><code>HTMLVideoElement.getVideoPlaybackQuality()</code></a></li><li><a href="/zh-CN/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div><p></p>
+
+<p>媒体源扩展 API（MSE） 提供了实现无插件且基于 Web 的流媒体的功能。使用 MSE，媒体串流能够通过 JavaScript 创建，并且能通过使用 <a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio&gt; 元素用于在文档中表示音频内容。 &lt;audio&gt; 元素可以包含多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source&gt; 元素来进行描述； 浏览器将会选择最合适的一个来使用。对于不支持&lt;audio&gt;元素的浏览器，&lt;audio&gt;元素也可以作为浏览器不识别的内容加入到文档中。"><code>&lt;audio&gt;</code></a> 和 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 元素进行播放。</p>
+
+<h2 id="概念和用法">概念和用法</h2>
+
+<p>近几年来，我们已经可以在 Web 应用程序上无插件地播放视频和音频了。但是，现有架构过于简单，只能满足一次播放整个曲目的需要，无法实现拆分/合并数个缓冲文件。流媒体直到现在还在使用 Flash 进行服务，以及通过 RTMP 协议进行视频串流的 Flash 媒体服务器。</p>
+
+<h3 id="MSE_标准">MSE 标准</h3>
+
+<p>媒体源扩展（MSE）实现后，情况就不一样了。MSE 使我们可以把通常的单个媒体文件的 <code>src</code> 值替换成引用 <code>MediaSource</code> 对象（一个包含即将播放的媒体文件的准备状态等信息的容器），以及引用多个 <code>SourceBuffer</code> 对象（代表多个组成整个串流的不同媒体块）的元素。MSE 让我们能够根据内容获取的大小和频率，或是内存占用详情（例如什么时候缓存被回收），进行更加精准地控制。 <span class="short_text" id="result_box" lang="zh-CN"><span>它是</span></span><span class="short_text" lang="zh-CN"><span>基于它可扩展的 API 建立自适应比特率流客户端（例如DASH 或 </span></span>HLS<span class="short_text" lang="zh-CN"><span> 的客户端）的基础。</span></span></p>
+
+<p>在现代浏览器中创造能兼容 MSE 的媒体（assets）非常费时费力，还要消耗大量计算机资源和能源。此外，还须使用外部实用程序将内容转换成合适的格式。虽然浏览器支持兼容 MSE 的各种媒体容器，但采用 H.264 视频编码、AAC 音频编码和 MP4 容器的格式是非常常见的，且一定兼容。MSE 同时还提供了一个 API，用于运行时检测容器和编解码是否受支持。</p>
+
+<p>如果没有精确的控制时间、媒体质量和内存释放等需求，使用 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 和 <a href="/zh-CN/docs/Web/HTML/Element/source" title="HTML &lt;source&gt; 元素为 &lt;picture&gt;, &lt;audio&gt; 或者 &lt;video&gt; 元素指定多个媒体资源。这是一个空元素。它通常用于以不同浏览器支持的多种格式提供相同的媒体内容。 It is commonly used to serve the same media content in multiple formats supported by different browsers."><code>&lt;source&gt;</code></a> 是一个更加简单但够用的方案。</p>
+
+<h3 id="DASH">DASH</h3>
+
+<p>DASH（Dynamic Adaptive Streaming over HTTP ）是一个规范了自适应内容应当如何被获取的协议。它实际上是建立在 MSE 顶部的一个层，用来构建自适应比特率串流客户端。虽然已经有一个类似的协议了（例如 HTTP 串流直播（HLS）），但 DASH 有最好的跨平台兼容性，这就是我们在这里介绍它的原因。</p>
+
+<p><span class="short_text" id="result_box" lang="zh-CN"><span>DASH 将大量逻辑从网络协议中移出到客户端应用程序逻辑中，使用更简单的 HTTP 协议获取文件。</span></span> <span id="result_box" lang="zh-CN"><span>这样就可以用一个简单的静态文件服务器来支持 DASH，这对CDN也很友好。</span></span><span id="result_box" lang="zh-CN"><span>这与之前的流传输解决方案形成鲜明对比，那些流解决方案需要昂贵的许可证来获得非标准的客户端/服务器协议才能实现。</span></span></p>
+
+<p><span id="result_box" lang="zh-CN"><span>DASH 的两个最常见的用例涉及“点播”或“直播”观看内容。点播功能让开发者有时间把媒体文件转码出多种不同的分辨率质量。</span></span></p>
+
+<p>实时处理内容会引入由转码和播发带来的延迟。因此 DASH 并不适用于类似 <a href="/en-US/docs/Web/API/WebRTC_API">WebRTC</a> 的即时通讯。但它可以支持比 WebRTC 更多的客户端连接。</p>
+
+<p>有非常多的自由开源的工具，能实现转码内容，并将其改造，以适应 DASH、DASH 文件服务器和用 JavaScript 编写的 DASH 客户端库。</p>
+
+<h2 id="媒体源扩展接口">媒体源扩展接口</h2>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/MediaSource" title="MediaSource是Media Source Extensions API 表示媒体资源HTMLMediaElement对象的接口。MediaSource 对象可以附着在HTMLMediaElement在客户端进行播放。"><code>MediaSource</code></a></dt>
+ <dd>代表了将由 <a href="/zh-CN/docs/Web/API/HTMLMediaElement" title="从父级元素 HTML 元素继承属性"><code>HTMLMediaElement</code></a> 对象播放的媒体资源。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/SourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>SourceBuffer</code></a></dt>
+ <dd>代表了一个经由 <code>MediaSource</code> 对象被传入 <a href="/zh-CN/docs/Web/API/HTMLMediaElement" title="从父级元素 HTML 元素继承属性"><code>HTMLMediaElement</code></a> 的媒体块。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/SourceBufferList" title="此页面仍未被本地化, 期待您的翻译!"><code>SourceBufferList</code></a></dt>
+ <dd>列出多个 <code>SourceBuffer</code> 对象的简单的容器列表。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/VideoPlaybackQuality" title="VideoPlaybackQuality 对象表示了一系列描述视频播放质量的指标。"><code>VideoPlaybackQuality</code></a></dt>
+ <dd>包含了有关正被 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 元素播放的视频的质量信息，例如被丢弃或损坏的帧的数量。由 <a href="/zh-CN/docs/Web/API/HTMLVideoElement/getVideoPlaybackQuality" title="此页面仍未被本地化, 期待您的翻译!"><code>HTMLVideoElement.getVideoPlaybackQuality()</code></a> 方法返回。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/TrackDefault" title="此页面仍未被本地化, 期待您的翻译!"><code>TrackDefault</code></a></dt>
+ <dd>为在媒体块的<a href="http://w3c.github.io/media-source/#init-segment">初始化段（initialization segments）</a>中没有包含类型、标签和语言信息的轨道，提供一个包含这些信息的 <a href="/zh-CN/docs/Web/API/SourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>SourceBuffer</code></a>。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/TrackDefaultList" title="此页面仍未被本地化, 期待您的翻译!"><code>TrackDefaultList</code></a></dt>
+ <dd>列出多个 <code>TrackDefault</code> 对象的简单的容器列表。</dd>
+</dl>
+
+<h2 id="其他接口的扩展">其他接口的扩展</h2>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/URL/createObjectURL" title="URL.createObjectURL() 静态方法会创建一个 DOMString，其中包含一个表示参数中给出的对象的URL。这个 URL 的生命周期和创建它的窗口中的 document 绑定。这个新的URL 对象表示指定的 File 对象或 Blob 对象。"><code>URL.createObjectURL()</code></a></dt>
+ <dd>创建一个指向一个 <code>MediaSource</code> 对象的 URL。要求此 URL 可以被指定为一个用来播放媒体流的 HTML 媒体元素的 <code>src</code> 的值。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/HTMLMediaElement/seekable" title="此页面仍未被本地化, 期待您的翻译!"><code>HTMLMediaElement.seekable</code></a></dt>
+ <dd>当一个 <code>MediaSource</code> 对象被 HTML 媒体元素播放时，此属性将返回一个包含用户能够在什么时间范围内进行调整的对象 <a href="/zh-CN/docs/Web/API/TimeRanges" title="一个 TimeRanges 对象包括一个或多个时间范围，其中每个都由一个开始偏移量和结束偏移量指定。你可以将你想要检索的时间范围的索引值传递给 start() 和 end() 方法来引用每个时间范围。"><code>TimeRanges</code></a>。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/HTMLVideoElement/getVideoPlaybackQuality" title="此页面仍未被本地化, 期待您的翻译!"><code>HTMLVideoElement.getVideoPlaybackQuality()</code></a></dt>
+ <dd>针对正在播放的视频，返回一个 <a href="/zh-CN/docs/Web/API/VideoPlaybackQuality" title="VideoPlaybackQuality 对象表示了一系列描述视频播放质量的指标。"><code>VideoPlaybackQuality</code></a> 对象。</dd>
+ <dt><a href="/zh-CN/docs/Web/API/AudioTrack/sourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>AudioTrack.sourceBuffer</code></a>, <a href="/zh-CN/docs/Web/API/VideoTrack/sourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>VideoTrack.sourceBuffer</code></a>, <a href="/zh-CN/docs/Web/API/TextTrack/sourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>TextTrack.sourceBuffer</code></a></dt>
+ <dd>返回创建了相关轨道的 <a href="/zh-CN/docs/Web/API/SourceBuffer" title="此页面仍未被本地化, 期待您的翻译!"><code>SourceBuffer</code></a>。</dd>
+</dl>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">附注</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/media-source/" hreflang="en" lang="en" title="Media Source Extensions">Media Source Extensions</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td><span class="short_text" id="result_box" lang="zh-CN"><span>初始定义。</span></span></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>功能</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>基本支持</td>
+   <td>23</td>
+   <td><a href="/en-US/Firefox/Releases/25" title="Released on 2013-10-29.">25.0</a> (25.0)<sup>[1]</sup><br>
+    <a href="/en-US/Firefox/Releases/42" title="Released on 2015-11-03.">42.0</a> (42.0)</td>
+   <td>11<sup>[2]</sup></td>
+   <td>15</td>
+   <td>8</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>功能</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>基本支持</td>
+   <td>4.4.4</td>
+   <td>
+    <p><span style="color: #f00;">未实现</span></p>
+   </td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>11</td>
+   <td>30</td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] 在将 <code>about:config </code>中的首选项 <code>media.mediasource.enabled</code> 切换到 <code>true</code> 后才可支持。此外，这一版本的 Firefox 仅支持白名单内的网站，例如 YouTube、Netflix 以及其他流行的流媒体网站。此白名单在 Firefox 42+ 被移除，媒体源扩展默认被启用，且支持所有网站。</p>
+
+<p>[2] 只针对 Windows 8+。</p>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Media_Source_Extensions_API/Transcoding_assets_for_MSE">媒体源扩展的音视频资源转码</a></li>
+ <li>用 MSE 创建基础的流服务（待定）</li>
+ <li>用 MPEG DASH 创建流应用（待定）</li>
+ <li><a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio&gt; 元素用于在文档中表示音频内容。 &lt;audio&gt; 元素可以包含多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source&gt; 元素来进行描述； 浏览器将会选择最合适的一个来使用。对于不支持&lt;audio&gt;元素的浏览器，&lt;audio&gt;元素也可以作为浏览器不识别的内容加入到文档中。"><code>&lt;audio&gt;</code></a> 和 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video&gt; 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 元素。</li>
+ <li><a href="/zh-CN/docs/Web/API/HTMLMediaElement" title="从父级元素 HTML 元素继承属性"><code>HTMLMediaElement</code></a>、<a href="/zh-CN/docs/Web/API/HTMLVideoElement" title="HTMLVideoElement 接口提供了用于操作视频对象的特殊属性和方法。它同时还继承了HTMLMediaElement 和 HTMLElement 的属性与方法。"><code>HTMLVideoElement</code></a>、<a href="/zh-CN/docs/Web/API/HTMLAudioElement" title="HTMLAudioElement 接口提供访问&lt;audio&gt; 元素的接口, 像方法一操作. 来源于 HTMLMediaElement 接口."><code>HTMLAudioElement</code></a>。</li>
+</ul>
+
+<div class="itanywhere-activator" style="left: 47px; top: 1258px; display: none;" title="Google Translator Anywhere"> </div>

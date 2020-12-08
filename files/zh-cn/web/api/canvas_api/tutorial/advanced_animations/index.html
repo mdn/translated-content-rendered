@@ -1,0 +1,451 @@
+---
+title: 高级动画
+slug: Web/API/Canvas_API/Tutorial/Advanced_animations
+tags:
+  - Canvas
+  - Graphics
+  - Tutorial
+translation_of: Web/API/Canvas_API/Tutorial/Advanced_animations
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas 教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_usage">基本用法</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">绘制形状</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">添加样式和颜色</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_text">绘制文本</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Using_images">使用图片</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations">变形</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing">合成与裁剪</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations">基本动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">高级动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">像素操作</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">点击区域和无障碍访问</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">canvas 的优化</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Finale">终极</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>示例</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/A_basic_ray-caster">一个基本的光线投射例子</a></li>
+        <li><a href="/zh-CN/Add-ons/Code_snippets/Canvas">Canvas 代码片段</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">在 canvas 中操作视频</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>接口</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span> <a href="/zh-CN/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/MDN">文档:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>常用页面列表</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/tag/Canvas">拥有 &quot;Canvas&quot; 标签的页面</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>贡献</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/MDN/Doc_status/API/Canvas">Canvas 文档翻译状态</a></li>
+        <li><a href="/zh-CN/docs/MDN">MDN 项目</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas" class="button">下一页  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>在上一章，我们制作了<a href="/zh-CN/docs/Web/Guide/HTML/Canvas_tutorial/Basic_animations">基本动画</a>以及逐步了解了让物件移动的方法。在这一部分，我们将会对运动有更深的了解并学会添加一些符合物理的运动以让我们的动画更加高级。</p>
+</div>
+
+<h2 id="绘制小球">绘制小球</h2>
+
+<p>我们将会画一个小球用于动画学习，所以首先在画布上画一个球。下面的代码帮助我们建立画布。</p>
+
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;
+</pre>
+
+<p>跟平常一样，我们需要先画一个 context（画布场景）。为了画出这个球，我们又会创建一个包含一些相关属性以及 <code>draw()</code> 函数的 <code>ball</code> 对象，来完成绘制。</p>
+
+<pre class="brush: js">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+
+var ball = {
+  x: 100,
+  y: 100,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+ball.draw();</pre>
+
+<p>这里并没有什么特别的。小球实际上是一个简单的圆形，在<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/arc"><code>arc()</code></a> 函数的帮助下画出。</p>
+
+<h2 id="添加速率">添加速率</h2>
+
+<p>现在我们有了一个小球，正准备添加一些基本动画，正如我们<a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations">上一章</a>所学的。又是这样，<a href="/zh-CN/docs/Web/API/Window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> 再一次帮助我们控制动画。小球依旧依靠添加速率矢量进行移动。在每一帧里面，我们依旧用<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/clearRect">clear</a> 清理掉之前帧里旧的圆形。</p>
+
+<pre class="brush: js; highlight:[8,9,24,25]">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+var raf;
+
+var ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 2,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+function draw() {
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener(&apos;mouseover&apos;, function(e){
+  raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener(&apos;mouseout&apos;, function(e){
+  window.cancelAnimationFrame(raf);
+});
+
+ball.draw();
+</pre>
+
+<h2 id="边界">边界  </h2>
+
+<p>若没有任何的碰撞检测，我们的小球很快就会超出画布。我们需要检查小球的 x 和 y 位置是否已经超出画布的尺寸以及是否需要将速度矢量反转。为了这么做，我们把下面的检查代码添加进 <code>draw</code> 函数：</p>
+
+<pre class="brush: js">if (ball.y + ball.vy &gt; canvas.height || ball.y + ball.vy &lt; 0) {
+  ball.vy = -ball.vy;
+}
+if (ball.x + ball.vx &gt; canvas.width || ball.x + ball.vx &lt; 0) {
+  ball.vx = -ball.vx;
+}</pre>
+
+<h3 id="首个预览">首个预览</h3>
+
+<p>让我们看看现今它变得如何。移动你的鼠标到画布里开启动画。</p>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; style=&quot;border: 1px solid&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+var raf;
+
+var ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 2,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+function draw() {
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  if (ball.y + ball.vy &gt; canvas.height ||
+      ball.y + ball.vy &lt; 0) {
+    ball.vy = -ball.vy;
+  }
+  if (ball.x + ball.vx &gt; canvas.width ||
+      ball.x + ball.vx &lt; 0) {
+    ball.vx = -ball.vx;
+  }
+
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener(&apos;mouseover&apos;, function(e) {
+  raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener(&apos;mouseout&apos;, function(e) {
+  window.cancelAnimationFrame(raf);
+});
+
+ball.draw();</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="310" id="frame_首个预览" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations$samples/%E9%A6%96%E4%B8%AA%E9%A2%84%E8%A7%88?revision=1623391" width="610"></iframe></p>
+
+<h2 id="加速度">加速度</h2>
+
+<p>为了让动作更真实，你可以像这样处理速度，例如：</p>
+
+<pre class="brush: js">ball.vy *= .99;
+ball.vy += .25;</pre>
+
+<p>这会逐帧减少垂直方向的速度，所以小球最终将只会在地板上弹跳。</p>
+
+<div class="hidden">
+<h6 id="Second_demo">Second demo</h6>
+
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; style=&quot;border: 1px solid&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+var raf;
+
+var ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 2,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+function draw() {
+  ctx.clearRect(0,0, canvas.width, canvas.height);
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  ball.vy *= .99;
+  ball.vy += .25;
+
+  if (ball.y + ball.vy &gt; canvas.height ||
+      ball.y + ball.vy &lt; 0) {
+    ball.vy = -ball.vy;
+  }
+  if (ball.x + ball.vx &gt; canvas.width ||
+      ball.x + ball.vx &lt; 0) {
+    ball.vx = -ball.vx;
+  }
+
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener(&apos;mouseover&apos;, function(e){
+  raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener(&apos;mouseout&apos;, function(e){
+  window.cancelAnimationFrame(raf);
+});
+
+ball.draw();</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="310" id="frame_Second_demo" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations$samples/Second_demo?revision=1623391" width="610"></iframe></p>
+
+<h2 id="长尾效果">长尾效果</h2>
+
+<p>现在，我们使用的是 <a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/clearRect"><code>clearRect</code></a> 函数帮我们清除前一帧动画。若用一个半透明的 <a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/fillRect"><code>fillRect</code></a> 函数取代之，就可轻松制作长尾效果。</p>
+
+<pre class="brush: js">ctx.fillStyle = &apos;rgba(255,255,255,0.3)&apos;;
+ctx.fillRect(0,0,canvas.width,canvas.height);</pre>
+
+<div class="hidden">
+<h6 id="Third_demo">Third demo</h6>
+
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; style=&quot;border: 1px solid&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+var raf;
+
+var ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 2,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+function draw() {
+  ctx.fillStyle = &apos;rgba(255,255,255,0.3)&apos;;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+  ball.vy *= .99;
+  ball.vy += .25;
+
+  if (ball.y + ball.vy &gt; canvas.height ||
+      ball.y + ball.vy &lt; 0) {
+    ball.vy = -ball.vy;
+  }
+  if (ball.x + ball.vx &gt; canvas.width ||
+      ball.x + ball.vx &lt; 0) {
+    ball.vx = -ball.vx;
+  }
+
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener(&apos;mouseover&apos;, function(e){
+  raf = window.requestAnimationFrame(draw);
+});
+
+canvas.addEventListener(&apos;mouseout&apos;, function(e){
+  window.cancelAnimationFrame(raf);
+});
+
+ball.draw();</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="310" id="frame_Third_demo" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations$samples/Third_demo?revision=1623391" width="610"></iframe></p>
+
+<h2 id="添加鼠标控制">添加鼠标控制</h2>
+
+<p>为了更好地控制小球，我们可以用 <code style="font-style: normal;"><a href="/en-US/docs/Web/Reference/Events/mousemove">mousemove</a></code>事件让它跟随鼠标活动。下面例子中，<a href="/en-US/docs/Web/Events/click" style="font-family: Consolas, Monaco, &apos;Andale Mono&apos;, monospace;">click</a> 事件会释放小球然后让它重新跳起。</p>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; style=&quot;border: 1px solid&quot; width=&quot;600&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;</pre>
+</div>
+
+<pre class="brush: js">var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+var raf;
+var running = false;
+
+var ball = {
+  x: 100,
+  y: 100,
+  vx: 5,
+  vy: 1,
+  radius: 25,
+  color: &apos;blue&apos;,
+  draw: function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+};
+
+function clear() {
+  ctx.fillStyle = &apos;rgba(255,255,255,0.3)&apos;;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+
+function draw() {
+  clear();
+  ball.draw();
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  if (ball.y + ball.vy &gt; canvas.height || ball.y + ball.vy &lt; 0) {
+    ball.vy = -ball.vy;
+  }
+  if (ball.x + ball.vx &gt; canvas.width || ball.x + ball.vx &lt; 0) {
+    ball.vx = -ball.vx;
+  }
+
+  raf = window.requestAnimationFrame(draw);
+}
+
+canvas.addEventListener(&apos;mousemove&apos;, function(e){
+  if (!running) {
+    clear();
+    ball.x = e.offsetX;
+    ball.y = e.offsetY;
+    ball.draw();
+  }
+});
+
+canvas.addEventListener(&apos;click&apos;,function(e){
+  if (!running) {
+    raf = window.requestAnimationFrame(draw);
+    running = true;
+  }
+});
+
+canvas.addEventListener(&apos;mouseout&apos;, function(e){
+  window.cancelAnimationFrame(raf);
+  running = false;
+});
+
+ball.draw();
+</pre>
+
+<p>用你的鼠标移动小球，点击可以释放。</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="310" id="frame_添加鼠标控制" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations$samples/%E6%B7%BB%E5%8A%A0%E9%BC%A0%E6%A0%87%E6%8E%A7%E5%88%B6?revision=1623391" width="610"></iframe></p>
+
+<h2 id="Breakout">Breakout</h2>
+
+<p>本短文仅仅解释了一小部分的创建高级动画的技巧。其实还有更多！试试添加一个球拍，一些砖块，然后将这个例子弄成一个 <a href="http://en.wikipedia.org/wiki/Breakout_%28video_game%29">Breakout</a>（译者注：打砖块游戏） 如何？查看我们的<a href="/en-US/docs/Games">游戏开发</a>区去查阅更多相关文章。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/Window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a></li>
+ <li><a href="/en-US/docs/Games/Techniques/Efficient_animation_for_web_games">网页动画高效开发</a></li>
+</ul>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas" class="button">下一页  »</a></p>
+</div>

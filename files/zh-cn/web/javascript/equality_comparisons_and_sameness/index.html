@@ -1,0 +1,554 @@
+---
+title: JavaScript 中的相等性判断
+slug: Web/JavaScript/Equality_comparisons_and_sameness
+tags:
+  - JavaScr
+  - 严格相等
+  - 同值相等
+  - 比较
+  - 相等
+  - 零值相等
+  - 非严格相等
+translation_of: Web/JavaScript/Equality_comparisons_and_sameness
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/zh-CN/docs/Web/JavaScript/Tutorials"><strong>教程:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>快速入门</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript 基础知识</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>JavaScript 指南</summary>
+      <ol>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types">Grammar and types</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Control flow and error handling</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Loops_and_iteration">Loops and iteration</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Functions">Functions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions and operators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Numbers_and_dates">Numbers and dates</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Text_formatting">Text formatting</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions">Regular expressions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Indexed_collections">Indexed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Keyed_collections">Keyed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects">Working with objects</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Details of the object model</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Iterators_and_generators">Iterators and generators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Meta_programming">Meta programming</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>中级教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/A_re-introduction_to_JavaScript">深入 JavaScript</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Equality_comparisons_and_sameness">如何正确判断相等性</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>高级</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">继承和原型链</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Typed_arrays">JavaScript 类型化数组</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Memory_Management">内存管理</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/EventLoop">Concurrency model and Event Loop</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference">引用:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>内置对象</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>表达式和运算符</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E5%8A%A0">相加运算符 (+)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Addition_assignment">加法赋值 (+=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Assignment">赋值运算符(=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E6%8C%89%E4%BD%8D%E4%B8%8E">按位与 (&amp;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">按位与赋值(&amp;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">按位非 (~)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">Bitwise OR assignment (|=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">按位异或赋值 (^=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Comma_Operator">逗号操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">条件运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E8%87%AA%E5%87%8F">自减 (--)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">解构赋值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division_assignment">Division assignment (/=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E7%AD%89">相等（==）</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function">函数表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than">大于运算符 (&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">大于或等于</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Grouping">圆括号运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Increment">自增 (++)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift">左移 (&lt;&lt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">小于或等于</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E9%80%BB%E8%BE%91%E5%92%8C">逻辑与(&amp;&amp;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_NOT">Logical NOT (!)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR (||)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">逻辑空赋值 (??=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication">乘法 (*)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">空值合并运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer">对象初始化</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">运算符优先级</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%AF%E9%80%89%E9%93%BE">可选链操作符</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%AE%A1%E9%81%93%E6%93%8D%E4%BD%9C%E7%AC%A6">管道操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Property_Accessors">属性访问器</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%96%E4%BD%99">取余 (%)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift">Right shift (&gt;&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax">展开语法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_equality">Strict equality (===)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_inequality">严格不相等 (!==)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_negation">Unary negation (-)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/async%E5%85%81%E8%AE%B8%E5%A3%B0%E6%98%8E%E4%B8%80%E4%B8%AA%E5%87%BD%E6%95%B0%E4%B8%BA%E4%B8%80%E4%B8%AA%E5%8C%85%E5%90%AB%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E7%9A%84%E5%87%BD%E6%95%B0">async function expression</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/class">类表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete">delete 操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function*">function* 表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/in">in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new">new 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/void">void 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>语句和声明</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function">async函数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/block">block</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/Empty">empty</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function">function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/var">var 描述</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>函数</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions">箭头函数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Default_parameters">默认参数值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Method_definitions">方法的定义</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">剩余参数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/arguments">Arguments 对象</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/get">getter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/set">setter</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Private_class_fields">类私有域</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Class_elements">类元素</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/constructor">构造方法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">X.prototype.y called on incompatible type</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/%E4%B8%8D%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>更多</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript 知识概要</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Lexical_grammar">词法文法</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">属性的可枚举性和所有权</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">切换到严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Template_literals">模板字符串</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">已废弃的特性</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>ES2015中有四种相等算法：</p>
+
+<ul>
+ <li>抽象（非严格）相等比较 (<code>==</code>)</li>
+ <li>严格相等比较 (<code>===</code>): 用于<font face="consolas, Liberation Mono, courier, monospace"> </font> <code>Array.prototype.indexOf</code>, <code>Array.prototype.lastIndexOf</code>, 和 <code>case</code>-matching</li>
+ <li>同值零: 用于 <code>%TypedArray%</code> 和 <code>ArrayBuffer </code>构造函数、以及<code>Map</code>和<code>Set</code>操作, 并将用于 ES2016/ES7 中的<code>String.prototype.includes </code></li>
+ <li>同值: 用于所有其他地方</li>
+</ul>
+
+<p>JavaScript提供三种不同的值比较操作：</p>
+
+<ul>
+ <li>严格相等比较 (也被称作&quot;strict equality&quot;, &quot;identity&quot;, &quot;triple equals&quot;)，使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Identity">===</a> ,</li>
+ <li>抽象相等比较 (&quot;loose equality&quot;，&quot;double equals&quot;) ，使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Equality">==</a></li>
+ <li>以及 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> （ECMAScript 2015/ ES6 新特性）</li>
+</ul>
+
+<p>选择使用哪个操作取决于你需要什么样的比较。</p>
+
+<p>简而言之，在比较两件事情时，双等号将执行类型转换; 三等号将进行相同的比较，而不进行类型转换 (如果类型不同, 只是总会返回 false );  而Object.is的行为方式与三等号相同，但是对于NaN和-0和+0进行特殊处理，所以最后两个不相同，而Object.is（NaN，NaN）将为 <code>true</code>。(通常使用双等号或三等号将NaN与NaN进行比较，结果为false，因为IEEE 754如是说.) 请注意，所有这些之间的区别都与其处理原语有关; 这三个运算符的原语中，没有一个会比较两个变量是否结构上概念类似。对于任意两个不同的非原始对象，即便他们有相同的结构， 以上三个运算符都会计算得到 false 。</p>
+
+<h2 id="严格相等">严格相等 <code>===</code></h2>
+
+<p>全等操作符比较两个值是否相等，两个被比较的值在比较前都不进行隐式转换。如果两个被比较的值具有不同的类型，这两个值是不全等的。否则，如果两个被比较的值类型相同，值也相同，并且都不是 number 类型时，两个值全等。最后，如果两个值都是 number 类型，当两个都不是 NaN，并且数值相同，或是两个值分别为 +0 和 -0 时，两个值被认为是全等的。</p>
+
+<pre class="brush: js notranslate">var num = 0;
+var obj = new String(&quot;0&quot;);
+var str = &quot;0&quot;;
+var b = false;
+
+console.log(num === num); // true
+console.log(obj === obj); // true
+console.log(str === str); // true
+
+console.log(num === obj); // false
+console.log(num === str); // false
+console.log(obj === str); // false
+console.log(null === undefined); // false
+console.log(obj === null); // false
+console.log(obj === undefined); // false
+</pre>
+
+<p>在日常中使用全等操作符几乎总是正确的选择。对于除了数值之外的值，全等操作符使用明确的语义进行比较：一个值只与自身全等。对于数值，全等操作符使用略加修改的语义来处理两个特殊情况：第一个情况是，浮点数 0 是不分正负的。区分 +0 和 -0 在解决一些特定的数学问题时是必要的，但是大部分情况下我们并不用关心。全等操作符认为这两个值是全等的。第二个情况是，浮点数包含了 NaN 值，用来表示某些定义不明确的数学问题的解，例如：正无穷加负无穷。全等操作符认为 NaN 与其他任何值都不全等，包括它自己。（等式 <code>(x !== x)</code> 成立的唯一情况是 x 的值为 NaN）</p>
+
+<h2 id="非严格相等">非严格相等 <code>==</code></h2>
+
+<p>相等操作符比较两个值是否相等，在比较前将两个被比较的值转换为相同类型。在转换后（等式的一边或两边都可能被转换），最终的比较方式等同于全等操作符 === 的比较方式。 相等操作符满足交换律。</p>
+
+<p>相等操作符对于不同类型的值，进行的比较如下图所示：</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="row"></th>
+   <th colspan="7" scope="col" style="text-align: center;">被比较值 B</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <th scope="row"></th>
+   <td></td>
+   <td style="text-align: center;">Undefined</td>
+   <td style="text-align: center;">Null</td>
+   <td style="text-align: center;">Number</td>
+   <td style="text-align: center;">String</td>
+   <td style="text-align: center;">Boolean</td>
+   <td style="text-align: center;">Object</td>
+  </tr>
+  <tr>
+   <th colspan="1" rowspan="6" scope="row">被比较值 A</th>
+   <td>Undefined</td>
+   <td style="text-align: center;"><code>true</code></td>
+   <td style="text-align: center;"><code>true</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>IsFalsy(B)</code></td>
+  </tr>
+  <tr>
+   <td>Null</td>
+   <td style="text-align: center;"><code>true</code></td>
+   <td style="text-align: center;"><code>true</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>IsFalsy(B)</code></td>
+  </tr>
+  <tr>
+   <td>Number</td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>A === B</code></td>
+   <td style="text-align: center;"><code>A === ToNumber(B)</code></td>
+   <td style="text-align: center;"><code>A=== ToNumber(B) </code></td>
+   <td style="text-align: center;"><code>A== ToPrimitive(B)</code></td>
+  </tr>
+  <tr>
+   <td>String</td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>ToNumber(A) === B</code></td>
+   <td style="text-align: center;"><code>A === B</code></td>
+   <td style="text-align: center;"><code>ToNumber(A) === ToNumber(B)</code></td>
+   <td style="text-align: center;"><code>ToPrimitive(B) == A</code></td>
+  </tr>
+  <tr>
+   <td>Boolean</td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>false</code></td>
+   <td style="text-align: center;"><code>ToNumber(A) === B</code></td>
+   <td style="text-align: center;"><code>ToNumber(A) === ToNumber(B)</code></td>
+   <td style="text-align: center;"><code>A === B</code></td>
+   <td style="text-align: center;">ToNumber(A) == ToPrimitive(B)</td>
+  </tr>
+  <tr>
+   <td>Object</td>
+   <td style="text-align: center;"><font face="Consolas, Liberation Mono, Courier, monospace">false</font></td>
+   <td style="text-align: center;"><font face="Consolas, Liberation Mono, Courier, monospace">false</font></td>
+   <td style="text-align: center;"><code>ToPrimitive(A) == B</code></td>
+   <td style="text-align: center;"><code>ToPrimitive(A) == B</code></td>
+   <td style="text-align: center;">ToPrimitive(A) == ToNumber(B)</td>
+   <td style="text-align: center;">
+    <p><code>A === B</code></p>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p>在上面的表格中，<code>ToNumber(A)</code> 尝试在比较前将参数 A 转换为数字，这与 +A（单目运算符+）的效果相同。<code>ToPrimitive(A)</code>通过尝试调用 A 的<code>A.toString()</code> 和 <code>A.valueOf()</code> 方法，将参数 A 转换为原始值（Primitive）。</p>
+
+<p>一般而言，根据 ECMAScript 规范，所有的对象都与 <code>undefined </code>和 <code>null </code>不相等。但是大部分浏览器允许非常窄的一类对象（即，所有页面中的 <code>document.all </code>对象），在某些情况下，充当效仿 <code>undefined </code>的角色。相等操作符就是在这样的一个背景下。因此，<code>IsFalsy(A) </code>方法的值为 <code>true </code>，当且仅当 <code>A </code>效仿 <code>undefined</code>。在其他所有情况下，一个对象都不会等于 <code>undefined </code>或 <code>null</code>。</p>
+
+<pre class="brush: js notranslate">var num = 0;
+var obj = new String(&quot;0&quot;);
+var str = &quot;0&quot;;
+var b = false;
+
+console.log(num == num); // true
+console.log(obj == obj); // true
+console.log(str == str); // true
+
+console.log(num == obj); // true
+console.log(num == str); // true
+console.log(obj == str); // true
+console.log(null == undefined); // true
+
+// both false, except in rare cases
+console.log(obj == null);
+console.log(obj == undefined);
+</pre>
+
+<p>有些开发者认为，最好永远都不要使用相等操作符。全等操作符的结果更容易预测，并且因为没有隐式转换，全等比较的操作会更快。</p>
+
+<h2 id="同值相等">同值相等</h2>
+
+<p>同值相等<span class="short_text" lang="zh-CN"><span>解决了</span><span class="alt-edited">最后一个用例</span><span>：</span><span>确定两个</span><span>值是否</span><span>在任何情况下</span><span>功能上</span><span>是相同的。</span></span>（这个用例演示了<a href="http://zh.wikipedia.org/zh-cn/%E9%87%8C%E6%B0%8F%E6%9B%BF%E6%8D%A2%E5%8E%9F%E5%88%99">里氏替换原则</a>的实例。）当试图对不可变（immutable）属性修改时发生出现的情况：</p>
+
+<pre class="brush: js notranslate">// 向 Nmuber 构造函数添加一个不可变的属性 NEGATIVE_ZERO
+Object.defineProperty(Number, &quot;NEGATIVE_ZERO&quot;,
+                      { value: -0, writable: false, configurable: false, enumerable: false });
+
+function attemptMutation(v)
+{
+  Object.defineProperty(Number, &quot;NEGATIVE_ZERO&quot;, { value: v });
+}
+</pre>
+
+<p><code>Object.defineProperty</code> 在试图修改不可变属性时，如果这个属性确实被修改了则会抛出异常，反之什么都不会发生。例如如果 v 是 -0 ，那么没有发生任何变化，所以也不会抛出任何异常。但如果 v 是 +0 ，则会抛出异常。不可变属性和新设定的值使用 same-value 相等比较。</p>
+
+<p>同值相等由 <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 方法提供。</p>
+
+<h2 id="零值相等">零值相等</h2>
+
+<p>与同值相等类似，不过会认为 +0 与 -0 相等。</p>
+
+<h2 id="规范中的相等、严格相等以及同值相等">规范中的相等、严格相等以及同值相等</h2>
+
+<p>在 ES5 中， <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators"><code>==</code></a> 相等在 <a href="http://ecma-international.org/ecma-262/5.1/#sec-11.9.3" title="http://ecma-international.org/ecma-262/5.1/#sec-11.9.3">Section 11.9.3, The Abstract Equality Algorithm</a>； <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators"><code>===</code></a> 相等在 <a href="http://ecma-international.org/ecma-262/5.1/#sec-11.9.6" title="http://ecma-international.org/ecma-262/5.1/#sec-11.9.6">11.9.6, The Strict Equality Algorithm</a>。（请参考这两个链接，他们很简洁易懂。提示：请先阅读严格相等的算法）ES5 也提供了 same-value 相等， <a href="http://ecma-international.org/ecma-262/5.1/#sec-9.12" title="http://ecma-international.org/ecma-262/5.1/#sec-9.12">Section 9.12, The SameValue Algorithm</a> ，用在 JS 引擎内部。除了 11.9.6.4 和 9.12.4 在处理数字上的不同外，它基本和严格相等算法相同。ES6 简单地通过  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 暴露了这个算法。</p>
+
+<p>我们可以看到，使用双等或三等时，除了 11.9.6.1 类型检查，严格相等算法是相等算法的子集因为 11.9.6.2–7 对应 11.9.3.1.a–f。</p>
+
+<h2 id="理解相等比较的模型">理解相等比较的模型</h2>
+
+<p>在 ES2015 以前，你可能会说双等和三等是“扩展”的关系。比如有人会说双等是三等的扩展版，因为他处理三等所做的，还做了类型转换。例如 6 == &quot;6&quot; 。反之另一些人可能会说三等是双等的扩展，因为他还要求两个参数的类型相同，所以增加了更多的限制。怎样理解取决于你怎样看待这个问题。</p>
+
+<p>但是这种比较的方式没办法把 ES2015 的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 排列到其中。因为 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 并不比双等更宽松，也并不比三等更严格，当然也不是在他们中间。从下表中可以看出，这是由于 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 处理 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"><code>NaN</code></a> 的不同。注意假如 <code>Object.is(NaN, NaN)</code> 被计算成 <code>false</code> ，我们就可以说他比三等更为严格，因为他可以区分 <code>-0</code> 和 <code>+0</code> 。但是对 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"><code>NaN</code></a> 的处理表明，这是不对的。 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 应该被认为是有其特殊的用途，而不应说他和其他的相等更宽松或严格。</p>
+
+<table class="standard-table">
+ <caption>判等</caption>
+ <thead>
+  <tr>
+   <th scope="col" style="text-align: center;">x</th>
+   <th scope="col" style="text-align: center;">y</th>
+   <th scope="col" style="width: 10em; text-align: center;"><code>==</code></th>
+   <th scope="col" style="width: 10em; text-align: center;"><code>===</code></th>
+   <th scope="col" style="width: 10em; text-align: center;"><code>Object.is</code></th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>undefined</code></td>
+   <td><code>undefined</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>null</code></td>
+   <td><code>null</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>true</code></td>
+   <td><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>false</code></td>
+   <td><code>false</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;foo&quot;</code></td>
+   <td><code>&quot;foo&quot;</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>0</code></td>
+   <td><code>0</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+  <tr>
+   <td><code>+0</code></td>
+   <td><code>-0</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>0</code></td>
+   <td><code>false</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;&quot;</code></td>
+   <td><code>false</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;&quot;</code></td>
+   <td><code>0</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;0&quot;</code></td>
+   <td><code>0</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;17&quot;</code></td>
+   <td><code>17</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>[1,2]</code></td>
+   <td><code>&quot;1,2&quot;</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>new String(&quot;foo&quot;)</code></td>
+   <td><code>&quot;foo&quot;</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>null</code></td>
+   <td><code>undefined</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>null</code></td>
+   <td><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>undefined</code></td>
+   <td><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>{ foo: &quot;bar&quot; }</code></td>
+   <td><code>{ foo: &quot;bar&quot; }</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>new String(&quot;foo&quot;)</code></td>
+   <td><code>new String(&quot;foo&quot;)</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>0</code></td>
+   <td><code>null</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>0</code></td>
+   <td><code>NaN</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>&quot;foo&quot;</code></td>
+   <td><code>NaN</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+  </tr>
+  <tr>
+   <td><code>NaN</code></td>
+   <td><code>NaN</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(255, 144, 144); text-align: center;"><code>false</code></td>
+   <td style="background-color: rgb(144, 255, 144); text-align: center;"><code>true</code></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="什么时候使用_Object.is_或是三等">什么时候使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a> 或是三等</h2>
+
+<p>总的来说，除了对待<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"><code>NaN</code></a>的方式，<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a>唯一让人感兴趣的，是当你需要一些元编程方案时，它对待0的特殊方式，特别是关于属性描述器，即你的工作需要去镜像<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty</code></a>的一些特性时。如果你的工作不需要这些，那你应该避免使用<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a>，使用<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators"><code>===</code></a>来代替。即使你需要比较两个<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"><code>NaN</code></a>使其结果为<code>true</code>，总的来说编写使用<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN"><code>NaN</code></a> 检查的特例函数(用旧版本ECMAScript的<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN"><code>isNaN方法</code></a>)也会比想出一些计算方法让<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a>不影响不同符号的0的比较更容易些。</p>
+
+<p>这里是一个会区别对待-0和+0的内置方法和操作符不完全列表：</p>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators#-_.28Unary_Negation.29" title="/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators"><code>- (一元负)</code></a></p>
+
+<dl>
+ <dd>
+ <p>显而易见，对<code>0一元负操作得到</code><code>-0</code>。但表达式的抽象化可能在你没有意识到得情况下导致-0延续传播。例如当考虑下例时:</p>
+
+ <pre class="brush:js  language-js notranslate"><code class="language-js"><span class="keyword token">let</span> stoppingForce <span class="operator token">=</span> obj<span class="punctuation token">.</span>mass <span class="operator token">*</span> <span class="operator token">-</span>obj<span class="punctuation token">.</span>velocity</code></pre>
+
+ <div class="line-number" style="top: 0px;"></div>
+
+ <p>如果<code>obj.velocity</code>是<code>0</code> (或计算结果为<code>0</code>), <code>一个-0</code>就在上处产生并被赋值为<code>stoppingForce的值</code>.</p>
+ </dd>
+</dl>
+
+<dl>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2"><code>Math.atan2</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil"><code>Math.ceil</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow"><code>Math.pow</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round"><code>Math.round</code></a></dt>
+</dl>
+
+<dl>
+ <dd>即使传入的参数中没有-0，这些方法的返回值都有可能是-0。例如当用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow"><code>Math.pow</code></a>计算<code>-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></code>的任何负奇指数的幂都会得到<code>-0</code>。详情请参见这些方法各自的文档。</dd>
+</dl>
+
+<dl>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/floor" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/floor"><code>Math.floor</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max"><code>Math.max</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min"><code>Math.min</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sin" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sin"><code>Math.sin</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sqrt" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sqrt"><code>Math.sqrt</code></a></dt>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/tan" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/tan"><code>Math.tan</code></a></dt>
+</dl>
+
+<dl>
+ <dd>当传入参数中有-0时，这些方法也可能返回-0。例如， <code>Math.min(-0, +0)</code> 得出 <code>-0</code>。详情请参见这些方法各自的文档。</dd>
+</dl>
+
+<dl>
+ <dt><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators">~</a></code></dt>
+ <dt><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators">&lt;&lt;</a></code></dt>
+ <dt><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators" title="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators">&gt;&gt;</a></code></dt>
+ <dd>这些操作符内部都使用了ToInt32算法。因为内部32位整数类型只有一个0（没有符号区别），-0的符号在反操作后并不会保留下来。例如<code>Object.is(~~(-0), -0)</code>和<code>Object.is(-0 &lt;&lt; 2 &gt;&gt; 2, -0)</code> <code>都会得到false</code>.</dd>
+</dl>
+
+<p>在未考虑0的符号的情况下依赖于<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a><code>是危险的。当然，如果本意就是区分-0和+0的话，</code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is" title="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is"><code>Object.is</code></a><code>能按照期望完成工作。</code></p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+ <li><a href="http://dorey.github.io/JavaScript-Equality-Table/">JS比较表</a></li>
+</ul>

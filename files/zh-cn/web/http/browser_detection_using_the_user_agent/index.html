@@ -1,0 +1,339 @@
+---
+title: 使用用户代理字段进行浏览器检测
+slug: Web/HTTP/Browser_detection_using_the_user_agent
+tags:
+  - Browser detection
+  - Browser detection using the user agent
+  - user agent
+translation_of: Web/HTTP/Browser_detection_using_the_user_agent
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li><a href="/zh-CN/docs/Web/HTTP"><strong><em>HTTP</em></strong></a></li>
+    <li><strong>Guides:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>Resources and URIs</summary>
+            <ol>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web">Identifying resources on the Web</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Data URIs</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_Types">Introduction to MIME Types</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">Complete list of MIME Types</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs">Choosing between www and non-www URLs</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP guide</summary>
+            <ol>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP">Basics of HTTP</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Overview">Overview of HTTP</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP">Evolution of HTTP</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Messages">HTTP Messages</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Session">A typical HTTP session</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Connection_management_in_HTTP_1.x">Connection management in HTTP/1.x</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Protocol_upgrade_mechanism">Protocol upgrade mechanism</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP security</summary>
+            <ol>
+                <li><a href="/zh-CN/docs/Web/HTTP/CSP">Content Security Policy (CSP)</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Public_Key_Pinning">HTTP Public Key Pinning (HPKP)</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Headers/Strict-Transport-Security">HTTP Strict Transport Security (HSTS)</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies">Cookie security</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+                <li><a href="/zh-CN/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+                <li><a href="https://wiki.mozilla.org/Security/Guidelines/Web_Security">Mozilla web security guidelines</a></li>
+                <li><a href="https://observatory.mozilla.org/">Mozilla Observatory</a></li>
+            </ol>
+        </details>
+    </li>
+
+    <li><a href="/zh-CN/docs/Web/HTTP/CORS">HTTP access control (CORS)</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Authentication">HTTP authentication</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Caching">HTTP caching</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Compression">HTTP compression</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Conditional_requests">HTTP conditional requests</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Content_negotiation">HTTP content negotiation</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Cookies">HTTP cookies</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Range_requests">HTTP range requests</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Redirections">HTTP redirects</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Resources_and_specifications">HTTP specifications</a></li>
+    <li><a href="/zh-CN/docs/Web/HTTP/Feature_Policy">Feature policy</a></li>
+    <li><strong>References:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP headers</summary>
+            <ol><li><a href="/zh-CN/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Accept-Charset"><code>Accept-Charset</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Accept-Encoding"><code>Accept-Encoding</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Accept-Ranges"><code>Accept-Ranges</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Expose-Headers"><code>Access-Control-Expose-Headers</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Max-Age"><code>Access-Control-Max-Age</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Request-Headers"><code>Access-Control-Request-Headers</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Access-Control-Request-Method"><code>Access-Control-Request-Method</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Age"><code>Age</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Allow"><code>Allow</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Alt-Svc"><code>Alt-Svc</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Authorization"><code>Authorization</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Clear-Site-Data"><code>Clear-Site-Data</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Disposition"><code>Content-Disposition</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Encoding"><code>Content-Encoding</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Length"><code>Content-Length</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Range"><code>Content-Range</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid"><code>Content-Security-Policy</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only"><code>Content-Security-Policy-Report-Only</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Cookie2"><code>Cookie2</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/DNT"><code>DNT</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Date"><code>Date</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/ETag"><code>ETag</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Early-Data"><code>Early-Data</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Expect"><code>Expect</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Expect-CT"><code>Expect-CT</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Expires"><code>Expires</code></a></li><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy"><code>Feature-Policy</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Forwarded"><code>Forwarded</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/From"><code>From</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Host"><code>Host</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/If-Match"><code>If-Match</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/If-Modified-Since"><code>If-Modified-Since</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/If-None-Match"><code>If-None-Match</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/If-Range"><code>If-Range</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/If-Unmodified-Since"><code>If-Unmodified-Since</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Index"><code>Index</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Index$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Keep-Alive"><code>Keep-Alive</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Large-Allocation"><code>Large-Allocation</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Last-Modified"><code>Last-Modified</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Location"><code>Location</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a></li><li><span class="sidebar-icon"><span title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Pragma"><code>Pragma</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Proxy-Authenticate"><code>Proxy-Authenticate</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Proxy-Authorization"><code>Proxy-Authorization</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Public-Key-Pins"><code>Public-Key-Pins</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only"><code>Public-Key-Pins-Report-Only</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Range"><code>Range</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Referer"><code>Referer</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Referrer-Policy"><code>Referrer-Policy</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Retry-After"><code>Retry-After</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Sec-WebSocket-Accept"><code>Sec-WebSocket-Accept</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Server"><code>Server</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Server-Timing"><code>Server-Timing</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Server-Timing$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Set-Cookie2"><code>Set-Cookie2</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/SourceMap"><code>SourceMap</code></a></li><li><a href="/zh-CN/docs/Security/HTTP_Strict_Transport_Security"><code>HTTP Strict Transport Security</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/TE"><code>TE</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Timing-Allow-Origin"><code>Timing-Allow-Origin</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Tk"><code>Tk</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Trailer"><code>Trailer</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Transfer-Encoding"><code>Transfer-Encoding</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests"><code>Upgrade-Insecure-Requests</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/User-Agent"><code>用户代理</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Vary"><code>Vary</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Via"><code>Via</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/WWW-Authenticate"><code>WWW-Authenticate</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Warning"><code>Warning</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/X-Content-Type-Options"><code>X-Content-Type-Options</code></a></li><li><a href="/zh-CN/docs/Controlling_DNS_prefetching"><code>DNS 预读取</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/X-Forwarded-For"><code>X-Forwarded-For</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/X-Forwarded-Host"><code>X-Forwarded-Host</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/X-Forwarded-Proto"><code>X-Forwarded-Proto</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/X-Frame-Options"><code>X-Frame-Options 响应头</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/X-XSS-Protection"><code>X-XSS-Protection</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP request methods</summary>
+            <ol><li><a href="/zh-CN/docs/Web/HTTP/Methods/CONNECT"><code>CONNECT</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/GET"><code>GET</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/POST"><code>POST</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>HTTP response status codes</summary>
+          <ol><li><a href="/zh-CN/docs/Web/HTTP/Status/100"><code>100 Continue</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/101"><code>101 Switching Protocol</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/200"><code>200 OK</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/201"><code>201 Created</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/202"><code>202 Accepted</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/203"><code>203 Non-Authoritative Information</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/204"><code>204 No Content</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/205"><code>205 Reset Content</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/206"><code>206 Partial Content</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/300"><code>300 Multiple Choices</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/301"><code>301 Moved Permanently</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/302"><code>302 Found</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/303"><code>303 See Other</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/304"><code>304 Not Modified</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/307"><code>307 Temporary Redirect</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/308"><code>308 Permanent Redirect</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/400"><code>400 Bad Request</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/401"><code>401 Unauthorized</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/403"><code>403 Forbidden</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/404"><code>404 Not Found</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/405"><code>405 Method Not Allowed</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/406"><code>406 Not Acceptable</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/407"><code>407 Proxy Authentication Required</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/408"><code>408 Request Timeout</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/409"><code>409 Conflict</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/410"><code>410 Gone</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/411"><code>411 Length Required</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/412"><code>412 Precondition Failed（先决条件失败）</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/413"><code>413 Payload Too Large</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/414"><code>414 URI Too Long</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/415"><code>415 Unsupported Media Type</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/416"><code>416 Range Not Satisfiable</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/417"><code>417 Expectation Failed</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/418"><code>418 I&apos;m a teapot</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/422"><code>422 Unprocessable Entity</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/425"><code>425 Too Early</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/426"><code>426 Upgrade Required</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/428"><code>428 Precondition Required</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/429"><code>429 Too Many Requests</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/431"><code>431 Request Header Fields Too Large</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/451"><code>451 Unavailable For Legal Reasons</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/500"><code>500 内部服务器错误</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/501"><code>501 Not Implemented</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/502"><code>502 Bad Gateway</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/503"><code>503 Service Unavailable</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/504"><code>504 Gateway Timeout</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/505"><code>505 HTTP Version Not Supported</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Status/511"><code>511 Network Authentication Required</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CSP directives</summary>
+          <ol><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/base-uri"><code>CSP: base-uri</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/block-all-mixed-content"><code>CSP: block-all-mixed-content</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/child-src"><code>CSP: child-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/child-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/connect-src"><code>CSP: connect-src</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/default-src"><code>CSP: default-src</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/font-src"><code>CSP: font-src</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/form-action"><code>CSP: form-action</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/form-action$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/frame-ancestors"><code>CSP: frame-ancestors</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src"><code>CSP: frame-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/img-src"><code>CSP: img-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/img-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src"><code>CSP: manifest-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/media-src"><code>CSP: media-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/media-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/object-src"><code>CSP: object-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/object-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types"><code>CSP: plugin-types</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/referrer"><code>CSP: referrer</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/referrer$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri"><code>CSP: report-uri</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/require-sri-for"><code>CSP: require-sri-for</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox"><code>CSP: sandbox</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"><code>CSP: script-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/script-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/style-src"><code>CSP: style-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/style-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/upgrade-insecure-requests"><code>CSP: upgrade-insecure-requests</code></a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src"><code>CSP: worker-src</code></a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Content-Security-Policy__by_cnvoid/report-to"><code>report-to</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CORS errors</summary>
+          <ol><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSDisabled">Reason: CORS disabled</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; does not match &apos;xyz&apos;</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; missing</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded">Reason: CORS header ‘Origin’ cannot be added</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed">Reason: CORS preflight channel did not succeed</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSDidNotSucceed">Reason: CORS request did not succeed</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed">Reason: CORS request external redirect not allowed</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp">Reason: CORS request not HTTP</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials">Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound">Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed">Reason: Multiple CORS header &apos;Access-Control-Allow-Origin&apos; not allowed</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials">Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight">Reason: missing token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight$translate">[我来译!]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>Feature-Policy directives</summary>
+          <ol><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/autoplay">Feature-Policy: autoplay</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/autoplay$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/camera">Feature-Policy: camera</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/camera$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media">Feature-Policy: encrypted-media</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/fullscreen">Feature-Policy: fullscreen</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/fullscreen$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/geolocation">Feature-Policy: geolocation</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/geolocation$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/microphone">Feature-Policy: microphone</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/microphone$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/midi">Feature-Policy: midi</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/midi$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/payment">Feature-Policy: payment</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/payment$translate">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/vr">Feature-Policy: vr</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/vr$translate">[我来译!]</a></li><li><span class="sidebar-icon"><span title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/document-domain">document-domain</a> <a style="opacity: 0.5;" href="/zh-CN/docs/Web/HTTP/Headers/Feature-Policy/document-domain$translate">[我来译!]</a></li></ol>
+        </details>
+    </li>
+  </ol>
+</section></div>
+
+<div> </div>
+
+<div>为不同浏览器提供不同的网页或服务通常是一个坏主意。互联网的本意是让任何人都可以访问，无论他们使用哪个浏览器或设备。有一些方法可以根据功能的可用性而不是针对特定的浏览器来开发您的网站以逐步增强自身。</div>
+
+<div> </div>
+
+<p>　但浏览器和标准并不完美，仍然需要检测浏览器的一些边缘情况。使用用户代理检测浏览器看起来很简单，但是做得很好，实际上是一个非常困难的问题。本文档将指导您尽可能正确地进行此操作。</p>
+
+<div class="note">
+<p>值得重申的是：使用用户代理嗅探很少会成为一个好主意。你几乎总能发现一个更好的、更广泛兼容的方式来解决你的问题。</p>
+</div>
+
+<h2 id="在使用浏览器检测之前需要考虑的一些事情">在使用浏览器检测之前需要考虑的一些事情</h2>
+
+<p>　当你考虑使用用户代理字段来检测用户正在使用哪种浏览器的时候，第一步是试着回避它。从想明白你<strong>为什么</strong>要这样做开始。</p>
+
+<dl>
+ <dt>你正尝试解决某个浏览器的某个版本中的一个特定错误吗？</dt>
+ <dd>在专业论坛中查找、询问：你不太可能是第一个遇到这个问题的人。 你也可以询问专家，或者仅仅是那些和你持有不同观点的人们，他们能提供给你不同的思路。如果这个问题看上去是不常见的，你需要检查一下是否这个错误已经通过错误跟踪系统(<a href="https://bugzilla.mozilla.org" class="link-https">Mozilla</a>; <a href="http://bugs.webkit.org" class="external">WebKit</a>; <a href="https://bugs.opera.com/" class="link-https">Opera</a>)报告给浏览器厂商。浏览器开发商非常关注错误报告，相关的分析也可能会有其他解决方案的提示。</dd>
+ <dt>你正尝试检查某个特性是否可用吗？</dt>
+ <dd>你的站点需要使用一个特定的网页特性，然而有一些浏览器还不支持该特性，你想发给那些使用不支持该特性的浏览器的用户一个更老的网页，该网页有更少的特性，但是你知道他们将正常显示。这是最糟糕的使用用户代理检测的理由，因为有很大的概率最终其余的所有浏览器都将使用这个特性。你应该尽你最大努力在这种可能情况下阻止使用用户代理嗅探器，作为替代，使用功能检测器。</dd>
+ <dt>你想依据正在使用的是哪个浏览器来提供不同的HTML页面吗？</dt>
+ <dd>这通常是一个坏的做法，不过有些情况下这又是必要的。在这些情形下，你首先应该分析你所处的情形并确定这确实是必要的。你是否可以通过添加一些无语义的 <a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，它在语义上不代表任何特定类型的内容，它可以被用来对其它元素进行分组，一般用于样式化相关的需求（使用 class 或 id 特性) 或者对具有相同特性的一组元素进行分组 (比如 lang)，它应该在没有任何其它语义元素可用时才使用 (比如 &lt;article&gt; 或 &lt;nav&gt;) 。"><code>&lt;div&gt;</code></a> 或者 <a href="/zh-CN/docs/Web/HTML/Element/span" title="HTML &lt;span&gt; 元素是短语内容的通用行内容器，并没有任何特殊语义。可以使用它来编组元素以达到某种样式意图（通过使用类或者Id属性），或者这些元素有着共同的属性，比如lang。应该在没有其他合适的语义元素时才使用它。&lt;span&gt; 与 &lt;div&gt; 元素很相似，但 &lt;div&gt; 是一个 块元素 而 &lt;span&gt; 则是  行内元素 ."><code>&lt;span&gt;</code></a> 元素来避免呢？想成功使用用户代理检测是困难的，值得牺牲一些HTML的整洁性来换取。另外，也请重新思考一下你的设计：能否通过使用渐进增强或者流体布局来去除使用用户代理检测的需要呢？</dd>
+</dl>
+
+<h2 id="避免进行用户代理检测">避免进行用户代理检测</h2>
+
+<p>　如果你想要尝试避免使用用户代理检测，在某些情形下有些可供选择的方法。</p>
+
+<dl>
+ <dt>功能检测</dt>
+ <dd>使用功能检测，你不需要弄清楚是哪种浏览器正在渲染你的页面，你只需要检测你需要的某个特定功能是否可用即可。如果该功能不可用，使用一个应变策略。然而，在某些罕见的情形下，你确实需要检测浏览器种类，由于其他浏览器也会在将来以不同方式实现这个功能，绝不要使用功能检测来判断。由此造成的错误将非常难发现和修复。</dd>
+ <dt>渐进增强</dt>
+ <dd>这种设计技术涉及了按照“层次”开发网页，使用自底向上的方法，从一个简单的层次开始，在一系列连续的层次中通过使用更多的功能来逐步提升站点的能力。</dd>
+ <dt>优雅降级</dt>
+ <dd>这是一种自顶向下的方式，在搭建可能最好的的站点时使用所有你想要的功能，然后稍微改进使其能在更老版本的浏览器上工作。与渐进增强的方法相比，这种方法可能更困难、效率更低，不过在一些情景下也许是有效的。</dd>
+</dl>
+
+<h2 id="用户代理中的哪个部分包含你正在寻找的信息">用户代理中的哪个部分包含你正在寻找的信息</h2>
+
+<p>　由于用户代理字串的不同部分缺乏统一性，这是一个较难对付的问题。</p>
+
+<h3 id="浏览器名">浏览器名</h3>
+
+<p>　当人们说他们想要进行“浏览器检测”的时候，他们实际上经常想要进行的是“渲染引擎检测”。你实际上想要检测使用的是火狐（Firefox）还是与之对应的海猴（SeaMonkey），或者使用的是Chrome还是与之对应的Chromium？或者你实际上只不过想看浏览器是否正在使用Gecko还是WebKit渲染引擎？如果这正是你需要的，请参阅后面的部分。</p>
+
+<p>　除了IE浏览器这个显著的例外，大部分的浏览器以浏览器名/版本号的格式设置浏览器名和版本。但是由于浏览器名不是用户代理字符串中唯一一个以这种格式命名的信息，你不能发现浏览器名，你只能检测是否这是你正在寻找的名字。但是要注意到，一些浏览器在说谎：例如Chrome的用户代理字符串中既会包含Chrome又会包含Safari。所以为了检测Safari浏览器，你不得不检测其中是否有Safari字符串同时没有Chrome字符串，Chromium也经常汇报它自己是Chrome浏览器，海猴有时也汇报它自己是火狐浏览器。</p>
+
+<p>　也要注意不要对浏览器名使用简单的正则表达式，用户代理字符串中也包含不属于键值对形式的字符串。例如在Safari和Chrome中包含有“like Gecko”一样的字符串。</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col"> </th>
+   <th scope="col">必须包含</th>
+   <th scope="col">禁止包含</th>
+   <th scope="col"> </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Firefox</td>
+   <td>Firefox/xyz</td>
+   <td>Seamonkey/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Seamonkey</td>
+   <td>Seamonkey/xyz</td>
+   <td> </td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Chrome</td>
+   <td>Chrome/xyz</td>
+   <td>Chromium/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Chromium</td>
+   <td>Chromium/xyz</td>
+   <td> </td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Safari</td>
+   <td>Safari/xyz</td>
+   <td>Chrome/xyz or Chromium/xyz</td>
+   <td>Safari 有两个版本号，一个技术性较强，格式是Safari/xyz，一个对用户友好一点，格式是Version/xyz</td>
+  </tr>
+  <tr>
+   <td>Opera</td>
+   <td>
+    <p>OPR/xyz <sup>[1]</sup></p>
+
+    <p>Opera/xyz <sup>[2]</sup></p>
+   </td>
+   <td> </td>
+   <td>
+    <p><sup>[1]</sup> Opera 15+ (基于Blink的引擎) </p>
+
+    <p><sup>[2]</sup> Opera 12- (基于Presto的引擎)</p>
+   </td>
+  </tr>
+  <tr>
+   <td>Internet Explorer</td>
+   <td>; MSIE xyz;</td>
+   <td> </td>
+   <td>IE浏览器的名字并没有使用<em>BrowserName/VersionNumber</em>的格式</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>　当然，这里并没有保证其它浏览器不劫持上述字符串（像在过去，Chrome劫持了Safari的字符串）。这就是为什么使用用户代理字段进行浏览器检测是不可信的，并且做这个检测也仅仅应该是为了检测版本号（劫持过去的版本号这种事情很少发生）。</p>
+
+<h3 id="浏览器版本">浏览器版本</h3>
+
+<p>　浏览器版本号通常但并不总是出现在用户代理字符串的<em>浏览器名/版本号</em>记号的值的位置。IE浏览器（该浏览器放置版本号刚好在MSIE记号之后）以及在版本10之后的Opera（新增了版本/版本号标记）就是例子。</p>
+
+<p>　此处再一次强调，由于并没有保证其它标记会包含有效的数字，请确保选取你正在寻找的浏览器的正确的标记。</p>
+
+<h3 id="渲染引擎">渲染引擎</h3>
+
+<p>　正如早先提及到的，在大多数情况下，寻找渲染引擎是一个更好的方式。这将有助于保留鲜为人知的浏览器。使用共同的渲染引擎的浏览器将以相同的方式显示页面：这经常是一个公平的假设：一处有效，处处有效。</p>
+
+<p>　现在市面上有5个主流的渲染引擎：Trident，Gecko，Presto，Blink和WebKit。由于嗅探渲染引擎名是很普遍的，大量的用户代理在其字段中增加其它的渲染引擎名来触发检测。因此当检测渲染引擎的时候，一件很重要的事情，就是要避免“假阳性”（注：false-positives，指一个特性可通过检测，但实际在该浏览器下并不可靠或不可用）情况的发生。</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col"> </th>
+   <th scope="col">必须包含</th>
+   <th scope="col"> </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Gecko</td>
+   <td>Gecko/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>WebKit</td>
+   <td>AppleWebKit/xyz</td>
+   <td>请注意，WebKit浏览器包含了&apos;like Gecko&apos;字符串，如果不加以注意，可能会触发检测Gecko的false positive。</td>
+  </tr>
+  <tr>
+   <td>Presto</td>
+   <td>Opera/xyz</td>
+   <td><strong>注:</strong> 在Opera浏览器在15及以上的版本中，已经不再使用Presto（参见&apos;Blink&apos;）。</td>
+  </tr>
+  <tr>
+   <td>Trident</td>
+   <td>Trident/xyz</td>
+   <td>IE浏览器将此字符串放在User Agent字符串的<em>注释</em>部分。</td>
+  </tr>
+  <tr>
+   <td>Blink</td>
+   <td>Chrome/xyz</td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="渲染引擎版本">渲染引擎版本</h2>
+
+<p>　除了Gecko这个显著的例外，大部分的渲染引擎将版本号放置在渲染引擎/版本号标记中。 该引擎将Gecko版本号放置在用户代理的注释部分，在rv字符串之后。在手机版Gecko14以及桌面版Gecko17之后，该引擎也在Gecko/version标记处放置版本号的值（先前的版本中此处放置的是构建日期，然后固定的日期调用GeckoTrail）。</p>
+
+<h2 id="操作系统">操作系统</h2>
+
+<p>　大多数的用户代理字符串也给出了用户使用的操作系统（尽管像Firefox OS这样的网络为中心的操作系统没有给出），但是给出的形式却多种多样。在用户代理的注释部分以夹在两个分号之间的固定字符串形式给出。对于每一个浏览器，这些字符串是特定的。这些字符串在显示操作系统的同时，也经常显示它的版本和其依赖的硬件信息（32位还是64位，或者是Mac平台的intel/PPC）.</p>
+
+<p>　正如所有情形一样，这些字符串在将来也可能会改变，我们应该仅仅与已经发布的浏览器一起使用它们。当新的浏览器版本发布的时候，一份修改脚本以适应新版本的技术调查必须出现。</p>
+
+<h3 id="手机，平板或者台式电脑">手机，平板或者台式电脑</h3>
+
+<p>　执行用户代理嗅探的一个最普遍的原因是查明浏览器是在何种硬件设备上运行的。而这么做的目的是对不同类型的设备提供不同的HTML页面。</p>
+
+<ul>
+ <li>从不要假设一款浏览器或者一种渲染引擎仅仅运行在一种类型的设备上。特别是不要对不同种类的浏览器或者渲染引擎采用不同的默认值。</li>
+ <li>从不要使用OS标记来定义是否该浏览器运行在手机、平板或者桌面机上。同一种操作系统也许也运行在不止一种类型的设备上（例如，Android既能在平板上运行也能在手机上运行）。</li>
+</ul>
+
+<p>下面这张表格总结了主要浏览器开发商声明他们的浏览器运行在手机设备上的方式：</p>
+
+<table>
+ <caption>主流浏览器用户代理字符串</caption>
+ <thead>
+  <tr>
+   <th scope="col">浏览器</th>
+   <th scope="col">规则</th>
+   <th scope="col">示例</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Mozilla (Gecko, Firefox)</td>
+   <td>注释中的 <a href="/en-US/docs/Gecko_user_agent_string_reference"><strong>Mobile或</strong><strong>Tablet标记</strong></a></td>
+   <td>Mozilla/5.0 (Android; Mobile; rv:13.0) Gecko/13.0 Firefox/13.0</td>
+  </tr>
+  <tr>
+   <td>WebKit-based (Android, Safari)</td>
+   <td>注释外的<a href="https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/OptimizingforSafarioniPhone/OptimizingforSafarioniPhone.html#//apple_ref/doc/uid/TP40006517-SW3"><strong>Mobile Safari标记</strong></a></td>
+   <td>Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30</td>
+  </tr>
+  <tr>
+   <td>Blink-based (Chromium, Google Chrome, Opera 15+)</td>
+   <td>注释外的<a href="https://developers.google.com/chrome/mobile/docs/user-agent"><strong>Mobile Safari标记</strong></a></td>
+   <td>Mozilla/5.0 (Linux; Android 4.4.2); Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Mobile Safari/537.36 OPR/20.0.1396.72047</td>
+  </tr>
+  <tr>
+   <td>Presto-based (Opera 12-)</td>
+   <td>
+    <p>注释中的<a href="http://my.opera.com/community/openweb/idopera/"><strong>Opera Mobi/xyz标记</strong></a>(Opera 12-)</p>
+   </td>
+   <td>
+    <p>Opera/9.80 (Android 2.3.3; Linux; Opera Mobi/ADR-1111101157; U; es-ES) Presto/2.9.201 Version/11.50</p>
+   </td>
+  </tr>
+  <tr>
+   <td>Internet Explorer</td>
+   <td>注释中的<strong>IEMobile/xyz标记</strong></td>
+   <td>Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>总之，我们建议检测移动设备的时候，在用户代理字符串中寻找“Mobi”字符串。</p>
+
+<div class="note">
+<p>如果设备屏幕足够大，它就不会被用“Mobi”标记，你应该提供给用户你的桌面版网页（由于越来越多的桌面设备开始配有触摸屏，作为一个最佳体验，不管怎样，应该在该网页中提供触碰输入）</p>
+</div>

@@ -1,0 +1,361 @@
+---
+title: 使用 CSS 动画
+slug: Web/CSS/CSS_Animations/Using_CSS_animations
+tags:
+  - Advanced
+  - CSS
+  - CSS Animations
+  - Example
+  - Experimental
+  - Guide
+  - Using CSS animations
+translation_of: Web/CSS/CSS_Animations/Using_CSS_animations
+---
+<div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/Reference">CSS 参考</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/CSS_Animations">CSS Animations</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Tips">CSS Animations tips and tricks</a></li><li><a href="/zh-CN/docs/Web/CSS/CSS_Animations/Detecting_CSS_animation_support">检测CSS动画的支持性</a></li><li><em>使用 CSS 动画</em></li></ol></details></li><li class="toggle"><details open><summary>At-Rules</summary><ol><li><a href="/zh-CN/docs/Web/CSS/@keyframes"><code>CSS3中的关键帧</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a></li><li><a href="/zh-CN/docs/Web/CSS/timing-function"><code>&lt;timing-function&gt;</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation"><code>animation</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-delay"><code>animation-delay</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-direction"><code>animation-direction</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-duration"><code>animation-duration</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-fill-mode"><code>animation-fill-mode</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-iteration-count"><code>animation-iteration-count</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-name"><code>animation-name</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-play-state"><code>animation-play-state</code></a></li><li><a href="/zh-CN/docs/Web/CSS/animation-timing-function"><code>animation-timing-function</code></a></li></ol></details></li></ol></section>
+
+<p><strong>CSS animations </strong>使得可以将从一个CSS样式配置转换到另一个CSS样式配置。动画包括两个部分:描述动画的样式规则和用于指定动画开始、结束以及中间点样式的关键帧。</p>
+
+<p>相较于传统的脚本实现动画技术，使用CSS动画有三个主要优点：</p>
+
+<ol>
+ <li><span style="line-height: 1.5;">能够非常容易地创建简单动画，你甚至不需要了解JavaScript就能创建动画。</span></li>
+ <li><span style="line-height: 1.5;">动画运行效果良好，甚至在低性能的系统上。渲染引擎会使用跳帧或者其他技术以保证动画表现尽可能的流畅。而使用JavaScript实现的动画通常表现不佳（除非经过很好的设计）。</span></li>
+ <li style="margin-bottom: 0px;"><span style="line-height: 1.5;">让浏览器控制动画序列，允许浏览器优化性能和效果，如降低位于隐藏选项卡中的动画更新频率。</span></li>
+</ol>
+
+<h2 id="配置动画">配置动画</h2>
+
+<p>创建动画序列，需要使用<a href="/zh-CN/docs/Web/CSS/animation" title="CSS animation 属性是 animation-name，animation-duration, animation-timing-function，animation-delay，animation-iteration-count，animation-direction，animation-fill-mode 和 animation-play-state 属性的一个简写属性形式。"><code>animation</code></a>属性或其子属性，该属性允许配置动画时间、时长以及其他动画细节，但该属性不能配置动画的实际表现，动画的实际表现是由 <a href="/zh-CN/docs/Web/CSS/@keyframes" title="@keyframes 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。这比转换更能控制动画序列的中间步骤。"><code>@keyframes</code></a>规则实现，具体情况参见<a href="#使用keyframes定义动画序列">使用keyframes定义动画序列</a>小节部分。</p>
+
+<p style="margin-bottom: 0px;"><span style="line-height: 1.5;"><a href="/zh-CN/docs/Web/CSS/animation" title="CSS animation 属性是 animation-name，animation-duration, animation-timing-function，animation-delay，animation-iteration-count，animation-direction，animation-fill-mode 和 animation-play-state 属性的一个简写属性形式。"><code>animation</code></a></span>的子属性有:</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<dl>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-delay" title="animation-delay CSS属性定义动画于何时开始，即从动画应用在元素上到动画开始的这段时间的长度。"><code>animation-delay</code></a></strong></dt>
+ <dd>设置延时，即从元素加载完成之后到动画序列开始执行的这段时间。</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-direction" title="animation-direction CSS 属性指示动画是否反向播放，它通常在简写属性animation中设定"><code>animation-direction</code></a></strong></dt>
+ <dd>设置动画在每次运行完后是反向运行还是重新回到开始位置重复运行。</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-duration" title="animation-duration属性指定一个动画周期的时长。"><code>animation-duration</code></a></strong></dt>
+ <dd>设置动画一个周期的时长。</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-iteration-count" title="animation-iteration-count CSS 属性   定义动画在结束前运行的次数 可以是1次 无限循环."><code>animation-iteration-count</code></a></strong></dt>
+ <dd>设置动画重复次数， 可以指定infinite无限次重复动画</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-name" title="使用简写属性animation可以很方便地同时设置所有的动画属性。"><code>animation-name</code></a></strong></dt>
+ <dd><span style="line-height: 1.5;">指定由</span><a href="/zh-CN/docs/Web/CSS/@keyframes" title="@keyframes 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。这比转换更能控制动画序列的中间步骤。"><code>@keyframes</code></a><span style="line-height: 1.5;">描述的关键帧名称。</span></dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-play-state" title="animation-play-state CSS 属性定义一个动画是否运行或者暂停。可以通过查询它来确定动画是否正在运行。另外，它的值可以被设置为暂停和恢复的动画的重放。"><code>animation-play-state</code></a></strong></dt>
+ <dd>允许暂停和恢复动画。</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-timing-function" title="CSS animation-timing-function属性定义CSS动画在每一动画周期中执行的节奏。可能值为一或多个 &lt;timing-function&gt;。"><code>animation-timing-function</code></a></strong></dt>
+ <dd>设置动画速度， 即通过建立加速度曲线，设置动画在关键帧之间是如何变化。</dd>
+ <dt><strong style="font-weight: bold;"><a href="/zh-CN/docs/Web/CSS/animation-fill-mode" title="CSS 属性 animation-fill-mode 设置CSS动画在执行之前和之后如何将样式应用于其目标。"><code>animation-fill-mode</code></a></strong></dt>
+ <dd>指定动画执行前后如何为目标元素应用样式。</dd>
+</dl>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<h2 id="使用keyframes定义动画序列">使用keyframes定义动画序列</h2>
+
+<p style="margin-bottom: 0px;">一旦完成动画的时间设置， 接下来就需要定义动画的表现。通过使用<a href="/zh-CN/docs/Web/CSS/@keyframes" title="@keyframes 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。这比转换更能控制动画序列的中间步骤。"><code>@keyframes</code></a>建立两个或两个以上关键帧来实现。每一个关键帧都描述了动画元素在给定的时间点上应该如何渲染。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">因为动画的时间设置是通过CSS样式定义的，关键帧使用<a href="/zh-CN/docs/Web/CSS/percentage" title="CSS 数据类型 &lt;percentage&gt; 表述一个百分比值。许多 CSS 属性 可以取百分比值，经常用以根据父对象来确定大小。百分比值由一个&lt;number&gt;具体数值后跟着%符号构成. 就像其它在css里的单位一样，在%和数值之间是不允许有空格的。"><code>percentage</code></a>来指定动画发生的时间点。<code>0%</code>表示动画的第一时刻，<code>100%</code>表示动画的最终时刻。因为这两个时间点十分重要，所以还有特殊的别名：<code>from</code>和<code>to</code>。这两个都是可选的，若<code>from/0%</code>或<code>to/100%</code>未指定，则浏览器使用计算值开始或结束动画。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">也可包含额外可选的关键帧，描述动画开始和结束之间的状态。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<h2 id="示例">示例</h2>
+
+<div class="note"><strong>注意:</strong> <span style="color: #4d4e53; font-style: normal; line-height: 1.5;">这里的示例没有在CSS动画属性上使用任何前缀，Webkit内核浏览器或者早期版本浏览器可能需要前缀，下面的实例包含了<code>-webkit-</code>前缀。</span></div>
+
+<h3 id="文本滑过浏览器窗口">文本滑过浏览器窗口</h3>
+
+<p><span style="line-height: 1.5;">该例中<a href="/zh-CN/docs/Web/HTML/Element/p" title="HTML &lt;p&gt;元素（或者说 HTML 段落元素）表示文本的一个段落。该元素通常表现为一整块与相邻文本分离的文本，或以垂直的空白隔离或以首行缩进。另外，&lt;p&gt; 是块级元素。"><code>&lt;p&gt;</code></a> </span><span style="line-height: 1.5;">元素由浏览器窗口右边滑至左边</span></p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<p style="margin-bottom: 0px;"><a href="/zh-CN/docs/Web/CSS/animation-duration" title="animation-duration属性指定一个动画周期的时长。"><code>animation-duration</code></a>属性指定 <a href="/zh-CN/docs/Web/HTML/Element/p" title="HTML &lt;p&gt;元素（或者说 HTML 段落元素）表示文本的一个段落。该元素通常表现为一整块与相邻文本分离的文本，或以垂直的空白隔离或以首行缩进。另外，&lt;p&gt; 是块级元素。"><code>&lt;p&gt;</code></a> 上的动画从开始到结束耗费3秒，<a href="/zh-CN/docs/Web/CSS/@keyframes" title="@keyframes 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。这比转换更能控制动画序列的中间步骤。"><code>@keyframes</code></a> 指定使用名字为&quot;slidein&quot;的关键帧。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">如果希望在不支持CSS动画的浏览器中使用自定义样式，应该将其写在这里;然而，在该例中，我们不需要除动画效果以外的任何自定义样式。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">关键帧是用<a href="/zh-CN/docs/Web/CSS/@keyframes" title="@keyframes 规则通过在动画序列中定义关键帧（或waypoints）的样式来控制CSS动画序列中的中间步骤。这比转换更能控制动画序列的中间步骤。"><code>@keyframes</code></a>定义的。该例中，我们只使用了两个关键帧。第一个出现在0%(此例中使用了别名<code>from</code>)处，此处元素的左边距为100%(即位于容器的右边界)，宽为300%(即容器宽度的3倍)，使得在动画的第一帧中标题位于浏览器窗口右边界之外。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">第二帧出现在100%(此例中使用了别名<code>to</code>)。元素的左边距设为0%，宽设为100%，使得动画结束时元素与窗口左边界对齐。</p>
+
+<pre class="brush: html">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_文本滑过浏览器窗口" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations$samples/%E6%96%87%E6%9C%AC%E6%BB%91%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E7%AA%97%E5%8F%A3?revision=1509553" width="100%"></iframe></p>
+
+<h3 id="增加关键帧">增加关键帧</h3>
+
+<p style="margin-bottom: 0px;">让我们给上面的示例中添加一个关键帧，比如标题的字号先变大然后恢复正常，添加这个关键帧十分简单：</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<pre class="brush: css">75% {
+  font-size: 300%;
+  margin-left: 25%;
+  width: 150%;
+}
+</pre>
+
+<pre class="brush: css hidden">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<pre class="brush: html hidden">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p>在动画序列执行到75%的时候，标题元素的左边距为25%，宽度为150%。</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_增加关键帧" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations$samples/%E5%A2%9E%E5%8A%A0%E5%85%B3%E9%94%AE%E5%B8%A7?revision=1509553" width="100%"></iframe></p>
+
+<h3 id="重复动画">重复动画</h3>
+
+<p><a href="/zh-CN/docs/Web/CSS/animation-iteration-count" title="animation-iteration-count CSS 属性   定义动画在结束前运行的次数 可以是1次 无限循环."><code>animation-iteration-count</code></a>用以指定动画重复的次数，仅仅使用该属性就能使动画重复播放。在该例中，设该属性为<code>infinite</code>以使动画无限重复</p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+  animation-iteration-count: infinite;
+}
+</pre>
+
+<pre class="brush: css hidden">@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<pre class="brush: html hidden">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_重复动画" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations$samples/%E9%87%8D%E5%A4%8D%E5%8A%A8%E7%94%BB?revision=1509553" width="100%"></iframe></p>
+
+<h3 id="来回运动">来回运动</h3>
+
+<p>上面实现了动画的重复播放，但是每次动画开始时总跳回开始位置显得很怪异。我们真正想要的是标题来回滑动，这时只需要设置<a href="/zh-CN/docs/Web/CSS/animation-direction" title="animation-direction CSS 属性指示动画是否反向播放，它通常在简写属性animation中设定"><code>animation-direction</code></a>属性为<code>alternate</code>。</p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+</pre>
+
+<pre class="brush: css hidden">@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<pre class="brush: html hidden">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_来回运动" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations$samples/%E6%9D%A5%E5%9B%9E%E8%BF%90%E5%8A%A8?revision=1509553" width="100%"></iframe></p>
+
+<h3 id="使用动画事件">使用动画事件</h3>
+
+<div>利用动画事件可以更好的控制动画和信息。这些事件由 <a href="/zh-CN/docs/Web/API/Event/AnimationEvent" title="此页面仍未被本地化, 期待您的翻译!"><code>AnimationEvent</code></a>对象表示，可探测动画何时开始结束和开始新的循环。每个事件包括动画发生的时间和触发事件的动画名称。</div>
+
+<div> </div>
+
+<div>我们将修改滑动文本示例，输出每个动画事件出现时的信息。</div>
+
+<pre class="brush: css">.slidein {
+  -moz-animation-duration: 3s;
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -moz-animation-name: slidein;
+  -webkit-animation-name: slidein;
+  animation-name: slidein;
+  -moz-animation-iteration-count: 3;
+  -webkit-animation-iteration-count: 3;
+  animation-iteration-count: 3;
+  -moz-animation-direction: alternate;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+}
+
+@-moz-keyframes slidein {
+  from {
+    margin-left:100%;
+    width:300%
+  }
+
+  to {
+    margin-left:0%;
+    width:100%;
+  }
+}
+
+@-webkit-keyframes slidein {
+  from {
+    margin-left:100%;
+    width:300%
+  }
+
+  to {
+   margin-left:0%;
+   width:100%;
+ }
+}
+
+@keyframes slidein {
+  from {
+    margin-left:100%;
+    width:300%
+  }
+
+  to {
+   margin-left:0%;
+   width:100%;
+ }
+}</pre>
+
+<h4 id="添加动画事件监听器">添加动画事件监听器</h4>
+
+<p>我们使用JavaScript代码监听所有三种可能的动画事件，<code>setup()</code>方法设置事件监听器，当文档第一次加载完成时执行该方法。</p>
+
+<pre class="brush: js">var e = document.getElementById(&quot;watchme&quot;);
+e.addEventListener(&quot;animationstart&quot;, listener, false);
+e.addEventListener(&quot;animationend&quot;, listener, false);
+e.addEventListener(&quot;animationiteration&quot;, listener, false);
+
+e.className = &quot;slidein&quot;;
+</pre>
+
+<div>以上是非常标准的代码写法，setup()最后设置动画元素的<code>class</code>为slidein，启动动画。</div>
+
+<div> </div>
+
+<div>为什么这样做?因为<code>animationstart</code>事件在动画一开始时就被触发，在我们的示例中，该事件在我们的代码执行前就被触发，所以我们自己通过设置元素的的<code>class</code>来启动动画。</div>
+
+<div> </div>
+
+<h4 id="接收事件">接收事件</h4>
+
+<p>事件传递给<code>listener()</code>函数，代码如下所示</p>
+
+<pre class="brush: js">function listener(e) {
+  var l = document.createElement(&quot;li&quot;);
+  switch(e.type) {
+    case &quot;animationstart&quot;:
+      l.innerHTML = &quot;Started: elapsed time is &quot; + e.elapsedTime;
+      break;
+    case &quot;animationend&quot;:
+      l.innerHTML = &quot;Ended: elapsed time is &quot; + e.elapsedTime;
+      break;
+    case &quot;animationiteration&quot;:
+      l.innerHTML = &quot;New loop started at time &quot; + e.elapsedTime;
+      break;
+  }
+  document.getElementById(&quot;output&quot;).appendChild(l);
+}</pre>
+
+<p style="margin-bottom: 0px;">这段代码同样非常简单，简单地通过<a href="/zh-CN/docs/Web/API/Event/type" title="只读属性 Event.type 会返回一个字符串, 表示该事件对象的事件类型。"><code>event.type</code></a>来判断发生的是何种事件，然后添加对应的注解到<a href="/zh-CN/docs/Web/HTML/Element/ul" title="HTML &lt;ul&gt; 元素（或称 HTML 无序列表元素）表示一个内可含多个元素的无序列表或项目符号列表。"><code>&lt;ul&gt;</code></a>中。</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<p style="margin-bottom: 0px;">输出结果如下所示:</p>
+
+<p style="margin-bottom: 0px;"> </p>
+
+<ul>
+ <li>Started: elapsed time is 0</li>
+ <li>New loop started at time 3.01200008392334</li>
+ <li>New loop started at time 6.00600004196167</li>
+ <li>Ended: elapsed time is 9.234000205993652</li>
+</ul>
+
+<div>注意以上时间非常接近预期时间，但不是完全相等。也要注意在最后一个周期完成后，不会触发<code>animationiteration</code>事件，而触发<code>animationend</code>事件。</div>
+
+<div> </div>
+
+<h4 id="HTML代码">HTML代码</h4>
+
+<p>下面是示例中的用到的HTML代码:</p>
+
+<pre class="brush: html">&lt;body&gt;
+  &lt;h1 id=&quot;watchme&quot;&gt;Watch me move&lt;/h1&gt;
+  &lt;p&gt;This example shows how to use CSS animations to make &lt;code&gt;h1&lt;/code&gt; elements
+  move across the page.&lt;/p&gt;
+  &lt;p&gt;In addition, we output some text each time an animation event fires, so you can see them in action.&lt;/p&gt;
+  &lt;ul id=&quot;output&quot;&gt;
+  &lt;/ul&gt;
+&lt;/body&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_使用动画事件" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/CSS_Animations/Using_CSS_animations$samples/%E4%BD%BF%E7%94%A8%E5%8A%A8%E7%94%BB%E4%BA%8B%E4%BB%B6?revision=1509553" width="600"></iframe></p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/AnimationEvent" title="AnimationEvent 接口表示提供与动画相关的信息的事件。"><code>AnimationEvent</code></a></li>
+ <li><a href="/en-US/docs/CSS/CSS_animations/Detecting_CSS_animation_support" title="en/CSS/CSS animations/Detecting CSS animation support">Detecting CSS animation support</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_CSS_transitions">Using CSS transitions</a></li>
+</ul>

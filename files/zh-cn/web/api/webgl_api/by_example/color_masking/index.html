@@ -1,0 +1,132 @@
+---
+title: Color masking
+slug: Web/API/WebGL_API/By_example/Color_masking
+translation_of: Web/API/WebGL_API/By_example/Color_masking
+---
+<div></div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Learn/WebGL/By_example/Simple_color_animation" class="button">« 上一页</a><a href="/zh-CN/docs/Learn/WebGL/By_example/Basic_scissoring" class="button">下一页  »</a></p>
+</div><p></p>
+
+<div id="color-masking">
+<div class="summary">
+<p><span class="seoSummary">这个 WebGL 示例 通过随机的颜色(random colors)应用到colorMask,从而将显示的颜色范围限制在特定的颜色通道(red/green/blue);</span></p>
+</div>
+
+<p><iframe src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/WebGL_API/By_example/Color_masking$samples/color-masking-source?revision=1438988" width="660" height="425" frameborder="0" class="live-sample-frame sample-code-frame" id="frame_color-masking-source"></iframe></p>
+
+<div id="color-masking-intro">
+<h3 id="Masking_random_colors">Masking random colors</h3>
+
+<p>This example modifies the random color animation by applying color masking with <a href="/zh-CN/docs/Web/API/WebGLRenderingContext/colorMask" title="此页面仍未被本地化, 期待您的翻译!"><code>colorMask()</code></a>. You can think of the color masking operation as if looking at the colored canvas through some tinted glass or color filter. So, by masking off the blue and green channels, you are only allowing the red component of pixels to be updated, and therefore it is as if you were looking through a red tinted glass.</p>
+
+<p>Color masking allows us to demonstrate some basics of <a href="https://en.wikipedia.org/wiki/Color_theory">color theory</a>. By masking off some channel(s), we are in fact biasing the displayed colors towards the complementary color. So, clearly masking both blue and red, would give us shades of green. Masking only the blue channel would give us shades of yellow (including shades of orange, brown, olive and yellow-green), the complementary of blue. Similarly, masking only green would give us shades of magenta (also purples, crimsons, and so on), and masking only red would give shades of cyan (also sea greens, blues, and so on).</p>
+
+<p>Note that the calls to <code>colorMask()</code> only occur when the user clicks on one of the toggle buttons. But rendering is done every second, using the timer. The color mask state of <a href="/en-US/docs/Glossary/WebGL" class="glossaryLink" title="WebGL: WebGL (Web Graphics Library) is a JavaScript API that draws interactive 2D and 3D graphics.">WebGL</a> is preserved, so we do not need to call <code>colorMask()</code> every frame to set up the color mask. This is an important aspect of the WebGL state machine. It allows us to setup WebGL in a single initialization phase, and then just execute drawing commands for each frame.</p>
+
+<p>Color masking gives you fine control of updating pixel values on the screen. By limiting the color channels that are written by each drawing command, you can use each channel, for example, to store a different grayscale image. Alternatively, you may use the <a href="/en-US/docs/Glossary/RGB" class="glossaryLink" title="RGB: Red Green Blue (RGB) is a color model that represents colors as mixtures of three underlying components (or channels), namely, red, green, and blue. Each color is described by a sequence of three numbers (typically between 0.0 and 1.0, or between 0 and 255) that represent the different intensities (or contributions) of red, green, and blue, in determining the final color.">RGB</a> components for color, but the alpha component for some custom pixel data of your invention.</p>
+
+<p>Finally, color masking teaches us that <a href="/en-US/docs/Glossary/WebGL" class="glossaryLink" title="WebGL: WebGL (Web Graphics Library) is a JavaScript API that draws interactive 2D and 3D graphics.">WebGL</a> is not only a state machine, it is also a <em>graphics pipeline</em>. This means that graphics operations in WebGL are done in a certain order, where the output of each operation serves as the input of the next. So, for example, clearing operation sets the value of each pixel to the chosen clear color. Masking occurs later in the pipeline, and modifies the pixel color value, so the final result on the screen is that of the clear color, tinted by the color mask.</p>
+</div>
+
+<div id="color-masking-source">
+<pre class="brush: html">&lt;p&gt;Tinting the displayed colors with color masking.&lt;/p&gt;
+&lt;canvas&gt;Your browser does not seem to support
+    HTML5 canvas.&lt;/canvas&gt;
+&lt;button id=&quot;red-toggle&quot;&gt;On&lt;/button&gt;
+&lt;button id=&quot;green-toggle&quot;&gt;On&lt;/button&gt;
+&lt;button id=&quot;blue-toggle&quot;&gt;On&lt;/button&gt;
+</pre>
+
+<pre class="brush: css">body {
+  text-align : center;
+}
+canvas {
+  display : block;
+  width : 280px;
+  height : 210px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+button {
+  display : inline-block;
+  font-family : serif;
+  font-size : inherit;
+  font-weight : 900;
+  color : white;
+  margin : auto;
+  padding : 0.6em 1.2em;
+}
+#red-toggle {
+  background-color : red;
+}
+#green-toggle {
+  background-color : green;
+}
+#blue-toggle {
+  background-color : blue;
+}
+</pre>
+
+<pre class="brush: js" id="livesample-js">window.addEventListener(&quot;load&quot;, function setupAnimation (evt) {
+  &quot;use strict&quot;
+  window.removeEventListener(evt.type, setupAnimation, false);
+
+  var canvas = document.querySelector(&quot;canvas&quot;);
+  var gl = canvas.getContext(&quot;webgl&quot;)
+      || canvas.getContext(&quot;experimental-webgl&quot;);
+  if (!gl) {
+    document.querySelector(&quot;p&quot;).innerHTML =
+      &quot;Failed to get WebGL context.&quot;
+      + &quot;Your browser or device may not support WebGL.&quot;;
+    return;
+  }
+  gl.viewport(0, 0,
+    gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+  var timer = setInterval(drawAnimation, 1000);
+
+  var mask = [true, true, true];
+  var redtoggle = document.querySelector(&quot;#red-toggle&quot;),
+    greentoggle = document.querySelector(&quot;#green-toggle&quot;),
+    bluetoggle = document.querySelector(&quot;#blue-toggle&quot;);
+  redtoggle.addEventListener(&quot;click&quot;, setColorMask, false);
+  greentoggle.addEventListener(&quot;click&quot;, setColorMask, false);
+  bluetoggle.addEventListener(&quot;click&quot;, setColorMask, false);
+
+  function setColorMask(evt) {
+    var index =
+      evt.target === greentoggle &amp;&amp; 1
+      || evt.target === bluetoggle &amp;&amp; 2
+      || 0;
+    mask[index] = !mask[index];
+    if (mask[index] === true)
+      evt.target.innerHTML=&quot;On&quot;;
+    else
+      evt.target.innerHTML=&quot;Off&quot;;
+    gl.colorMask(mask[0], mask[1], mask[2], true);
+    drawAnimation();
+  };
+
+  function drawAnimation () {
+    var color = getRandomColor();
+    gl.clearColor(color[0], color[1], color[2], 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  }
+
+  function getRandomColor() {
+    return [Math.random(), Math.random(), Math.random()];
+  }
+}, false);
+</pre>
+
+<p>The source code of this example is also available on <a href="https://github.com/idofilin/webgl-by-example/tree/master/color-masking">GitHub</a>.</p>
+</div>
+</div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/zh-CN/docs/Learn/WebGL/By_example/Simple_color_animation" class="button">« 上一页</a><a href="/zh-CN/docs/Learn/WebGL/By_example/Basic_scissoring" class="button">下一页  »</a></p>
+</div><p></p>

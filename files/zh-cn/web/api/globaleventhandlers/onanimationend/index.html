@@ -1,0 +1,258 @@
+---
+title: GlobalEventHandler.onanimationend
+slug: Web/API/GlobalEventHandlers/onanimationend
+translation_of: Web/API/GlobalEventHandlers/onanimationend
+---
+<h2 id="概述">概述</h2>
+
+<p>事件处理程序。 当CSS动画到达其活动期的结束时发送此事件</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="syntaxbox">var <em>animEndHandler</em> = <em>target</em>.onanimationend;
+
+<em>target</em>.onanimationend = <em>事件处理函数</em>
+</pre>
+
+<h3 id="值">值</h3>
+
+<p>当<em><code>target</code></em>(HTML元素， document 或者 window)的CSS动画已经开始，<code><a href="/zh-CN/docs/Web/Reference/Events/animationend" title="/zh-CN/docs/Web/Reference/Events/animationend">animationend</a></code>事件会触发同时<code>事件处理函数</code>会被调用。<code>事件处理函数</code>会接收到唯一的参数：<a href="/zh-CN/docs/Web/API/AnimationEvent" title="AnimationEvent 接口表示提供与动画相关的信息的事件。"><code>AnimationEvent</code></a> 描述发生的事件。</p>
+
+<h2 id="例子">例子</h2>
+
+<p></p><div class="hidden">
+<h3 id="HTML_content">HTML content</h3>
+
+<pre class="brush: html">&lt;div class=&quot;main&quot;&gt;
+  &lt;div id=&quot;box&quot;&gt;
+    &lt;div id=&quot;text&quot;&gt;Box&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;button&quot; id=&quot;play&quot;&gt;
+  Play Animation
+&lt;/div&gt;
+
+&lt;pre id=&quot;log&quot;&gt;&lt;/pre&gt;</pre>
+</div>
+
+<h3 id="CSS_content">CSS content</h3>
+
+<div class="hidden">
+<pre class="brush: css">:root {
+  --boxwidth:50px;
+}
+
+.main {
+  width: 300px;
+  height:300px;
+  border: 1px solid black;
+}
+
+.button {
+  cursor: pointer;
+  width: 300px;
+  border: 1px solid black;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 0;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  color: white;
+  background-color: darkgreen;
+  font: 14px &quot;Open Sans&quot;, &quot;Arial&quot;, sans-serif;
+}
+
+#text {
+  width: 46px;
+  padding: 10px;
+  position: relative;
+  text-align: center;
+  align-self: center;
+  color: white;
+  font: bold 1.4em &quot;Lucida Grande&quot;, &quot;Open Sans&quot;, sans-serif;
+}
+
+ </pre>
+</div>
+
+<p>Leaving out some bits of the CSS that don&apos;t matter for the discussion here, let&apos;s take a look at the styles for the box that we&apos;re animating. First is the box itself. We set its size, position, color, and layout. Note that there&apos;s nothing there about animation. That&apos;s because we don&apos;t want the box to start animating right away. We&apos;ll add the <a href="/en-US/docs/Web/CSS/animation" title="The animation shorthand CSS property sets an animated transition between styles."><code>animation</code></a> style later to start animating the box.</p>
+
+<pre class="brush: css">#box {
+  width: var(--boxwidth);
+  height: var(--boxwidth);
+  left: 0;
+  top: 0;
+  border: 1px solid #7788FF;
+  margin: 0;
+  position: relative;
+  background-color: #2233FF;
+  display: flex;
+  justify-content: center;
+}
+
+</pre>
+
+<p>The animation sequence is described next. First, the <code>&quot;slideAnimation&quot;</code> class, which establishes the <a href="/en-US/docs/Web/CSS/animation" title="The animation shorthand CSS property sets an animated transition between styles."><code>animation</code></a> that will cause the box to move over the course of five seconds, one time, using the <code>&quot;slideBox&quot;</code> keyframe set. The keyframes are defined next; they describe an animation which causes the box to migrate from the top-left corner of the container to the bottom-right corner.</p>
+
+<pre class="brush: css">.slideAnimation {
+  animation: 5s ease-in-out 0s 1 slideBox;
+}
+
+@keyframes slideBox {
+  from {
+    left:0;
+    top:0;
+  }
+  to {
+    left:calc(100% - var(--boxwidth));
+    top:calc(100% - var(--boxwidth))
+  }
+}
+</pre>
+
+<p>Since the CSS describes the animation but doesn&apos;t connect it to the box, we&apos;ll need some JavaScript code to do that.  We&apos;ll get to that shortly.</p>
+
+<h3 id="JavaScript_content">JavaScript content</h3>
+
+<p>Before we get to the animation code, we define a function which logs information to a box on the user&apos;s screen. We&apos;ll use this to show information about the events we receive. Note the use of <a href="/en-US/docs/Web/API/AnimationEvent/animationName" title="The AnimationEvent.animationName read-only property is a DOMString containing the value of the animation-name CSS property associated with the transition."><code>AnimationEvent.animationName</code></a> and <a href="/en-US/docs/Web/API/AnimationEvent/elapsedTime" title="The AnimationEvent.elapsedTime read-only property is a float giving the amount of time the animation has been running, in seconds, when this event fired, excluding any time the animation was paused. For an &quot;animationstart&quot; event, elapsedTime is 0.0 unless there was a negative value for animation-delay, in which case the event will be fired with elapsedTime containing  (-1 * delay)."><code>AnimationEvent.elapsedTime</code></a> to get information about the event which occurred.</p>
+
+<pre class="brush: js">function log(msg, event) {
+  let logBox = document.getElementById(&quot;log&quot;);
+
+  logBox.innerHTML += msg;
+
+  if (event) {
+    logBox.innerHTML += &quot; &lt;code&gt;&quot;+ event.animationName +
+        &quot;&lt;/code&gt; at time &quot; + event.elapsedTime.toFixed(2) +
+        &quot; seconds.&quot;;
+  }
+
+  logBox.innerHTML += &quot;\n&quot;;
+};
+</pre>
+
+<p>Then we set up the event handlers for the <code><a href="/en-US/docs/Web/Events/animationstart" title="/en-US/docs/Web/Events/animationstart">animationstart</a></code> and <code><a href="/en-US/docs/Web/Events/animationend" title="/en-US/docs/Web/Events/animationend">animationend</a></code> events:</p>
+
+<pre class="brush: js">let box = document.getElementById(&quot;box&quot;);
+
+box.onanimationstart = function(event) {
+  log(&quot;Animation started&quot;, event);
+}
+
+box.onanimationend = function(event) {
+  log(&quot;Animation stopped&quot;, event);
+};
+</pre>
+
+<p>Finally, we set up a handler for a click on the button that runs the animation:</p>
+
+<pre class="brush: js">document.getElementById(&quot;play&quot;).addEventListener(&quot;click&quot;, function(event) {
+  document.getElementById(&quot;box&quot;).className = &quot;slideAnimation&quot;;
+  event.target.style.display = &quot;none&quot;;
+}, false);</pre>
+
+<p>This sets the class of the box we want to animate to the class that contains the <a href="/en-US/docs/Web/CSS/animation" title="The animation shorthand CSS property sets an animated transition between styles."><code>animation</code></a> description, then hides the play button because this example will only run the animation once. For information about why, and how to support running an animation more than once, see <a href="/en-US/docs/Web/CSS/CSS_Animations/Tips#Run_an_animation_again" title="CSS Animations make it possible to do incredible things with the elements that make up your documents and apps. However, there are things you might want to do that aren&apos;t obvious, or clever ways to do things that you might not come up with right away. This article is a collection of tips and tricks we&apos;ve found that may make your work easier, including how to run a stopped animation again.">Run an animation again</a> in <a href="/en-US/docs/Web/CSS/CSS_Animations/Tips" title="CSS Animations make it possible to do incredible things with the elements that make up your documents and apps. However, there are things you might want to do that aren&apos;t obvious, or clever ways to do things that you might not come up with right away. This article is a collection of tips and tricks we&apos;ve found that may make your work easier, including how to run a stopped animation again.">CSS Animations tips and tricks</a>.</p>
+
+<h3 id="Result">Result</h3>
+
+<p>Assembled together, you get this:</p>
+
+<p><iframe src="https://mdn.mozillademos.org/en-US/docs/Web/API/GlobalEventHandlers/onanimationstart%24samples/Example?revision=1407510" width="500" height="400" id="frame_Example" frameborder="0" class="live-sample-frame sample-code-frame"></iframe></p><p></p>
+
+<h2 id="规范">规范</h2>
+
+<table class="spectable standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://drafts.csswg.org/css-animations/#eventdef-animationevent-animationend" class="external" hreflang="en">CSS Animations<br><small lang="zh-CN">onanimationend</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Microsoft Edge</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><br>
+    <span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> (unprefixed)</td>
+   <td><a href="/en-US/Firefox/Releases/51" title="Released on 2017-01-24.">51</a> (51)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><br>
+    <span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> (unprefixed)</td>
+   <td>51.0 (51)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><br>
+    <span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span> (unprefixed)</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+ <li>The <code><a href="/zh-CN/docs/Web/Reference/Events/animationend" title="/zh-CN/docs/Web/Reference/Events/animationend">animationend</a></code> event this event handler is triggered by</li>
+ <li><a href="/zh-CN/docs/Web/API/AnimationEvent" title="AnimationEvent 接口表示提供与动画相关的信息的事件。"><code>AnimationEvent</code></a></li>
+ <li>The <code><a href="/zh-CN/docs/Web/Reference/Events/animationstart" title="/zh-CN/docs/Web/Reference/Events/animationstart">animationstart</a></code> event</li>
+</ul>

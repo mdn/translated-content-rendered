@@ -1,0 +1,823 @@
+---
+title: hyphens
+slug: Web/CSS/hyphens
+translation_of: Web/CSS/hyphens
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/Reference">CSS 参考</a></strong></li><li><strong><a href="/zh-CN/docs/Web/CSS/CSS_Text">CSS Text</a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/CSS/hanging-punctuation"><code>hanging-punctuation</code></a></li><li><em><code>hyphens</code></em></li><li><a href="/zh-CN/docs/Web/CSS/letter-spacing"><code>letter-spacing</code></a></li><li><a href="/zh-CN/docs/Web/CSS/line-break"><code>line-break</code></a></li><li><a href="/zh-CN/docs/Web/CSS/word-wrap"><code>overflow-wrap</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/CSS/paint-order"><code>paint-order</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/CSS/tab-size"><code>tab-size</code></a></li><li><a href="/zh-CN/docs/Web/CSS/text-align"><code>text-align</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/CSS/text-align-last"><code>text-align-last</code></a></li><li><a href="/zh-CN/docs/Web/CSS/text-indent"><code>text-indent</code></a></li><li><a href="/zh-CN/docs/Web/CSS/text-justify"><code>text-justify</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/CSS/text-size-adjust"><code>text-size-adjust</code></a></li><li><a href="/zh-CN/docs/Web/CSS/text-transform"><code>text-transform</code></a></li><li><a href="/zh-CN/docs/Web/CSS/white-space"><code>white-space</code></a></li><li><a href="/zh-CN/docs/Web/CSS/word-break"><code>word-break</code></a></li><li><a href="/zh-CN/docs/Web/CSS/word-spacing"><code>word-spacing</code></a></li></ol></details></li></ol></section></div>
+
+<h2 id="Summary">Summary</h2>
+
+<p><a href="/en-US/docs/CSS">CSS</a> 属性 <strong><code>hyphens</code></strong> 告知浏览器在换行时如何使用连字符连接单词。可以完全阻止使用连字符，也可以控制浏览器什么时候使用，或者让浏览器决定什么时候使用。</p>
+
+<p>连字规则具有语言特定性。在 HTML 中，语言由 lang 属性决定，浏览器只会在当前属性存在且有合适的连字字典可用的情况使用连字进行连接。 在 XML 中，必须使用 <code>xml:lang</code> 属性。</p>
+
+<div class="note"><strong>注意:</strong>：在规范中，没有明确定义连字符的实现规则，所以具体的连字符在不同浏览器中可能有所区别。</div>
+
+<table class="properties"><tbody><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/initial_value">初始值</a></th><td><code>manual</code></td></tr><tr><th scope="row">适用元素</th><td>all elements</td></tr><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/inheritance">是否是继承属性</a></th><td>yes</td></tr><tr><th scope="row">适用媒体</th><td>visual</td></tr><tr><th scope="row"><a href="/zh-CN/docs/Web/CSS/computed_value">计算值</a></th><td>as specified</td></tr><tr><th scope="row">Animation type</th><td>discrete</td></tr><tr><th scope="row">正规顺序</th><td>the unique non-ambiguous order defined by the formal grammar</td></tr></tbody></table>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush:css">hyphens: none;
+hyphens: manual;
+hyphens: auto;
+
+/* Global values */
+hyphens: inherit;
+hyphens: initial;
+hyphens: unset;
+</pre>
+
+<h3 id="值">值</h3>
+
+<dl>
+ <dt><code>none</code></dt>
+ <dd>换行时单词不会被打断，甚至在单词内的字符建议有换行点时。行只会在空白符处换行。</dd>
+ <dt><code>manual</code></dt>
+ <dd>Words are broken for line-wrapping only where characters inside the word suggest line break opportunities. See <a href="#Suggesting_line_break_opportunities">Suggesting line break opportunities</a> for details.</dd>
+ <dt><code>auto</code></dt>
+ <dd>The browser is free to automatically break words at appropriate hyphenation points, following whatever rules it chooses to use. Suggested line break opportunities, as covered in <a href="#Suggesting_line_break_opportunities">Suggesting line break opportunities</a>, should be preferred over automatically selecting break points whenever possible.</dd>
+</dl>
+
+<div class="note"><strong>Note:</strong> The <code>auto</code> setting&apos;s behavior depends on the language being properly tagged so that the appropriate hyphenation rules can be selected. You must specify a language using the <code>lang</code> HTML attribute in order to guarantee that automatic hyphenation is applied in the language of your choice.</div>
+
+<h2 id="Suggesting_line_break_opportunities">Suggesting line break opportunities</h2>
+
+<p>There are two Unicode characters that can be used to manually specify potential line break points within text:</p>
+
+<dl>
+ <dt>U+2010 (HYPHEN)</dt>
+ <dd>The &quot;hard&quot; hyphen character indicates a visible line break opportunity. Even if the line is not actually broken at that point, the hyphen is still rendered.</dd>
+ <dt>U+00AD (SHY)</dt>
+ <dd>An invisible, &quot;soft&quot; hyphen. This character is not rendered visibly; instead, it suggests a place where the browser might choose to break the word if necessary. In HTML, you can use <code>&amp;shy;</code> to insert a soft hyphen.</dd>
+</dl>
+
+<h3 id="Formal_syntax">Formal syntax</h3>
+
+<pre class="syntaxbox">none <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> manual <a href="/zh-CN/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> auto</pre>
+
+<h2 id="示例">示例</h2>
+
+<p>以下代码段展示了<code>hyphens</code>属性取none/manual/auto这三类值的效果。</p>
+
+<pre class="brush: html">&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;none&lt;/code&gt;: no hyphen; overflow if needed
+    &lt;p lang=&quot;en&quot; class=&quot;none&quot;&gt;An extreme&amp;shy;ly long English word&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;manual&lt;/code&gt;: hyphen only at &amp;amp;hyphen; or &amp;amp;shy; (if needed)
+    &lt;p lang=&quot;en&quot; class=&quot;manual&quot;&gt;An extreme&amp;shy;ly long English word&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;auto&lt;/code&gt;: hyphen where the algo is deciding (if needed)
+    &lt;p lang=&quot;en&quot; class=&quot;auto&quot;&gt;An extreme&amp;shy;ly long English word&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<pre class="brush: css">p {
+  width: 55px;
+  border: 1px solid black;
+ }
+p.none {
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+p.manual {
+  -webkit-hyphens: manual;
+  -ms-hyphens: manual;
+  hyphens: manual;
+}
+p.auto {
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
+</pre>
+
+<figure>
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="470&apos;" id="frame_Example" src="https://mdn.mozillademos.org/zh-CN/docs/Web/CSS/hyphens$samples/Example?revision=1494267" width="100%"></iframe></p>
+</figure>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-text-3/#hyphens-property" hreflang="en" lang="en">CSS Text Module Level 3<br><small lang="zh-CN">hyphens</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>13<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><sup>[1]</sup></td>
+   <td>
+    <p><a href="/en-US/Firefox/Releases/6" title="Released on 2011-08-16.">6.0</a> (6.0)<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><sup>[2]</sup><br>
+     <a href="/en-US/Firefox/Releases/43" title="Released on 2015-12-15.">43.0</a> (43.0)</p>
+   </td>
+   <td>10.0<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-ms&apos; as this browser considers it experimental">-ms</a></span><sup>[3]</sup></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Afrikaans (af, af-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Bulgarian (bg, bg-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Catalan (ca, ca-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Croatian (hr, hr-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Czech (cs, cs-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Danish (da, da-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Dutch (nl, nl-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for English (en, en-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/6" title="Released on 2011-08-16.">6.0</a> (6.0)<sup>[4]</sup></td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1<sup>[5]</sup></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Esperanto (eo, eo-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Estonian (et, et-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Finnish (fi, fi-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for French (fr, fr-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8.0</a> (8.0)</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Galician (gl, gl-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>9.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Traditional Orthography of 1901 (de-1901, de-AT-1901, de-DE-1901)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Reformed Orthography of 1996 (de, de-1996, de-DE, de-AT, de-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Swiss Orthography (de-CH, de-CH-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Hungarian (hu, hu-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>9.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Icelandic (is, is-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Interlingua (ia, ia-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Italian (it, it-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>9.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Kurmanji (kmr, kmr-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Latin (la, la-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Lithuanian (lt, lt-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Mongolian (mn, mn-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Norwegian (Bokmål) (no, no-*, nb, nb-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Norwegian (Nynorsk) (nn, nn-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Polish (pl, pl-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>31.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Portuguese (pt, pt-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0<sup>[6]</sup></td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Brazilian Portuguese (pt-BR)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0<sup>[6]</sup></td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Russian (ru, ru-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Serbian, Bosnian, Serbo-Croatian (sh, sh-*, sr, sr-*, bs, bs-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Slovenian (sl, sl-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Spanish (es, es-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Swedish (sv, sv-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Turkish (tr, tr-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>9.0</td>
+   <td>10.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Ukrainian (uk, uk-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>9.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Upper Sorbian (hsb, hsb-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Welsh (cy, cy-*)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>8.0</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for other languages</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>4.0<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><sup>[1]</sup></td>
+   <td>6.0 (6.0)<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><sup>[2]</sup><br>
+    <a href="/en-US/Firefox/Releases/43" title="Released on 2015-12-15.">43.0</a> (43.0)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>4.2<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-CN/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Afrikaans (af, af-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Bulgarian (bg, bg-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Catalan (ca, ca-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Croatian (hr, hr-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Czech (cs, cs-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Danish (da, da-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Dutch (nl, nl-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for English (en, en-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Esperanto (eo, eo-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Estonian (et, et-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Finnish (fi, fi-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for French (fr, fr-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Galician (gl, gl-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Traditional Orthography of 1901 (de-1901, de-AT-1901, de-DE-1901)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Reformed Orthography of 1996 (de, de-1996, de-DE, de-AT, de-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for German, Swiss Orthography (de-CH, de-CH-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Hungarian (hu, hu-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Icelandic (is, is-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Interlingua (ia, ia-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Italian (it, it-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Kurmanji (kmr, kmr-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Latin (la, la-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Lithuanian (lt, lt-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Mongolian (mn, mn-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Norwegian (Bokmål) (no, no-*, nb, nb-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Norwegian (Nynorsk) (nn, nn-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Polish (pl, pl-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Portuguese (pt, pt-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Brazilian Portuguese (pt-BR)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Russian (ru, ru-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Serbian, Bosnian, Serbo-Croatian (sh, sh-*, sr, sr-*, bs, bs-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Slovenian (sl, sl-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Spanish (es, es-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Swedish (sv, sv-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Turkish (tr, tr-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Ukrainian (uk, uk-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Upper Sorbian (hsb, hsb-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for Welsh (cy, cy-*)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>Hyphenation dictionary for other languages</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] <strong>No automatic hyphenation</strong>, only <code>-webkit-hyphens: none</code> is supported.</p>
+
+<p>[2] Automatic hyphenation only works for languages whose hyphenation dictionaries are integrated in Gecko. See <a href="#Notes_on_supported_languages">the note below</a> for a complete list of such languages.</p>
+
+<p>[3] Automatic hyphenation only works for languages whose hyphenation dictionaries are integrated in Internet Explorer. See <a href="#Notes_on_supported_languages">the note below</a> for a complete list of such languages.</p>
+
+<p>[4] Uses an en-US dictionary.</p>
+
+<p>[5] en-GB and en-US used different dictionaries.</p>
+
+<p>[6] Uses a Portuguese dictionary.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/CSS/content" title="CSS的 content CSS 属性用于在元素的  ::before 和 ::after 伪元素中插入内容。使用content 属性插入的内容都是匿名的可替换元素。"><code>content</code></a></li>
+</ul>

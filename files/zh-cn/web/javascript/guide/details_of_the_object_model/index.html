@@ -1,0 +1,866 @@
+---
+title: 对象模型的细节
+slug: Web/JavaScript/Guide/Details_of_the_Object_Model
+tags:
+  - JavaScript
+  - Object
+  - 中级
+  - 教程
+translation_of: Web/JavaScript/Guide/Details_of_the_Object_Model
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/zh-CN/docs/Web/JavaScript/Tutorials"><strong>教程:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>快速入门</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript 基础知识</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>JavaScript 指南</summary>
+      <ol>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types">Grammar and types</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Control flow and error handling</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Loops_and_iteration">Loops and iteration</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Functions">Functions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions and operators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Numbers_and_dates">Numbers and dates</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Text_formatting">Text formatting</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions">Regular expressions</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Indexed_collections">Indexed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Keyed_collections">Keyed collections</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects">Working with objects</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Details of the object model</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Iterators_and_generators">Iterators and generators</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Meta_programming">Meta programming</a></li>
+          <li><a href="/zh-CN/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>中级教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/zh-CN/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/A_re-introduction_to_JavaScript">深入 JavaScript</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Equality_comparisons_and_sameness">如何正确判断相等性</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>高级</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">继承和原型链</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Typed_arrays">JavaScript 类型化数组</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Memory_Management">内存管理</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/EventLoop">Concurrency model and Event Loop</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference">引用:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>内置对象</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>表达式和运算符</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E5%8A%A0">相加运算符 (+)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Addition_assignment">Addition assignment (+=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Addition_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Assignment">Assignment (=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">Bitwise AND (&amp;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">Bitwise AND assignment (&amp;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">Bitwise NOT (~)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">Bitwise OR assignment (|=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">Bitwise XOR assignment (^=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Comma_Operator">逗号操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">条件运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Decrement">Decrement (--)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Decrement$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">解构赋值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division_assignment">Division assignment (/=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Division_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%9B%B8%E7%AD%89">【宽松】相等 (==)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function">函数表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than">Greater than (&gt;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">Greater than or equal (&gt;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Grouping">圆括号运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Increment">Increment (++)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Increment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Inequality$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift">Left shift (&lt;&lt;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">Less than or equal (&lt;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND">Logical AND (&amp;&amp;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_NOT">Logical NOT (!)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_NOT$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR (||)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">Logical nullish assignment (??=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication">Multiplication (*)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">空值合并运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer">对象初始化</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">运算符优先级</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%AF%E9%80%89%E9%93%BE">可选链操作符</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E7%AE%A1%E9%81%93%E6%93%8D%E4%BD%9C%E7%AC%A6">管道操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Property_Accessors">属性访问器</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/%E5%8F%96%E4%BD%99">取余 (%)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Remainder_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift">Right shift (&gt;&gt;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax">展开语法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_equality">Strict equality (===)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_equality$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Strict_inequality">严格不相等 (!==)</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_negation">Unary negation (-)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_negation$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unary_plus$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a> <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/async%E5%85%81%E8%AE%B8%E5%A3%B0%E6%98%8E%E4%B8%80%E4%B8%AA%E5%87%BD%E6%95%B0%E4%B8%BA%E4%B8%80%E4%B8%AA%E5%8C%85%E5%90%AB%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%E7%9A%84%E5%87%BD%E6%95%B0">async function expression</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/class">类表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete">delete 操作符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/function*">function* 表达式</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/in">in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new">new 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/void">void 运算符</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>语句和声明</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function">async function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/block">block</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/Empty">empty</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function">function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/var">var 描述</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>函数</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions">箭头函数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Default_parameters">默认参数值</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Method_definitions">方法的定义</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/Rest_parameters">剩余参数</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/arguments">Arguments 对象</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/get">getter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Functions/set">setter</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Private_class_fields">类私有域</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/Class_elements">类元素</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/constructor">构造方法</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">X.prototype.y called on incompatible type</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/%E4%B8%8D%E8%83%BD%E6%B7%BB%E5%8A%A0%E5%B1%9E%E6%80%A7">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>更多</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript 知识概要</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Lexical_grammar">词法文法</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Data_structures">JavaScript 数据结构</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">属性的可枚举性和所有权</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode">严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">切换到严格模式</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Template_literals">模板字符串</a></li>
+        <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">已废弃的特性</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/JavaScript/Guide/Using_promises" class="button">下一页  »</a></p>
+</div></div>
+
+<p class="summary">JavaScript 是一种基于原型而不是基于类的基于对象(object-based)语言。正是由于这一根本的区别，其如何创建对象的层级结构以及对象的属性与属性值是如何继承的并不是那么清晰。本节试着阐明。</p>
+
+<p>本节假设您已经有一些 JavaScript 基础，并且用 JavaScript 函数创建过简单的对象。</p>
+
+<h2 id="class-based_vs_prototype-based_languages" name="class-based_vs_prototype-based_languages">基于类 vs 基于原型的语言</h2>
+
+<p>基于类的面向对象语言，比如 Java 和 C++，是构建在两个不同实体之上的：类和实例。</p>
+
+<ul>
+ <li>一个<em>类(class)</em>定义了某一对象集合所具有的特征性属性（可以将 Java 中的方法和域以及 C++ 中的成员都视作属性）。类是抽象的，而不是其所描述的对象集合中的任何特定的个体。例如 <code>Employee</code> 类可以用来表示所有雇员的集合。</li>
+ <li>另一方面，一个<em>实例(instance)</em>是一个<em>类</em>的实例化。例如， <code>Victoria</code> 可以是 <code>Employee</code> 类的一个实例，表示一个特定的雇员个体。实例具有和其父类完全一致的属性，不多也不少。</li>
+</ul>
+
+<p>基于原型的语言（如 JavaScript）并不存在这种区别：它只有对象。基于原型的语言具有所谓<em>原型对象(prototypical object)</em>的概念。原型对象可以作为一个模板，新对象可以从中获得原始的属性。任何对象都可以指定其自身的属性，既可以是创建时也可以在运行时创建。而且，任何对象都可以作为另一个对象的<em>原型(prototype)</em>，从而允许后者共享前者的属性。</p>
+
+<h3 id="定义类">定义类</h3>
+
+<p>在基于类的语言中，需要专门的<em>类定义(class definition)</em>来定义类。在定义类时，允许定义被称为<em>构造器(constructor)</em>的特殊的方法来创建该类的实例。在构造器方法中，可以指定实例的属性的初始值并做一些其他的操作。你可以通过使用 <code>new</code> 操作符来创建类的实例。</p>
+
+<p>JavaScript 大体上与之类似，但并没有专门的<em>类定义</em>，你通过定义构造函数的方式来创建一系列有着特定初始值和方法的对象。任何JavaScript函数都可以被用作构造函数。你也可以使用 <code>new</code> 操作符来创建一个新对象。</p>
+
+<div class="note notecard">
+<p><strong>提示：</strong>在ES6中引入了 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes">类定义</a> ，但它实际上是已有的原型继承方式的语法糖而已，并没有引入新的面向对象继承模型。</p>
+</div>
+
+<h3 id="子类和继承">子类和继承</h3>
+
+<p>基于类的语言是通过对类的定义中构建类的层级结构的。在类定义中，可以指定新的类是一个现存的类的子类。子类将继承父类的全部属性，并可以添加新的属性或者修改继承的属性。例如，假设 <code>Employee</code> 类只有 <code>name</code> 和 <code>dept</code> 属性，而 <code>Manager</code> 是 <code>Employee</code> 的子类并添加了 <code>reports</code> 属性。这时，<code>Manager</code> 类的实例将具有所有三个属性：<code>name</code>，<code>dept</code>和<code>reports</code>。</p>
+
+<p>JavaScript 通过将构造器函数与原型对象相关联的方式来实现继承。这样，您可以创建完全一样的 <code>Employee</code> — <code>Manager</code> 示例，不过需要使用略微不同的术语。首先，定义Employee构造函数，在该构造函数内定义name、dept属性；接下来，定义Manager构造函数，在该构造函数内调用Employee构造函数，并定义reports属性；最后，将一个获得了Employee.prototype(Employee构造函数原型)的新对象赋予manager构造函数，以作为Manager构造函数的原型。之后当你创建新的Manager对象实例时，该实例会从Employee对象继承name、dept属性。</p>
+
+<h3 id="添加和移除属性">添加和移除属性</h3>
+
+<p>在基于类的语言中，通常在编译时创建类，然后在编译时或者运行时对类的实例进行实例化。一旦定义了类，无法对类的属性进行更改。然而，在 JavaScript 中，允许运行时添加或者移除任何对象的属性。如果您为一个对象中添加了一个属性，而这个对象又作为其它对象的原型，则以该对象作为原型的所有其它对象也将获得该属性。</p>
+
+<h3 id="差异总结">差异总结</h3>
+
+<p>下面的表格摘要给出了上述区别。本节的后续部分将描述有关使用 JavaScript 构造器和原型创建对象层级结构的详细信息，并将其与在 Java 中的做法加以对比。</p>
+
+<table class="fullwidth-table">
+ <caption>基于类（Java）和基于原型（JavaScript）的对象系统的比较</caption>
+ <thead>
+  <tr>
+   <th scope="col">基于类的（Java）</th>
+   <th scope="col">基于原型的（JavaScript）</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>类和实例是不同的事物。</td>
+   <td>所有对象均为实例。</td>
+  </tr>
+  <tr>
+   <td>通过类定义来定义类；通过构造器方法来实例化类。</td>
+   <td>通过构造器函数来定义和创建一组对象。</td>
+  </tr>
+  <tr>
+   <td>通过 <code>new</code> 操作符创建单个对象。</td>
+   <td>相同。</td>
+  </tr>
+  <tr>
+   <td>通过类定义来定义现存类的子类，从而构建对象的层级结构。</td>
+   <td>指定一个对象作为原型并且与构造函数一起构建对象的层级结构</td>
+  </tr>
+  <tr>
+   <td>遵循类链继承属性。</td>
+   <td>遵循原型链继承属性。</td>
+  </tr>
+  <tr>
+   <td>类定义指定类的所有实例的<strong>所有</strong>属性。无法在运行时动态添加属性。</td>
+   <td>构造器函数或原型指定实例的<strong>初始</strong>属性集。允许动态地向单个的对象或者整个对象集中添加或移除属性。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Employee_示例">Employee 示例</h2>
+
+<p>本节的余下部分将使用如下图所示的 Employee 层级结构。</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/3060/figure8.1.png"></p>
+
+<div style="display: table-cell; vertical-align: middle; padding: 10px;">
+<ul>
+ <li><code>Employee</code> 具有 <code>name</code> 属性（默认值为空的字符串）和 <code>dept</code> 属性（默认值为 &quot;general&quot;）。</li>
+ <li><code>Manager</code> 是 <code>Employee</code>的子类。它添加了 <code>reports</code> 属性（默认值为空的数组，以 <code>Employee</code> 对象数组作为它的值）。</li>
+ <li><code>WorkerBee</code> 是 <code>Employee</code>的子类。它添加了 <code>projects</code> 属性（默认值为空的数组，以字符串数组作为它的值）。</li>
+ <li><code>SalesPerson</code> 是 <code>WorkerBee</code>的子类。它添加了 <code>quota</code> 属性（其值默认为 100）。它还重载了 <code>dept</code> 属性值为 &quot;sales&quot;，表明所有的销售人员都属于同一部门。</li>
+ <li><code>Engineer</code> 基于 <code>WorkerBee</code>。它添加了 <code>machine</code> 属性（其值默认为空字符串）同时重载了 <code>dept</code> 属性值为 &quot;engineering&quot;。</li>
+</ul>
+</div>
+
+<h2 id="创建层级结构">创建层级结构</h2>
+
+<p>可以有几种不同的方式来定义适当的构造器函数，从而实现雇员的层级结构。如何选择很大程度上取决于您希望在您的应用程序中能做到什么。</p>
+
+<p>本节介绍了如何使用非常简单的（同时也是相当不灵活的）定义，使得继承得以实现。在定义完成后，就无法在创建对象时指定属性的值。新创建的对象仅仅获得了默认值，当然允许随后加以修改。图例 8.2 展现了这些简单的定义形成的层级结构。</p>
+
+<p>在实际应用程序中，您很可能想定义构造器，以允许您在创建对象时指定属性值。（参见<a href="#More_flexible_constructors">More flexible constructors</a>）。当前，这些简单的定义只是说明了继承是如何实现的。</p>
+
+<p>下面关于 <code>Employee</code> 的 Java 和 JavaScript 的定义是非常类似的。唯一的不同是在 Java 中需要指定每个属性的类型，而在 JavaScript 中则不需要（这是因为Java是 <a href="https://zh.wikipedia.org/wiki/%E5%BC%B7%E5%BC%B1%E5%9E%8B%E5%88%A5">强类型</a> 语言，而 JavaScript 是弱类型语言）。</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">JavaScript</th>
+   <th scope="col">Java</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function Employee () {
+  this.name = &quot;&quot;;
+  this.dept = &quot;general&quot;;
+}
+</pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate">public class Employee {
+   public String name = &quot;&quot;;
+   public String dept = &quot;general&quot;;
+}</pre>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p><code>Manager 和 WorkerBee 的定义表示在如何指定继承链中上一层对象时，两者存在不同点。在 JavaScript 中，您会添加一个原型实例作为构造器函数prototype 属性的值，然后将该构造函数原型的构造器重载为其自身。这一动作可以在构造器函数定义后的任意时刻执行。而在 Java 中，则需要在类定义中指定父类，且不能在类定义之外改变父类。</code></p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">JavaScript</th>
+   <th scope="col">Java</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function Manager() {
+  Employee.call(this);
+  this.reports = [];
+}
+Manager.prototype = Object.create(Employee.prototype);
+
+function WorkerBee() {
+  Employee.call(this);
+  this.projects = [];
+}
+WorkerBee.prototype = Object.create(Employee.prototype);</pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate">public class Manager extends Employee {
+   public Employee[] reports = new Employee[0];
+}
+
+
+
+public class WorkerBee extends Employee {
+   public String[] projects = new String[0];
+}</pre>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p>在对<code>Engineer</code> 和 <code>SalesPerson</code> 定义时，创建了继承自 <code>WorkerBee</code> 的对象，该对象会进而继承自<code>Employee</code>。这些对象会具有在这个链之上的所有对象的属性。另外，它们在定义时，又重载了继承的 <code>dept</code> 属性值，赋予新的属性值。</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">JavaScript</th>
+   <th scope="col">Java</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function SalesPerson() {
+   WorkerBee.call(this);
+   this.dept = &apos;sales&apos;;
+   this.quota = 100;
+}
+SalesPerson.prototype = Object.create(WorkerBee.prototype);
+
+function Engineer() {
+   WorkerBee.call(this);
+   this.dept = &apos;engineering&apos;;
+   this.machine = &apos;&apos;;
+}
+Engineer.prototype <code>= Object.create(WorkerBee.prototype);</code></pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate"><code>public class SalesPerson extends WorkerBee {
+   public String dept = &quot;sales&quot;;
+   public double quota = 100.0;
+}
+
+
+public class Engineer extends WorkerBee {
+   public String dept = &quot;engineering&quot;;
+   public String machine = &quot;&quot;;
+}</code></pre>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p>使用这些定义，您可以创建这些对象的实例，以获取其属性的默认值。下图说明了如何使用这些 JavaScript 定义创建新对象并显示新对象的属性值。</p>
+
+<div class="note">
+<p><strong>提示：</strong>实例在基于类的语言中具有特定的技术含义。在这些语言中，一个实例是一个类的单独实例化，与一个类本质上是不同的。在 JavaScript 中，“实例”没有这个技术含义，因为JavaScript在类和实例之间不存在这样的区别。然而，在讨论 JavaScript 时，可以非正式地使用“实例”来表示使用特定构造函数创建的对象。 所以，在这个例子中，你可以非正式地说<code>jane</code> 是 <code>Engineer</code>的一个实例。同样，虽然术语 parent，child，ancestor 和 descendant 在 JavaScript 中没有正式含义；你可以非正式地使用它们来引用原型链中较高或更低的对象。</p>
+</div>
+
+<h3 id="用简单的定义创建对象">用简单的定义创建对象</h3>
+
+<h4 id="对象层次结构">对象层次结构</h4>
+
+<p>使用右侧的代码创建以下层次结构。</p>
+
+<p><img src="https://mdn.mozillademos.org/files/10412/=figure8.3.png"></p>
+
+<h4 id="个别对象">个别对象</h4>
+
+<pre class="brush: js notranslate">var jim = new Employee; // 如构造函数无须接受任何参数，圆括号可以省略。
+// jim.name is &apos;&apos;
+// jim.dept is &apos;general&apos;
+
+var sally = new Manager;
+// sally.name is &apos;&apos;
+// sally.dept is &apos;general&apos;
+// sally.reports is []
+
+var mark = new WorkerBee;
+// mark.name is &apos;&apos;
+// mark.dept is &apos;general&apos;
+// mark.projects is []
+
+var fred = new SalesPerson;
+// fred.name is &apos;&apos;
+// fred.dept is &apos;sales&apos;
+// fred.projects is []
+// fred.quota is 100
+
+var jane = new Engineer;
+// jane.name is &apos;&apos;
+// jane.dept is &apos;engineering&apos;
+// jane.projects is []
+// jane.machine is &apos;&apos;</pre>
+
+<h2 id="对象的属性">对象的属性</h2>
+
+<p>本节将讨论对象如何从原型链中的其它对象中继承属性，以及在运行时添加属性的相关细节。</p>
+
+<h3 id="继承属性">继承属性</h3>
+
+<p>假设您通过如下语句创建一个<code>mark</code>对象作为 <code>WorkerBee</code>的实例：</p>
+
+<pre class="brush: js notranslate">var mark = new WorkerBee;
+</pre>
+
+<p>当 JavaScript 执行 <code>new</code> 操作符时，它会先创建一个普通对象，并将这个普通对象中的 [[prototype]] 指向 <code>WorkerBee.prototype</code> ，然后再把这个普通对象设置为执行 <code>WorkerBee</code> 构造函数时 <code>this</code>  的值。该普通对象的 [[Prototype]] 决定其用于检索属性的原型链。当构造函数执行完成后，所有的属性都被设置完毕，JavaScript 返回之前创建的对象，通过赋值语句将它的引用赋值给变量 <code>mark</code>。</p>
+
+<p>这个过程不会显式的将 <code style="font-size: 14px;">mark</code>所继承的原型链中的属性作为本地属性存放在 <code>mark</code> 对象中。当访问属性时，JavaScript 将首先检查对象自身中是否存在该属性，如果有，则返回该属性的值。如果不存在，JavaScript会检查原型链（使用内置的 [[Prototype]] ）。如果原型链中的某个对象包含该属性，则返回这个属性的值。如果遍历整条原型链都没有找到该属性，JavaScript 则认为对象中不存在该属性，返回一个 <code>undefined</code>。这样，<code>mark</code> 对象中将具有如下的属性和对应的值：</p>
+
+<pre class="brush: js notranslate">mark.name = &quot;&quot;;
+mark.dept = &quot;general&quot;;
+mark.projects = [];
+</pre>
+
+<p><code>mark</code> 对象从 <code>mark.__proto__</code> 中保存的原型对象里继承了 <code>name</code> 和 <code>dept</code> 属性。并由 <code>WorkerBee</code> 构造函数为 <code>projects</code> 属性设置了本地值。 这就是 JavaScript 中的属性和属性值的继承。这个过程的一些微妙之处将在 <a href="#Property_inheritance_revisited">Property inheritance revisited</a> 中进一步讨论。</p>
+
+<p>由于这些构造器不支持为实例设置特定的值，所以这些属性值仅仅是创建自 <code>WorkerBee</code> 的所有对象所共享的默认值。当然这些属性的值是可以修改的，所以您可以为 <code>mark</code>指定特定的信息，如下所示：</p>
+
+<pre class="brush: js notranslate">mark.name = &quot;Doe, Mark&quot;;
+mark.dept = &quot;admin&quot;;
+mark.projects = [&quot;navigator&quot;];</pre>
+
+<h3 id="添加属性">添加属性</h3>
+
+<p>在 JavaScript 中，您可以在运行时为任何对象添加属性，而不必受限于构造函数提供的属性。添加特定于某个对象的属性，只需要为该对象指定一个属性值，如下所示：</p>
+
+<pre class="brush: js notranslate">mark.bonus = 3000;
+</pre>
+
+<p>这样 <code>mark</code> 对象就有了 <code>bonus</code> 属性，而其它 <code>WorkerBee</code> 则没有该属性。</p>
+
+<p>如果您向某个构造函数的原型对象中添加新的属性，那么该属性将添加到从这个原型中继承属性的所有对象的中。例如，可以通过如下的语句向所有雇员中添加 <code>specialty</code> 属性：</p>
+
+<pre class="brush: js notranslate">Employee.prototype.specialty = &quot;none&quot;;
+</pre>
+
+<p>只要 JavaScript 执行了该语句，则 <code>mark</code> 对象也将具有 <code>specialty</code> 属性，其值为 <code>&quot;none&quot;</code>。下图则表示了在 <code>Employee</code> 原型中添加该属性，然后在 <code>Engineer</code> 的原型中重载该属性的效果。</p>
+
+<p><img alt class="internal" src="/@api/deki/files/4422/=figure8.4.png" style="height: 519px; width: 833px;"><br>
+ <small><strong>添加属性</strong></small></p>
+
+<h2 id="more_flexible_constructors" name="more_flexible_constructors">更灵活的构造器</h2>
+
+<p>到目前为止，本文所展示的构造函数都不能让你在创建新实例时为其制定属性值。其实我们也可以像 Java 一样，为构造器提供参数以初始化实例的属性值。下图展示了一种实现方式。</p>
+
+<p><img alt class="internal" id="figure8.5" src="/@api/deki/files/4423/=figure8.5.png" style="height: 481px; width: 1012px;"><br>
+ <small><strong>Specifying properties in a constructor, take 1</strong></small></p>
+
+<p>下面的表格中罗列了这些对象在 Java 和 JavaScript 中的定义。</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">JavaScript</th>
+   <th scope="col">Java</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function Employee (name, dept) {
+  this.name = name || &quot;&quot;;
+  this.dept = dept || &quot;general&quot;;
+}
+</pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate">public class Employee {
+   public String name;
+   public String dept;
+   public Employee () {
+      this(&quot;&quot;, &quot;general&quot;);
+   }
+   public Employee (String name) {
+      this(name, &quot;general&quot;);
+   }
+   public Employee (String name, String dept) {
+      this.name = name;
+      this.dept = dept;
+   }
+}
+</pre>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function WorkerBee (projs) {
+  this.projects = projs || [];
+}
+WorkerBee.prototype = new Employee;
+</pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate">public class WorkerBee extends Employee {
+   public String[] projects;
+   public WorkerBee () {
+      this(new String[0]);
+   }
+   public WorkerBee (String[] projs) {
+      projects = projs;
+   }
+}
+
+</pre>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">
+function Engineer (mach) {
+   this.dept = &quot;engineering&quot;;
+   this.machine = mach || &quot;&quot;;
+}
+Engineer.prototype = new WorkerBee;
+</pre>
+   </td>
+   <td>
+    <pre class="brush: java notranslate">public class Engineer extends WorkerBee {
+   public String machine;
+   public Engineer () {
+      dept = &quot;engineering&quot;;
+      machine = &quot;&quot;;
+   }
+   public Engineer (String mach) {
+      dept = &quot;engineering&quot;;
+      machine = mach;
+   }
+}
+</pre>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p>上面使用 JavaScript 定义过程使用了一种设置默认值的特殊惯用法：</p>
+
+<pre class="brush: js notranslate">this.name = name || &quot;&quot;;
+</pre>
+
+<p>JavaScript 的逻辑或操作符（<code>||</code>）会对第一个参数进行判断。如果该参数值运算后结果为真，则操作符返回该值。否则，操作符返回第二个参数的值。因此，这行代码首先检查 <code>name</code> 是否是对<code>name</code> 属性有效的值。如果是，则设置其为 <code>this.name</code> 的值。否则，设置 <code>this.name</code> 的值为空的字符串。尽管这种用法乍看起来有些费解，为了简洁起见，本章将使用这种习惯用法。</p>
+
+<div class="note">
+<p><strong>提示：</strong>如果调用构造函数时，指定了可以转换为 <code><code>false</code></code> 的参数（比如<code>0</code>和空字符串），结果可能出乎调用者意料。此时，将使用默认值（译注：不是指定的参数值 0 和 &quot;&quot;）。</p>
+</div>
+
+<p>使用这些定义，当创建对象的实例时，可以为本地定义的属性指定值。你可以使用以下语句创建一个新的<code>Engineer</code>：</p>
+
+<pre class="brush: js notranslate">var jane = new Engineer(&quot;belau&quot;);
+</pre>
+
+<p>此时，<code>Jane</code> 的属性如下所示：</p>
+
+<pre class="brush: js notranslate">jane.name == &quot;&quot;;
+jane.dept == &quot;engineering&quot;;
+jane.projects == [];
+jane.machine == &quot;belau&quot;
+</pre>
+
+<p>注意，由上面对类的定义，您无法为诸如 <code>name</code> 这样的继承属性指定初始值。如果想在 JavaScript 中为继承的属性指定初始值，您需要在构造函数中添加更多的代码。</p>
+
+<p>到目前为止，构造函数已经能够创建一个普通对象，然后为新对象指定本地的属性和属性值。您还可以通过直接调用原型链上的更高层次对象的构造函数，让构造器添加更多的属性。下图即实现了这一功能。</p>
+
+<p><img alt class="internal" src="/@api/deki/files/4430/=figure8.6.png" style="height: 534px; width: 1063px;"><br>
+ <small><strong>Specifying properties in a constructor, take 2</strong></small></p>
+
+<p>我们来详细看一下这些定义。这是<code>Engineer</code>构造函数的新定义：</p>
+
+<pre class="brush: js notranslate">function Engineer (name, projs, mach) {
+  this.base = WorkerBee;
+  this.base(name, &quot;engineering&quot;, projs);
+  this.machine = mach || &quot;&quot;;
+}
+</pre>
+
+<p>假设您创建了一个新的 <code>Engineer</code> 对象，如下所示：</p>
+
+<pre class="brush: js notranslate">var jane = new Engineer(&quot;Doe, Jane&quot;, [&quot;navigator&quot;, &quot;javascript&quot;], &quot;belau&quot;);
+</pre>
+
+<p>JavaScript 会按以下步骤执行：</p>
+
+<ol>
+ <li><code>new</code> 操作符创建了一个新的对象，并将其 <code>__proto__</code> 属性设置为 <code>Engineer.prototype</code>。</li>
+ <li><code>new</code> 操作符将该新对象作为 <code>this</code> 的值传递给 <code>Engineer</code> 构造函数。</li>
+ <li>构造函数为该新对象创建了一个名为 <code>base</code> 的新属性，并指向 <code>WorkerBee</code> 的构造函数。这使得 <code>WorkerBee</code> 构造函数成为 <code>Engineer</code> 对象的一个方法。<code>base</code> 属性的名称并没有什么特殊性，我们可以使用任何其他合法的名称来代替；<code>base</code> 仅仅是为了贴近它的用意。</li>
+ <li>
+  <p>构造函数调用 <code>base</code> 方法，将传递给该构造函数的参数中的两个，作为参数传递给 <code>base</code> 方法，同时还传递一个字符串参数  <code>&quot;engineering&quot;。显式地在构造函数中使用</code> <code>&quot;engineering&quot;</code> 表明所有 <code>Engineer</code> 对象继承的 <code>dept</code> 属性具有相同的值，且该值重载了继承自 <code>Employee</code> 的值。</p>
+ </li>
+ <li>
+  <p>因为 <code>base</code> 是 <code>Engineer</code> 的一个方法，在调用 <code>base</code> 时，JavaScript 将在步骤 1 中创建的对象绑定给 <code>this</code> 关键字。这样，<code>WorkerBee</code> 函数接着将 <code>&quot;Doe, Jane&quot;</code> 和 <code>&quot;engineering&quot;</code> 参数传递给 <code>Employee</code> 构造函数。当从 <code>Employee</code> 构造函数返回时，<code>WorkerBee</code> 函数用剩下的参数设置 <code>projects</code> 属性。</p>
+ </li>
+ <li>当从 <code>base</code> 方法返回后，<code>Engineer</code> 构造函数将对象的 <code>machine</code> 属性初始化为 <code>&quot;belau&quot;</code>。</li>
+ <li>当从构造函数返回时，JavaScript 将新对象赋值给 <code>jane</code> 变量。</li>
+</ol>
+
+<p>你可以认为，在 <code>Engineer</code> 的构造器中调用了 <code>WorkerBee</code> 的构造器，也就为 <code>Engineer</code> 对象设置好了继承关系。事实并非如此。调用 <code>WorkerBee</code> 构造器确保了<code>Engineer</code> 对象以所有在构造器中所指定的属性被调用。但是，如果后续在 <code>Employee</code> 或者 <code>WorkerBee</code> 原型中添加了属性，那些属性不会被 <code>Engineer</code> 对象继承。例如，假设如下语句：</p>
+
+<pre class="brush: js notranslate">function Engineer (name, projs, mach) {
+  this.base = WorkerBee;
+  this.base(name, &quot;engineering&quot;, projs);
+  this.machine = mach || &quot;&quot;;
+}
+var jane = new Engineer(&quot;Doe, Jane&quot;, [&quot;navigator&quot;, &quot;javascript&quot;], &quot;belau&quot;);
+Employee.prototype.specialty = &quot;none&quot;;
+</pre>
+
+<p>对象 <code>jane</code> 不会继承 <code>specialty</code> 属性。您必须显式地设置原型才能确保动态的继承。如果修改成如下的语句：</p>
+
+<pre class="brush: js notranslate">function Engineer (name, projs, mach) {
+  this.base = WorkerBee;
+  this.base(name, &quot;engineering&quot;, projs);
+  this.machine = mach || &quot;&quot;;
+}
+Engineer.prototype = new WorkerBee;
+var jane = new Engineer(&quot;Doe, Jane&quot;, [&quot;navigator&quot;, &quot;javascript&quot;], &quot;belau&quot;);
+Employee.prototype.specialty = &quot;none&quot;;
+</pre>
+
+<p>现在 <code>jane</code> 对象的 <code>specialty</code> 属性为 &quot;none&quot; 了。</p>
+
+<p>继承的另一种途径是使用<a href="/zh-CN/docs/JavaScript/Reference/Global_Objects/Function/call" title="en-US/docs/JavaScript/Reference/Global Objects/Function/call"><code>call()</code></a> / <a href="/zh-CN/docs/JavaScript/Reference/Global_Objects/Function/apply" title="en-US/docs/JavaScript/Reference/Global Objects/Function/apply"><code>apply()</code></a> 方法。下面的方式都是等价的：</p>
+
+<table>
+ <tbody>
+  <tr>
+   <td>
+    <pre class="brush: js notranslate">function Engineer (name, projs, mach) {
+  this.base = WorkerBee;
+  this.base(name, &quot;engineering&quot;, projs);
+  this.machine = mach || &quot;&quot;;
+}
+</pre>
+   </td>
+   <td>
+    <pre class="brush: js notranslate">function Engineer (name, projs, mach) {
+  WorkerBee.call(this, name, &quot;engineering&quot;, projs);
+  this.machine = mach || &quot;&quot;;
+}
+</pre>
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+<p>使用 javascript 的 <code>call()</code> 方法相对明了一些，因为无需 <code>base</code> 方法了。</p>
+
+<h2 id="再谈属性的继承">再谈属性的继承</h2>
+
+<p>前面的小节中描述了 JavaScript 构造器和原型如何提供层级结构和继承的实现。本节中对之前未讨论的一些细节进行阐述。</p>
+
+<h3 id="本地值和继承值">本地值和继承值</h3>
+
+<p>正如本章前面所述，在访问一个对象的属性时，JavaScript 将执行下面的步骤：</p>
+
+<ol>
+ <li>检查对象自身是否存在。如果存在，返回值。</li>
+ <li>如果本地值不存在，检查原型链（通过 <code>__proto__</code> 属性）。</li>
+ <li>如果原型链中的某个对象具有指定属性，则返回值。</li>
+ <li>如果这样的属性不存在，则对象没有该属性，返回 undefined。</li>
+</ol>
+
+<p>以上步骤的结果依赖于你是如何定义的。最早的例子中有如下定义：</p>
+
+<pre class="brush: js notranslate">function Employee () {
+  this.name = &quot;&quot;;
+  this.dept = &quot;general&quot;;
+}
+
+function WorkerBee () {
+  this.projects = [];
+}
+WorkerBee.prototype = new Employee;
+</pre>
+
+<p>基于这些定义，假定通过如下的语句创建 <code>WorkerBee</code> 的实例 <code>amy</code>：</p>
+
+<pre class="brush: js notranslate">var amy = new WorkerBee;
+</pre>
+
+<p>则 <code>amy</code> 对象将具有一个本地属性 <code>projects</code>。<code>name</code>和 <code>dept</code> 则不是 <code>amy</code> 对象的本地属性，而是从 <code>amy</code> 对象的 <code>__proto__</code> 属性获得的。因此，<code>amy</code> 将具有如下的属性值：</p>
+
+<pre class="brush: js notranslate">amy.name == &quot;&quot;;
+amy.dept == &quot;general&quot;;
+amy.projects == [];
+</pre>
+
+<p>现在，假设修改了与 <code>Employee</code> 的相关联原型中的 <code>name</code> 属性的值：</p>
+
+<pre class="brush: js notranslate">Employee.prototype.name = &quot;Unknown&quot;
+</pre>
+
+<p>乍一看，你可能觉得新的值会传播给所有 <code>Employee</code> 的实例。然而，并非如此。</p>
+
+<p>在创建 <code>Employee</code> 对象的<em>任意</em>实例时，该实例的 <code>name</code> 属性将获得一个<strong>本地值</strong>（空的字符串）。这就意味着在创建一个新的 <code>Employee</code> 对象作为 <code>WorkerBee</code> 的原型时，<code>WorkerBee.prototype</code> 的 <code>name</code> 属性将具有一个本地值。因此，当 JavaScript 查找 <code>amy</code> 对象（<code>WorkerBee</code> 的实例）的 <code>name</code> 属性时，JavaScript 将找到 <code>WorkerBee.prototype</code> 中的本地值。因此，也就不会继续在原型链中向上找到 <code>Employee.prototype</code> 了。</p>
+
+<p>如果想在运行时修改一个对象的属性值并且希望该值被所有该对象的后代所继承，您就不能在该对象的构造器函数中定义该属性。而应该将该属性添加到该对象所关联的原型中。例如，假设将前面的代码作如下修改：</p>
+
+<pre class="brush: js notranslate">function Employee () {
+  this.dept = &quot;general&quot;;
+}
+Employee.prototype.name = &quot;&quot;;
+
+function WorkerBee () {
+  this.projects = [];
+}
+WorkerBee.prototype = new Employee;
+
+var amy = new WorkerBee;
+
+Employee.prototype.name = &quot;Unknown&quot;;
+</pre>
+
+<p>在这种情况下，<code>amy</code> 的 <code>name</code> 属性将为 &quot;Unknown&quot;。</p>
+
+<p>正如这些例子所示，如果希望对象的属性具有默认值，并且希望在运行时修改这些默认值，应该在对象的原型中设置这些属性，而不是在构造器函数中。</p>
+
+<h3 id="判断实例的关系">判断实例的关系</h3>
+
+<p>JavaScript 的属性查找机制首先在对象自身的属性中查找，如果指定的属性名称没有找到，将在对象的特殊属性 <code>__proto__</code> 中查找。这个过程是递归的；被称为“在原型链中查找”。</p>
+
+<p>特殊的 <code>__proto__</code> 属性是在构建对象时设置的；设置为构造器的 <code>prototype</code> 属性的值。所以表达式 <code>new Foo()</code> 将创建一个对象，其 <code>__proto__ == <code class="moz-txt-verticalline">Foo.prototype</code></code>。因而，修改 <code class="moz-txt-verticalline">Foo.prototype</code> 的属性，将改变所有通过 <code>new Foo()</code> 创建的对象的属性的查找。</p>
+
+<p>每个对象都有一个 <code>__proto__</code> 对象属性（除了 <code>Object）；每个函数都有一个</code> <code>prototype</code> 对象属性。因此，通过“原型继承”，对象与其它对象之间形成关系。通过比较对象的 <code>__proto__</code> 属性和函数的 <code>prototype</code> 属性可以检测对象的继承关系。JavaScript 提供了便捷方法：<code>instanceof</code> 操作符可以用来将一个对象和一个函数做检测，如果对象继承自函数的原型，则该操作符返回真。例如：</p>
+
+<pre class="brush: js notranslate">var f = new Foo();
+var isTrue = (f instanceof Foo);</pre>
+
+<p>作为详细一点的例子，假定我们使用和在 <a href="#Inheriting_properties">Inheriting properties</a> 中相同的一组定义。创建 <code>Engineer</code> 对象如下：</p>
+
+<pre class="brush: js notranslate">var chris = new Engineer(&quot;Pigman, Chris&quot;, [&quot;jsd&quot;], &quot;fiji&quot;);
+</pre>
+
+<p>对于该对象，以下所有语句均为真：</p>
+
+<pre class="brush: js notranslate">chris.__proto__ == Engineer.prototype;
+chris.__proto__.__proto__ == WorkerBee.prototype;
+chris.__proto__.__proto__.__proto__ == Employee.prototype;
+chris.__proto__.__proto__.__proto__.__proto__ == Object.prototype;
+chris.__proto__.__proto__.__proto__.__proto__.__proto__ == null;
+</pre>
+
+<p>基于此，可以写出一个如下所示的 <code>instanceOf</code> 函数：</p>
+
+<pre class="brush: js notranslate">function instanceOf(object, constructor) {
+   while (object != null) {
+      if (object == constructor.prototype)
+         return true;
+      if (typeof object == &apos;xml&apos;) {
+        return constructor.prototype == XML.prototype;
+      }
+      object = object.__proto__;
+   }
+   return false;
+}
+</pre>
+
+<div class="note"><strong>Note:</strong> 在上面的实现中，检查对象的类型是否为 &quot;xml&quot; 的目的在于解决新近版本的 JavaScript 中表达 XML 对象的特异之处。如果您想了解其中琐碎细节，可以参考 <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=634150">bug 634150</a>。</div>
+
+<div>使用上面定义的 instanceOf 函数，这些表达式为真：</div>
+
+<div></div>
+
+<pre class="brush: js notranslate">instanceOf (chris, Engineer)
+instanceOf (chris, WorkerBee)
+instanceOf (chris, Employee)
+instanceOf (chris, Object)
+</pre>
+
+<p>但如下表达式为假：</p>
+
+<pre class="brush: js notranslate">instanceOf (chris, SalesPerson)</pre>
+
+<h3 id="构造器中的全局信息">构造器中的全局信息</h3>
+
+<p>在创建构造器时，在构造器中设置全局信息要小心。例如，假设希望为每一个雇员分配一个唯一标识。可能会为 <code>Employee</code> 使用如下定义：</p>
+
+<pre class="brush: js notranslate">var idCounter = 1;
+
+function Employee (name, dept) {
+   this.name = name || &quot;&quot;;
+   this.dept = dept || &quot;general&quot;;
+   this.id = idCounter++;
+}
+</pre>
+
+<p>基于该定义，在创建新的 <code>Employee</code> 时，构造器为其分配了序列中的下一个标识符。然后递增全局的标识符计数器。因此，如果，如果随后的语句如下，则 <code>victoria.id</code> 为 1 而 <code>harry.id</code> 为 2：</p>
+
+<pre class="brush: js notranslate">var victoria = new Employee(&quot;Pigbert, Victoria&quot;, &quot;pubs&quot;)
+var harry = new Employee(&quot;Tschopik, Harry&quot;, &quot;sales&quot;)
+</pre>
+
+<p>乍一看似乎没问题。但是，无论什么目的，在每一次创建 <code>Employee</code> 对象时，<code>idCounter</code> 都将被递增一次。如果创建本章中所描述的整个 <code>Employee</code> 层级结构，每次设置原型的时候，<code>Employee</code> 构造器都将被调用一次。假设有如下代码：</p>
+
+<pre class="brush: js notranslate">var idCounter = 1;
+
+function Employee (name, dept) {
+   this.name = name || &quot;&quot;;
+   this.dept = dept || &quot;general&quot;;
+   this.id = idCounter++;
+}
+
+function Manager (name, dept, reports) {...}
+Manager.prototype = new Employee;
+
+function WorkerBee (name, dept, projs) {...}
+WorkerBee.prototype = new Employee;
+
+function Engineer (name, projs, mach) {...}
+Engineer.prototype = new WorkerBee;
+
+function SalesPerson (name, projs, quota) {...}
+SalesPerson.prototype = new WorkerBee;
+
+var mac = new Engineer(&quot;Wood, Mac&quot;);
+</pre>
+
+<p>还可以进一步假设上面省略掉的定义中包含 <code>base</code> 属性而且调用了原型链中高于它们的构造器。即便在现在这个情况下，在 <code>mac</code> 对象创建时，<code>mac.id</code> 为 5。</p>
+
+<p>依赖于应用程序，计数器额外的递增可能有问题，也可能没问题。如果确实需要准确的计数器，则以下构造器可以作为一个可行的方案：</p>
+
+<pre class="brush: js notranslate">function Employee (name, dept) {
+   this.name = name || &quot;&quot;;
+   this.dept = dept || &quot;general&quot;;
+   if (name)
+      this.id = idCounter++;
+}
+</pre>
+
+<p>在用作原型而创建新的 <code>Employee</code> 实例时，不会指定参数。使用这个构造器定义，如果不指定参数，构造器不会指定标识符，也不会递增计数器。而如果想让 <code>Employee</code> 分配到标识符，则必需为雇员指定姓名。在这个例子中，<code>mac.id</code> 将为 1。</p>
+
+<p>或者，您可以创建一个 Employee 的原型对象的副本以分配给 WorkerBee：</p>
+
+<pre class="brush: js notranslate">WorkerBee.prototype = Object.create(Employee.prototype);
+// instead of WorkerBee.prototype = new Employee</pre>
+
+<h3 id="没有多重继承">没有多重继承</h3>
+
+<p>某些面向对象语言支持多重继承。也就是说，对象可以从无关的多个父对象中继承属性和属性值。JavaScript 不支持多重继承。</p>
+
+<p>JavaScript 属性值的继承是在运行时通过检索对象的原型链来实现的。因为对象只有一个原型与之关联，所以 JavaScript 无法动态地从多个原型链中继承。</p>
+
+<p>在 JavaScript 中，可以在构造器函数中调用多个其它的构造器函数。这一点造成了多重继承的假象。例如，考虑如下语句：</p>
+
+<pre class="brush: js notranslate">function Hobbyist (hobby) {
+   this.hobby = hobby || &quot;scuba&quot;;
+}
+
+function Engineer (name, projs, mach, hobby) {
+   this.base1 = WorkerBee;
+   this.base1(name, &quot;engineering&quot;, projs);
+   this.base2 = Hobbyist;
+   this.base2(hobby);
+   this.machine = mach || &quot;&quot;;
+}
+Engineer.prototype = new WorkerBee;
+
+var dennis = new Engineer(&quot;Doe, Dennis&quot;, [&quot;collabra&quot;], &quot;hugo&quot;)
+</pre>
+
+<p>进一步假设使用本章前面所属的 <code>WorkerBee</code> 的定义。此时 <code>dennis</code> 对象具有如下属性：</p>
+
+<pre class="brush: js notranslate">dennis.name == &quot;Doe, Dennis&quot;
+dennis.dept == &quot;engineering&quot;
+dennis.projects == [&quot;collabra&quot;]
+dennis.machine == &quot;hugo&quot;
+dennis.hobby == &quot;scuba&quot;
+</pre>
+
+<p><code>dennis</code> 确实从 <code>Hobbyist</code> 构造器中获得了 <code>hobby</code> 属性。但是，假设添加了一个属性到 <code>Hobbyist</code> 构造器的原型：</p>
+
+<pre class="brush: js notranslate">Hobbyist.prototype.equipment = [&quot;mask&quot;, &quot;fins&quot;, &quot;regulator&quot;, &quot;bcd&quot;]
+</pre>
+
+<p><code>dennis</code> 对象不会继承这个新属性。</p>
+
+<div><div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/JavaScript/Guide/Predefined_Core_Objects" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/JavaScript/Guide/Inheritance_Revisited" class="button">下一页  »</a></p>
+</div></div>

@@ -1,0 +1,111 @@
+---
+title: DOM allocation example
+slug: Tools/Memory/DOM_allocation_example
+tags:
+  - 内存
+  - 开发者工具
+translation_of: Tools/Memory/DOM_allocation_example
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/zh-CN/docs/Tools/Page_Inspector">页面检查器</a></li>
+        <li><a href="/zh-CN/docs/Tools/Web_Console">Web 控制台</a></li>
+        <li><a href="/zh-CN/docs/Tools/Debugger">JavaScript 调试器</a></li>
+        <li><a href="/zh-CN/docs/Tools/Network_Monitor">网络监视器</a></li>
+        <li><a href="/zh-CN/docs/Tools/Performance">性能</a></li>
+        <li><a href="/zh-CN/docs/Tools/Application">Application</a></li>
+        <li><a href="/zh-CN/docs/Tools/Responsive_Design_Mode">响应式设计模式</a></li>
+        <li><a href="/zh-CN/docs/Tools/Accessibility_inspector">无障碍环境</a></li>
+        <li class="toggle">
+            <details>
+                <summary>更多工具</summary>
+                <ol>
+                    <li><a href="/zh-CN/docs/Tools/Memory">内存</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Storage_Inspector">存储检查器</a></li>
+                    <li><a href="/zh-CN/docs/Tools/DOM_Property_Viewer">DOM属性查看器</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Eyedropper">页面取色器</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Taking_screenshots">截图</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Style_Editor">样式编辑器</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Rulers">Rulers</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+                    <li><a href="/zh-CN/docs/Tools/View_source">View Source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>连接到devtools</summary>
+                <ol>
+                    <li><a href="/zh-CN/docs/Tools/about:debugging">关于：调试</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">连接到 Android 的 Firefox </a></li>
+                    <li><a href="/zh-CN/docs/Tools/Working_with_iframes">连接到iframes</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Valence">连接到其他浏览器</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>调试浏览器</summary>
+                <ol>
+                    <li><a href="/zh-CN/docs/Tools/Browser_Console">浏览器控制台</a></li>
+                    <li><a href="/zh-CN/docs/Tools/Browser_Toolbox">浏览器工具箱</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/zh-CN/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">扩展开发者工具</a></li>
+        <li><a href="/zh-CN/docs/Tools/Settings">设置</a></li>
+        <li><a href="/zh-CN/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/zh-CN/docs/Tools/Release_notes">说明</a></li>
+    </ol>
+</section></div>
+
+<p>这篇文章描述了一个简单的 Web 页面，它被用于阐述内存工具的一些特性。</p>
+
+<p>你可以在这个网页中试试：<a href="https://mdn.github.io/performance-scenarios/dom-allocs/alloc.html">https://mdn.github.io/performance-scenarios/dom-allocs/alloc.html</a>。</p>
+
+<p>它仅仅包含了一个创建大量 DOM 节点的脚本：</p>
+
+<pre class="brush: js notranslate">var toolbarButtonCount = 20;
+var toolbarCount = 200;
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function createToolbarButton() {
+  var toolbarButton = document.createElement("span");
+  toolbarButton.classList.add("toolbarbutton");
+  // stop Spidermonkey from sharing instances
+  toolbarButton[getRandomInt(0,5000)] = "foo";
+  return toolbarButton;
+}
+
+function createToolbar() {
+  var toolbar = document.createElement("div");
+  // stop Spidermonkey from sharing instances
+  toolbar[getRandomInt(0,5000)] = "foo";
+  for (var i = 0; i &lt; toolbarButtonCount; i++) {
+    var toolbarButton = createToolbarButton();
+    toolbar.appendChild(toolbarButton);
+  }
+  return toolbar;
+}
+
+function createToolbars() {
+  var container = document.getElementById("container");
+  for (var i = 0; i &lt; toolbarCount; i++) {
+    var toolbar = createToolbar();
+    container.appendChild(toolbar);
+  }
+}
+
+createToolbars();
+</pre>
+
+<p>一段表示代码工作流程的伪代码：</p>
+
+<pre class="notranslate">createToolbars()
+    -&gt; createToolbar() // 调用 200 次, 每次创建一个 DIV 元素
+       -&gt; createToolbarButton() // 每次调用 createToolbar() 时，调用 20 次，每次创建一个 SPAN 元素</pre>
+
+<p>它总共创建了 200 个 <code><a href="/en-US/docs/Web/API/HTMLDivElement">HTMLDivElement</a></code> 对象和 4000 个 <code><a href="/en-US/docs/Web/API/HTMLSpanElement">HTMLSpanElement</a></code> 对象。</p>

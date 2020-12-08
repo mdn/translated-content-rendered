@@ -1,0 +1,186 @@
+---
+title: canvas的优化
+slug: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+tags:
+  - Advanced
+  - Canvas
+  - Tutorial
+translation_of: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/zh-CN/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas 教程</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_usage">基本用法</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">绘制形状</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">添加样式和颜色</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_text">绘制文本</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Using_images">使用图片</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations">变形</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Compositing">合成与裁剪</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_animations">基本动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">高级动画</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">像素操作</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">点击区域和无障碍访问</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">canvas 的优化</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Finale">终极</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>示例</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/A_basic_ray-caster">一个基本的光线投射例子</a></li>
+        <li><a href="/zh-CN/Add-ons/Code_snippets/Canvas">Canvas 代码片段</a></li>
+        <li><a href="/zh-CN/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">在 canvas 中操作视频</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>接口</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/zh-CN/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span></span> <a href="/zh-CN/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-CN/docs/MDN">文档:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>常用页面列表</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/tag/Canvas">拥有 &quot;Canvas&quot; 标签的页面</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>贡献</summary>
+      <ol>
+        <li><a href="/zh-CN/docs/MDN/Doc_status/API/Canvas">Canvas 文档翻译状态</a></li>
+        <li><a href="/zh-CN/docs/MDN">MDN 项目</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">下一页  »</a></p>
+</div></div>
+
+<div>
+<p class="summary"><a href="/zh-CN/docs/Web/HTML/Element/canvas" title="&lt;canvas&gt;元素可被用来通过JavaScript（Canvas API 或 WebGL API）绘制图形及图形动画。"><code>&lt;canvas&gt;</code></a>元素是众多广泛使用的网络2D图像渲染标准之一。它被广泛用于游戏及复杂的图像可视化中。然而，随着网站和应用将canvas画布推至极限，性能开始成为问题。此文目标是给使用canvas画布元素的优化带来建议，去保证你的网站或者应用表现卓越。</p>
+</div>
+
+<h2 id="性能贴士">性能贴士</h2>
+
+<p>下面是一些改善性能的建议</p>
+
+<h3 id="在离屏canvas上预渲染相似的图形或重复的对象">在离屏canvas上预渲染相似的图形或重复的对象</h3>
+
+<p>如果发现自己在每个动画帧上重复了一些相同的绘制操作，请考虑将其分流到屏幕外的画布上。 然后，您可以根据需要频繁地将屏幕外图像渲染到主画布上，而不必首先重复生成该图像的步骤。</p>
+
+<pre class="brush: js">myEntity.offscreenCanvas = document.createElement(&quot;canvas&quot;);
+myEntity.offscreenCanvas.width = myEntity.width;
+myEntity.offscreenCanvas.height = myEntity.height;
+myEntity.offscreenContext = myEntity.offscreenCanvas.getContext(&quot;2d&quot;);
+
+myEntity.render(myEntity.offscreenContext);
+</pre>
+
+<h3 id="避免浮点数的坐标点，用整数取而代之">避免浮点数的坐标点，用整数取而代之</h3>
+
+<p>当你画一个没有整数坐标点的对象时会发生子像素渲染。</p>
+
+<pre class="brush: js">ctx.drawImage(myImage, 0.3, 0.5);
+</pre>
+
+<p>浏览器为了达到抗锯齿的效果会做额外的运算。为了避免这种情况，请保证在你调用<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage()</code></a>函数时，用<a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/floor"><code>Math.floor()</code></a>函数对所有的坐标点取整。</p>
+
+<h3 id="不要在用drawImage时缩放图像">不要在用<code>drawImage</code>时缩放图像</h3>
+
+<p>在离屏canvas中缓存图片的不同尺寸，而不要用<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage()</code></a>去缩放它们。</p>
+
+<h3 id="使用多层画布去画一个复杂的场景">使用多层画布去画一个复杂的场景</h3>
+
+<p>在您的应用程序中，您可能会发现某些对象需要经常移动或更改，而其他对象则保持相对静态。 在这种情况下，可能的优化是使用多个<code>&lt;canvas&gt;</code>元素对您的项目进行分层。</p>
+
+<p>例如，假设您有一个游戏，其UI位于顶部，中间是游戏性动作，底部是静态背景。 在这种情况下，您可以将游戏分成三个<code>&lt;canvas&gt;</code>层。 UI将仅在用户输入时发生变化，游戏层随每个新框架发生变化，并且背景通常保持不变。</p>
+
+<pre class="brush: html">&lt;div id=&quot;stage&quot;&gt;
+  &lt;canvas id=&quot;ui-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;game-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;background-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+  #stage {
+    width: 480px;
+    height: 320px;
+    position: relative;
+    border: 2px solid black
+  }
+  canvas { position: absolute; }
+  #ui-layer { z-index: 3 }
+  #game-layer { z-index: 2 }
+  #background-layer { z-index: 1 }
+&lt;/style&gt;
+</pre>
+
+<h3 id="用CSS设置大的背景图">用CSS设置大的背景图</h3>
+
+<p>如果像大多数游戏那样，你有一张静态的背景图，用一个静态的<a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，在不使用CSS的情况下，其对内容或布局没有任何影响。"><code>&lt;div&gt;</code></a>元素，结合<a href="/zh-CN/docs/Web/CSS/background" title="background 是一种 CSS 简写属性，用于一次性集中定义各种背景属性，包括 color, image, origin 与 size, repeat 方式等等。"><code>background</code></a> 特性，以及将它置于画布元素之后。这么做可以避免在每一帧在画布上绘制大图。</p>
+
+<h3 id="用CSS_transforms特性缩放画布">用CSS transforms特性缩放画布</h3>
+
+<p><a href="/en-US/docs/Web/Guide/CSS/Using_CSS_transforms">CSS transforms</a> 使用GPU，因此速度更快。 最好的情况是不直接缩放画布，或者具有较小的画布并按比例放大，而不是较大的画布并按比例缩小。</p>
+
+<pre class="brush: js">var scaleX = window.innerWidth / canvas.width;
+var scaleY = window.innerHeight / canvas.height;
+
+var scaleToFit = Math.min(scaleX, scaleY);
+var scaleToCover = Math.max(scaleX, scaleY);
+
+stage.style.transformOrigin = &apos;0 0&apos;; //scale from top left
+stage.style.transform = &apos;scale(&apos; + scaleToFit + &apos;)&apos;;
+</pre>
+
+<h3 id="关闭透明度">关闭透明度</h3>
+
+<p>如果你的游戏使用画布而且不需要透明，当使用 <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext" title="The HTMLCanvasElement.getContext() method returns a drawing context on the canvas, or null if the context identifier is not supported.">HTMLCanvasElement.getContext()</a></code> 创建一个绘图上下文时把 <code>alpha</code> 选项设置为 <code>false</code> 。这个选项可以帮助浏览器进行内部优化。</p>
+
+<pre class="brush: js">var ctx = canvas.getContext(&apos;2d&apos;, { alpha: false });</pre>
+
+<h3 id="更多的贴士">更多的贴士</h3>
+
+<ul>
+ <li>将画布的函数调用集合到一起（例如，画一条折线，而不要画多条分开的直线）</li>
+ <li>避免不必要的画布状态改变</li>
+ <li>渲染画布中的不同点，而非整个新状态</li>
+ <li>尽可能避免 <a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/shadowBlur"><code>shadowBlur</code></a>特性</li>
+ <li>尽可能避免<a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_text">text rendering</a></li>
+ <li>尝试不同的方法来清除画布(<a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/clearRect"><code>clearRect()</code></a> vs. <a href="/zh-CN/docs/Web/API/CanvasRenderingContext2D/fillRect"><code>fillRect()</code></a> vs. 调整canvas大小)</li>
+ <li> 有动画，请使用<a href="/zh-CN/docs/Web/API/Window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> 而非<a href="/zh-CN/docs/Web/API/Window/setInterval"><code>window.setInterval()</code></a></li>
+ <li>请谨慎使用大型物理库</li>
+</ul>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="http://www.html5rocks.com/en/tutorials/canvas/performance/#toc-ref">Improving HTML5 Canvas Performance – HTML5 Rocks</a></li>
+ <li><a href="https://hacks.mozilla.org/2013/05/optimizing-your-javascript-game-for-firefox-os/">Optimizing your JavaScript game for Firefox OS – Mozilla Hacks</a></li>
+</ul>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">下一页  »</a></p>
+</div>

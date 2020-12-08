@@ -1,0 +1,538 @@
+---
+title: 在web应用程序中使用文件
+slug: Web/API/File/Using_files_from_web_applications
+tags:
+  - File
+  - File API
+  - ajax上传
+  - 文件
+  - 文件上传
+translation_of: Web/API/File/Using_files_from_web_applications
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/File"><code>File</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><a href="/zh-CN/docs/Web/API/File/File"><code>File()</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/API/File/fileName"><code>fileName</code></a></s></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/API/File/fileSize"><code>fileSize</code></a></s></li><li><a href="/zh-CN/docs/Web/API/File/lastModified"><code>lastModified</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-CN/docs/Web/API/File/lastModifiedDate"><code>lastModifiedDate</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/API/File/mozFullPath"><code>mozFullPath</code></a></li><li><a href="/zh-CN/docs/Web/API/File/name"><code>name</code></a></li><li><a href="/zh-CN/docs/Web/API/File/type"><code>type</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-CN/docs/Web/API/File/webkitRelativePath"><code>webkitRelativePath</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/API/File/getAsBinary"><code>getAsBinary</code></a></s></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/API/File/getAsDataURL"><code>getAsDataURL()</code></a></s></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/API/File/getAsText"><code>getAsText</code></a></s></li></ol></details></li><li class="toggle"><details open><summary>继承</summary><ol><li><a href="/zh-CN/docs/Web/API/Blob"><code>Blob</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for File API</summary><ol><li><a href="/zh-CN/docs/Web/API/Blob"><code>Blob</code></a></li><li><a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a></li><li><a href="/zh-CN/docs/Web/API/FileReader"><code>FileReader</code></a></li><li><a href="/zh-CN/docs/Web/API/FileReaderSync"><code>FileReaderSync</code></a></li></ol></details></li></ol></section>
+
+<p>通过使用在 HTML5 中加入到 DOM 的 File API，使在web内容中让用户选择本地文件然后读取这些文件的内容成为可能。用户可以通过HTML中的 <a href="/zh-CN/docs/Web/HTML/Element/input/file" title="使用 type=&quot;file&quot; 的 &lt;input&gt; 元素使得用户可以选择一个或多个元素以提交表单的方式上传到服务器上，或者通过 Javascript 的 File API 对文件进行操作。">&lt;input type=&quot;file&quot;&gt;</a> 元素或者是通过拖拽来选择本地文件。</p>
+
+<p>如果你想通过扩展或者其它的chrome源码浏览器（browser chrome code）使用DOM File API，是可行的；然而，需要注意有一些附加特性。详细请见 <a href="/en/Extensions/Using_the_DOM_File_API_in_chrome_code" title="en/Extensions/Using the DOM File API in chrome code">Using the DOM File API in chrome code</a>。</p>
+
+<h2 id="访问被选择的文件">访问被选择的文件</h2>
+
+<p>考虑这段 HTML:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot;&gt;</pre>
+
+<p>通过 File API，我们可以访问 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a>，它包含了表示用户所选文件的 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象</p>
+
+<p>如果用户只选择了一个文件，那么只需要考虑列表中的第一个文件。</p>
+
+<p>使用传统的 DOM 选择器访问一个被选择的文件：</p>
+
+<pre class="brush: js">const selectedFile = document.getElementById(&apos;input&apos;).files[0];
+</pre>
+
+<h3 id="通过_change_事件访问被选择的文件"><strong>通过 change 事件访问被选择的文件</strong></h3>
+
+<p>可以（但不是强制的）通过 <code>change</code> 事件访问 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a>：</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;</pre>
+
+<p>当用户选择一个文件时，<code>handleFiles()</code> 方法会用一个 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a> 对象作为参数被调用，<a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a> 对象包含表示用户选择的文件的 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象。</p>
+
+<p>如果你想让用户选择多个文件，只需在 <code>input</code> 元素上使用 <code>multiple</code> 属性：</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot; multiple onchange=&quot;handleFiles(this.files)&quot;&gt;</pre>
+
+<p>在这个例子中，对于每个用户选择的文件，传递给 <code>handleFiles()</code>方法的文件列表都包含一个对应的 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象。</p>
+
+<h3 id="动态添加change监听器"><strong>动态添加change监听器</strong></h3>
+
+<p>你需要使用 <a href="/zh-CN/docs/Web/API/EventTarget/addEventListener"><code>EventTarget.addEventListener()</code></a> 去添加 <code>change</code> 事件监听器，像这样：</p>
+
+<pre class="brush: js">const inputElement = document.getElementById(&quot;input&quot;);
+inputElement.addEventListener(&quot;change&quot;, handleFiles, false);
+function handleFiles() {
+  const fileList = this.files; /* now you can work with the file list */
+}
+</pre>
+
+<p>注意在这个例子里，<code>handleFiles()</code> 方法本身是一个事件处理器，不像之前的例子中，它被事件处理器调用然后传递给它一个参数。</p>
+
+<h2 id="获取被选择文件的信息">获取被选择文件的信息</h2>
+
+<p>DOM 提供 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a> 对象列出了用户选择的所有文件，每一个文件被指定为一个 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象。你可以通过检查文件列表 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a> 的 <code>length</code> 属性来确定用户选择了多少个文件：</p>
+
+<pre class="brush: js">const numFiles = files.length;
+</pre>
+
+<p>可以像数组一样简单地访问文件列表来检索各个 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象：</p>
+
+<pre class="brush: js">for (let i = 0, numFiles = files.length; i &lt; numFiles; i++) {
+  const file = files[i];
+  // ...
+}</pre>
+
+<p>这个循环遍历了文件列表里的所有文件。</p>
+
+<p> <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 对象提供了三个属性，包含了文件的有用信息。</p>
+
+<dl>
+ <dt><code>name</code></dt>
+ <dd>文件名称，只读字符串。只包含文件名，不包含任何路径信息。</dd>
+ <dt><code>size</code></dt>
+ <dd>以字节数为单位的文件大小，只读的64位整数。</dd>
+ <dt><code>type</code></dt>
+ <dd>文件的 MIME 类型，只读字符串，当类型不能确定时为 <code>&quot;&quot;</code>。</dd>
+</dl>
+
+<h3 id="示例：显示文件大小">示例：显示文件大小</h3>
+
+<p>下面的例子展示了 <code>size</code> 属性的一种可能用法：</p>
+
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;File(s) size&lt;/title&gt;
+&lt;script&gt;
+function updateSize() {
+  let nBytes = 0,
+      oFiles = document.getElementById(&quot;uploadInput&quot;).files,
+      nFiles = oFiles.length;
+  for (let nFileId = 0; nFileId &lt; nFiles; nFileId++) {
+    nBytes += oFiles[nFileId].size;
+  }
+  let sOutput = nBytes + &quot; bytes&quot;;
+  // optional code for multiples approximation
+  const aMultiples = [&quot;KiB&quot;, &quot;MiB&quot;, &quot;GiB&quot;, &quot;TiB&quot;, &quot;PiB&quot;, &quot;EiB&quot;, &quot;ZiB&quot;, &quot;YiB&quot;];
+  for (nMultiple = 0, nApprox = nBytes / 1024; nApprox &gt; 1; nApprox /= 1024, nMultiple++) {
+    sOutput = nApprox.toFixed(3) + &quot; &quot; + aMultiples[nMultiple] + &quot; (&quot; + nBytes + &quot; bytes)&quot;;
+  }
+  // end of optional code
+  document.getElementById(&quot;fileNum&quot;).innerHTML = nFiles;
+  document.getElementById(&quot;fileSize&quot;).innerHTML = sOutput;
+}
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body onload=&quot;updateSize()&quot;&gt;
+  &lt;form name=&quot;uploadForm&quot;&gt;
+    &lt;div&gt;
+      &lt;input id=&quot;uploadInput&quot; type=&quot;file&quot; name=&quot;myFiles&quot; onchange=&quot;updateSize();&quot; multiple&gt;
+      selected files: &lt;span id=&quot;fileNum&quot;&gt;0&lt;/span&gt;;
+      total size: &lt;span id=&quot;fileSize&quot;&gt;0&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div&gt;&lt;input type=&quot;submit&quot; value=&quot;Send file&quot;&gt;&lt;/div&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<h2 id="通过_click_方法使用隐藏的_file_input_元素">通过 click() 方法使用隐藏的 file input 元素</h2>
+
+<p>你可以隐藏公认难看的 file <a href="/zh-CN/docs/Web/HTML/Element/input" title="HTML &lt;input&gt; 元素用于为基于Web的表单创建交互式控件，以便接受来自用户的数据; 可以使用各种类型的输入数据和控件小部件，具体取决于设备和user agent。"><code>&lt;input&gt;</code></a> 元素并显示你自己的界面来打开文件选择器，然后显示哪个或哪些文件被用户选中了。你可以通过给 input 元素添加 <code>display:none</code> 的样式，再调用 <a href="/zh-CN/docs/Web/HTML/Element/input" title="HTML &lt;input&gt; 元素用于为基于Web的表单创建交互式控件，以便接受来自用户的数据; 可以使用各种类型的输入数据和控件小部件，具体取决于设备和user agent。"><code>&lt;input&gt;</code></a> 元素的 <a href="/zh-CN/docs/Web/API/Element/click"><code>click()</code></a> 方法来实现。</p>
+
+<p>考虑这段HTML：</p>
+
+<pre>&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; style=&quot;display:none&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;
+&lt;button id=&quot;fileSelect&quot;&gt;Select some files&lt;/button&gt;
+</pre>
+
+<p>处理 <code>click</code> 事件的代码类似于这样：</p>
+
+<pre class="brush: js">const fileSelect = document.getElementById(&quot;fileSelect&quot;),
+  fileElem = document.getElementById(&quot;fileElem&quot;);
+
+fileSelect.addEventListener(&quot;click&quot;, function (e) {
+  if (fileElem) {
+    fileElem.click();
+  }
+}, false);
+</pre>
+
+<p>你可以给这个用来打开文件选择器的新按钮添加任何你想要的样式。</p>
+
+<h2 id="使用_label_元素来触发一个隐藏的_file_input_元素">使用 label 元素来触发一个隐藏的 file input 元素</h2>
+
+<p>允许在不使用 JavaScript（click() 方法）来打开文件选择器，可以使用 <a href="/zh-CN/docs/Web/HTML/Element/label" title="HTML &lt;label&gt; 元素（标签）表示用户界面中某个元素的说明。"><code>&lt;label&gt;</code></a> 元素。注意在这种情况下，input 元素不能使用 <code>display: none</code>（或 <code>visibility: hidden</code>）隐藏，否则 label 将无法通过键盘访问。使用 <a href="https://a11yproject.com/posts/how-to-hide-content/">visually-hidden technique</a> 作为替代。</p>
+
+<p>考虑这段HTML：</p>
+
+<pre>&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; class=&quot;visually-hidden&quot;&gt;
+&lt;label for=&quot;fileElem&quot;&gt;Select some files&lt;/label&gt;</pre>
+
+<p>和这段CSS：</p>
+
+<pre class="brush: css">.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+/* Separate rule for compatibility, :focus-within is required on modern Firefox and Chrome */
+input.visually-hidden:focus + label {
+  outline: thin dotted;
+}
+input.visually-hidden:focus-within + label {
+  outline: thin dotted;
+}
+</pre>
+
+<p>这里不需要添加任何 JavaScript 代码来调用<code>fileElem.click()</code>，另外，这时你也可以给 label 元素添加你想要的样式。您需要在其 label 上提供隐藏 input 字段的焦点状态的视觉提示，比如上面用的轮廓，或者背景颜色或边框阴影。（截至编写时为止，Firefox 不显示 <code>&lt;input type=&quot;file&quot;&gt;</code> 元素的视觉提示。）</p>
+
+<h2 id="使用拖放来选择文件">使用拖放来选择文件</h2>
+
+<p>你还可以让用户将文件拖拽到你的网页应用中。</p>
+
+<p>第一步是创建一个drop区域。虽然你网页内容的哪部分接受拖放取决于你的应用设计，但是使一个元素接收drop事件是很容易的。</p>
+
+<pre class="brush: js">let dropbox;
+
+dropbox = document.getElementById(&quot;dropbox&quot;);
+dropbox.addEventListener(&quot;dragenter&quot;, dragenter, false);
+dropbox.addEventListener(&quot;dragover&quot;, dragover, false);
+dropbox.addEventListener(&quot;drop&quot;, drop, false);
+
+</pre>
+
+<p>在这个例子中，我们将ID为<code>dropbox</code>的元素变为了我们的drop区域。这是通过给元素添加<code><a href="/zh-CN/docs/Web/Reference/Events/dragenter" title="/zh-CN/docs/Web/Reference/Events/dragenter">dragenter</a></code>, <code><a href="/zh-CN/docs/Web/Reference/Events/dragover" title="/zh-CN/docs/Web/Reference/Events/dragover">dragover</a></code>, 和<code><a href="/zh-CN/docs/Web/Reference/Events/drop" title="/zh-CN/docs/Web/Reference/Events/drop">drop</a></code> 事件监听器实现的。</p>
+
+<p>我们其实并不需要对<code>dragenter</code> and <code>dragover</code> 事件进行处理，所以这些函数都很简单。他们只需要包括禁止事件传播和阻止默认事件：</p>
+
+<pre class="brush: js">function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+</pre>
+
+<p>真正的奥妙在<code>drop()</code>这个函数中：</p>
+
+<pre class="brush: js">function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+
+  handleFiles(files);
+}
+</pre>
+
+<p>这里，我们从事件中获取到了<code>dataTransfer</code> 这个域，然后从中得到文件列表，再将它们传递给<code>handleFiles()</code>函数。在这之后，处理文件的方法和用<code>input</code>元素或者用拖拽就是一样的了。</p>
+
+<h2 id="例子：显示用户选择的图片的缩略图">例子：显示用户选择的图片的缩略图</h2>
+
+<p>比方说，你正在开发一个炫酷的下一代图片分享网站，并且想使用HTML5来展示用户在实际上传之前的图片的缩略图。你可以像我们之前讨论的那样创建自己的input元素或者drop区域，然后对他们使用一个回调函数，比如下面的<code>handleFiles()</code>。</p>
+
+<pre class="brush: js">function handleFiles(files) {
+  for (var i = 0; i &lt; files.length; i++) {
+    var file = files[i];
+    var imageType = /^image\//;
+
+    if (!imageType.test(file.type)) {
+      continue;
+    }
+
+    var img = document.createElement(&quot;img&quot;);
+    img.classList.add(&quot;obj&quot;);
+    img.file = file;
+    preview.appendChild(img); // 假设&quot;preview&quot;就是用来显示内容的div
+
+    var reader = new FileReader();
+    reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+    reader.readAsDataURL(file);
+  }
+}
+</pre>
+
+<p>这里我们循环处理用户选择的文件，看每个文件的<code>type</code>属性是不是image（通过正则表达式来匹配MIME类型字符串模式&quot;<code>image/*</code>&quot;）。 对每个文件而言，如果它是image，我们就创建一个新的<code>img</code>元素。可以使用css来创建一个漂亮的边框或阴影来显示图片的具体大小，在这儿就不具体做了。</p>
+
+<p>为了在DOM树中更容易地找到他们，每个图片元素都被添加了一个名为<code>obj</code>的CSS类。我们还给每个图片添加了<code>file</code>属性使它具有 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a>；这样做可以让我们拿到稍后需要实际上传的图片。我们在预览页中使用 <a href="/zh-CN/docs/Web/API/Node/appendChild"><code>Node.appendChild()</code></a>来添加新的缩略图。</p>
+
+<p>接下来，我们创建了<a href="/zh-CN/docs/Web/API/FileReader"><code>FileReader</code></a>来处理异步的图片加载并把他赋给<code>img</code>元素。在创建一个新的 <code>FileReader</code>对象后，我们新建了它的<code>onload</code> 函数，然后调用<code>readAsDataURL()</code>函数开始后台读取文件。当整个图片文件的内容都被全部加载完后，它们被转换成了一个被传递到<code>onload</code>回调函数的<code>data:</code>URL。我们再执行常规操作将<code>img</code>元素的<code>src</code>属性设置为刚刚加载完毕的URL，使得图像可以显示在用户屏幕上的缩略图中。</p>
+
+<h2 id="使用对象_URL">使用对象 URL</h2>
+
+<p>Gecko 2.0 (Firefox 4 / Thunderbird 3.3 / SeaMonkey 2.1)引入了对DOM <a href="/zh-CN/docs/Web/API/Window/URL/createObjectURL"><code>window.URL.createObjectURL()</code></a> 和 <a href="/zh-CN/docs/Web/API/Window/URL/revokeObjectURL"><code>window.URL.revokeObjectURL()</code></a> 方法的支持。这使得你可以创建用于引用任何数据的简单URL字符串，也可以引用一个包括用户电脑上的本地文件的DOM <a href="/zh-CN/docs/Web/API/File"><code>File</code></a>对象。</p>
+
+<p>当你需要在HTML中通过URL来引用一个<a href="/zh-CN/docs/Web/API/File"><code>File</code></a>对象时，你可以创建一个对象URL，就像这样：</p>
+
+<pre class="brush: js">var objectURL = window.URL.createObjectURL(fileObj);
+</pre>
+
+<p>这个对象URL是一个标识<a href="/zh-CN/docs/Web/API/File"><code>File</code></a>对象的字符串。每次你调用<a href="/zh-CN/docs/Web/API/Window/URL/createObjectURL"><code>window.URL.createObjectURL()</code></a>，就会产生一个唯一的对象URL，即使是你对一个已创建了对象URL的文件再次创建一个对象URL。每个创建了的对象URL必须要释放。当文档关闭时，它们会自动被释放。如果你的网页要动态使用它们，你需要显式调用 <a href="/zh-CN/docs/Web/API/Window/URL/revokeObjectURL"><code>window.URL.revokeObjectURL()</code></a>来释放它们：</p>
+
+<pre class="brush: js">window.URL.revokeObjectURL(objectURL);
+</pre>
+
+<h2 id="示例：使用对象URL来显示图片">示例：使用对象URL来显示图片</h2>
+
+<p>这个例子使用对象URL来显示图片缩略图。另外，示例也会显示文件名和文件大小等其他文件信息。</p>
+
+<p>显示接口的HTML类似于这样：</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; style=&quot;display:none&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;
+&lt;a href=&quot;#&quot; id=&quot;fileSelect&quot;&gt;Select some files&lt;/a&gt;
+&lt;div id=&quot;fileList&quot;&gt;
+  &lt;p&gt;No files selected!&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>这确定我们的文件 <a href="/zh-CN/docs/Web/HTML/Element/input" title="HTML &lt;input&gt; 元素用于为基于Web的表单创建交互式控件，以便接受来自用户的数据; 可以使用各种类型的输入数据和控件小部件，具体取决于设备和user agent。"><code>&lt;input&gt;</code></a> 元素显示为一个可以调用文件选择器的链接（我们隐藏了文件输入元素来阻止显示用户不友好的界面）。这个在 <a href="#Using_hidden_file_input_elements_using_the_click()_method">Using hidden file input elements using the click() method</a>节已经说明了这种调用文件选择器的方法。</p>
+
+<p><code>handleFiles()</code> 方法如下：</p>
+
+<pre class="brush: js">window.URL = window.URL || window.webkitURL;
+
+var fileSelect = document.getElementById(&quot;fileSelect&quot;),
+    fileElem = document.getElementById(&quot;fileElem&quot;),
+    fileList = document.getElementById(&quot;fileList&quot;);
+
+fileSelect.addEventListener(&quot;click&quot;, function (e) {
+  if (fileElem) {
+    fileElem.click();
+  }
+  e.preventDefault(); // prevent navigation to &quot;#&quot;
+}, false);
+
+function handleFiles(files) {
+  if (!files.length) {
+    fileList.innerHTML = &quot;&lt;p&gt;No files selected!&lt;/p&gt;&quot;;
+  } else {
+    fileList.innerHTML = &quot;&quot;;
+    var list = document.createElement(&quot;ul&quot;);
+    fileList.appendChild(list);
+    for (var i = 0; i &lt; files.length; i++) {
+      var li = document.createElement(&quot;li&quot;);
+      list.appendChild(li);
+
+      var img = document.createElement(&quot;img&quot;);
+      img.src = window.URL.<strong>createObjectURL</strong>(files[i]);
+      img.height = 60;
+      img.onload = function() {
+        window.URL.<strong>revokeObjectURL</strong>(this.src);
+      }
+      li.appendChild(img);
+      var info = document.createElement(&quot;span&quot;);
+      info.innerHTML = files[i].name + &quot;: &quot; + files[i].size + &quot; bytes&quot;;
+      li.appendChild(info);
+    }
+  }
+}
+</pre>
+
+<p>首先，获取ID为 <code>fileList</code> 的 <a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，在不使用CSS的情况下，其对内容或布局没有任何影响。"><code>&lt;div&gt;</code></a> 。这个区块里我们会插入我们的文件列表，包括缩略图。</p>
+
+<p>如果传入 <code>handleFiles()</code> 的 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a> 对象值为 <code>null</code> 时，我们只要简单将这块的内部HTML为显示“No files selected!”。否则，我们就需要像下面这样编写我们的文件列表：</p>
+
+<ol>
+ <li><span style="font-size: 1rem; letter-spacing: -0.00278rem;">创建一个无序列表 (<a href="/zh-CN/docs/Web/HTML/Element/ul" title="HTML &lt;ul&gt; 元素（或称 HTML 无序列表元素）表示一个内可含多个元素的无序列表或项目符号列表。"><code>&lt;ul&gt;</code></a>) 元素。</span></li>
+ <li>通过调用列表的<a href="/zh-CN/docs/Web/API/Node/appendChild"><code>Node.appendChild()</code></a>方法来将新的列表元素插入到 <a href="/zh-CN/docs/Web/HTML/Element/div" title="HTML &lt;div&gt; 元素 (或 HTML 文档分区元素) 是一个通用型的流内容容器，在不使用CSS的情况下，其对内容或布局没有任何影响。"><code>&lt;div&gt;</code></a>块。</li>
+ <li>遍历文件集合 <a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a>（即<code>files</code>）中的每个 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a>：
+  <ol>
+   <li>创建一个新的列表项（<a href="/zh-CN/docs/Web/HTML/Element/li" title="HTML &lt;li&gt; 元素 （或称 HTML 列表条目元素） 用于表示列表里的条目。它必须包含在一个父元素里：一个有序列表(&lt;ol&gt;)，一个无序列表(&lt;ul&gt;)，或者一个菜单 (&lt;menu&gt;)。在菜单或者无序列表里，列表条目通常用点排列显示；在有序列表里，列表条目通常在左边显示按升序排列的计数，例如数字或者字母。"><code>&lt;li&gt;</code></a>）元素并插入到列表中。</li>
+   <li>创建一个新的图片（<a href="/zh-CN/docs/Web/HTML/Element/img" title="HTML &lt;img&gt; 元素将一份图像嵌入文档。"><code>&lt;img&gt;</code></a>）元素。</li>
+   <li>设置图片的源为一个新的指代文件的对象URL，使用<a href="/zh-CN/docs/Web/API/Window/URL/createObjectURL"><code>window.URL.createObjectURL()</code></a>来创建blob URL。</li>
+   <li>设置图片的高度为60像素。</li>
+   <li>设置图片的load事件处理器来释放对象URL，当图片加载完成之后对象URL就不再需要了。这个可以通过调用<a href="/zh-CN/docs/Web/API/Window/URL/revokeObjectURL"><code>window.URL.revokeObjectURL()</code></a>方法并且传递 <code>img.src</code>中的对象URL字符串来实现。</li>
+   <li>将新的列表项添加到列表中。</li>
+  </ol>
+ </li>
+</ol>
+
+<p>这是上面代码的一个在线示例：</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300px" id="frame_示例：使用对象URL来显示图片" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications$samples/%E7%A4%BA%E4%BE%8B%EF%BC%9A%E4%BD%BF%E7%94%A8%E5%AF%B9%E8%B1%A1URL%E6%9D%A5%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87?revision=1613763" width="100%"></iframe></p>
+
+<h2 id="例子：上传一个用户选择的文件">例子：上传一个用户选择的文件</h2>
+
+<p>另一件您可能想要做的事是让用户将选定的一个或多个文件（例如前一个示例中选择的图像）上传到服务器。这用异步可以很容易地完成。</p>
+
+<h3 id="创建上传任务">创建上传任务</h3>
+
+<p>继续前面示例中构建缩略图的代码，回想一下每个缩略图图像都在CSS类<code>obj</code>中，并且<code>file</code>属性中附加了相应的 <a href="/zh-CN/docs/Web/API/File"><code>File</code></a> 。这允许我们使用 <a href="/zh-CN/docs/Web/API/Document/querySelectorAll"><code>Document.querySelectorAll()</code></a> 选择用户决定上传的所有图像，如下所示：</p>
+
+<pre class="brush: js">function sendFiles() {
+  var imgs = document.querySelectorAll(&quot;.obj&quot;);
+
+  for (var i = 0; i &lt; imgs.length; i++) {
+    new FileUpload(imgs[i], imgs[i].file);
+  }
+}
+</pre>
+
+<p>第2行获取了文档中所有CSS类为<code>obj</code>的元素的 <span style="line-height: 1.5;"><a href="/zh-CN/docs/Web/API/NodeList"><code>NodeList</code></a></span>，命名为<code>imgs</code>。在我们的例子中，这些是包含所有图像缩略图的列表。有了这个列表，遍历并为每一项创建一个新的<code>FileUpload</code>实例就很简单了。每个实例都可以处理相应文件的上传。</p>
+
+<h3 id="Handling_the_upload_process_for_a_file处理文件的上传过程">Handling the upload process for a file处理文件的上传过程</h3>
+
+<p><code>FileUpload</code>函数接受两个输入：一个image元素和一个包含图像数据的文件。</p>
+
+<pre class="brush: js">function FileUpload(img, file) {
+  var reader = new FileReader();
+  this.ctrl = createThrobber(img);
+  var xhr = new XMLHttpRequest();
+  this.xhr = xhr;
+
+  var self = this;
+  this.xhr.upload.addEventListener(&quot;progress&quot;, function(e) {
+        if (e.lengthComputable) {
+          var percentage = Math.round((e.loaded * 100) / e.total);
+          self.ctrl.update(percentage);
+        }
+      }, false);
+
+  xhr.upload.addEventListener(&quot;load&quot;, function(e){
+          self.ctrl.update(100);
+          var canvas = self.ctrl.ctx.canvas;
+          canvas.parentNode.removeChild(canvas);
+      }, false);
+  xhr.open(&quot;POST&quot;, &quot;http://demos.hacks.mozilla.org/paul/demos/resources/webservices/devnull.php&quot;);
+  xhr.overrideMimeType(&apos;text/plain; charset=x-user-defined-binary&apos;);
+  reader.onload = function(evt) {
+    xhr.send(evt.target.result);
+  };
+  reader.readAsBinaryString(file);
+}
+</pre>
+
+<p>上面的<code>FileUpload()</code> 函数创建了一个“加载中”指示器，用于显示进度信息，然后创建了一个 <a href="/zh-CN/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> 来处理上传数据。</p>
+
+<p>实际传输数据前，采取了几道准备步骤：</p>
+
+<ol>
+ <li><code>XMLHttpRequest</code>的<code>progress</code>监听器被设为将加载指示器更新为新的百分比信息，这样随着上传进行，指示器会显示最新的信息。</li>
+ <li><code>XMLHttpRequest</code>的<code>load</code>事件监听器被设为将加载指示器的进度信息更新为100%，以保证进度显示确实达到了100%（以防在上传过程中出现粒度误差）。然后它移除了已经不再需要的加载指示器。这样上传一完成指示器就会消失。</li>
+ <li>上传图像文件的请求，是由调用<code>XMLHttpRequest</code>的<code>open()</code>函数发送POST请求完成的。</li>
+ <li>上传的MIME类型是通过调用<code>XMLHttpRequest</code>的<code>overrideMimeType()</code>函数来设置的。这个例子中，我们使用通用MIME类型。是否需要设置MIME类型取决于你的具体使用情况。</li>
+ <li><code>FileReader</code>对象用于将文件转换为二进制字符串。</li>
+ <li>最后，当内容被加载时，会调用<code>XMLHttpRequest</code>的<code>send()</code>函数来上传文件内容。</li>
+</ol>
+
+<div class="note"><strong>提示：</strong>上面例子中使用的非标准的<code>sendAsBinary</code>方法在Gecko 31 (Firefox 31 / Thunderbird 31 / SeaMonkey 2.28) 中已废弃。请使用标准的<code>send(Blob data)</code>方法代替。</div>
+
+<h3 id="异步处理文件上传">异步处理文件上传</h3>
+
+<p>这个例子演示了如何异步上传文件，在服务器端使用了php、在客户端使用了JavaScript。</p>
+
+<pre class="brush: js">&lt;?php
+if (isset($_FILES[&apos;myFile&apos;])) {
+    // Example:
+    move_uploaded_file($_FILES[&apos;myFile&apos;][&apos;tmp_name&apos;], &quot;uploads/&quot; . $_FILES[&apos;myFile&apos;][&apos;name&apos;]);
+    exit;
+}
+?&gt;&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;dnd binary upload&lt;/title&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+    &lt;script type=&quot;application/javascript&quot;&gt;
+        function sendFile(file) {
+            const uri = &quot;/index.php&quot;;
+            const xhr = new XMLHttpRequest();
+            const fd = new FormData();
+
+            xhr.open(&quot;POST&quot;, uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) {
+                    alert(xhr.responseText); // handle response.
+                }
+            };
+            fd.append(&apos;myFile&apos;, file);
+            // Initiate a multipart/form-data upload
+            xhr.send(fd);
+        }
+
+        window.onload = function() {
+            const dropzone = document.getElementById(&quot;dropzone&quot;);
+            dropzone.ondragover = dropzone.ondragenter = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+
+            dropzone.ondrop = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                const filesArray = event.dataTransfer.files;
+                for (let i=0; i&lt;filesArray.length; i++) {
+                    sendFile(filesArray[i]);
+                }
+            }
+        }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div&gt;
+        &lt;div id=&quot;dropzone&quot; style=&quot;margin:30px; width:500px; height:300px; border:1px dotted grey;&quot;&gt;Drag &amp; drop your file here...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="例子：用对象URL显示PDF">例子：用对象URL显示PDF</h2>
+
+<p>对象URL可以用于image之外的其它东西！它可以用于显示嵌入的PDF文件或任何其它浏览器能显示的资源。</p>
+
+<p>在Firefox中，要让PDF嵌入式地显示在iframe中（而不是作为下载的文件弹出），必须将<code>pdfjs.disabled</code>设为<code>false</code> <span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span>.</p>
+
+<pre class="brush: html">&lt;iframe id=&quot;viewer&quot;&gt;
+</pre>
+
+<p>这是<code>src</code>属性的改动：</p>
+
+<pre class="brush: js">const obj_url = window.URL.createObjectURL(blob);
+const iframe = document.getElementById(&apos;viewer&apos;);
+iframe.setAttribute(&apos;src&apos;, obj_url);
+window.URL.revokeObjectURL(obj_url);
+</pre>
+
+<h2 id="例子：将对象URL用于其它文件类型">例子：将对象URL用于其它文件类型</h2>
+
+<p>你可以用同样方式操作其它格式的文件。这是预览上传的视频的方法：</p>
+
+<pre class="brush: js">const video = document.getElementById(&apos;video&apos;);
+const obj_url = window.URL.createObjectURL(blob);
+video.src = obj_url;
+video.play()
+window.URL.revokeObjectURL(obj_url);</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">注解</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/number-state.html#concept-input-type-file-selected" hreflang="en" lang="en">HTML Living Standard<br><small lang="zh-CN">File upload state</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/FileAPI/" hreflang="en" lang="en" title="File API">File API</a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="相关链接">相关链接</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/File"><code>File</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/FileList"><code>FileList</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/FileReader"><code>FileReader</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/URL"><code>URL</code></a></li>
+ <li><a href="/zh-CN/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="/en/DOM/XMLHttpRequest/Using_XMLHttpRequest" title="En/Using XMLHttpRequest">Using XMLHttpRequest</a></li>
+</ul>

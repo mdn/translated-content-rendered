@@ -1,0 +1,135 @@
+---
+title: Worker.onmessage
+slug: Web/API/Worker/onmessage
+translation_of: Web/API/Worker/onmessage
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/Worker"><code>Worker</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><a href="/zh-CN/docs/Web/API/Worker/Worker"><code>Worker()</code></a></li></ol></details></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/AbstractWorker/onerror"><code>onerror</code></a></li><li><em><code>onmessage</code></em></li><li><a href="/zh-CN/docs/Web/API/Worker/onmessageerror"><code>onmessageerror</code></a></li></ol></details></li><li class="toggle"><details open><summary>方法</summary><ol><li><a href="/zh-CN/docs/Web/API/Worker/postMessage"><code>postMessage()</code></a></li><li><a href="/zh-CN/docs/Web/API/Worker/terminate"><code>terminate()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-CN/docs/Web/API/Worker/message_event"><code>message</code></a></li><li><a href="/zh-CN/docs/Web/API/Worker/messageerror_event"><code>messageerror</code></a></li></ol></details></li><li class="toggle"><details open><summary>继承</summary><ol><li><a href="/zh-CN/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Web Workers API</summary><ol><li><a href="/zh-CN/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li><li><a href="/zh-CN/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/zh-CN/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/zh-CN/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section>
+
+<p><a href="/zh-CN/docs/Web/API/Worker"><code>Worker</code></a> 接口的<strong><code>onmessage</code></strong>属性表示一个<a href="/zh-CN/docs/Web/API/EventHandler"><code>EventHandler</code></a>事件处理函数，当<code><a href="/zh-CN/docs/Web/Reference/Events/message" title="/zh-CN/docs/Web/Reference/Events/message">message</a></code> 事件发生时，该函数被调用。这些事件所属<a href="/zh-CN/docs/Web/API/MessageEvent"><code>MessageEvent</code></a>类型，且当Worker子线程返回一条消息时被调用（比如：从<a href="/zh-CN/docs/Web/API/DedicatedWorkerGlobalScope/postMessage"><code>DedicatedWorkerGlobalScope.postMessage</code></a>函数发出的信息）</p>
+
+<div class="note">
+<p><strong>注意</strong>: 消息被装载到 <code><a href="/zh-CN/docs/Web/Reference/Events/message" title="/zh-CN/docs/Web/Reference/Events/message">message</a></code>事件对象的<code>data</code>属性。（译者：即传递的消息参数将被赋值给<code>onmessage</code>处理函数的事件参数<code>e</code>中的<code>data</code>属性）</p>
+</div>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js notranslate">myWorker.onmessage = function(e) { ... }</pre>
+
+<h2 id="范例">范例</h2>
+
+<p>下面的代码片段示范用<a href="/zh-CN/docs/Web/API/Worker/Worker"><code>Worker()</code></a> 构造函数创建一个<a href="/zh-CN/docs/Web/API/Worker"><code>Worker</code></a>对象。当表单的<code>first</code>输入框的值变更时，消息被传递给worker。<code>myWorker.onmessage</code>函数用来处理从worker回传的消息。</p>
+
+<pre class="brush: js notranslate">var myWorker = new Worker(&apos;worker.js&apos;);
+
+first.onchange = function() {
+  myWorker.postMessage([first.value,second.value]);
+  console.log(&apos;Message posted to worker&apos;);
+}
+
+myWorker.onmessage = function(e) {
+  result.textContent = e.data;
+  console.log(&apos;Message received from worker&apos;);
+}
+</pre>
+
+<p>在<code>worker.js</code>中,  <code>onmessage</code> 函数用来接收从主线程传递过来的信息:</p>
+
+<pre class="brush: js notranslate">onmessage = function(e) {
+  console.log(&apos;Message received from main script&apos;);
+  var workerResult = &apos;Result: &apos; + (e.data[0] * e.data[1]);
+  console.log(&apos;Posting message back to main script&apos;);
+  postMessage(workerResult);
+}</pre>
+
+<p>请注意，主线程中必须以myWorker.<code>onmessage</code>方式调用,  反之 <code>worker.js</code> 脚本中, 只需定义 <code>onmessage</code>, 因为worker.js全域有效(<a href="/zh-CN/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a>).</p>
+
+<p>完整范例，请参考<a class="external external-icon" href="https://github.com/mdn/simple-web-worker">Basic dedicated worker example</a> (<a class="external external-icon" href="http://mdn.github.io/simple-web-worker/">run dedicated worker</a>).</p>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">规范</th>
+   <th scope="col">状态</th>
+   <th scope="col">注释</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/#handler-worker-onmessage" hreflang="en" lang="en">HTML Living Standard<br><small lang="zh-CN">Worker.onmessage</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>No change from <a class="external" hreflang="en" lang="en" title="Unknown">Unknown</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en">Unknown<br><small lang="zh-CN">Worker.onmessage</small></a></td>
+   <td><span class="spec-">Unknown</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>特性</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>基本支持</td>
+   <td>4</td>
+   <td>3.5</td>
+   <td>10.0</td>
+   <td>10.6</td>
+   <td>4</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>特性</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>基本支持</td>
+   <td>4.4</td>
+   <td>3.5</td>
+   <td>1.0.1</td>
+   <td>10.0</td>
+   <td>11.5</td>
+   <td>5.1</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="参阅">参阅</h2>
+
+<p><a href="/zh-CN/docs/Web/API/Worker"><code>Worker</code></a> 接口所属。</p>

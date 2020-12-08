@@ -1,0 +1,202 @@
+---
+title: 滤镜效果
+slug: Web/SVG/Tutorial/Filter_effects
+tags:
+  - SVG
+  - 'SVG:Tutorial'
+translation_of: Web/SVG/Tutorial/Filter_effects
+---
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/SVG/Tutorial/Other_content_in_SVG" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/SVG/Tutorial/SVG_Fonts" class="button">下一页  »</a></p>
+</div>
+
+<p>在某些情况下，一些基本的 SVG 图形并不能提供某种想要达到的效果。比如常见的阴影效果，就不能合理地与渐变类元素（<code>&lt;linearGradient&gt;</code>, <code>&lt;radialGradient&gt;</code>）一起被创建。滤镜（Filter）就是 SVG 中用于创建复杂效果的一种机制。</p>
+
+<p>下面是一个为 SVG 内容添加模糊效果的基本示例。尽管基本的模糊效果可以使用渐变类元素创建，但是使用模糊滤镜可以做更多的事情。</p>
+
+<h2 id="示例">示例</h2>
+
+<p>滤镜通过 <a href="/zh-CN/docs/Web/SVG/Element/filter" title="filter元素作用是作为原子滤镜操作的容器。它不能直接呈现。可以利用目标SVG元素上的filter属性引用一个滤镜。"><code>&lt;filter&gt;</code></a> 元素进行定义，并且置于 <code>&lt;defs&gt;</code> 区块中。在 <code>filter</code> 标签中提供一系列<em>图元</em>（<em>primitives</em>），以及在前一个基本变换操作上建立的另一个操作（比如添加模糊后又添加明亮效果）。如果要应用所创建的滤镜效果，只需要为 SVG 图形元素设置 <code><a href="/zh-CN/docs/Web/SVG/Attribute/filter">filter</a></code> 属性即可。</p>
+
+<pre class="brush: html">&lt;svg width=&quot;250&quot; viewBox=&quot;0 0 200 85&quot;
+     xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot;&gt;
+  &lt;defs&gt;
+    &lt;!-- Filter declaration --&gt;
+    &lt;filter id=&quot;MyFilter&quot; filterUnits=&quot;userSpaceOnUse&quot;
+            x=&quot;0&quot; y=&quot;0&quot;
+            width=&quot;200&quot; height=&quot;120&quot;&gt;
+
+      &lt;!-- offsetBlur --&gt;
+      &lt;feGaussianBlur in=&quot;SourceAlpha&quot; stdDeviation=&quot;4&quot; result=&quot;blur&quot;/&gt;
+      &lt;feOffset in=&quot;blur&quot; dx=&quot;4&quot; dy=&quot;4&quot; result=&quot;offsetBlur&quot;/&gt;
+
+      &lt;!-- litPaint --&gt;
+      &lt;feSpecularLighting in=&quot;blur&quot; surfaceScale=&quot;5&quot; specularConstant=&quot;.75&quot;
+                          specularExponent=&quot;20&quot; lighting-color=&quot;#bbbbbb&quot;
+                          result=&quot;specOut&quot;&gt;
+        &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+      &lt;/feSpecularLighting&gt;
+      &lt;feComposite in=&quot;specOut&quot; in2=&quot;SourceAlpha&quot; operator=&quot;in&quot; result=&quot;specOut&quot;/&gt;
+      &lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;specOut&quot; operator=&quot;arithmetic&quot;
+                   k1=&quot;0&quot; k2=&quot;1&quot; k3=&quot;1&quot; k4=&quot;0&quot; result=&quot;litPaint&quot;/&gt;
+
+      &lt;!-- merge offsetBlur + litPaint --&gt;
+      &lt;feMerge&gt;
+        &lt;feMergeNode in=&quot;offsetBlur&quot;/&gt;
+        &lt;feMergeNode in=&quot;litPaint&quot;/&gt;
+      &lt;/feMerge&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Graphic elements --&gt;
+  &lt;g filter=&quot;url(#MyFilter)&quot;&gt;
+      &lt;path fill=&quot;none&quot; stroke=&quot;#D90000&quot; stroke-width=&quot;10&quot;
+            d=&quot;M50,66 c-50,0 -50,-60 0,-60 h100 c50,0 50,60 0,60z&quot; /&gt;
+      &lt;path fill=&quot;#D90000&quot;
+            d=&quot;M60,56 c-30,0 -30,-40 0,-40 h80 c30,0 30,40 0,40z&quot; /&gt;
+      &lt;g fill=&quot;#FFFFFF&quot; stroke=&quot;black&quot; font-size=&quot;45&quot; font-family=&quot;Verdana&quot; &gt;
+        &lt;text x=&quot;52&quot; y=&quot;52&quot;&gt;SVG&lt;/text&gt;
+      &lt;/g&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;
+</pre>
+
+<div class="hidden">
+<h2 id="Example">Example</h2>
+
+<h3 id="HTML">HTML</h3>
+
+<pre class="brush: html">&lt;svg width=&quot;250&quot; viewBox=&quot;0 0 200 85&quot;
+     xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot;&gt;
+  &lt;defs&gt;
+    &lt;!-- Filter declaration --&gt;
+    &lt;filter id=&quot;MyFilter&quot; filterUnits=&quot;userSpaceOnUse&quot;
+            x=&quot;0&quot; y=&quot;0&quot;
+            width=&quot;200&quot; height=&quot;120&quot;&gt;
+
+      &lt;!-- offsetBlur --&gt;
+      &lt;feGaussianBlur in=&quot;SourceAlpha&quot; stdDeviation=&quot;4&quot; result=&quot;blur&quot;/&gt;
+      &lt;feOffset in=&quot;blur&quot; dx=&quot;4&quot; dy=&quot;4&quot; result=&quot;offsetBlur&quot;/&gt;
+
+      &lt;!-- litPaint --&gt;
+      &lt;feSpecularLighting in=&quot;blur&quot; surfaceScale=&quot;5&quot; specularConstant=&quot;.75&quot;
+                          specularExponent=&quot;20&quot; lighting-color=&quot;#bbbbbb&quot;
+                          result=&quot;specOut&quot;&gt;
+        &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+      &lt;/feSpecularLighting&gt;
+      &lt;feComposite in=&quot;specOut&quot; in2=&quot;SourceAlpha&quot; operator=&quot;in&quot; result=&quot;specOut&quot;/&gt;
+      &lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;specOut&quot; operator=&quot;arithmetic&quot;
+                   k1=&quot;0&quot; k2=&quot;1&quot; k3=&quot;1&quot; k4=&quot;0&quot; result=&quot;litPaint&quot;/&gt;
+
+      &lt;!-- merge offsetBlur + litPaint --&gt;
+      &lt;feMerge&gt;
+        &lt;feMergeNode in=&quot;offsetBlur&quot;/&gt;
+        &lt;feMergeNode in=&quot;litPaint&quot;/&gt;
+      &lt;/feMerge&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Graphic elements --&gt;
+  &lt;g filter=&quot;url(#MyFilter)&quot;&gt;
+      &lt;path fill=&quot;none&quot; stroke=&quot;#D90000&quot; stroke-width=&quot;10&quot;
+            d=&quot;M50,66 c-50,0 -50,-60 0,-60 h100 c50,0 50,60 0,60z&quot; /&gt;
+      &lt;path fill=&quot;#D90000&quot;
+            d=&quot;M60,56 c-30,0 -30,-40 0,-40 h80 c30,0 30,40 0,40z&quot; /&gt;
+      &lt;g fill=&quot;#FFFFFF&quot; stroke=&quot;black&quot; font-size=&quot;45&quot; font-family=&quot;Verdana&quot; &gt;
+        &lt;text x=&quot;52&quot; y=&quot;52&quot;&gt;SVG&lt;/text&gt;
+      &lt;/g&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;
+</pre>
+
+
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="120" id="frame_Example" src="https://mdn.mozillademos.org/zh-CN/docs/Web/SVG/Tutorial/Filter_effects$samples/Example?revision=1624134" width="100%"></iframe></p>
+
+<h3 id="步骤_1">步骤 1</h3>
+
+<pre class="brush: html">&lt;feGaussianBlur in=&quot;SourceAlpha&quot;
+                stdDeviation=&quot;4&quot;
+                result=&quot;blur&quot;/&gt;</pre>
+
+<p>设置 <a href="/zh-CN/docs/Web/SVG/Element/feGaussianBlur" title="该滤镜对输入图像进行高斯模糊，属性stdDeviation中指定的数量定义了钟形。"><code>&lt;feGaussianBlur&gt;</code></a> 中的 <code>in</code> 属性为 <code>&quot;SourceAlpha&quot;</code> 值，即原图像的 alpha 通道，并设置了模糊度为 4 以及把 <code>result</code> 保存在了一个名为 &quot;blur&quot; 的临时缓冲区中。</p>
+
+<h3 id="步骤_2">步骤 2</h3>
+
+<pre class="brush: html">&lt;feOffset in=&quot;blur&quot;
+          dx=&quot;4&quot; dy=&quot;4&quot;
+          result=&quot;offsetBlur&quot;/&gt;</pre>
+
+<p><a href="/zh-CN/docs/Web/SVG/Element/feOffset" title="该输入图像作为一个整体，在属性dx和属性dy的值指定了它的偏移量。"><code>&lt;feOffset&gt;</code></a> 设置 <code>in</code> 的值为 &quot;blur&quot;，即我们前面保存 <code>result</code> 的那个临时缓冲区。然后设置相对坐标，向右偏移 4，向下偏移 4。最后把结果 <code>result</code> 保存到名为 &quot;offsetBlur&quot; 的缓冲区中。步骤1、2其实是创建图形阴影的两个图元。</p>
+
+<h3 id="步骤_3">步骤 3</h3>
+
+<pre class="brush: html">&lt;feSpecularLighting in=&quot;offsetBlur&quot;
+                    surfaceScale=&quot;5&quot; specularConstant=&quot;.75&quot;
+                    specularExponent=&quot;20&quot; lighting-color=&quot;#bbbbbb&quot;
+                    result=&quot;specOut&quot;&gt;
+  &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+&lt;/feSpecularLighting&gt;</pre>
+
+<p><a href="/zh-CN/docs/Web/SVG/Element/feSpecularLighting" title="该滤镜照亮一个源图形，使用alpha通道作为隆起映射。该结果图像是一个基于光色的RGBA图象。该光照计算遵守标准冯氏照明模式的镜面组件。结果图像依赖于光色、光的位置以及输入隆起映射的表面几何形状。光照计算的结果是叠加的。该滤镜假定观察者在X方向无穷远处。"><code>&lt;feSpecularLighting&gt;</code></a> 设置输入源 <code>in</code> 为 &quot;offsetBlur&quot;，将会生成一个光照效果，并将结果 <code>result</code> 保存在 &quot;specOut&quot; 中。</p>
+
+<h3 id="步骤_4">步骤 4</h3>
+
+<pre class="brush: html">&lt;feComposite in=&quot;specOut&quot; in2=&quot;SourceAlpha&quot;
+             operator=&quot;in&quot;
+             result=&quot;specOut&quot;/&gt;</pre>
+
+<p>第一个 <a href="/zh-CN/docs/Web/SVG/Element/feComposite" title="该滤镜执行两个输入图像的智能像素组合，在图像空间中使用以下Porter-Duff合成操作之一：over、in、atop、xor。另外，还可以应用一个智能组件arithmetic操作（结果被压到[0,1]范围内）。"><code>&lt;feComposite&gt;</code></a> 元素设置输入源为 &quot;specOut&quot;，第二个输入源（<code>in2</code>）为 &quot;SourceAlpha&quot;，将 &quot;specOut&quot; 的结果效果遮盖掉，以致于最后的结果不会大于 &quot;SourceAlpha&quot;（源图像），最后覆盖输出结果 <code>result</code> 为 &quot;specOut&quot;。</p>
+
+<h3 id="步骤_5">步骤 5</h3>
+
+<pre>&lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;specOut&quot;
+             operator=&quot;arithmetic&quot;
+             k1=&quot;0&quot; k2=&quot;1&quot; k3=&quot;1&quot; k4=&quot;0&quot;
+             result=&quot;litPaint&quot;/&gt;</pre>
+
+<p>第二个 <a href="/zh-CN/docs/Web/SVG/Element/feComposite" title="该滤镜执行两个输入图像的智能像素组合，在图像空间中使用以下Porter-Duff合成操作之一：over、in、atop、xor。另外，还可以应用一个智能组件arithmetic操作（结果被压到[0,1]范围内）。"><code>&lt;feComposite&gt;</code></a> 设置 <code>in</code> 为 &quot;SourceGraphic&quot; 和 &quot;specOut&quot;，即在 &quot;SourceGraphic&quot; 之上添加 &quot;specOut&quot; 的效果，复合模式为 &quot;arithmetic&quot;，然后保存结果为 &quot;litPaint&quot;。</p>
+
+<h3 id="步骤_6">步骤 6</h3>
+
+<pre>&lt;feMerge&gt;
+  &lt;feMergeNode in=&quot;offsetBlur&quot;/&gt;
+  &lt;feMergeNode in=&quot;litPaint&quot;/&gt;
+&lt;/feMerge&gt;</pre>
+
+<p>最后，<a href="/zh-CN/docs/Web/SVG/Element/feMerge" title="feMerge滤镜允许同时应用滤镜效果而不是按顺序应用滤镜效果。利用result存储别的滤镜的输出可以实现这一点，然后在一个 &lt;feMergeNode&gt;子元素中访问它。"><code>&lt;feMerge&gt;</code></a> 元素合并了阴影效果 &quot;offsetBlur&quot; 和源图像的光照效果 &quot;litPaint&quot;。</p>
+
+<div style="display: flex; text-align: center;">
+<div><img alt="Source graphic" src="https://mdn.mozillademos.org/files/16310/filters01-0.png" style="height: 70px; width: 115px;">
+<p>源图像</p>
+</div>
+
+<div><img alt="Primitive 1" src="https://mdn.mozillademos.org/files/16311/filters01-1.png" style="height: 70px; width: 115px;">
+<p>图元 1</p>
+</div>
+
+<div><img alt="Primitive 2" src="https://mdn.mozillademos.org/files/16312/filters01-2.png" style="height: 70px; width: 115px;">
+<p>图元 2</p>
+</div>
+
+<div><img alt="Primitive 3" src="https://mdn.mozillademos.org/files/16313/filters01-3.png" style="height: 70px; width: 115px;">
+<p>图元 3</p>
+</div>
+
+<div><img alt="Primitive 4" src="https://mdn.mozillademos.org/files/16314/filters01-4.png" style="height: 70px; width: 115px;">
+<p>图元 4</p>
+</div>
+
+<div><img alt="Primitive 5" src="https://mdn.mozillademos.org/files/16315/filters01-5.png" style="height: 70px; width: 115px;">
+<p>图元 5</p>
+</div>
+
+<div><img alt="Primitive 6" src="https://mdn.mozillademos.org/files/16316/filters01-6.png" style="height: 70px; width: 115px;">
+<p>图元 6</p>
+</div>
+</div>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-CN/docs/Web/SVG/Tutorial/Other_content_in_SVG" style="float: left;" class="button">« 上一页</a><a href="/zh-CN/docs/Web/SVG/Tutorial/SVG_Fonts" class="button">下一页  »</a></p>
+</div>

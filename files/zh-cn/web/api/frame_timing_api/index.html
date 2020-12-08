@@ -1,0 +1,52 @@
+---
+title: Frame Timing API
+slug: Web/API/Frame_Timing_API
+translation_of: Web/API/Frame_Timing_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Frame_Timing_API">Frame Timing API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/Frame_Timing_API/Using_the_Frame_Timing_API">Using the Frame Timing API</a> <a href="/zh-CN/docs/Web/API/Frame_Timing_API/Using_the_Frame_Timing_API$translate" style="opacity: 0.5;">[我来译!]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/Performance"><code>Performance</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceFrameTiming"><code>PerformanceFrameTiming</code></a></li><li><a href="/zh-CN/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a></li></ol></details></li></ol></section> <div class="experimental indicator-warning notecard">
+    <p><strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div></div>
+
+<p>该<strong><code>PerformanceFrameTiming</code></strong>界面提供有关浏览器事件循环的<em>帧</em>计时数据。一<em>帧</em>表示浏览器在<a href="https://html.spec.whatwg.org/multipage/webappapis.html#processing-model-8">一个事件循环迭代</a>中所做的工作量，例如处理DOM事件，调整大小，滚动，渲染，CSS动画等。60Hz刷新速率的<em>帧率</em>为60 fps（每秒帧），良好<em>响应</em>用户体验的共同目标。这意味着浏览器应在大约16.7毫秒内处理一个帧。</p>
+
+<p>应用程序可以为“<code>frame</code>”<a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>性能条目类型</code></a> 注册 <a href="/zh-CN/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a>。当新的“<code>frame</code>”事件添加到浏览器的<em>性能时间轴</em>并且框架的<a href="/zh-CN/docs/Web/API/PerformanceEntry/duration"><code>持续时间</code></a>（时间长度）可用时，将通知<em>观察者</em>（回调）。此数据可用于帮助识别需要太长时间才能提供良好用户体验的区域。</p>
+
+<p>本文档中描述的接口的示例代码包含在“<em><a href="/Web/API/Frame_Timing_API/Using_the_Frame_Timing_API">使用帧定时API”</a><a></a></em><a>中。</a></p><a>
+
+<h2 id="性能_frames">性能 <code>frames</code></h2>
+
+</a><p><a>The </a><a href="/zh-CN/docs/Web/API/PerformanceFrameTiming"><code>PerformanceFrameTiming</code></a> interface extends the following <a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a> properties (for &quot;<code>frame</code>&quot; <a href="/zh-CN/docs/Web/API/PerformanceEntry/entryType"><code>performance entry types</code></a>) by qualifying and constrainting the properties as follows:</p>
+
+<dl><a>
+ </a><dt><a></a><a href="/zh-CN/docs/Web/API/PerformanceEntry/entryType"><code>PerformanceEntry.entryType</code></a></dt>
+ <dd>Set to &quot;<code>frame</code>&quot;.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/PerformanceEntry/name"><code>PerformanceEntry.name</code></a></dt>
+ <dd><a>Set to the </a><a href="https://dom.spec.whatwg.org/#concept-document-url">document&apos;s address</a>.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/PerformanceEntry/startTime"><code>PerformanceEntry.startTime</code></a></dt>
+ <dd>Set to the <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp"><code>DOMHighResTimeStamp</code></a> when the frame was started.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/PerformanceEntry/duration"><code>PerformanceEntry.duration</code></a></dt>
+ <dd>Set to a <a href="/zh-CN/docs/Web/API/DOMHighResTimeStamp"><code>timestamp</code></a> indicating the difference between the <code>startTime</code>s of two successive frames.</dd>
+</dl>
+
+<p>This data, particularly the <code>duration</code> timestamp, can be used to help identify performance problems.</p>
+
+<h2 id="Frame_observers">Frame observers</h2>
+
+<p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span>The <em>performance observer</em> interfaces allow an application to register an <em>observer</em> for specific <a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>performance event types</code></a>. When one of those event types is recorded in the browser&apos;s <em>performance timeline</em>, the application is notified of the event via the observer&apos;s callback function that was specified when the observer was created.</p>
+
+<p>To observe &quot;<code>frame</code>&quot; performance entry types, the application first creates a <a href="/zh-CN/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a> object with a specific frame observer callback (function). Next, <a href="/zh-CN/docs/Web/API/PerformanceObserver/observe"><code>PerformanceObserver.observe()</code></a> is used to specify the set of performance events to observe - in this case, just the &quot;<code>frame</code>&quot; event type. When the browser adds a new frame to the performance timeline, the specified observer callback will be invoked.</p>
+
+<h2 id="Accessing_frame_data">Accessing frame data</h2>
+
+<p>调用框架<a href="/zh-CN/docs/Web/API/PerformanceObserver"><code>观察者</code></a>时，可以通过调用<a href="/zh-CN/docs/Web/API/PerformanceObserverEntryList/getEntriesByType"><code>PerformanceObserverEntryList.getEntriesByType()</code></a>，参数为” <code>frame</code>“。此方法返回一个“ <code>frame</code>” <a href="/zh-CN/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a>对象的列表。每个帧对象的<a href="/zh-CN/docs/Web/API/PerformanceEntry/duration"><code>duration</code></a>属性返回两个连续帧的时间戳。如果此值大于提供良好用户体验所需的时间，则可能需要进一步分析。</p>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span>如<a href="/zh-CN/docs/Web/API/PerformanceFrameTiming"><code>PerformanceFrameTiming</code></a>界面的“ <a href="/Web/API/PerformanceFrameTiming#Browser_compatibility">浏览器兼容性”</a>表中所示，此界面没有任何实现。</p>
+
+<h2 id="也可以看看">也可以看看</h2>
+
+<ul>
+ <li><a href="/docs/Tools/Performance/Frame_rate">帧速率（Firefox性能工具）</a></li>
+ <li><a href="/Web/API/Frame_Timing_API/Using_the_Frame_Timing_API">使用帧计时API</a></li>
+</ul>

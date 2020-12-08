@@ -1,0 +1,141 @@
+---
+title: 关于使用动态样式的信息
+slug: Web/API/CSS_Object_Model/Using_dynamic_styling_information
+tags:
+  - API
+  - CSSOM
+  - 初学者
+  - 指南
+translation_of: Web/API/CSS_Object_Model/Using_dynamic_styling_information
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/CSS_Object_Model">CSS Object Model</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-CN/docs/Web/API/CSS_Object_Model/Determining_the_dimensions_of_elements">Determining the dimensions of elements</a></li><li><a href="/zh-CN/docs/Web/API/CSS_Object_Model/Managing_screen_orientation">Managing screen orientation</a> <a href="/zh-CN/docs/Web/API/CSS_Object_Model/Managing_screen_orientation$translate" style="opacity: 0.5;">[我来译!]</a></li><li><a href="/zh-CN/docs/Web/API/CSS_Object_Model/Using_dynamic_styling_information">Using dynamic styling information</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-CN/docs/Web/API/AnimationEvent"><code>AnimationEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/CaretPosition"><code>CaretPosition</code></a></li><li><a href="/zh-CN/docs/Web/API/CSS"><code>CSS</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSConditionRule"><code>CSSConditionRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSGroupingRule"><code>CSSGroupingRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSKeyframeRule"><code>CSSKeyframeRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSKeyframesRule"><code>CSSKeyframesRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSMediaRule"><code>CSSMediaRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSNamespaceRule"><code>CSSNamespaceRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSPageRule"><code>CSSPageRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSRule"><code>CSSRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSRuleList"><code>CSSRuleList</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSStyleDeclaration"><code>CSSStyleDeclaration</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSStyleRule"><code>CSSStyleRule</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSStyleSheet"><code>CSSStyleSheet</code></a></li><li><a href="/zh-CN/docs/Web/API/CSSSupportsRule"><code>CSSSupportsRule</code></a></li><li><a href="/zh-CN/docs/Web/API/LinkStyle"><code>LinkStyle</code></a></li><li><a href="/zh-CN/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a></li><li><a href="/zh-CN/docs/Web/API/MediaQueryListListener"><code>MediaQueryListListener</code></a></li><li><a href="/zh-CN/docs/Web/API/Screen"><code>Screen</code></a></li><li><a href="/zh-CN/docs/Web/API/StyleSheet"><code>StyleSheet</code></a></li><li><a href="/zh-CN/docs/Web/API/StyleSheetList"><code>StyleSheetList</code></a></li><li><a href="/zh-CN/docs/Web/API/TransitionEvent"><code>TransitionEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-CN/docs/Web/API/Document/scroll_event"><code>Document</code>: <code>scroll</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/animationend_event"><code>Element</code>: <code>animationend</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/animationiteration_event"><code>Element</code>: <code>animationiteration</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/animationstart_event"><code>Element</code>: <code>animationstart</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/scroll_event"><code>Element</code>: <code>scroll</code></a></li><li><a href="/zh-CN/docs/Web/API/Element/transitionend_event"><code>Element</code>: <code>transitionend</code></a></li><li><a href="/zh-CN/docs/Web/API/Window/resize_event"><code>Window</code>: <code>resize</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">CSS 对象模型（CSSOM），是 DOM 的一部分，通过暴露一些接口，允许操作很多与 CSS 相关的信息。最初定义在 <em>DOM Level 2 Style</em> 提议中，现在，这些接口形成了一个规范，<em>CSS对象模型（CSSOM）</em>，旨在取代它。</p>
+
+<p>在很多情况下，如果可能的话，通过 <a href="/zh-CN/docs/Web/API/Element/className"><code>className</code></a> 属性来动态操作元素类名确实是最好的方式，因为所有的样式钩子的最终外观都可以在一个样式表中控制。这样写出的 JavaScript 代码也会变得更清晰，因为它不专注与样式相关的细节，而是专注于所创作或者操作的每一部分的整体语义，将精细的样式细节留给样式表。然而实际上也有以一些获取或者操作样式规则有用的情况（无论是对于正样式包还是的那个元素），将在下面进一步详细描述。同样应该注意，同操作单独元素的样式一样，当说到操作样式表的时候，并不是真的操作实际的物理文档，而仅仅是文档的内部表示。</p>
+
+<p>基本样式对象公开了 <a href="/zh-CN/docs/Web/API/Stylesheet"><code>Stylesheet</code></a> 和 <a href="/zh-CN/docs/Web/API/CSSStylesheet"><code>CSSStylesheet</code></a> 接口。这些接口包括 <code>insertRule</code>、<code>selectorText</code> 以及 <code>parentStyleSheet</code> 等成员，用于获取和操作组成 CSS 样式表的各个规则。</p>
+
+<p>要从 <code>document</code> 中获取 <code>style</code> 对象，可以使用 <a href="/zh-CN/docs/Web/API/Document/styleSheets"><code>document.styleSheets</code></a> 属性，并使用索引来获取某个对象（例如， <code>document.styleSheets[0]</code> 是该文档中的第一个样式表）。</p>
+
+<h2 id="Modify_a_stylesheet_rule" name="Modify_a_stylesheet_rule">通过 CSSOM 修改样式表</h2>
+
+<pre class="brush: html" style="font-size: 14px;">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Modifying a stylesheet rule with CSSOM&lt;/title&gt;
+&lt;style type=&quot;text/css&quot;&gt;
+body {
+ background-color: red;
+}
+&lt;/style&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+var stylesheet = document.styleSheets[1];
+stylesheet.cssRules[0].style.backgroundColor=&quot;blue&quot;;
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+The stylesheet declaration for the body&apos;s background color is modified via JavaScript.
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_Modify_a_stylesheet_rule" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/CSS_Object_Model/Using_dynamic_styling_information$samples/Modify_a_stylesheet_rule?revision=1609315"></iframe></p>
+
+<p> <a href="https://developer.mozilla.org/en-US/docs/DOM/CSS" title="en/DOM/CSS">DOM CSS Properties List</a> 中给出了 DOM 中 style 属性的可用属性列表。</p>
+
+<p>若要使用 CSS 语法修改文档的样式，可以插入样式规则，或者插入<a href="/zh-CN/docs/Web/HTML/Element/style" title="HTML的&lt;style&gt;元素包含文档的样式信息或者文档的部分内容。默认情况下，该标签的样式信息通常是CSS的格式。"><code>&lt;style&gt;</code></a> 标签，并将其 <code>innerHTML</code> 属性设置为期望的 CSS。</p>
+
+<h2 id="Modify_an_element_style" name="Modify_an_element_style">修改元素样式</h2>
+
+<p> 元素的 <a href="/zh-CN/docs/Web/API/HTMLElement/style"><code>style</code></a> 属性（见下面的 DOM 样式对象部分）也可以用于获取和设置元素的样式。然而，该属性只能返回通过内敛方式设置的样式属性（例如 <code>&lt;td style=&quot;background-color: lightblue&quot;&gt;</code> 返回 &quot;<code>background-color:lightblue</code>&quot;，或者直接针对哪个元素使用  <code>element.style.propertyName</code>, 即使样式表中还有该元素上的其他样式）。</p>
+
+<p>此外，当你在元素上设置某个属性的时候，你会覆盖并擦除掉别处为该元素的这个属性设置的值。以设置 border 属性为例，将覆盖掉在 &lt;head&gt; 部分或者外部样式表设置的该元素的 border 属性。然而这并不会影响元素的其他属性，例如 padding、margin 或 font等。</p>
+
+<p>要修改特定元素的样式，可以将以下示例修改为你想要的样式。</p>
+
+<pre class="brush: html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;simple style example&lt;/title&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+
+function alterStyle(elem) {
+  elem.style.background = &apos;green&apos;;
+}
+
+function resetStyle(elemId) {
+  elem = document.getElementById(elemId);
+  elem.style.background = &apos;white&apos;;
+}
+&lt;/script&gt;
+
+&lt;style type=&quot;text/css&quot;&gt;
+#p1 {
+  border: solid blue 2px;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;!-- passes a reference to the element&apos;s object as parameter &apos;this&apos;. --&gt;
+&lt;p id=&quot;p1&quot; onclick=&quot;alterStyle(this);&quot;&gt;
+ Click here to change background color.
+&lt;/p&gt;
+
+&lt;!-- passes the &apos;p1&apos; id of another element&apos;s style to modify. --&gt;
+&lt;button onclick=&quot;resetStyle(&apos;p1&apos;);&quot;&gt;Reset background color&lt;/button&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_Modify_an_element_style" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/CSS_Object_Model/Using_dynamic_styling_information$samples/Modify_an_element_style?revision=1609315"></iframe></p>
+
+<p><code>document.defaultView</code> 对象的 <a href="/zh-CN/docs/Web/API/Window/getComputedStyle"><code>getComputedStyle()</code></a> 返回某个元素的所有经过计算的样式. 查看<a href="/en/Gecko_DOM_Reference/Examples#Example_6:_getComputedStyle" title="en/Gecko_DOM_Reference/Examples#Example_6:_getComputedStyle">Example 6: getComputedStyle</a> 示例章节了解更多使用该方法的信息。.</p>
+
+<h2 id="DOM_Style_Object" name="DOM_Style_Object">DOM样式对象</h2>
+
+<p><code>style</code> 对象表示了一个单独的样式声明。不像<code><a href="/en/DOM/document.styleSheets" title="en/DOM/document.styleSheets">document.styleSheets</a></code> 集合中每个单独的样式规则，样式规则是通过 <code>document</code> 对象或者应用改样式的元素来访问的. 它表示特定元素的内联样式。</p>
+
+<p>比这两个属性更重要的是使用 <code>style</code> 对象来给某个元素设置单独的样式属性。</p>
+
+<div id="DOM_Style_Object_code_sample">
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+ &lt;head&gt;
+  &lt;title&gt;style Property Example&lt;/title&gt;
+  &lt;link rel=&quot;StyleSheet&quot; href=&quot;example.css&quot; type=&quot;text/css&quot;&gt;
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    function stilo() {
+      document.getElementById(&apos;d&apos;).style.color = &apos;orange&apos;;
+    }
+    function resetStyle() {
+      document.getElementById(&apos;d&apos;).style.color = &apos;black&apos;;
+    }
+  &lt;/script&gt;
+ &lt;/head&gt;
+
+ &lt;body&gt;
+  &lt;div id=&quot;d&quot; class=&quot;thunder&quot;&gt;Thunder&lt;/div&gt;
+  &lt;button onclick=&quot;stilo()&quot;&gt;Click here to change text color&lt;/button&gt;
+  &lt;button onclick=&quot;resetStyle()&quot;&gt;Reset text color&lt;/button&gt;
+ &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_DOM_Style_Object_code_sample" src="https://mdn.mozillademos.org/zh-CN/docs/Web/API/CSS_Object_Model/Using_dynamic_styling_information$samples/DOM_Style_Object_code_sample?revision=1609315"></iframe></p>
+
+<p>style的 media 和type 给不给出都可以。</p>
+
+<h3 id="DOM_Style_Object_SetAttribue" name="DOM_Style_Object_SetAttribue">使用 <code>setAttribute</code> 方法</h3>
+
+<p>注意，你也可以通过获得元素的引用，然后使用它的 <code><a href="/en/DOM/element.setAttribute" title="en/DOM/element.setAttribute">setAttribute</a></code> 方法，指定CSS属性和值，来改变该元素的样式。</p>
+
+<pre class="brush: js">var el = document.getElementById(&apos;some-element&apos;);
+el.setAttribute(&apos;style&apos;, &apos;background-color:darkblue;&apos;);
+</pre>
+
+
+
+<p>但请注意，<code>setAttribute</code> 会移除该元素样式对象中已经定义的其他样式属性。如果上面的 <code><var>some-element</var></code> 有一个行内样式属性：<code>style=&quot;font-size: 18px&quot;</code>，其值将会因为使用了 <code>setAttribute</code> 方法而被移除。</p>

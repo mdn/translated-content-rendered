@@ -1,0 +1,176 @@
+---
+title: ServiceWorker
+slug: Web/API/ServiceWorker
+tags:
+  - API
+  - Draft
+  - Experimental
+  - Service Worker
+  - 离线
+translation_of: Web/API/ServiceWorker
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="这是一个实验性的 API，请尽量不要在生产环境中使用它。"><i class="icon-beaker"> </i></span> <strong>这是一个实验中的功能</strong><br>此功能某些浏览器尚在开发中，请参考<a href="#Browser_compatibility">浏览器兼容性表格</a>以得到在不同浏览器中适合使用的前缀。由于该功能对应的标准文档可能被重新修订，所以在未来版本的浏览器中该功能的语法和行为可能随之改变。</p>
+</div> <section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/API/Service_Worker_API">Service Worker API</a></strong></li><li><strong><a href="/zh-CN/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></strong></li><li class="toggle"><details open><summary>属性</summary><ol><li><a href="/zh-CN/docs/Web/API/AbstractWorker/onerror"><code>onerror</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorker/onstatechange"><code>onstatechange</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorker/scriptURL"><code>scriptURL</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorker/state"><code>state</code></a></li></ol></details></li><li class="toggle"><details open><summary>继承</summary><ol><li><a href="/zh-CN/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for Service Workers API</summary><ol><li><a href="/zh-CN/docs/Web/API/Cache"><code>Cache</code></a></li><li><a href="/zh-CN/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li><li><a href="/zh-CN/docs/Web/API/Client"><code>Client</code></a></li><li><a href="/zh-CN/docs/Web/API/Clients"><code>Clients</code></a></li><li><a href="/zh-CN/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li><li><a href="/zh-CN/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li><li><a href="/zh-CN/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li><li><a href="/zh-CN/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncManager"><code>SyncManager</code></a></li><li><a href="/zh-CN/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li><li><a href="/zh-CN/docs/Web/API/WindowClient"><code>WindowClient</code></a></li></ol></details></li></ol></section></div>
+
+<div>ServiceWorker API 的<a href="https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker_API"> ServiceWorker接口</a> 提供一个对一个服务工作者的引用。 多个浏览上下文（例如页面，工作者等）可以与相同的服务工作者相关联，每个都通过唯一的ServiceWorker对象。</div>
+
+<div> </div>
+
+<p>一个ServiceWorker对象在 <a href="/zh-CN/docs/Web/API/ServiceWorkerRegistration/active" title="The active property of the ServiceWorkerRegistration interface returns a service worker whose ServiceWorker.state is activating or activated. This property is initially set to null."><code>ServiceWorkerRegistration.active</code></a> 属性和 <a href="/zh-CN/docs/Web/API/ServiceWorkerContainer/controller" title="当状态为activated 时， ServiceWorkerContainer 接口的只读属性 controller 返回一个 ServiceWorker 对象（与 ServiceWorkerRegistration.active 返回的对象是同一个）。当页面强制刷新 (Shift + refresh) 或不存在active worder时，该属性返回 null 。"><code>ServiceWorkerContainer.controller</code></a> 属性中可用 — 这是一个激活并在控制页面的service worker(service worker成功注册,被控页面已经重新加载完毕.)</p>
+
+<p>ServiceWorker接口被分配了一系列生命周期事件 --- 安装和激活 --- 以及功能型的事件,包括 fetch.一个ServiceWorker对象有一个与之关联的 <a href="/zh-CN/docs/Web/API/ServiceWorker/state" title="一个 ServiceWorkerState 的定义值 (see the spec.)"><code>ServiceWorker.state</code></a>,指示着它的生命周期.</p>
+
+<h2 id="属性">属性</h2>
+
+<p><em>ServiceWorker 接口继承它父类<a href="/zh-CN/docs/Web/API/Worker" title="运行者 Worker 接口是Web Workers API 的一部分，代表一个后台任务，它容易被创建并向创建者发回消息。创建一个运行者只要简单的调用Worker()构造函数，指定一个脚本，在工作线程中执行。"><code>Worker</code></a>的属性.</em></p>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/ServiceWorker/scriptURL" title="作为ServiceWorkerRegistration的一部分定义，会返回该ServiceWorker的序列化脚本url. 必须与document注册ServiceWorker的地址同源."><code>ServiceWorker.scriptURL</code></a> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></dt>
+ <dd>返回作为 <a href="/zh-CN/docs/Web/API/ServiceWorkerRegistration" title="The ServiceWorkerRegistration interface of the ServiceWorker API represents the service worker registration. You register a service worker to control one or more pages that share the same origin."><code>ServiceWorkerRegistration</code></a> 一部分所定义的ServiceWorker序列化脚本URL.这个URL必须和注册该ServiceWorker的文档处于同一域.</dd>
+ <dt><a href="/zh-CN/docs/Web/API/ServiceWorker/state" title="一个 ServiceWorkerState 的定义值 (see the spec.)"><code>ServiceWorker.state</code></a> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></dt>
+ <dd>返回service worker的状态.其值可能是如下之一:installing,installed,activating,activated或者是redundant.</dd>
+</dl>
+
+<h3 id="Event_handlers">Event handlers</h3>
+
+<dl>
+ <dt><a href="/zh-CN/docs/Web/API/ServiceWorker/onstatechange" title="一个 EventListener 联动的属性，其会被任何stagechange类型事件抛出时联动; 它也基本上能在任何时候ServiceWorker.state 改变时被抛出."><code>ServiceWorker.onstatechange</code></a> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></dt>
+ <dd>一个一旦 <a href="/zh-CN/docs/Web/API/ServiceWorker/state" title="一个 ServiceWorkerState 的定义值 (see the spec.)"><code>ServiceWorker.state</code></a> 发生改变时,即一个类型为statechange事件触发时就会被调用的 <a href="/zh-CN/docs/Web/API/EventListener" title="EventListener 接口表示的对象可以处理 EventTarget 对象所调度的事件。"><code>EventListener</code></a> 属性.</dd>
+</dl>
+
+<h2 id="方法">方法</h2>
+
+<dl>
+ <dd><em>ServiceWorker 接口继承它父类 <a href="/zh-CN/docs/Web/API/Worker" title="运行者 Worker 接口是Web Workers API 的一部分，代表一个后台任务，它容易被创建并向创建者发回消息。创建一个运行者只要简单的调用Worker()构造函数，指定一个脚本，在工作线程中执行。"><code>Worker</code></a> 的方法 ,并带有一个 <a href="/zh-CN/docs/Web/API/Worker/terminate" title="Worker 接口中的 terminate()  方法用于立即终止 Worker 的行为. 本方法并不会等待 worker 去完成它剩余的操作；worker 将会被立刻停止"><code>Worker.terminate</code></a> 的异常 --- 它不应该从service workers.ServiceWorker中访问.</em></dd>
+</dl>
+
+<h2 id="例子">例子</h2>
+
+<p>代码段来自<a href="https://github.com/GoogleChrome/samples/blob/gh-pages/service-worker/registration-events/index.html">service worker registration-events sample</a> (<a href="https://googlechrome.github.io/samples/service-worker/registration-events/">live demo</a>). 这段代码监听了<a href="/zh-CN/docs/Web/API/ServiceWorker/state" title="一个 ServiceWorkerState 的定义值 (see the spec.)"><code>ServiceWorker.state</code></a> 的变化并且返回它的值.</p>
+
+<pre class="brush: js">if (&apos;serviceWorker&apos; in navigator) {
+    navigator.serviceWorker.register(&apos;service-worker.js&apos;, {
+        scope: &apos;./&apos;
+    }).then(function (registration) {
+        var serviceWorker;
+        if (registration.installing) {
+            serviceWorker = registration.installing;
+            document.querySelector(&apos;#kind&apos;).textContent = &apos;installing&apos;;
+        } else if (registration.waiting) {
+            serviceWorker = registration.waiting;
+            document.querySelector(&apos;#kind&apos;).textContent = &apos;waiting&apos;;
+        } else if (registration.active) {
+            serviceWorker = registration.active;
+            document.querySelector(&apos;#kind&apos;).textContent = &apos;active&apos;;
+        }
+        if (serviceWorker) {
+            // logState(serviceWorker.state);
+            serviceWorker.addEventListener(&apos;statechange&apos;, function (e) {
+                // logState(e.target.state);
+            });
+        }
+    }).catch (function (error) {
+        // Something went wrong during registration. The service-worker.js file
+        // might be unavailable or contain a syntax error.
+    });
+} else {
+    // The current browser doesn&apos;t support service workers.
+}</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#service-worker-obj" hreflang="en" lang="en">Service Workers<br><small lang="zh-CN">ServiceWorker</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/44" title="Released on 2016-01-26.">44.0</a> (44.0)<sup>[1]</sup></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>24</td>
+   <td><span style="color: #f00;">未实现</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>44.0 (44.0)</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td>40.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Service workers (and <a href="/en-US/docs/Web/API/Push_API">Push</a>) have been disabled in the <a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 Extended Support Release</a> (ESR.)</p>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="https://serviceworke.rs">ServiceWorker Cookbook</a></li>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API/Using_Service_Workers">Using Service Workers</a></li>
+ <li><a href="https://github.com/mdn/sw-test">Service workers basic code example</a></li>
+ <li><a href="https://jakearchibald.github.io/isserviceworkerready/">Is ServiceWorker ready?</a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" title="Promise 对象用于表示一个异步操作的最终完成 (或失败), 及其结果值."><code>Promises</code></a></li>
+ <li><a href="/en-US/docs/Web/Guide/Performance/Using_web_workers">Using web workers</a></li>
+</ul>
