@@ -1,0 +1,244 @@
+---
+title: Geolocation API
+slug: Web/API/Geolocation_API
+translation_of: Web/API/Geolocation_API
+---
+<div class="secureContexts notecard"><p><strong>Secure context</strong><br>This feature is available only in <a href="/vi/docs/Web/Security/Secure_Contexts">secure contexts</a> (HTTPS), in some or all <a href="#Browser_compatibility">supporting browsers</a>.</p></div> <section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/vi/docs/Web/API/Geolocation_API"><code>Geolocation_API</code></a></strong></li></ol></section>
+
+<p>Các <strong>API Định vị</strong> cho phép người dùng để cung cấp vị trí của họ vào các ứng dụng web nếu họ mong muốn. Vì lý do riêng tư, người dùng được yêu cầu cho phép báo cáo thông tin vị trí.</p>
+
+<h2 id="Đối_tượng_định_vị_địa_lý">Đối tượng định vị địa lý</h2>
+
+<p>Các <a href="/en-US/docs/Web/API/Geolocation">Định vị</a> API được công bố thông qua <a href="/vi/docs/Web/API/Navigator/geolocation"><code>navigator.geolocation</code></a> đối tượng.</p>
+
+<p>Nếu đối tượng tồn tại, dịch vụ định vị địa lý có sẵn. Do đó, bạn có thể kiểm tra sự hiện diện của vị trí địa lý:</p>
+
+<pre class="brush: js notranslate">if (&quot;geolocation&quot; in navigator) {
+  / * định vị địa lý có sẵn * /
+} else {
+  / * định vị địa lý KHÔNG có sẵn * /
+}
+</pre>
+
+<div class="note">
+<p><strong>Lưu ý:</strong> Trên Firefox 24 và các phiên bản cũ hơn, <code>&quot;geolocation&quot; in navigator</code>luôn được trả về <code>true</code>ngay cả khi API bị tắt. Điều này đã được sửa với <a href="/en-US/docs/Mozilla/Firefox/Releases/25/Site_Compatibility">Firefox 25</a> để tuân thủ thông số kỹ thuật. (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=884921">bug 884921</a>).</p>
+</div>
+
+<h3 id="Lấy_vị_trí_hiện_tại">Lấy vị trí hiện tại</h3>
+
+<p>Để có được vị trí hiện tại của người dùng, bạn có thể gọi phương thức <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition"><code>getCurrentPosition()</code></a>. Điều này bắt đầu một yêu cầu không đồng bộ để phát hiện vị trí của người dùng và truy vấn phần cứng định vị để có được thông tin cập nhật. Khi vị trí được xác định, chức năng gọi lại được xác định sẽ được thực thi. Bạn có thể tùy chọn cung cấp chức năng gọi lại thứ hai để được thực thi nếu xảy ra lỗi. Tham số thứ ba, tùy chọn, là một đối tượng tùy chọn trong đó bạn có thể đặt tuổi tối đa của vị trí được trả về, thời gian chờ yêu cầu và nếu bạn muốn độ chính xác cao cho vị trí.</p>
+
+<div class="note">
+<p><strong>Lưu ý:</strong> Theo mặc định, <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition "><code>getCurrentPosition()</code></a> cố gắng trả lời nhanh nhất có thể với kết quả chính xác thấp. Nó rất hữu ích nếu bạn cần một câu trả lời nhanh bất kể độ chính xác. Chẳng hạn, các thiết bị có GPS có thể mất một phút hoặc hơn để sửa lỗi GPS, do đó, dữ liệu kém chính xác hơn(vị trí IP hoặc wifi) có thể được trả về <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition"><code>getCurrentPosition() </code></a>.</p>
+</div>
+
+<pre class="brush: js notranslate">navigator.geolocation.getCurrentPosition(function(position) {
+  do_something(location.coords.latitude, location.coords.longitude);
+});</pre>
+
+<p>Ví dụ trên sẽ khiến <code>do_something()</code>hàm thực thi khi lấy được vị trí.</p>
+
+<h3 id="Xem_vị_trí_hiện_tại">Xem vị trí hiện tại</h3>
+
+<p>Nếu dữ liệu vị trí thay đổi (theo chuyển động của thiết bị hoặc nếu có thông tin địa lý chính xác hơn), bạn có thể thiết lập chức năng gọi lại được gọi với thông tin vị trí được cập nhật đó. Điều này được thực hiện bằng cách sử dụng hàm <a href="/vi/docs/Web/API/Geolocation/watchPocation_"><code>watchPosition()</code></a>, có cùng tham số đầu vào như <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition"><code>getCurrentPosition() </code></a>. Chức năng gọi lại được gọi nhiều lần, cho phép trình duyệt cập nhật vị trí của bạn khi bạn di chuyển hoặc cung cấp vị trí chính xác hơn vì các kỹ thuật khác nhau được sử dụng để định vị địa lý cho bạn. Hàm gọi lại lỗi, là tùy chọn giống như đối với <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition"><code>getCurrentPosition()</code></a>, có thể được gọi lặp lại.</p>
+
+<div class="note">
+<p><strong>Lưu ý:</strong> Bạn có thể sử dụng <a href="/vi/docs/Web/API/Geolocation/watchPosition"><code>watchPosition()</code></a> mà không cần một cuộc gọi <a href="/vi/docs/Web/API/Geolocation/getCienPocation_"><code>getCienPocation ()</code></a>.</p>
+</div>
+
+<pre class="brush: js notranslate">var watchID = navigator.geolocation.watchPosition(function(location) {
+  do_something(location.coords.latitude, location.coords.longitude);
+});</pre>
+
+<p>Phương thức <a href="/vi/docs/Web/API/Geolocation/watchPosition"><code>watchPosition()</code></a> trả về số ID có thể được sử dụng để xác định duy nhất trình theo dõi vị trí được yêu cầu; bạn sử dụng giá trị này song song với phương thức <a href="/vi/docs/Web/API/Geolocation/clearWatch"><code>clearWatch()</code></a> để dừng xem vị trí của người dùng.</p>
+
+<pre class="brush: js notranslate">navigator.geolocation.clearWatch(watchID);
+</pre>
+
+<h3 id="Phản_ứng_tinh_chỉnh">Phản ứng tinh chỉnh</h3>
+
+<p>Both <a href="/vi/docs/Web/API/Geolocation/getCurrentPosition"><code>getCurrentPosition()</code></a> and <a href="/vi/docs/Web/API/Geolocation/watchPosition"><code>watchPosition()</code></a> accept a success callback, an optional error callback, and an optional <a href="/en-US/docs/Web/API/PositionOptions">PositionOptions</a> object.</p>
+
+
+
+<p>A call to <a href="/vi/docs/Web/API/Geolocation/watchPosition"><code>watchPosition</code></a> could look like:</p>
+
+<pre class="brush: js notranslate">function geo_success(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+}
+
+function geo_error() {
+  alert(&quot;Sorry, no position available.&quot;);
+}
+
+var geo_options = {
+  enableHighAccuracy: true,
+  maximumAge        : 30000,
+  timeout           : 27000
+};
+
+var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);</pre>
+
+<h2 id="Describing_a_position">Describing a position</h2>
+
+<p>The user&apos;s location is described using a <a href="/vi/docs/Web/API/Position"><code>Position</code></a> object referencing a <a href="/vi/docs/Web/API/Coordinates"><code>Coordinates</code></a> object.</p>
+
+
+
+
+
+<h2 id="Handling_errors">Handling errors</h2>
+
+<p>The error callback function, if provided when calling <code>getCurrentPosition()</code> or <code>watchPosition()</code>, expects a <a href="/en-US/docs/Web/API/PositionError">PositionError</a> object as its first parameter.</p>
+
+<pre class="brush: js notranslate">function errorCallback(error) {
+  alert(&apos;ERROR(&apos; + error.code + &apos;): &apos; + error.message);
+};
+</pre>
+
+
+
+<h2 id="Geolocation_Live_Example">Geolocation Live Example</h2>
+
+<div class="hidden">
+<pre class="brush: css notranslate">body {
+  padding: 20px;
+  background-color:#ffffc9
+}
+
+button {
+  margin: .5rem 0;
+}
+</pre>
+</div>
+
+<h3 id="HTML_Content">HTML Content</h3>
+
+<pre class="brush: html; notranslate">&lt;button id = &quot;find-me&quot;&gt;Show my location&lt;/button&gt;&lt;br/&gt;
+&lt;p id = &quot;status&quot;&gt;&lt;/p&gt;
+&lt;a id = &quot;map-link&quot; target=&quot;_blank&quot;&gt;&lt;/a&gt;
+</pre>
+
+<h3 id="JavaScript_Content">JavaScript Content</h3>
+
+<pre class="brush: js notranslate">function geoFindMe() {
+
+  const status = document.querySelector(&apos;#status&apos;);
+  const mapLink = document.querySelector(&apos;#map-link&apos;);
+
+  mapLink.href = &apos;&apos;;
+  mapLink.textContent = &apos;&apos;;
+
+  function success(position) {
+    const latitude  = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    status.textContent = &apos;&apos;;
+    mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+    mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+  }
+
+  function error() {
+    status.textContent = &apos;Unable to retrieve your location&apos;;
+  }
+
+  if (!navigator.geolocation) {
+    status.textContent = &apos;Geolocation is not supported by your browser&apos;;
+  } else {
+    status.textContent = &apos;Locating…&apos;;
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+
+}
+
+document.querySelector(&apos;#find-me&apos;).addEventListener(&apos;click&apos;, geoFindMe);
+</pre>
+
+<h3 id="Live_Result">Live Result</h3>
+
+<p><iframe allow="geolocation" class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_Geolocation_Live_Example" src="https://mdn.mozillademos.org/vi/docs/Web/API/Geolocation_API$samples/Geolocation_Live_Example?revision=1554654" width="350"></iframe></p>
+
+<h2 id="Prompting_for_permission">Prompting for permission</h2>
+
+<p>Any add-on hosted on <a href="https://addons.mozilla.org/">addons.mozilla.org</a> which makes use of geolocation data must explicitly request permission before doing so. The following function will request permission in a manner similar to the automatic prompt displayed for web pages. The user&apos;s response will be saved in the preference specified by the <code>pref</code> parameter, if applicable. The function provided in the <code>callback</code> parameter will be called with a boolean value indicating the user&apos;s response. If <code>true</code>, the add-on may access geolocation data.</p>
+
+<pre class="brush: js notranslate">function prompt(window, pref, message, callback) {
+    let branch = Components.classes[&quot;@mozilla.org/preferences-service;1&quot;]
+                           .getService(Components.interfaces.nsIPrefBranch);
+
+    if (branch.getPrefType(pref) === branch.PREF_STRING) {
+        switch (branch.getCharPref(pref)) {
+        case &quot;always&quot;:
+            return callback(true);
+        case &quot;never&quot;:
+            return callback(false);
+        }
+    }
+
+    let done = false;
+
+    function remember(value, result) {
+        return function() {
+            done = true;
+            branch.setCharPref(pref, value);
+            callback(result);
+        }
+    }
+
+    let self = window.PopupNotifications.show(
+        window.gBrowser.selectedBrowser,
+        &quot;geolocation&quot;,
+        message,
+        &quot;geo-notification-icon&quot;,
+        {
+            label: &quot;Share Location&quot;,
+            accessKey: &quot;S&quot;,
+            callback: function(notification) {
+                done = true;
+                callback(true);
+            }
+        }, [
+            {
+                label: &quot;Always Share&quot;,
+                accessKey: &quot;A&quot;,
+                callback: remember(&quot;always&quot;, true)
+            },
+            {
+                label: &quot;Never Share&quot;,
+                accessKey: &quot;N&quot;,
+                callback: remember(&quot;never&quot;, false)
+            }
+        ], {
+            eventCallback: function(event) {
+                if (event === &quot;dismissed&quot;) {
+                    if (!done) callback(false);
+                    done = true;
+                    window.PopupNotifications.remove(self);
+                }
+            },
+            persistWhileVisible: true
+        });
+}
+
+prompt(window,
+       &quot;extensions.foo-addon.allowGeolocation&quot;,
+       &quot;Foo Add-on wants to know your location.&quot;,
+       function callback(allowed) { alert(allowed); });
+</pre>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="bc-data" id="bcd:api.Geolocation"></div>
+
+<h3 id="khả_dụng">khả dụng</h3>
+
+<p>Vì định vị dựa trên WiFi thường được cung cấp bởi Google, API định vị vanilla có thể không khả dụng ở Trung Quốc. Bạn có thể sử dụng các nhà cung cấp bên thứ ba địa phương như <a href="http://lbsyun.baidu.com/index.php?title=jspopular/guide/geolocation">Baidu</a> , <a href="https://lbs.amap.com/api/javascript-api/guide/services/geolocation#geolocation">Autonavi</a> hoặc <a href="http://lbs.qq.com/tool/component-geolocation.html">Tencent</a> . Các dịch vụ này sử dụng địa chỉ IP của người dùng và / hoặc ứng dụng cục bộ để cung cấp định vị nâng cao.</p>
+
+<h2 id="Xem_thêm">Xem thêm</h2>
+
+<ul>
+ <li><a href="/vi/docs/Web/API/Navigator/geolocation"><code>navigator.geolocation</code></a></li>
+ <li><a href="/en-US/Apps/Build/gather_and_modify_data/Plotting_yourself_on_the_map">Vẽ sơ đồ trên bản đồ</a></li>
+ <li><a href="https://www.w3.org/TR/geolocation-API/" rel="external">API định vị địa lý trên w3.org</a></li>
+ <li><a href="https://hacks.mozilla.org/2013/10/who-moved-my-geolocation/">Ai đã di chuyển vị trí địa lý của tôi? </a>(Blog hack)</li>
+</ul>

@@ -1,0 +1,167 @@
+---
+title: Array.prototype.toLocaleString()
+slug: Web/JavaScript/Reference/Global_Objects/Array/toLocaleString
+translation_of: Web/JavaScript/Reference/Global_Objects/Array/toLocaleString
+---
+<div>Hàm <strong>toLocaleString()</strong> trả về 1 chuỗi các phần tử trong mảng. Các phần tử này được chuyển đổi sang kiểu chuỗi nhờ hàm toLocalString và được ngăn cách với nhau bằng một xâu đặc biệt (ví dụ : dấu phẩy (,))</div>
+
+<h2 id="Syntax">Syntax</h2>
+
+<pre class="syntaxbox notranslate"><var>arr</var>.toLocaleString([<var>locales[</var>, <var>options]]</var>);
+</pre>
+
+<h3 id="Parameters">Parameters</h3>
+
+<dl>
+ <dt><code>locales</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>A string with a BCP 47 language tag, or an array of such strings. For the general form and interpretation of the <code>locales</code> argument, see the <a href="/vi/docs/Web/JavaScript/Reference/Intl"><code>Intl</code></a> page.</dd>
+ <dt><code>options</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>An object with configuration properties, for numbers see <a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString"><code>Number.prototype.toLocaleString()</code></a>, and for dates see <a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString"><code>Date.prototype.toLocaleString()</code></a>.</dd>
+</dl>
+
+<h3 id="Return_value">Return value</h3>
+
+<p>A string representing the elements of the array.</p>
+
+<h2 id="Examples">Examples</h2>
+
+<h3 id="Using_locales_and_options">Using <code>locales</code> and <code>options</code></h3>
+
+<p>The elements of the array are converted to strings using their <code>toLocaleString</code> methods.</p>
+
+<ul>
+ <li><code>Object</code>: <a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString"><code>Object.prototype.toLocaleString()</code></a></li>
+ <li><code>Number</code>: <a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString"><code>Number.prototype.toLocaleString()</code></a></li>
+ <li><code>Date</code>: <a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString"><code>Date.prototype.toLocaleString()</code></a></li>
+</ul>
+
+<p>Always display the currency for the strings and numbers in the <code>prices</code> array:</p>
+
+<pre class="brush: js notranslate">var prices = [&apos;￥7&apos;, 500, 8123, 12];
+prices.toLocaleString(&apos;ja-JP&apos;, { style: &apos;currency&apos;, currency: &apos;JPY&apos; });
+
+// &quot;￥7,￥500,￥8,123,￥12&quot;
+</pre>
+
+<p>For more examples, see also the <a href="/vi/docs/Web/JavaScript/Reference/Intl"><code>Intl</code></a>, <a href="/vi/docs/Web/JavaScript/Reference/NumberFormat"><code>NumberFormat</code></a>, and <a href="/vi/docs/Web/JavaScript/Reference/DateTimeFormat"><code>DateTimeFormat</code></a> pages.</p>
+
+<h2 id="Polyfill">Polyfill</h2>
+
+<pre class="brush: js notranslate">// https://tc39.github.io/ecma402/#sup-array.prototype.tolocalestring
+if (!Array.prototype.toLocaleString) {
+  Object.defineProperty(Array.prototype, &apos;toLocaleString&apos;, {
+    value: function(locales, options) {
+      // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw new TypeError(&apos;&quot;this&quot; is null or not defined&apos;);
+      }
+
+      var a = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(A, &quot;length&quot;)).
+      var len = a.length &gt;&gt;&gt; 0;
+
+      // 3. Let separator be the String value for the
+      //    list-separator String appropriate for the
+      //    host environment&apos;s current locale (this is
+      //    derived in an implementation-defined way).
+      // NOTE: In this case, we will use a comma
+      var separator = &apos;,&apos;;
+
+      // 4. If len is zero, return the empty String.
+      if (len === 0) {
+        return &apos;&apos;;
+      }
+
+      // 5. Let firstElement be ? Get(A, &quot;0&quot;).
+      var firstElement = a[0];
+      // 6. If firstElement is undefined or null, then
+      //  a.Let R be the empty String.
+      // 7. Else,
+      //  a. Let R be ?
+      //     ToString(?
+      //       Invoke(
+      //        firstElement,
+      //        &quot;toLocaleString&quot;,
+      //        « locales, options »
+      //       )
+      //     )
+      var r = firstElement == null ?
+        &apos;&apos; : firstElement.toLocaleString(locales, options);
+
+      // 8. Let k be 1.
+      var k = 1;
+
+      // 9. Repeat, while k &lt; len
+      while (k &lt; len) {
+        // a. Let S be a String value produced by
+        //   concatenating R and separator.
+        var s = r + separator;
+
+        // b. Let nextElement be ? Get(A, ToString(k)).
+        var nextElement = a[k];
+
+        // c. If nextElement is undefined or null, then
+        //   i. Let R be the empty String.
+        // d. Else,
+        //   i. Let R be ?
+        //     ToString(?
+        //       Invoke(
+        //        nextElement,
+        //        &quot;toLocaleString&quot;,
+        //        « locales, options »
+        //       )
+        //     )
+        r = nextElement == null ?
+          &apos;&apos; : nextElement.toLocaleString(locales, options);
+
+        // e. Let R be a String value produced by
+        //   concatenating S and R.
+        r = s + r;
+
+        // f. Increase k by 1.
+        k++;
+      }
+
+      // 10. Return R.
+      return r;
+    }
+  });
+}
+</pre>
+
+<p>If you need to support truly obsolete JavaScript engines that don&apos;t support <code><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty">Object.defineProperty</a></code>, it&apos;s best not to polyfill <code>Array.prototype</code> methods at all, as you can&apos;t make them non-enumerable.</p>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-array.prototype.tolocalestring" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="vi">The definition of &apos;Array.prototype.toLocaleString&apos; in that specification.</small></a></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma402/#sup-array.prototype.tolocalestring" hreflang="en" lang="en">ECMAScript Internationalization API (ECMA-402)<br><small lang="vi">The definition of &apos;Array.prototype.toLocaleString&apos; in that specification.</small></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div>
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Array.toLocaleString"></div>
+</div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Array/toString"><code>Array.prototype.toString()</code></a></li>
+ <li><a href="/vi/docs/Web/JavaScript/Reference/Intl"><code>Intl</code></a></li>
+ <li><a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString"><code>Object.prototype.toLocaleString()</code></a></li>
+ <li><a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString"><code>Number.prototype.toLocaleString()</code></a></li>
+ <li><a href="/vi/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString"><code>Date.prototype.toLocaleString()</code></a></li>
+</ul>

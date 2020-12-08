@@ -1,0 +1,94 @@
+---
+title: CustomElementRegistry
+slug: Web/API/CustomElementRegistry
+tags:
+  - API
+  - CustomElementRegistry
+  - Experimental
+  - Interface
+  - Reference
+  - Web Components
+translation_of: Web/API/CustomElementRegistry
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/ko/docs/Web/Web_Components/Using_custom_elements">커스텀 엘리먼트 사용하기</a></li><li><a href="/ko/docs/Web/Web_Components/Using_shadow_DOM">Using shadow DOM</a></li><li><a href="/ko/docs/Web/Web_Components/Using_templates_and_slots">Using templates and slots</a> <a href="/ko/docs/Web/Web_Components/Using_templates_and_slots$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/ko/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/ko/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/ko/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/ko/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/ko/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/ko/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Properties</summary><ol><li><a href="/ko/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/ko/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/ko/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/ko/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/ko/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/ko/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methods</summary><ol><li><a href="/ko/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/ko/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/ko/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary"><strong><code>CustomElementRegistry</code></strong> 인터페이스는 사용자 지정 요소를 등록하고, 등록한 요소를 가져올 수 있는 메서드를 제공합니다.</span> 인스턴스에 접근하려면 <a href="/ko/docs/Web/API/Window/customElements"><code>window.customElements</code></a> 속성을 사용하세요.</p>
+
+<h2 id="메서드">메서드</h2>
+
+<dl>
+ <dt><a href="/ko/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a></dt>
+ <dd>새로운 <a href="/ko/docs/Web/Web_Components/Custom_Elements">사용자 지정 요소</a>를 정의합니다.</dd>
+ <dt><a href="/ko/docs/Web/API/CustomElementRegistry/get"><code>CustomElementRegistry.get()</code></a></dt>
+ <dd>유명 사용자 지정 요소의 생성자를 반환합니다. 그런 요소가 없는 경우 <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/undefined"><code>undefined</code></a>를 대신 반환합니다.</dd>
+ <dt><a href="/ko/docs/Web/API/CustomElementRegistry/upgrade"><code>CustomElementRegistry.upgrade()</code></a></dt>
+ <dd>사용자 지정 요소가 자신의 섀도 루트(shadow root)에 연결되기 전에 직접 업그레이드합니다.</dd>
+ <dt><a href="/ko/docs/Web/API/CustomElementRegistry/whenDefined"><code>CustomElementRegistry.whenDefined()</code></a></dt>
+ <dd>주어진 이름의 사용자 지정 요소가 등록되는 순간 이행하는, 빈 <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>를 반환합니다. 만약 그런 요소가 이미 등록된 경우 즉시 이행합니다.</dd>
+</dl>
+
+<h2 id="예제">예제</h2>
+
+<p>다음 코드는 <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> 예제에서 가져온 것입니다(<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">라이브로 확인하세요</a>). 사용자 지정 요소 클래스를 생성한 후, <a href="/ko/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> 메서드로 등록하는 과정을 살펴보세요.</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // count words in element&apos;s parent element
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create text node and add word count to it
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // Append it to the shadow root
+    shadow.appendChild(text);
+
+
+    // Update count when element content changes
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// Define the new element
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<h2 id="명세">명세</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#customelementregistry" hreflang="en" lang="en">HTML Living Standard<br><small lang="ko">The definition of &apos;CustomElementRegistry&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="브라우저_호환성">브라우저 호환성</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry"></div>

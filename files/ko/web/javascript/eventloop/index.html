@@ -1,0 +1,265 @@
+---
+title: 동시성 모델과 이벤트 루프
+slug: Web/JavaScript/EventLoop
+tags:
+  - 이벤트 루프
+translation_of: Web/JavaScript/EventLoop
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/ko/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/ko/docs/Web/JavaScript/Tutorials"><strong>Tutorials:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>Complete beginners</summary>
+      <ol>
+        <li><a href="/ko/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics</a></li>
+        <li><a href="/ko/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/ko/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/ko/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>JavaScript Guide</summary>
+      <ol>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Grammar_and_Types">Grammar and types</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Control flow and error handling</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Loops_and_iteration">Loops and iteration</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Functions">Functions</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions and operators</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Numbers_and_dates">Numbers and dates</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Text_formatting">Text formatting</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Regular_Expressions">Regular expressions</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Indexed_collections">Indexed collections</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Keyed_collections">Keyed collections</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Working_with_Objects">Working with objects</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Details of the object model</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Iterators_and_generators">Iterators and generators</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Meta_programming">Meta programming</a></li>
+          <li><a href="/ko/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Intermediate</summary>
+      <ol>
+        <li><a href="/ko/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+        <li><a href="/ko/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/A_re-introduction_to_JavaScript">A re-introduction to JavaScript</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Data_structures">JavaScript data structures</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Advanced</summary>
+      <ol>
+        <li><a href="/ko/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">Inheritance and the prototype chain</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Strict_mode">Strict mode</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Typed_arrays">JavaScript typed arrays</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Memory_Management">Memory Management</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/EventLoop">Concurrency model and Event Loop</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ko/docs/Web/JavaScript/Reference">References:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>Built-in objects</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/AggregateError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/AsyncIterator">AsyncIterator</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/AsyncIterator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Float32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Float64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int16Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Int8Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Collator">Intl.Collator</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Collator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat">Intl.DateTimeFormat</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/DisplayNames">Intl.DisplayNames</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/DisplayNames$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/ListFormat">Intl.ListFormat</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/ListFormat$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Locale">Intl.Locale</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat">Intl.NumberFormat</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/PluralRules">Intl.PluralRules</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/PluralRules$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/RelativeTimeFormat">Intl.RelativeTimeFormat</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/RelativeTimeFormat$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Iterator">Iterator</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Iterator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/URIError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/escape$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt()</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a> <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/unescape$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Expressions &amp; operators</summary>
+      <ol><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators">산술 연산자</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Operators/%EB%B0%B0%EC%97%B4">배열 내포</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Assignment_Operators">할당 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators">비트 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Comma_Operator">쉼표 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Comparison_Operators">비교 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">삼항 조건 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">구조 분해 할당</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Operators/Expression_closures">표현식 클로저</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/function">함수 표현식</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Operators/Generator_comprehensions">생성기 내포</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Grouping">그룹 연산자</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Operators/Legacy_generator_function">구형 생성기 함수 표현식</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/%EB%85%BC%EB%A6%AC_%EC%97%B0%EC%82%B0%EC%9E%90(Logical_Operators)">논리 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">Nullish coalescing operator</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Object_initializer">객체 초기자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/%EC%97%B0%EC%82%B0%EC%9E%90_%EC%9A%B0%EC%84%A0%EC%88%9C%EC%9C%84">연산자 우선순위</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Optional_chaining">Optional chaining</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Operators/Pipeline_operator">파이프 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Property_Accessors">속성 접근자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/Spread_syntax">전개 구문</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/async_function">async function 표현식</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/class">class 식</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/delete">delete 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/function*">function* expression</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/in">in 연산자</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/new">new operator</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/void">void</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Statements &amp; declarations</summary>
+      <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Statements/Legacy_generator_function">Legacy generator function</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/async_function">async function</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/block">block</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/default">default</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/Empty">empty</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Statements/for_each...in">for each...in</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/function">함수 선언</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a> <a href="/ko/docs/Web/JavaScript/Reference/Statements/import.meta$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/var">var</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ko/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Functions</summary>
+      <ol><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/%EC%95%A0%EB%A1%9C%EC%9A%B0_%ED%8E%91%EC%85%98">화살표 함수</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/Default_parameters">기본 매개변수</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/Method_definitions">메서드 정의</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/rest_parameters">Rest 파라미터</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/arguments">arguments 객체</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/get">getter</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Functions/set">setter</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/ko/docs/Web/JavaScript/Reference/Classes/Class_fields">Class fields</a> <a href="/ko/docs/Web/JavaScript/Reference/Classes/Class_fields$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Classes/constructor">constructor</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Equal_as_assign$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/No_properties$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/No_non-null_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">TypeError: X.prototype.y called on incompatible type</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Dead_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_access_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: cannot use &apos;in&apos; operator to search for &apos;x&apos; in &apos;y&apos;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/in_operator_no_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Array_sort_argument$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Cant_delete$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Getter_only$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Var_hides_argument$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Malformed_URI$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Already_has_pragma$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a> <a href="/ko/docs/Web/JavaScript/Reference/Errors/Stmt_after_return$translate" style="opacity: 0.5;">[Translate]</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Misc</summary>
+      <ol>
+        <li><a href="/ko/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript technologies overview</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Lexical_grammar">Lexical grammar</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Data_structures">JavaScript data structures</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">Enumerability and ownership of properties</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Strict_mode">Strict mode</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">Transitioning to strict mode</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Template_literals">Template literals</a></li>
+        <li><a href="/ko/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">Deprecated features</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>자바스크립트는 코드 실행, 이벤트 수집과 처리, 큐에 놓인 하위 작업들을 담당하는 <strong>이벤트 루프</strong>에 기반한 동시성(concurrency) 모델을 가지고 있습니다. 이 모델은 C 또는 Java와 같은 언어와 완전히 다릅니다.</p>
+
+<h2 id="런타임_개념">런타임 개념</h2>
+
+<p>이어지는 섹션에서는 이론적 모델을 설명합니다. 모던 자바스크립트 엔진들은 아래 묘사된 개념들을 구현하고 최적화 합니다.</p>
+
+<h3 id="시각적_표현">시각적 표현</h3>
+
+<p style="text-align: center;"><img alt="Stack, heap, queue" src="/files/4617/default.svg" style="height: 270px; width: 294px;"></p>
+
+<h3 id="Stack">Stack</h3>
+
+<p>함수 호출은 <em>프레임</em>들의 스택을 형성합니다.</p>
+
+<pre class="brush: js"><code>function foo(b) {
+  var a = 10;
+  return a + b + 11;
+}
+
+function bar(x) {
+  var y = 3;
+  return foo(x * y);
+}
+
+console.log(bar(7)); //returns 42</code></pre>
+
+<p><code>bar</code>를 호출할 때, <code>bar</code>의 인자와 지역 변수를 포함하는 첫 번째 프레임이 생성됩니다. <code>bar</code>가 <code>foo</code>를 호출하면 두 번째 프레임이 만들어져 <code>foo</code>의 인수와 지역 변수가 들어있는 첫 번째 프레임의 맨 위에 푸시됩니다. <code>foo</code>가 반환되면, 최상위 프레임 요소는 <code>bar</code>의 호출 프레임만을 남겨둔 채로 스택 밖으로 빠져나옵니다. <code>bar</code>가 반환되면, 스택은 비워집니다.</p>
+
+<h3 id="Heap">Heap</h3>
+
+<p>객체들은 힙 안에 할당됩니다. 힙은 구조화되지 않은 넓은 메모리 영역을 지칭합니다.</p>
+
+<h3 id="Queue">Queue</h3>
+
+<p>JavaScript 런타임은 처리 할 메시지 목록 인 메시지 대기열을 사용합니다. 각 메시지에는 메시지를 처리하기 위해 호출되는 관련 함수가 있습니다.</p>
+
+<p><a href="#Event_loop">event loop</a> 중 어떤 시점에서 런타임은 대기열에서 가장 오래된 메시지부터 처리하기 시작합니다. 그렇게하기 위해, 메시지는 큐에서 제거되고 해당 기능이 메시지를 입력 매개 변수로 호출됩니다. 언제나 그렇듯이, 함수를 호출하면 그 함수의 사용을위한 새로운 스택 프레임이 생성됩니다.</p>
+
+<p>함수의 처리는 스택이 다시 비워 질 때까지 계속됩니다. 이벤트 루프는 큐의 다음 메시지를 처리합니다(존재할 경우).</p>
+
+<h2 id="Event_loop">Event loop</h2>
+
+<p><strong>Event loop</strong>는 그 구현 방식 때문에 붙은 이름이며 보통 다음과 유사합니다 :</p>
+
+<pre class="brush: js">while(queue.waitForMessage()){
+  queue.processNextMessage();
+}</pre>
+
+<p><code>queue.waitForMessage()</code> 함수는 현재 아무 메시지도 없다면 새로운 메시지 도착을 동기적으로 기다립니다.</p>
+
+<h3 id="Run-to-completion">&quot;Run-to-completion&quot;</h3>
+
+<p>각 메시지는 다른 메시지가 처리되기 전에 완전히 처리됩니다.</p>
+
+<p>이것은 함수가 실행될 때마다 미리 비워질 수 없고 다른 코드가 실행되기 전에 완전히 실행되며 함수가 조작하는 데이터를 수정할 수 있다는 사실을 포함하여 프로그램에 대한 추론을 할 때 좋은 속성을 제공합니다. 이것은 C와는 다릅니다. 예를 들어 함수가 쓰레드에서 실행된다면 런타임 시스템이 다른 쓰레드에서 다른 코드를 실행하기 위해 어느 시점에서 멈출 수 있습니다.</p>
+
+<p>이 모델의 부정적인 면은 어떤 메시지가 완료되기 까지 지나치게 오래 걸린다면 웹 어플리케이션은 클릭이나 스크롤과 같은 사용자 인터랙션을 처리할 수 없게 됩니다. 브라우저는 이러한 상황을 &quot;a script is taking too long to run&quot;과 같은 대화상자로 완화 합니다. 추천되는 좋은 방법은 메시지 처리를 짧도록 만드는 것과 하나의 메시지를 여러개의 메시지로 나누는 것 입니다.</p>
+
+<h3 id="메시지_추가하기">메시지 추가하기</h3>
+
+<p>웹 브라우저에서 이벤트 리스너가 부착된 이벤트가 발생할 때마다 메시지가 추가됩니다. 리스너가 없으면 이벤트는 손실됩니다. 클릭 이벤트 핸들러가 있는 요소를 클릭하면 다른 이벤트와 마찬가지로 메시지가 추가됩니다.</p>
+
+<p><code><a href="/en-US/docs/Web/API/WindowTimers.setTimeout" title="/en-US/docs/window.setTimeout">setTimeout</a></code> 함수는 2 개의 인수, 대기열에 추가 할 메시지와 시간값(선택사항, 기본값은 0)으로 호출됩니다. 시간 값은 메시지가 실제로 큐에 푸시 될 때까지의 (최소) 지연을 나타냅니다. 대기열에 다른 메시지가 없으면 지연 직후에 메시지가 처리됩니다. 그러나 메시지가있는 경우 setTimeout 메시지는 다른 메시지가 처리 될 때까지 기다려야합니다. 따라서 두 번째 인수는 최소 시간을 나타내지 만 보장 된 시간은 아닙니다.</p>
+
+<p>다음은 이 개념에 대한 예제입니다 (<code>setTimeout</code>은 타이머 만료 직후에 실행되지 않습니다).</p>
+
+<pre class="brush: js"><code>const s = new Date().getSeconds();
+
+setTimeout(function() {
+  // prints out &quot;2&quot;, meaning that the callback is not called immediately after 500 milliseconds.
+  console.log(&quot;Ran after &quot; + (new Date().getSeconds() - s) + &quot; seconds&quot;);
+}, 500);
+
+while(true) {
+  if(new Date().getSeconds() - s &gt;= 2) {
+    console.log(&quot;Good, looped for 2 seconds&quot;);
+    break;
+  }
+}</code></pre>
+
+<h3 id="Zero_delays">Zero delays</h3>
+
+<p>Zero delay는 실제로 0ms 후에 콜백이 시작된다는 의미는 아닙니다. 0ms 지연된 <a href="/ko/docs/Web/API/WindowTimers/setTimeout"><code>setTimeout</code></a>은 주어진 간격 후에 콜백 함수를 실행하지 않습니다.</p>
+
+<p>실행은 큐에 대기중인 작업 수에 따라 다릅니다. 아래 예에서, 콜백의 메시지가 처리되기 전에 콘솔에 &quot;this is just message&quot;메시지가 기록됩니다. 왜냐하면 지연(delay)은 보장된 시간이 아니라 요청을 처리하기 위해 필요한 최소의 시간이기 때문입니다.</p>
+
+<p>기본적으로 setTimeout은 setTimeout에 대한 특정 시간 제한을 지정 했더라도 대기중인 메시지의 모든 코드가 완료 될 때까지 대기해야합니다.</p>
+
+<pre class="brush: js"><code>(function() {
+
+  console.log(&apos;this is the start&apos;);
+
+  setTimeout(function cb() {
+    console.log(&apos;this is a msg from call back&apos;);
+  });
+
+  console.log(&apos;this is just a message&apos;);
+
+  setTimeout(function cb1() {
+    console.log(&apos;this is a msg from call back1&apos;);
+  }, 0);
+
+  console.log(&apos;this is the end&apos;);
+
+})();
+
+// &quot;this is the start&quot;
+// &quot;this is just a message&quot;
+// &quot;this is the end&quot;
+// note that function return, which is undefined, happens here
+// &quot;this is a msg from call back&quot;
+// &quot;this is a msg from call back1&quot;</code></pre>
+
+<h3 id="몇가지_런타임_통신">몇가지 런타임 통신</h3>
+
+<p>웹워커 또는 크로스 오리진 <code>iframe</code>은 자신의 스택, 힙, 메시지 큐를 가지고 있습니다. 두 별개의 런타임들은 <a href="/en-US/docs/DOM/window.postMessage" title="/en-US/docs/DOM/window.postMessage"><code>postMessage</code></a> method를 통해서만 서로 통신할 수 있습니다. 이 메서드는 다른 런타임이 <code>message</code> 이벤트 핸들러를 등록하고 있다면 해당 런타임의 큐에 메시지를 추가합니다.</p>
+
+<h2 id="Never_blocking">Never blocking</h2>
+
+<p>이벤트 루프 모델의 무척 재밌는 부분은 다른 언어와 달리 자바스크립트는 결코 Block하지 않는다는 것입니다. I/O 처리는 흔히 이벤트와 콜백으로 처리 됩니다. 그래서 응용프로그램이 <a href="/en-US/docs/Web/API/IndexedDB_API" title="/en-US/docs/IndexedDB">IndexedDB</a> query 반환을 기다리고 있거나 <a href="/en-US/docs/Web/API/XMLHttpRequest" title="/en-US/docs/DOM/XMLHttpRequest">XHR</a> 요청 반환을 기다릴 때에도 여전히 사용자 입력과 같은 다른 것을을 처리할 수 있습니다.</p>
+
+<p><code>alert</code> 또는 synchronous XHR과 같은 구현 예외가 존재 합니다. 그러나 그것들은 사용되지 않는 것이 좋다라고 여겨집니다. <a href="http://stackoverflow.com/questions/2734025/is-javascript-guaranteed-to-be-single-threaded/2734311#2734311" title="http://stackoverflow.com/questions/2734025/is-javascript-guaranteed-to-be-single-threaded/2734311#2734311">예외를 위한 예외</a>를 조심하세요 (그러나 보통 구현 버그일뿐 그이상 아무것도 아닙니다).</p>
+
+<h2 id="명세">명세</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">명세</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loops" hreflang="en" lang="en">HTML Living Standard<br><small lang="ko">The definition of &apos;Event loops&apos; in that specification.</small></a></td>
+  </tr>
+  <tr>
+   <td><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#what-is-the-event-loop">Node.js Event Loop</a></td>
+  </tr>
+ </tbody>
+</table>

@@ -1,0 +1,86 @@
+---
+title: ImageCapture.getPhotoSettings()
+slug: Web/API/ImageCapture/getPhotoSettings
+tags:
+  - API
+  - Experimental
+  - ImageCapture
+  - MediaStream Image Capture API
+  - Method
+  - Reference
+translation_of: Web/API/ImageCapture/getPhotoSettings
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ko/docs/Web/API/ImageCapture"><code>ImageCapture</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/API/ImageCapture/ImageCapture"><code>ImageCapture() 생성자</code></a></li></ol></details></li><li class="toggle"><details open><summary>Properties</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/API/ImageCapture/track"><code>track</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methods</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/API/ImageCapture/getPhotoCapabilities"><code>getPhotoCapabilities()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><em><code>getPhotoSettings()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/API/ImageCapture/grabFrame"><code>grabFrame()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/ko/docs/Web/API/ImageCapture/takePhoto"><code>takePhoto()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Inheritance:</summary><ol><li><a href="/ko/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary"><a href="/ko/docs/Web/API/ImageCapture"><code>ImageCapture</code></a> 인터페이스의 <strong><code>getPhotoSettings()</code></strong> 메서드는 현재 촬영 설정을 담은 <a href="/ko/docs/Web/API/PhotoSettings"><code>PhotoSettings</code></a> 객체로 이행하는 <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>를 반환합니다.</span></p>
+
+<h2 id="구문">구문</h2>
+
+<pre class="syntaxbox notranslate">const <em>settingsPromise</em> = <em>imageCapture</em>.getPhotoSettings()</pre>
+
+<h3 id="반환_값"><span style="font-family: x-locale-heading-primary,zillaslab,Palatino,&quot;Palatino Linotype&quot;,x-locale-heading-secondary,serif; font-size: 1.375rem;">반환 값</span></h3>
+
+<p>다음의 속성으로 구성된 <a href="/ko/docs/Web/API/PhotoSettings"><code>PhotoSettings</code></a> 객체로 이행하는 <a href="/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>.</p>
+
+<ul>
+ <li><code>fillLightMode</code>: 캡처 장치의 플래시 설정. <code>&quot;auto&quot;</code>, <code>&quot;off&quot;</code>, <code>&quot;flash&quot;</code> 중 하나를 사용할 수 있습니다.</li>
+ <li><code>imageHeight</code>: 원하는 이미지 크기의 높이를 나타내는 정숫값. 일련의 정해진 크기만 지원하는 경우, <a href="/ko/docs/Glossary/User_agent">사용자 에이전트</a>는 이 값과 제일 가까운 높이를 사용합니다.</li>
+ <li><code>imageWidth</code>: 원하는 이미지 크기의 너비를 나타내는 정숫값. 일련의 정해진 크기만 지원하는 경우, 사용자 에이전트는 이 값과 제일 가까운 너비를 사용합니다.</li>
+ <li><code>redEyeReduction</code>: 적목 현상 감소 기능이 존재하는 경우, 사용할지 나타내는 불리언 값.</li>
+</ul>
+
+<h2 id="예제">예제</h2>
+
+<p>다음 예제는 <a href="https://googlechrome.github.io/samples/image-capture/photo-resolution.html">Chrome의 Image Capture / Photo Resolution Sample</a>에서 가져온 코드로, <code>getPhotoCapabilities()</code>를 사용해 범위 입력 칸의 크기를 수정합니다. 또한 장치의 <a href="/ko/docs/Web/API/MediaStream"><code>MediaStream</code></a>에서 가져온 <a href="/ko/docs/Web/API/MediaStreamTrack"><code>MediaStreamTrack</code></a> 객체를 사용해 <a href="/ko/docs/Web/API/ImageCapture"><code>ImageCapture</code></a> 객체를 생성하는 부분도 포함하고 있습니다.</p>
+
+<pre class="brush: js notranslate"><code>const input = document.querySelector(&apos;input[type=&quot;range&quot;]&apos;);
+
+var imageCapture;
+
+navigator.mediaDevices.getUserMedia({video: true})
+.then(mediaStream =&gt; {
+  document.querySelector(&apos;video&apos;).srcObject = mediaStream;
+
+  const track = mediaStream.getVideoTracks()[0];
+  imageCapture = new ImageCapture(track);
+
+  return imageCapture.getPhotoCapabilities();
+})
+.then(photoCapabilities =&gt; {
+  const settings = imageCapture.track.getSettings();
+
+  input.min = photoCapabilities.imageWidth.min;
+  input.max = photoCapabilities.imageWidth.max;
+  input.step = photoCapabilities.imageWidth.step;
+
+  return imageCapture.getPhotoSettings();
+})
+.then(photoSettings =&gt; {
+  input.value = photoSettings.imageWidth;
+})
+.catch(error =&gt; console.log(&apos;Argh!&apos;, error.name || error));</code></pre>
+
+<h2 id="명세">명세</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/mediacapture-image/#dom-imagecapture-getphotosettings" hreflang="en" lang="en">MediaStream Image Capture<br><small lang="ko">The definition of &apos;getPhotoSettings()&apos; in that specification.</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="브라우저_호환성">브라우저 호환성</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.ImageCapture.getPhotoSettings"></div>
+</div>

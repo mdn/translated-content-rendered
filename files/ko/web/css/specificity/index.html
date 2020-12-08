@@ -1,0 +1,351 @@
+---
+title: 명시도
+slug: Web/CSS/Specificity
+tags:
+  - CSS
+  - Example
+  - Guide
+  - Reference
+  - Web
+translation_of: Web/CSS/Specificity
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ko/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ko/docs/Web/CSS/Reference">CSS Reference</a></strong></li></ol></section></div>
+
+<p><strong>명시도</strong>란 브라우저가 어느 요소와 가장 연관된 속성을 찾는 수단으로, 이렇게 찾은 속성이 해당 요소에 적용됩니다. 명시도는 여러 종류의 <a href="/ko/docs/Web/CSS/CSS_Reference#Selectors" title="CSS selectors">CSS 선택자</a>로 구성된 일치 규칙에 기반합니다.</p>
+
+<h2 id="어떻게_계산되는가">어떻게 계산되는가?</h2>
+
+<p>명시도는 주어진 CSS 선언에 적용되는 가중치(weight)로, 일치하는 선택자 내 각 <a href="#selector-type">선택자 유형</a>의 수에 의해 결정됩니다. 여러 선언이 명시도가 같은 경우, CSS에서 맨 끝에 오는 선언이 요소에 적용됩니다. 명시도는 같은 요소가 여러 선언의 대상이 되는 경우에만 적용합니다. CSS 규칙에 따라 <a href="#directly-targeted-elements" title="directly targeted element">직접 대상 요소</a>는 요소가 부모로부터 상속받는 규칙보다 항상 우선합니다.</p>
+
+<div class="note"><strong>주의:</strong> 문서 트리 내 <a href="#tree-proximity-ignorance">요소의 근접도(proximity, 가까움)</a>는 명시도에 영향이 없습니다.</div>
+
+<h3 id="선택자_유형">선택자 유형</h3>
+
+<p>아래 선택자는 유형별로 명시도를 증가시킵니다.</p>
+
+<ol>
+ <li><a href="/ko/docs/Web/CSS/Type_selectors">유형 선택자</a>(<code>h1</code> 등) 및 의사 요소(<code>:before</code> 등).</li>
+ <li><a href="/ko/docs/Web/CSS/Class_selectors">클래스 선택자</a>(<code>.example</code> 등), 속성 선택자(<code>[type=&quot;radio&quot;]</code> 등), 의사 클래스(<code>:hover</code> 등).</li>
+ <li><a href="/ko/docs/Web/CSS/ID_selectors">ID 선택자</a>(<code>#example</code> 등).</li>
+</ol>
+
+<p>전역 선택자(<a href="/ko/docs/Web/CSS/Universal_selectors" title="The documentation about this has not yet been written; please consider contributing!"><code>*</code></a>), 조합자(<a href="/ko/docs/Web/CSS/Adjacent_sibling_combinator" title="The documentation about this has not yet been written; please consider contributing!"><code>+</code></a>, <a href="/ko/docs/Web/CSS/Child_combinator" title="The documentation about this has not yet been written; please consider contributing!"><code>&gt;</code></a>, <a href="/ko/docs/Web/CSS/General_sibling_combinator" title="The documentation about this has not yet been written; please consider contributing!"><code>~</code></a>, <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator">&apos;<code> </code>&apos;</a>, <a href="/ko/docs/Web/CSS/Column_combinator" title="The documentation about this has not yet been written; please consider contributing!"><code>||</code></a>) 및 부정 의사 클래스(<code>:not()</code>)는 명시도에 영향을 주지 않습니다. (<code>:not()</code> <em>내부에</em> 선언한 선택자는 영향을 끼칩니다)</p>
+
+<p><a href="https://specifishity.com">https://specifishity.com</a>에서 자세한 정보를 확인할 수 있습니다.</p>
+
+<p>요소에 추가한 인라인 스타일(<code>style=&quot;font-weight: bold&quot;</code>처럼)은 항상 외부 스타일시트의 모든 스타일을 덮어쓰므로 가장 높은 명시도를 갖는 것으로 생각할 수 있습니다.</p>
+
+<h3 id="!important_예외"><code>!important</code> 예외</h3>
+
+<p><code>!important</code> 규칙이 스타일 선언에 사용된 경우, 이 선언은 다른 선언보다 우선합니다. 엄밀히 말해 <code>!important</code> 자체는 명시도와 아무 관련이 없지만, 명시도에 직접 영향을 미칩니다. 그러나 <code>!important</code> 사용은 <strong>나쁜 습관</strong>이고 스타일시트 내 자연스러운 <a href="/ko/docs/Web/CSS/Cascade" title="cascading">종속</a>을 깨뜨려 디버깅을 더 어렵게 만들기에 피해야 합니다. <code>!important</code> 규칙으로 충돌하는 두 선언이 같은 요소에 적용된 경우, 더 큰 명시도를 갖는 선언이 적용됩니다.</p>
+
+<p><strong>몇몇 경험 법칙들:</strong></p>
+
+<ul>
+ <li><strong>항상</strong> !important를 고려하기도 전에 명시도를 활용할 방법을 찾아보세요.</li>
+ <li>외부 CSS(Bootstrap 또는 Normalize.css 같은 외부 라이브러리에서)를 재정의하는 페이지 전용 CSS에<strong>만</strong> <code>!important</code>를 쓰세요.</li>
+ <li>플러그인/매시업을 작성할 때 <code>!important</code>는 <strong>절대</strong> 쓰지 마세요.</li>
+ <li>사이트 전반 CSS에는 <code>!important</code>를 <strong>절대</strong> 쓰지 마세요.</li>
+</ul>
+
+<p><strong><code>!important</code>를 사용하는 대신에, 다음을 고려하세요:</strong></p>
+
+<ol>
+ <li>CSS 종속<sup>cascading</sup>을 더 잘 활용하세요.</li>
+ <li>
+  <p>더 명시된(명확한) 규칙을 쓰세요. 선택 중인 요소 앞에 하나 이상의 요소를 나타냄으로써 규칙은 더 명확해지고 더 높은 우선 순위를 얻습니다:</p>
+
+  <pre class="brush: html">&lt;div id=&quot;test&quot;&gt;
+  &lt;span&gt;Text&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+  <pre class="brush: css">div#test span { color: green; }
+div span { color: blue; }
+span { color: red; }</pre>
+
+  <p>순서와 무관하게 첫 번째 규칙이 가장 명확하므로 텍스트는 녹색이 됩니다. (또한, 역시 순서와 무관하게 파란색 규칙이 빨간색 규칙보다 우선합니다.)</p>
+ </li>
+ <li>(2)의 말도 안 되는 특별한 경우로, 더 이상 명시할 요소가 없는 경우 간단한 선택자를 여러 번 써서 명시도를 높일 수 있습니다.
+  <pre class="brush: css">#myId#myId span { color: yellow; }
+.myClass.myClass span { color: orange; }</pre>
+ </li>
+</ol>
+
+<h4 id="!important를_사용하는_때"><code>!important</code>를 사용하는 때</h4>
+
+<h5 id="A_인라인_스타일을_재정의할_때">A) 인라인 스타일을 재정의할 때</h5>
+
+<p>사이트 전체의 시각적 요소를 설정하는 전역 CSS 파일은 각 요소에 직접 정의된 인라인 스타일에 덮어쓰일 수 있습니다. 인라인 스타일과 <code>!important</code> 모두 매우 나쁜 습관으로 취급되지만, 가끔씩은 <code>!important</code>로 인라인 스타일을 덮어써야 할 때가 있습니다.</p>
+
+<p>이때는 전역 CSS 파일의 몇몇 스타일을 <code>!important</code>로 설정해서 요소에 직접 작성한 인라인 스타일을 덮어쓸 수 있습니다.</p>
+
+<pre class="brush: html">&lt;div class=&quot;foo&quot; style=&quot;color: red;&quot;&gt;나는 무슨 색일까?&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.foo[style*=&quot;color: red&quot;] {
+  color: firebrick !important;
+}
+</pre>
+
+<p>여러 자바스크립트 프레임워크와 라이브러리에서 인라인 스타일을 추가합니다. 이런 인라인 스타일을 덮어쓸 때 매우 구체적인 선택자와 함께 <code>!important</code>를 사용할 수 있습니다.</p>
+
+<h5 id="B_명시도가_높은_규칙을_재정의할_때">B) 명시도가 높은 규칙을 재정의할 때</h5>
+
+<pre class="brush: css">#someElement p {
+  color: blue;
+}
+
+p.awesome {
+  color: red;
+}</pre>
+
+<p>어떻게 하면 <code>awesome</code> 문단이 <code>#someElement</code> 안에 있더라도 항상 빨갛게 만들 수 있을까요? <code>!important</code>를 사용하지 않으면 위쪽 규칙의 명시도가 높으므로 아래쪽 규칙보다 우선합니다.</p>
+
+<h4 id="!important를_덮어쓰는_방법"><code>!important</code>를 덮어쓰는 방법</h4>
+
+<p>A) 태그, ID나 클래스를 추가함으로써 명시도가 더 높은 !important한 CSS 규칙을 만듭니다.</p>
+
+<pre class="brush: css">table td    { height: 50px !important; }
+.myTable td { height: 50px !important; }
+#myTable td { height: 50px !important; }
+</pre>
+
+<p>B) 혹은 기존의 선택자 아래에 똑같은 선택자를 하나 더 만듭니다(명시도가 같으면 나중에 정의된 규칙이 우선하므로).</p>
+
+<pre class="brush: css">td { height: 50px !important; }</pre>
+
+<p>C) 아니면 기존 규칙을 수정해서 아예 <code>!important</code>를 사용하지 않게 만드는 것이 더 좋은 방법입니다.</p>
+
+<pre class="brush: css">[id=&quot;someElement&quot;] p {
+  color: blue;
+}
+
+p.awesome {
+  color: red;
+}</pre>
+
+<p>ID를 ID 선택자 대신 속성 선택자로 선택하면 클래스 1개와 같은 명시도가 됩니다. 두 선택자의 명시도가 같아졌으므로 나중에 오는 규칙이 우선합니다.</p>
+
+<h4 id="아래에서_자세한_정보를_확인하세요">아래에서 자세한 정보를 확인하세요:</h4>
+
+<ul>
+ <li><a href="https://stackoverflow.com/questions/3706819/what-are-the-implications-of-using-important-in-css">https://stackoverflow.com/questions/3706819/what-are-the-implications-of-using-important-in-css</a></li>
+ <li><a href="https://stackoverflow.com/questions/9245353/what-does-important-in-css-mean">https://stackoverflow.com/questions/9245353/what-does-important-in-css-mean</a></li>
+ <li><a href="https://stackoverflow.com/questions/5701149/when-to-use-important-property-in-css">https://stackoverflow.com/questions/5701149/when-to-use-important-property-in-css</a></li>
+ <li><a href="https://stackoverflow.com/questions/11178673/how-to-override-important">https://stackoverflow.com/questions/11178673/how-to-override-important</a></li>
+ <li><a href="https://stackoverflow.com/questions/2042497/when-to-use-important-to-save-the-day-when-working-with-css">https://stackoverflow.com/questions/2042497/when-to-use-important-to-save-the-day-when-working-with-css</a></li>
+</ul>
+
+<h3 id="is_및_not_예외"><code>:is()</code> 및 <code>:not()</code> 예외</h3>
+
+<p>모두 일치 의사 클래스 <a href="/ko/docs/Web/CSS/:is" title="The documentation about this has not yet been written; please consider contributing!"><code>:is()</code></a> <span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> 및 부정 의사 클래스 <a href="/ko/docs/Web/CSS/:not" title="The documentation about this has not yet been written; please consider contributing!"><code>:not()</code></a>은 명시도 계산에서 의사 클래스로 취급되지 <em>않습니다</em>. 그러나 이들 의사 클래스 안에 명시된 선택자는 <a href="#selector-type" title="selector types">선택자 유형</a>의 수를 결정할 때 일반 선택자로 셉니다.</p>
+
+<p>다음 CSS 조각과 HTML은...</p>
+
+<pre class="brush: css">div.outer p {
+  color:orange;
+}
+div:not(.outer) p {
+  color: lime;
+}
+</pre>
+
+<pre class="brush: html">&lt;div class=&quot;outer&quot;&gt;
+  &lt;p&gt;This is in the outer div.&lt;/p&gt;
+  &lt;div class=&quot;inner&quot;&gt;
+    &lt;p&gt;This text is in the inner div.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>...다음과 같이 화면에 표시됩니다.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100" id="frame_is_및_not_예외" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/Specificity$samples/is_%EB%B0%8F_not_%EC%98%88%EC%99%B8?revision=1613203" width="600"></iframe></p>
+
+<h3 id="The_where_exception" name="The_where_exception"><code>:where()</code> 예외 <span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></h3>
+
+<div class="experimental indicator-warning notecard">
+    <p><strong>This is an <a href="/en-US/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">experimental technology</a></strong><br>Check the <a href="#Browser_compatibility">Browser compatibility table</a> carefully before using this in production.</p>
+</div>
+
+<p>명시도 조정 가상 클래스 <a href="/ko/docs/Web/CSS/:where" title="The documentation about this has not yet been written; please consider contributing!"><code>:where()</code></a> <span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span>의 명시도는 항상 0입니다.</p>
+
+<p>다음 CSS 조각과 HTML은...</p>
+
+<pre class="brush: css">div:where(.outer) p {
+  color: orange;
+}
+
+div p {
+  color: blueviolet;
+}
+</pre>
+
+<div class="hidden">
+<pre class="brush: css;">#no-where-support {
+  margin: 0.5em;
+  border: 1px solid red;
+}
+
+#no-where-support:where(*) {
+  display: none !important;
+}
+</pre>
+</div>
+
+<div class="hidden">
+<pre class="brush: html;">&lt;div id=&quot;no-where-support&quot;&gt;
+⚠️ Your browser doesn&apos;t support the &lt;code&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/CSS/:where&quot; target=&quot;_top&quot;&gt;:where()&lt;/a&gt;&lt;/code&gt; pseudo-class.
+&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;outer&quot;&gt;
+  &lt;p&gt;This is in the outer div.&lt;/p&gt;
+  &lt;div class=&quot;inner&quot;&gt;
+    &lt;p&gt;This text is in the inner div.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>...다음과 같이 화면에 표시됩니다.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100" id="frame_The_where_exception" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/Specificity$samples/The_where_exception?revision=1613203" width="600"></iframe></p>
+
+<h3 id="형태_기반_명시도">형태 기반 명시도</h3>
+
+<p>명시도는 선택자의 형태(form)를 기반으로 합니다. 아래에서 선택자 <code>*[id=&quot;foo&quot;]</code>는 그 자체로는 ID를 선택하지만 선택자의 명시도를 계산할 때는 속성 선택자로 취급됩니다.</p>
+
+<p>다음 스타일 선언과 마크업은...</p>
+
+<pre class="brush: css">*#foo {
+  color: green;
+}
+*[id=&quot;foo&quot;] {
+  color: purple;
+}
+</pre>
+
+<pre class="brush: html">&lt;p id=&quot;foo&quot;&gt;I am a sample text.&lt;/p&gt;
+</pre>
+
+<p>...다음과 같이 표시됩니다.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100" id="frame_형태_기반_명시도" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/Specificity$samples/%ED%98%95%ED%83%9C_%EA%B8%B0%EB%B0%98_%EB%AA%85%EC%8B%9C%EB%8F%84?revision=1613203" width="600"></iframe></p>
+
+<p>같은 요소와 일치하지만 ID 선택자는 더 높은 명시도를 갖기 때문입니다.</p>
+
+<h3 id="트리_근접도_무시"><a id="tree-proximity-ignorance" name="tree-proximity-ignorance">트리 근접도 무시</a></h3>
+
+<p>요소와 주어진 선택자로 참조된 다른 요소와의 근접도(proximity)는 명시도에 영향을 주지 않습니다.</p>
+
+<p>다음 스타일 선언과 HTML은...</p>
+
+<pre class="brush: css">body h1 {
+  color: green;
+}
+html h1 {
+  color: purple;
+}
+</pre>
+
+<pre class="brush: html">&lt;html&gt;
+&lt;body&gt;
+  &lt;h1&gt;Here is a title!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>...아래와 같이 렌더링됩니다.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100" id="frame_트리_근접도_무시" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/Specificity$samples/%ED%8A%B8%EB%A6%AC_%EA%B7%BC%EC%A0%91%EB%8F%84_%EB%AC%B4%EC%8B%9C?revision=1613203" width="600"></iframe></p>
+
+<p>두 선언은 <a href="#selector-type">선택자 유형</a> 갯수가 같지만 <code>html h1</code> 선택자가 나중에 선언되었기 때문입니다.</p>
+
+<h3 id="직접_일치_요소와_상속된_스타일"><a id="directly-targeted-elements" name="directly-targeted-elements">직접 일치 요소와 상속된 스타일</a></h3>
+
+<p>특정한 요소와 직접적으로 일치하는 스타일은 상속된 규칙의 명시도와 무관하게 항상 상속된 스타일보다 우선합니다.</p>
+
+<p>다음 CSS와 HTML은...</p>
+
+<pre class="brush: css" style="font-size: 14px;">#parent {
+  color: green;
+}
+h1 {
+  color: purple;
+}</pre>
+
+<pre class="brush: html" style="font-size: 14px;">&lt;html&gt;
+&lt;body id=&quot;parent&quot;&gt;
+  &lt;h1&gt;Here is a title!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>...역시 아래와 같이 렌더링됩니다.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100" id="frame_직접_일치_요소와_상속된_스타일" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/Specificity$samples/%EC%A7%81%EC%A0%91_%EC%9D%BC%EC%B9%98_%EC%9A%94%EC%86%8C%EC%99%80_%EC%83%81%EC%86%8D%EB%90%9C_%EC%8A%A4%ED%83%80%EC%9D%BC?revision=1613203" width="600"></iframe></p>
+
+<p><code>h1</code> 선택자는 특정한 요소와 직접 일치하지만 초록색 선택자는 그렇지 않고 부모로부터 상속되기 때문입니다.</p>
+
+<h2 id="명세">명세</h2>
+
+<div style="overflow: auto;">
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/selectors-4/#specificity-rules" hreflang="en" lang="en">Selectors Level 4<br><small lang="ko">The definition of &apos;Calculating a selector&apos;s specificity&apos; in that specification.</small></a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>명시도 조정 선택자 <a href="/ko/docs/Web/CSS/:where" title="The documentation about this has not yet been written; please consider contributing!"><code>:where()</code></a> 추가.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/selectors-3/#specificity" hreflang="en" lang="en">Selectors Level 3<br><small lang="ko">The definition of &apos;Calculating a selector&apos;s specificity&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements">의사 요소</a> 추가.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS2/cascade.html#specificity" hreflang="en" lang="en">CSS Level 2 (Revision 1)<br><small lang="ko">The definition of &apos;Calculating a selector&apos;s specificity&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes">의사 클래스</a> 추가.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS1/#cascading-order" hreflang="en" lang="en">CSS Level 1<br><small lang="ko">The definition of &apos;Cascading order&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>초기 정의.</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="같이_보기">같이 보기</h2>
+
+<ul>
+ <li>명시도 계산기: CSS 규칙을 테스트하고 이해할 수 있는 대화형 웹사이트 - <a href="https://specificity.keegan.st/">https://specificity.keegan.st/</a></li>
+ <li>CSS3 선택자 명시도 - <a class="external" href="http://www.w3.org/TR/selectors/#specificity" rel="freelink">http://www.w3.org/TR/selectors/#specificity</a></li>
+ <li>CSS Key Concepts:
+ <a href="/en-US/docs/Web/CSS/Syntax" title="Syntax">CSS syntax</a>,
+ <a href="/en-US/docs/Web/CSS/At-rule" title="At-rule">at-rule</a>,
+ <a href="/en-US/docs/Web/CSS/Comments" title="Comments">comments</a>,
+ <a href="/en-US/docs/Web/CSS/Specificity" title="Specificity">specificity</a> and
+ <a href="/en-US/docs/Web/CSS/inheritance" title="inheritance">inheritance</a>,
+ the <a href="/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model" title="Box model">box</a>,
+ <a href="/en-US/docs/Web/CSS/Layout_mode" title="CSS layout modes">layout modes</a> and
+ <a href="/en-US/docs/Web/Guide/CSS/Visual_formatting_model" title="Visual formatting model">visual formatting models</a>,
+ and <a href="/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing" title="Margin collapsing">margin collapsing</a>,
+ or the <a href="/en-US/docs/Web/CSS/initial_value" title="initial value">initial</a>,
+ <a href="/en-US/docs/Web/CSS/computed_value" title="computed value">computed</a>,
+ <a href="/en-US/docs/Web/CSS/resolved_value" title="resolved value">resolved</a>,
+ <a href="/en-US/docs/Web/CSS/specified_value" title="specified value">specified</a>,
+ <a href="/en-US/docs/Web/CSS/used_value" title="used value">used</a>,
+ and <a href="/en-US/docs/Web/CSS/actual_value" title="actual value">actual</a> values.
+ Definitions of <a href="/en-US/docs/Web/CSS/Value_definition_syntax" title="Value definition syntax">value syntax</a>,
+ <a href="/en-US/docs/Web/CSS/Shorthand_properties" title="Shorthand properties">shorthand properties</a>
+ and <a href="/en-US/docs/Web/CSS/Replaced_element" title="Replaced element">replaced elements</a>.</li>
+</ul>

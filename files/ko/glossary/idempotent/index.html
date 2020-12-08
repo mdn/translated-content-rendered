@@ -1,0 +1,49 @@
+---
+title: 멱등성
+slug: Glossary/Idempotent
+tags:
+  - Glossary
+  - WebMechanics
+translation_of: Glossary/Idempotent
+---
+<p>동일한 요청을 한 번 보내는 것과 여러 번 연속으로 보내는 것이 같은 효과를 지니고, 서버의 상태도 동일하게 남을 때, 해당 HTTP 메서드가 <strong>멱등성</strong>을 가졌다고 말합니다. 다른 말로는, 멱등성 메서드에는 통계 기록 등을 제외하면 어떠한 부수 효과(side effect)도 존재해서는 안됩니다. 올바르게 구현한 경우 <a href="/ko/docs/Web/HTTP/Methods/GET" title="HTTP GET 메서드는 특정한 리소스를 가져오도록 요청합니다."><code>GET</code></a>, <a href="/ko/docs/Web/HTTP/Methods/HEAD" title="HTTP HEAD 메소드는 특정 리소스를 HTTP GET 메소드로 요청하는 경우에 어떤 헤더들이 반환되는지를 요청합니다. 예를 들어, 큰 용량의 리소스를 다운로드 받을지 말지 결정하기 위해서 사전 요청하는 용도로 사용할 수 있습니다."><code>HEAD</code></a>, <a href="/ko/docs/Web/HTTP/Methods/PUT" title="HTTP PUT 메서드는 요청 페이로드를 사용해 새로운 리소스를 생성하거나, 대상 리소스를 나타내는 데이터를 대체합니다."><code>PUT</code></a>, <a href="/ko/docs/Web/HTTP/Methods/DELETE" title="HTTP DELETE 요청 메소드는 특정 리소스를 삭제합니다."><code>DELETE</code></a> 메서드는 멱등성을 가지며, <a href="/ko/docs/Web/HTTP/Methods/POST" title="HTTP POST 메서드는 서버로 데이터를 전송합니다. 요청 본문의 유형은 Content-Type 헤더로 나타냅니다."><code>POST</code></a> 메서드는 그렇지 않습니다. 모든 <a class="glossaryLink" href="/ko/docs/Glossary/safe" title="용어 (안전한) 의 정의가 아직 번역되지 않았습니다. 번역에 동참해주세요!">안전한</a> 메서드는 멱등성도 가집니다.</p>
+
+<p>멱등성을 따질 땐 실제 서버의 백엔드 상태만 보면 되며, 각 요청에서 반환하는 응답 코드는 다를 수 있습니다. 첫 번째 <a href="/ko/docs/Web/HTTP/Methods/DELETE" title="HTTP DELETE 요청 메소드는 특정 리소스를 삭제합니다."><code>DELETE</code></a> 요청이 <a href="/ko/docs/Web/HTTP/Status/200" title="HTTP 200 OK는 요청이 성공했음을 나타내는 성공 응답 상태 코드입니다."><code>200</code></a>을 반환한다면, 그 이후는 아마 <a href="/ko/docs/Web/HTTP/Status/404" title="HTTP 404 Not Found 클라이언트 오류 응답 코드는 서버가 요청받은 리소스를 찾을 수 없다는 것을 의미합니다. 404 페이지를 띄우는 링크는 대체로 브로큰 링크(broken link) 또는 데드 링크(dead link)라고 부르며, link rot 대상일 수도 있습니다."><code>404</code></a>를 반환할 것입니다. <code>DELETE</code>가 멱등성을 가진다는 것은, REST API에서 개발자는 <code>DELETE</code> 메서드를 사용해 "목록의 마지막 항목 제거" 기능을 구현해서는 안된다는 것입니다.</p>
+
+<p>다만, 서버는 멱등성을 보장하지 않으며, 일부 애플리케이션은 잘못된 구현으로 멱등성 제약을 어길 수도 있습니다.</p>
+
+<p><code>GET /pageX HTTP/1.1</code>는 멱등성을 가집니다. 여러 번 연속해서 호출해도 클라이언트가 받는 응답은 동일합니다.</p>
+
+<pre>GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+</pre>
+
+<p><code>POST /add_row HTTP/1.1</code>는 멱등성을 갖지 않습니다. 여러 번 호출할 경우, 여러 열을 추가합니다.</p>
+
+<pre>POST /add_row HTTP/1.1
+POST /add_row HTTP/1.1   -&gt; Adds a 2nd row
+POST /add_row HTTP/1.1   -&gt; Adds a 3rd row
+</pre>
+
+<p><code>DELETE /idX/delete HTTP/1.1</code>의 상태 코드는 응답마다 달라질 수 있지만, 그럼에도 멱등성을 가집니다.</p>
+
+<pre>DELETE /idX/delete HTTP/1.1   -&gt; Returns 200 if idX exists
+DELETE /idX/delete HTTP/1.1   -&gt; Returns 404 as it just got deleted
+DELETE /idX/delete HTTP/1.1   -&gt; Returns 404</pre>
+
+<h2 id="더_알아보기">더 알아보기</h2>
+
+<h3 id="일반_지식">일반 지식</h3>
+
+<ul>
+ <li><a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">HTTP 명세의 멱등성</a> 정의</li>
+</ul>
+
+<h3 id="기술_지식">기술 지식</h3>
+
+<ul>
+ <li>멱등성 메서드 문서: <a href="/ko/docs/Web/HTTP/Methods/GET" title="HTTP GET 메서드는 특정한 리소스를 가져오도록 요청합니다."><code>GET</code></a>, <a href="/ko/docs/Web/HTTP/Methods/HEAD" title="HTTP HEAD 메소드는 특정 리소스를 HTTP GET 메소드로 요청하는 경우에 어떤 헤더들이 반환되는지를 요청합니다. 예를 들어, 큰 용량의 리소스를 다운로드 받을지 말지 결정하기 위해서 사전 요청하는 용도로 사용할 수 있습니다."><code>HEAD</code></a>, <a href="/ko/docs/Web/HTTP/Methods/PUT" title="HTTP PUT 메서드는 요청 페이로드를 사용해 새로운 리소스를 생성하거나, 대상 리소스를 나타내는 데이터를 대체합니다."><code>PUT</code></a>, <a href="/ko/docs/Web/HTTP/Methods/DELETE" title="HTTP DELETE 요청 메소드는 특정 리소스를 삭제합니다."><code>DELETE</code></a>, <a href="/ko/docs/Web/HTTP/Methods/OPTIONS" title="HTTP OPTIONS method 는 목표 리소스와의 통신 옵션을 설명하기 위해 사용됩니다. 클라이언트는 OPTIONS 메소드의 URL을 특정지을 수 있으며, aterisk(*) 를 통해 서버 전체를 선택할 수 있습니다."><code>OPTIONS</code></a>, <a href="/ko/docs/Web/HTTP/Methods/TRACE" title="The documentation about this has not yet been written; please consider contributing!"><code>TRACE</code></a></li>
+ <li>비 멱등성 메서드 문서: <a href="/ko/docs/Web/HTTP/Methods/POST" title="HTTP POST 메서드는 서버로 데이터를 전송합니다. 요청 본문의 유형은 Content-Type 헤더로 나타냅니다."><code>POST</code></a>,<a href="/ko/docs/Web/HTTP/Methods/PATCH" title="HTTP PATCH 메소드는 리소스의 부분적인 수정을 할 때에 사용됩니다."><code>PATCH</code></a>, <a href="/ko/docs/Web/HTTP/Methods/CONNECT" title="HTTP CONNECT 메소드는 요청한 리소스에 대해 양방향 연결을 시작하는 메소드입니다. 이는 터널을 열기 위해서 사용될 수 있습니다."><code>CONNECT</code></a></li>
+</ul>

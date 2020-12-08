@@ -1,0 +1,245 @@
+---
+title: DOM giriş
+slug: Web/API/Document_Object_Model/Introduction
+translation_of: Web/API/Document_Object_Model/Introduction
+---
+<p><span class="seoSummary"><strong>Document Object Model</strong> (<strong>DOM</strong>) web dökümanında oluşturulan içerik ve yapılar gibi nesnelerin veri gösterimidir.Bu klavuzda,DOM&apos; u kısaca göstereceğiz.</span>O halde DOM hafızada nasıl  HTML ya da XML dökümanını temsil eder ve web içerik ve uygulamaları için API nasıl kullanılır bakalım.</p>
+
+<h2 id="What_is_the_DOM" name="What_is_the_DOM">DOM nedir ?</h2>
+
+<p>Document Object Model (DOM) , HTML ve XML için programlama arayüzüdür. Sayfayı temsil eder ve böylece program döküman yapısını, stilini ve içeriğini değiştirebilir. DOM dökümanı nodes(düğümler) ve objects(nesneler) şeklinde temsil eder. Bu sayede programlama dili sayfayla bağlantı kurabilir.</p>
+
+<p>Web sayfası bir dökümandır. Bu döküman tarayıcı penceresinde ya da HTML kaynağı gibi görüntülenebilir. Ama her iki durumda da aynı belge vardır. DOM aynı belgeyi temsil eder bu yüzden değiştirilebilir. DOM web sayfasında nesne yönelimli temsilidir, ki javascript gibi script dilleri ile modifiye edilebilir.</p>
+
+<p><a class="external external-icon" href="http://www.w3.org/DOM/">W3C DOM</a> <span class="tlid-translation translation" lang="tr"><span title> ve </span></span> <a class="external external-icon" href="https://dom.spec.whatwg.org">WHATWG DOM</a> <span class="tlid-translation translation" lang="tr"><span title> standartları çoğu modern tarayıcıda uygulanmaktadır.</span></span></p>
+
+<p>For example, the standard DOM specifies that the <code>getElementsByTagName</code> method in the code below must return a list of all the <code>&lt;p&gt;</code> elements in the document:</p>
+
+<pre class="brush: js notranslate">const paragraphs = document.getElementsByTagName(&quot;p&quot;);
+// paragraphs[0] is the first &lt;p&gt; element
+// paragraphs[1] is the second &lt;p&gt; element, etc.
+alert(paragraphs[0].nodeName);
+</pre>
+
+<p>All of the properties, methods, and events available for manipulating and creating web pages are organized into objects (for example, the <code>document</code> object that represents the document itself, the <code>table</code> object that implements the special <a href="/tr/docs/Web/API/HTMLTableElement"><code>HTMLTableElement</code></a> DOM interface for accessing HTML tables, and so forth). This documentation provides an object-by-object reference to the DOM.</p>
+
+<p>The modern DOM is built using multiple APIs that work together. The core <a href="/en-US/docs/Web/API/Document_Object_Model">DOM</a> defines the objects that fundamentally describe a document and the objects within it. This is expanded upon as needed by other APIs that add new features and capabilities to the DOM. For example, the <a href="/en-US/docs/Web/API/HTML_DOM">HTML DOM API</a> adds support for representing HTML documents to the core DOM.</p>
+
+<h2 id="DOM_and_JavaScript" name="DOM_and_JavaScript">DOM and JavaScript</h2>
+
+<p>The short example above, like nearly all of the examples in this reference, is <a href="/tr/docs/Glossary/JavaScript">JavaScript</a>. That is to say, it&apos;s <em>written</em> in JavaScript, but it <em>uses</em> the DOM to access the document and its elements. The DOM is not a programming language, but without it, the JavaScript language wouldn&apos;t have any model or notion of web pages, HTML documents, XML documents, and their component parts (e.g. elements). Every element in a document—the document as a whole, the head, tables within the document, table headers, text within the table cells—is part of the document object model for that document, so they can all be accessed and manipulated using the DOM and a scripting language like JavaScript.</p>
+
+<p>In the beginning, JavaScript and the DOM were tightly intertwined, but eventually, they evolved into separate entities. The page content is stored in the DOM and may be accessed and manipulated via JavaScript, so that we may write this approximative equation:</p>
+
+<p>API = DOM + JavaScript</p>
+
+<p>The DOM was designed to be independent of any particular programming language, making the structural representation of the document available from a single, consistent API. Though we focus exclusively on JavaScript in this reference documentation, implementations of the DOM can be built for any language, as this Python example demonstrates:</p>
+
+<pre class="brush: python notranslate"># Python DOM example
+import xml.dom.minidom as m
+doc = m.parse(r&quot;C:\Projects\Py\chap1.xml&quot;)
+doc.nodeName # DOM property of document object
+p_list = doc.getElementsByTagName(&quot;para&quot;)
+</pre>
+
+<p>For more information on what technologies are involved in writing JavaScript on the web, see <a href="/en-US/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript technologies overview</a>.</p>
+
+<h2 id="How_Do_I_Access_the_DOM.3F" name="How_Do_I_Access_the_DOM.3F">Accessing the DOM</h2>
+
+<p>You don&apos;t have to do anything special to begin using the DOM. Different browsers have different implementations of the DOM, and these implementations exhibit varying degrees of conformance to the actual DOM standard (a subject we try to avoid in this documentation), but every web browser uses some document object model to make web pages accessible via JavaScript.</p>
+
+<p>When you create a script–whether it&apos;s inline in a <code>&lt;script&gt;</code> element or included in the web page by means of a script loading instruction–you can immediately begin using the API for the <a href="/tr/docs/Web/API/Document"><code>document</code></a> or <a href="/tr/docs/Web/API/Window"><code>window</code></a> elements to manipulate the document itself or to get at the children of that document, which are the various elements in the web page. Your DOM programming may be something as simple as the following, which displays an alert message by using the <a href="/tr/docs/Web/API/Window/alert"><code>alert()</code></a> function from the <a href="/tr/docs/Web/API/Window"><code>window</code></a> object, or it may use more sophisticated DOM methods to actually create new content, as in the longer example below.</p>
+
+<p>This following JavaScript will display an alert when the document is loaded (and when the whole DOM is available for use):</p>
+
+<pre class="brush: html notranslate">&lt;body onload=&quot;window.alert(&apos;Welcome to my home page!&apos;);&quot;&gt;
+</pre>
+
+<p>Another example. This function creates a new H1 element, adds text to that element, and then adds the <code>H1</code> to the tree for this document:</p>
+
+<pre class="brush: html notranslate">&lt;html&gt;
+  &lt;head&gt;
+    &lt;script&gt;
+       // run this function when the document is loaded
+       window.onload = function() {
+
+         // create a couple of elements in an otherwise empty HTML page
+         const heading = document.createElement(&quot;h1&quot;);
+         const heading_text = document.createTextNode(&quot;Big Head!&quot;);
+         heading.appendChild(heading_text);
+         document.body.appendChild(heading);
+      }
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="Important_Data_Types" name="Important_Data_Types">Fundamental data types</h2>
+
+<p>This reference tries to describe the various objects and types in simple terms. But there are a number of different data types being passed around the API that you should be aware of.</p>
+
+<div class="note notecard">
+<p><strong>Note:</strong> Because the vast majority of code that uses the DOM revolves around manipulating HTML documents, it&apos;s common to refer to the nodes in the DOM as <strong>elements</strong>, although strictly speaking not every node is an element.</p>
+</div>
+
+<p>The following table briefly describes these data types.</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th>Data type (Interface)</th>
+   <th>Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a href="/tr/docs/Web/API/Document"><code>Document</code></a></td>
+   <td>When a member returns an object of type <code>document</code> (e.g., the <code>ownerDocument</code> property of an element returns the <code>document</code> to which it belongs), this object is the root <code>document</code> object itself. The <a href="/en-US/docs/Web/API/Document">DOM <code>document</code> Reference</a> chapter describes the <code>document</code> object.</td>
+  </tr>
+  <tr>
+   <td><a href="/tr/docs/Web/API/Node"><code>Node</code></a></td>
+   <td>Every object located within a document is a node of some kind. In an HTML document, an object can be an element node but also a text node or attribute node.</td>
+  </tr>
+  <tr>
+   <td><a href="/tr/docs/Web/API/Element"><code>Element</code></a></td>
+   <td>The <code>element</code> type is based on <code>node</code>. It refers to an element or a node of type <code>element</code> returned by a member of the DOM API. Rather than saying, for example, that the <a href="/tr/docs/Web/API/Document/createElement"><code>document.createElement()</code></a> method returns an object reference to a <code>node</code>, we just say that this method returns the <code>element</code> that has just been created in the DOM. <code>element</code> objects implement the DOM <code>Element</code> interface and also the more basic <code>Node</code> interface, both of which are included together in this reference. In an HTML document, elements are further enhanced by the HTML DOM API&apos;s <a href="/tr/docs/Web/API/HTMLElement"><code>HTMLElement</code></a> interface as well as other interfaces describing capabilities of specific kinds of elements (for instance, <a href="/tr/docs/Web/API/HTMLTableElement"><code>HTMLTableElement</code></a> for <a href="/tr/docs/Web/HTML/Element/table" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;table&gt;</code></a> elements).</td>
+  </tr>
+  <tr>
+   <td><a href="/tr/docs/Web/API/NodeList"><code>NodeList</code></a></td>
+   <td>A <code>nodeList</code> is an array of elements, like the kind that is returned by the method <a href="/tr/docs/Web/API/Document/getElementsByTagName"><code>document.getElementsByTagName()</code></a>. Items in a <code>nodeList</code> are accessed by index in either of two ways:
+    <ul>
+     <li>list.item(1)</li>
+     <li>list[1]</li>
+    </ul>
+    These two are equivalent. In the first, <code>item()</code> is the single method on the <code>nodeList</code> object. The latter uses the typical array syntax to fetch the second item in the list.</td>
+  </tr>
+  <tr>
+   <td><a href="/tr/docs/Web/API/Attribute"><code>Attribute</code></a></td>
+   <td>When an <code>attribute</code> is returned by a member (e.g., by the <code>createAttribute()</code> method), it is an object reference that exposes a special (albeit small) interface for attributes. Attributes are nodes in the DOM just like elements are, though you may rarely use them as such.</td>
+  </tr>
+  <tr>
+   <td><a href="/tr/docs/Web/API/NamedNodeMap"><code>NamedNodeMap</code></a></td>
+   <td>A <code>namedNodeMap</code> is like an array, but the items are accessed by name or index, though this latter case is merely a convenience for enumeration, as they are in no particular order in the list. A <code>namedNodeMap</code> has an <code>item()</code> method for this purpose, and you can also add and remove items from a <code>namedNodeMap</code>.</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>There are also some common terminology considerations to keep in mind. It&apos;s common to refer to any <a href="/tr/docs/Web/API/Attribute"><code>Attribute</code></a> node as simply an <code>attribute</code>, for example, and to refer to an array of DOM nodes as a <code>nodeList</code>. You&apos;ll find these terms and others to be introduced and used throughout the documentation.</p>
+
+<h2 id="DOM_interfaces" name="DOM_interfaces">DOM interfaces</h2>
+
+<p>This guide is about the objects and the actual <em>things</em> you can use to manipulate the DOM hierarchy. There are many points where understanding how these work can be confusing. For example, the object representing the HTML <code>form</code> element gets its <code>name</code> property from the <code>HTMLFormElement</code> interface but its <code>className</code> property from the <code>HTMLElement</code> interface. In both cases, the property you want is simply in that form object.</p>
+
+<p>But the relationship between objects and the interfaces that they implement in the DOM can be confusing, and so this section attempts to say a little something about the actual interfaces in the DOM specification and how they are made available.</p>
+
+<h3 id="Interfaces_and_Objects" name="Interfaces_and_Objects">Interfaces and Objects</h3>
+
+<p>Many objects borrow from several different interfaces. The table object, for example, implements a specialized <a href="/tr/docs/Web/API/HTMLTableElement"><code>HTMLTableElement</code></a> interface, which includes such methods as <code>createCaption</code> and <code>insertRow</code>. But since it&apos;s also an HTML element, <code>table</code> implements the <code>Element</code> interface described in the DOM <a href="/tr/docs/Web/API/Element"><code>Element</code></a> Reference chapter. And finally, since an HTML element is also, as far as the DOM is concerned, a node in the tree of nodes that make up the object model for an HTML or XML page, the table object also implements the more basic <code>Node</code> interface, from which <code>Element</code> derives.</p>
+
+<p>When you get a reference to a <code>table</code> object, as in the following example, you routinely use all three of these interfaces interchangeably on the object, perhaps without knowing it.</p>
+
+<pre class="brush: js notranslate">const table = document.getElementById(&quot;table&quot;);
+const tableAttrs = table.attributes; // Node/Element interface
+for (let i = 0; i &lt; tableAttrs.length; i++) {
+  // HTMLTableElement interface: border attribute
+  if(tableAttrs[i].nodeName.toLowerCase() == &quot;border&quot;)
+    table.border = &quot;1&quot;;
+}
+// HTMLTableElement interface: summary attribute
+table.summary = &quot;note: increased border&quot;;
+</pre>
+
+<h3 id="Core_Interfaces_in_the_DOM" name="Core_Interfaces_in_the_DOM">Core Interfaces in the DOM</h3>
+
+<p>This section lists some of the most commonly-used interfaces in the DOM. The idea is not to describe what these APIs do here but to give you an idea of the sorts of methods and properties you will see very often as you use the DOM. These common APIs are used in the longer examples in the <a href="/en-US/docs/Web/API/Document_Object_Model/Examples">DOM Examples</a> chapter at the end of this book.</p>
+
+<p>The <code>document</code> and <code>window</code> objects are the objects whose interfaces you generally use most often in DOM programming. In simple terms, the <code>window</code> object represents something like the browser, and the <code>document</code> object is the root of the document itself. <code>Element</code> inherits from the generic <code>Node</code> interface, and together these two interfaces provide many of the methods and properties you use on individual elements. These elements may also have specific interfaces for dealing with the kind of data those elements hold, as in the <code>table</code> object example in the previous section.</p>
+
+<p>The following is a brief list of common APIs in web and XML page scripting using the DOM.</p>
+
+<ul>
+ <li><code><a href="/tr/docs/Web/API/Document/getElementById">document.getElementById</a>(id)</code></li>
+ <li><code>document.<a href="/tr/docs/Web/API/Element/getElementsByTagName">getElementsByTagName</a>(name)</code></li>
+ <li><code><a href="/tr/docs/Web/API/Document/createElement">document.createElement</a>(name)</code></li>
+ <li><code>parentNode.<a href="/tr/docs/Web/API/Node/appendChild">appendChild</a>(node)</code></li>
+ <li><code>element.<a href="/tr/docs/Web/API/Element/innerHTML">innerHTML</a></code></li>
+ <li><code>element.<a href="/tr/docs/Web/API/HTMLElement/style">style</a>.left</code></li>
+ <li><code>element.<a href="/tr/docs/Web/API/Element/setAttribute">setAttribute</a>()</code></li>
+ <li><code>element.<a href="/tr/docs/Web/API/Element/getAttribute">getAttribute</a>()</code></li>
+ <li><code>element.<a href="/tr/docs/Web/API/EventTarget/addEventListener">addEventListener</a>()</code></li>
+ <li><code><a href="/tr/docs/Web/API/Window/content">window.content</a></code></li>
+ <li><code><a href="/tr/docs/Web/API/Window/onload">window.onload</a></code></li>
+ <li><code><a href="/tr/docs/Web/API/Window/scrollTo">window.scrollTo</a>()</code></li>
+</ul>
+
+<h2 id="Testing_the_DOM_API" name="Testing_the_DOM_API">Testing the DOM API</h2>
+
+<p>This document provides samples for every interface that you can use in your own web development. In some cases, the samples are complete HTML pages, with the DOM access in a <code>&lt;script&gt;</code> element, the interface (e.g, buttons) necessary to fire up the script in a form, and the HTML elements upon which the DOM operates listed as well. When this is the case, you can cut and paste the example into a new HTML document, save it, and run the example from the browser.</p>
+
+<p>There are some cases, however, when the examples are more concise. To run examples that only demonstrate the basic relationship of the interface to the HTML elements, you may want to set up a test page in which interfaces can be easily accessed from scripts. The following very simple web page provides a <code>&lt;script&gt;</code> element in the header in which you can place functions that test the interface, a few HTML elements with attributes that you can retrieve, set, or otherwise manipulate, and the web user interface necessary to call those functions from the browser.</p>
+
+<p>You can use this test page or create a similar one to test the DOM interfaces you are interested in and see how they work on the browser platform. You can update the contents of the <code>test()</code> function as needed, create more buttons, or add elements as necessary.</p>
+
+<pre class="brush: html notranslate">&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;DOM Tests&lt;/title&gt;
+  &lt;script&gt;
+    function setBodyAttr(attr, value) {
+      if (document.body) document.body[attr] = value;
+      else throw new Error(&quot;no support&quot;);
+    }
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div style=&quot;margin: .5in; height: 400px;&quot;&gt;
+    &lt;p&gt;&lt;b&gt;&lt;tt&gt;text&lt;/tt&gt;&lt;/b&gt;&lt;/p&gt;
+    &lt;form&gt;
+      &lt;select onChange=&quot;setBodyAttr(&apos;text&apos;,
+        this.options[this.selectedIndex].value);&quot;&gt;
+        &lt;option value=&quot;black&quot;&gt;black&lt;/option&gt;
+        &lt;option value=&quot;red&quot;&gt;red&lt;/option&gt;
+      &lt;/select&gt;
+      &lt;p&gt;&lt;b&gt;&lt;tt&gt;bgColor&lt;/tt&gt;&lt;/b&gt;&lt;/p&gt;
+      &lt;select onChange=&quot;setBodyAttr(&apos;bgColor&apos;,
+        this.options[this.selectedIndex].value);&quot;&gt;
+        &lt;option value=&quot;white&quot;&gt;white&lt;/option&gt;
+        &lt;option value=&quot;lightgrey&quot;&gt;gray&lt;/option&gt;
+      &lt;/select&gt;
+      &lt;p&gt;&lt;b&gt;&lt;tt&gt;link&lt;/tt&gt;&lt;/b&gt;&lt;/p&gt;
+      &lt;select onChange=&quot;setBodyAttr(&apos;link&apos;,
+        this.options[this.selectedIndex].value);&quot;&gt;
+        &lt;option value=&quot;blue&quot;&gt;blue&lt;/option&gt;
+        &lt;option value=&quot;green&quot;&gt;green&lt;/option&gt;
+      &lt;/select&gt;
+      &lt;small&gt;
+        &lt;a href=&quot;http://some.website.tld/page.html&quot; id=&quot;sample&quot;&gt;
+          (sample link)
+        &lt;/a&gt;
+      &lt;/small&gt;&lt;br /&gt;
+      &lt;input type=&quot;button&quot; value=&quot;version&quot; onclick=&quot;ver()&quot; /&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>To test a lot of interfaces in a single page—for example, a &quot;suite&quot; of properties that affect the colors of a web page—you can create a similar test page with a whole console of buttons, textfields, and other HTML elements. The following screenshot gives you some idea of how interfaces can be grouped together for testing.</p>
+
+<figure>
+<figcaption>Figure 0.1 Sample DOM Test Page</figcaption>
+<img alt="Image:DOM_Ref_Introduction_to_the_DOM.gif" class="internal" src="/@api/deki/files/173/=DOM_Ref_Introduction_to_the_DOM.gif"></figure>
+
+<p>In this example, the drop-down menus dynamically update such DOM—accessible aspects of the web page as its background color (<code>bgColor</code>), the color of the hyperlinks (<code>aLink</code>), and color of the text (<code>text</code>). However, you design your test pages, testing the interfaces as you read about them is an important part of learning how to use the DOM effectively.</p>
+
+<h2 id="Subnav">Subnav</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Document_Object_Model">DOM Reference</a></li>
+ <li><a href="/en-US/docs/Web/API/Document_Object_Model/Introduction">Introduction to the DOM</a></li>
+ <li><a href="/en-US/docs/Web/API/Document_Object_Model/Events">Events and the DOM</a></li>
+ <li><a href="/en-US/docs/Web/API/Document_Object_Model/Examples">Examples</a></li>
+</ul>
+
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/tr/docs/Web/API/Document_Object_Model">Document Object Model</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/tr/docs/Web/API/Document_Object_Model/Introduction">Introduction to the DOM</a> <a href="/tr/docs/Web/API/Document_Object_Model/Introduction$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_object_model/Using_the_W3C_DOM_Level_1_Core">Using the W3C DOM Level 1 Core</a> <a href="/tr/docs/Web/API/Document_object_model/Using_the_W3C_DOM_Level_1_Core$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_Object_Model/Traversing_an_HTML_table_with_JavaScript_and_DOM_Interfaces">Traversing an HTML table with JavaScript and DOM Interfaces</a> <a href="/tr/docs/Web/API/Document_Object_Model/Traversing_an_HTML_table_with_JavaScript_and_DOM_Interfaces$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_object_model/Locating_DOM_elements_using_selectors">Locating DOM elements using selectors</a> <a href="/tr/docs/Web/API/Document_object_model/Locating_DOM_elements_using_selectors$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_object_model/How_to_create_a_DOM_tree">How to create a DOM tree</a> <a href="/tr/docs/Web/API/Document_object_model/How_to_create_a_DOM_tree$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_Object_Model/Events">Events and the DOM</a> <a href="/tr/docs/Web/API/Document_Object_Model/Events$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_Object_Model/Whitespace_in_the_DOM">How whitespace is handled by HTML, CSS, and in the DOM</a> <a href="/tr/docs/Web/API/Document_Object_Model/Whitespace_in_the_DOM$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/tr/docs/Web/API/Document_Object_Model/Examples">Examples of web and XML development using the DOM</a> <a href="/tr/docs/Web/API/Document_Object_Model/Examples$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/tr/docs/Web/API/AbortController"><code>AbortController</code></a></li><li><a href="/tr/docs/Web/API/AbortSignal"><code>AbortSignal</code></a></li><li><a href="/tr/docs/Web/API/AbstractRange"><code>AbstractRange</code></a></li><li><a href="/tr/docs/Web/API/Attr"><code>Attr</code></a></li><li><a href="/tr/docs/Web/API/ByteString"><code>ByteString</code></a></li><li><a href="/tr/docs/Web/API/CDATASection"><code>CDATASection</code></a></li><li><a href="/tr/docs/Web/API/CharacterData"><code>CharacterData</code></a></li><li><a href="/tr/docs/Web/API/ChildNode"><code>ChildNode</code></a></li><li><a href="/tr/docs/Web/API/CSSPrimitiveValue"><code>CSSPrimitiveValue</code></a></li><li><a href="/tr/docs/Web/API/CSSValue"><code>CSSValue</code></a></li><li><a href="/tr/docs/Web/API/CSSValueList"><code>CSSValueList</code></a></li><li><a href="/tr/docs/Web/API/Comment"><code>Comment</code></a></li><li><a href="/tr/docs/Web/API/CustomEvent"><code>CustomEvent</code></a></li><li><a href="/tr/docs/Web/API/Document"><code>Document</code></a></li><li><a href="/tr/docs/Web/API/DocumentFragment"><code>DocumentFragment</code></a></li><li><a href="/tr/docs/Web/API/DocumentType"><code>DocumentType</code></a></li><li><a href="/tr/docs/Web/API/DOMConfiguration"><code>DOMConfiguration</code></a></li><li><a href="/tr/docs/Web/API/DOMError"><code>DOMError</code></a></li><li><a href="/tr/docs/Web/API/DOMErrorHandler"><code>DOMErrorHandler</code></a></li><li><a href="/tr/docs/Web/API/DOMException"><code>DOMException</code></a></li><li><a href="/tr/docs/Web/API/DOMImplementation"><code>DOMImplementation</code></a></li><li><a href="/tr/docs/Web/API/DOMImplementationList"><code>DOMImplementationList</code></a></li><li><a href="/tr/docs/Web/API/DOMImplementationRegistry"><code>DOMImplementationRegistry</code></a></li><li><a href="/tr/docs/Web/API/DOMImplementationSource"><code>DOMImplementationSource</code></a></li><li><a href="/tr/docs/Web/API/DOMLocator"><code>DOMLocator</code></a></li><li><a href="/tr/docs/Web/API/DOMObject"><code>DOMObject</code></a></li><li><a href="/tr/docs/Web/API/DOMParser"><code>DOMParser</code></a></li><li><a href="/tr/docs/Web/API/DOMPoint"><code>DOMPoint</code></a></li><li><a href="/tr/docs/Web/API/DOMPointInit"><code>DOMPointInit</code></a></li><li><a href="/tr/docs/Web/API/DOMPointReadOnly"><code>DOMPointReadOnly</code></a></li><li><a href="/tr/docs/Web/API/DOMRect"><code>DOMRect</code></a></li><li><a href="/tr/docs/Web/API/DOMString"><code>DOMString</code></a></li><li><a href="/tr/docs/Web/API/DOMTimeStamp"><code>DOMTimeStamp</code></a></li><li><a href="/tr/docs/Web/API/DOMTokenList"><code>DOMTokenList</code></a></li><li><a href="/tr/docs/Web/API/DOMUserData"><code>DOMUserData</code></a></li><li><a href="/tr/docs/Web/API/Element"><code>Element</code></a></li><li><a href="/tr/docs/Web/API/ElementTraversal"><code>ElementTraversal</code></a></li><li><a href="/tr/docs/Web/API/Entity"><code>Entity</code></a></li><li><a href="/tr/docs/Web/API/EntityReference"><code>EntityReference</code></a></li><li><a href="/tr/docs/Web/API/Event"><code>Event</code></a></li><li><a href="/tr/docs/Web/API/EventTarget"><code>EventTarget</code></a></li><li><a href="/tr/docs/Web/API/HTMLCollection"><code>HTMLCollection</code></a></li><li><a href="/tr/docs/Web/API/MutationObserver"><code>MutationObserver</code></a></li><li><a href="/tr/docs/Web/API/Node"><code>Node</code></a></li><li><a href="/tr/docs/Web/API/NodeFilter"><code>NodeFilter</code></a></li><li><a href="/tr/docs/Web/API/NodeIterator"><code>NodeIterator</code></a></li><li><a href="/tr/docs/Web/API/NodeList"><code>NodeList</code></a></li><li><a href="/tr/docs/Web/API/NonDocumentTypeChildNode"><code>NonDocumentTypeChildNode</code></a></li><li><a href="/tr/docs/Web/API/ProcessingInstruction"><code>ProcessingInstruction</code></a></li><li><a href="/tr/docs/Web/API/PromiseResolver"><code>PromiseResolver</code></a></li><li><a href="/tr/docs/Web/API/Range"><code>Range</code></a></li><li><a href="/tr/docs/Web/API/StaticRange"><code>StaticRange</code></a></li><li><a href="/tr/docs/Web/API/Text"><code>Text</code></a></li><li><a href="/tr/docs/Web/API/TextDecoder"><code>TextDecoder</code></a></li><li><a href="/tr/docs/Web/API/TextEncoder"><code>TextEncoder</code></a></li><li><a href="/tr/docs/Web/API/TimeRanges"><code>TimeRanges</code></a></li><li><a href="/tr/docs/Web/API/TreeWalker"><code>TreeWalker</code></a></li><li><a href="/tr/docs/Web/API/TypeInfo"><code>TypeInfo</code></a></li><li><a href="/tr/docs/Web/API/UserDataHandler"><code>UserDataHandler</code></a></li><li><a href="/tr/docs/Web/API/USVString"><code>USVString</code></a></li><li><a href="/tr/docs/Web/API/XMLDocument"><code>XMLDocument</code></a></li></ol></details></li></ol></section></div>

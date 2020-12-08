@@ -1,0 +1,257 @@
+---
+title: Użycie zmiennych CSS
+slug: Web/CSS/Using_CSS_custom_properties
+translation_of: Web/CSS/Using_CSS_custom_properties
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><strong>This is an <a href="/en-US/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">experimental technology</a></strong><br>Check the <a href="#Browser_compatibility">Browser compatibility table</a> carefully before using this in production.</p>
+</div></div>
+
+<div></div>
+
+<p><strong>Zmienne CSS </strong>to zdefiniowane jednostki zawierające specyficzne wartości, reużywalne w całym dokumencie. Zmienne są ustawiane przy użyciu notacji właściwości niestandardowych (np. <strong><code>--kolor-glowny: black;</code></strong>) i mają dostęp do funkcji <code>var() (np. kolor: <strong>var(--kolor-glowny)</strong>;</code>) .</p>
+
+<p>Skomplikowane strony internetowe mają bardzo dużo powtarzającego się kodu CSS. Dla przykładu, taki sam kolor może być użyty setki razy w różnych miejscach, co w przypadku zmiany wymana globalnego wyszukiwania i zmian w wielu miejsach. Zmienne CSS pozwalają na przechowywanie wartości w jednym miejscu, zmiast wielu. Używają one również semantycznych identyfikatorów. Na przykład <code>--glowny-kolor-tekstu</code> jest łatwiejszy do zrozumienia niż <code>#00ff00</code> szczególnie gdy taki sam kolor jest użyty w różnych kontekstach.</p>
+
+<p>Zmienne CSS podlegają kaskadowości i dziedziczą wartości po rodzicach.</p>
+
+<h2 id="Podstawowe_użycie">Podstawowe użycie</h2>
+
+<p>Deklarowanie zmiennych:</p>
+
+<pre class="brush:css; highlight:[2]  language-css">element {
+  --glowny-kolor-tla: brown;
+}
+</pre>
+
+<p>Użycie zmiennych:</p>
+
+<pre class="brush:css; highlight:[2]  language-css">element {
+  background-color: var(--glowny-kolor-tla);
+}
+</pre>
+
+<div class="note">
+<p><strong>Notatka:</strong> Niestandardowy prefix <code>var-</code> istniał we wcześniejszych wersjach, jednak później został zmieniony na <code>--</code>. Firefox 31 i wyższy posiada nową specyfikację. (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=985838">błąd 985838</a>)</p>
+</div>
+
+<h2 id="Zmienne_CSS_-_pierwsze_kroki">Zmienne CSS - pierwsze kroki</h2>
+
+<p>Zacznijmy od prostego kodu CSS z różnymi klasami, których elementy posiadają różne kolory:</p>
+
+<div id="sample1">
+<pre class="brush:css; highlight:[3,20,26,32]">.jeden {
+  color: white;
+  background-color: brown;
+  margin: 10px;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+}
+
+.dwa {
+  color: white;
+  background-color: black;
+  margin: 10px;
+  width: 150px;
+  height: 70px;
+  display: inline-block;
+}
+.trzy {
+  color: white;
+  background-color: brown;
+  margin: 10px;
+  width: 75px;
+}
+.cztery {
+  color: white;
+  background-color: brown;
+  margin: 10px;
+  width: 100px;
+}
+
+.piec {
+  background-color: brown;
+}
+
+</pre>
+
+<p>Implementujemy to w HTML&apos;u:</p>
+
+<pre class="brush:html">&lt;div&gt;
+    &lt;div class=&quot;jeden&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;dwa&quot;&gt;Tekst &lt;span class=&quot;cztery&quot;&gt;- wiecej tekstu&lt;/span&gt;&lt;/div&gt;
+    &lt;input class=&quot;trzy&quot;&gt;
+    &lt;textarea class=&quot;piec&quot;&gt;Lorem Ipsum&lt;/textarea&gt;
+&lt;/div&gt;
+</pre>
+
+<p>co w efekcie daje nam:</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="180" id="frame_sample1" src="https://mdn.mozillademos.org/pl/docs/Web/CSS/Using_CSS_custom_properties$samples/sample1?revision=1614186" width="600"></iframe></p>
+
+<p><br>
+ Zauważ powtarzalność kodu CSS. Kolor tła jest ustawiony na brązowy w kilku miejscach.W niektórych przypadkach możemy zadeklarować kolor do wszystkich elementów, co rozwiązuje problem. Jednak w przypadku złożonych projektów, nie zawsze jest to możliwe. Deklarując zmienną przy pomocy pseudo-klasy :root, możemy przechowywać zmienną i używać jej według potrzeb.</p>
+</div>
+
+<div id="sample2">
+<pre class="brush:css; highlight:[2, 7, 24,30,36]">:root {
+  --glowny-kolor-tla: brown;
+}
+
+.jeden {
+  color: white;
+  background-color: var(--glowny-kolor-tla);
+  margin: 10px;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+}
+
+.dwa {
+  color: white;
+  background-color: black;
+  margin: 10px;
+  width: 150px;
+  height: 70px;
+  display: inline-block;
+}
+.trzy {
+  color: white;
+  background-color: var(--glowny-kolor-tla);
+  margin: 10px;
+  width: 75px;
+}
+.cztery {
+  color: white;
+  background-color: var(--glowny-kolor-tla);
+  margin: 10px;
+  width: 100px;
+}
+
+.piec {
+  background-color: var(--glowny-kolor-tla);
+}
+
+</pre>
+
+<div style="display: none;">
+<pre class="brush:html">&lt;div&gt;
+    &lt;div class=&quot;one&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;two&quot;&gt;Text &lt;span class=&quot;five&quot;&gt;- more text&lt;/span&gt;&lt;/div&gt;
+    &lt;input class=&quot;three&quot;&gt;
+    &lt;textarea class=&quot;four&quot;&gt;Lorem Ipsum&lt;/textarea&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<p>Powyższy kod daje taki sam rezultat jak we wcześniejszym przykładzie. </p>
+
+<h2 id="Dziedziczenie_zmiennych_CSS">Dziedziczenie zmiennych CSS</h2>
+
+<p>Niestandardowe właściwości mogą być dziedziczone. Oznacza to, że jeśli dany element nie ma wartości, może użyć tej odziedziczonej od rodzica:</p>
+
+<pre class="brush: html">&lt;div class=&quot;jeden&quot;&gt;
+  &lt;div class=&quot;dwa&quot;&gt;
+    &lt;div class=&quot;trzy&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;cztery&quot;&gt;
+    &lt;/div&gt;
+  &lt;div&gt;
+&lt;/div&gt;</pre>
+</div>
+
+<p>z następującym kodem CSS:</p>
+
+<pre class="brush: css">.dwa {
+  --test: 10px;
+}
+
+.trzy {
+  --test: 2em;
+}
+</pre>
+
+<p>W tym przykładzie wynikiem dla <code>var(--test)</code> jest:</p>
+
+<ul>
+ <li><code>class=&quot;dwa&quot;</code> element: <code>10px</code></li>
+ <li><code>class=&quot;trzy&quot;</code> element: <code>2em</code></li>
+ <li><code>class=&quot;cztery&quot;</code> element: <code>10px</code> (odziedziczone od rodzica)</li>
+ <li><code>class=&quot;jeden&quot;</code> element: <em>nieprawidłowa wartość</em>, która jest wartością domyślą każdej właściwości.</li>
+</ul>
+
+<h2 id="Zgodność_z_przeglądarkami">Zgodność z przeglądarkami</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/pl/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Pulpit</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/pl/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span><br>
+    33.0<br>
+    <span style="color: #f00;">No support</span> 34.0<sup>[2]</sup><br>
+    49.0</td>
+   <td><a href="/en-US/Firefox/Releases/29" title="Released on 2014-04-29.">29</a> (29)<sup>[3]</sup><br>
+    <a href="/en-US/Firefox/Releases/31" title="Released on 2014-07-22.">31</a> (31)</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>36.0</td>
+   <td>9.1</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>49.0</td>
+   <td><a href="/en-US/Firefox/Releases/29" title="Released on 2014-04-29.">29</a> (29)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>9.1</td>
+   <td>49.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Przeglądarka Chrome początkowo zaimplementowała zmienne CSS ze zmienioną składną, która wymagała niestandardowego prefixu przed nazwą zmiennej <code>-webkit-var-</code>. Można jej było następnie użyć przy pomocy funkcji <code>-webkit-var()</code>. Dodatkowo implementacja została ukryta pod flagą <em>Eksperymentalne funkcje platformy internetowej  </em>pod <code>chrome://flags.</code></p>
+
+<p>[2] Chrome 34.0 usunął zmienne CSS ze względu na problemy z wydajnością.</p>
+
+<p>[3] Zmienne CSS są zaimplementowane w preferencjach <code>layout.css.variables.enabled</code>, standardowo ustawione na <code>false</code> i używające stare składnia <code>var-<var>variablename</var></code> w Gecko 29. Rozpoczynając od Gecko 31 implementacja jest włączona i używa nowej składni <code>--<var>variablename</var></code>.</p>

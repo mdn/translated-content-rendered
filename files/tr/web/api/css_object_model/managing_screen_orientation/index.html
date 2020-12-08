@@ -1,0 +1,181 @@
+---
+title: Ekran Oryantasyonunu Yönetmek
+slug: Web/API/CSS_Object_Model/Managing_screen_orientation
+tags:
+  - API
+  - CSSOM
+  - Ekran Konumu
+  - Ekran Oryantasyonu
+  - Oryantasyon
+  - Uzman
+translation_of: Web/API/CSS_Object_Model/Managing_screen_orientation
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/tr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a></li><li><a href="/tr/docs/Web/API/MediaQueryListListener"><code>MediaQueryListListener</code></a></li><li><a href="/tr/docs/Web/API/Screen"><code>Screen</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/tr/docs/Web/Events/resize"><code>resize</code></a></li><li><a href="/tr/docs/Web/Events/scroll"><code>scroll</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>This is an <a href="/en-US/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">experimental technology</a></strong><br>Check the <a href="#Browser_compatibility">Browser compatibility table</a> carefully before using this in production.</p>
+</div></div>
+
+<h2 id="Summary">Özet</h2>
+
+<p>Ekran oryantasyonu <a href="/en-US/docs/WebAPI/Detecting_device_orientation" title="/en-US/docs/WebAPI/Detecting_device_orientation">cihaz oryantasyonundan</a> bir miktar farklı bir terim. Cihazın kendi oryantasyonunu tespit etme yeteneği olmasa bile ekranının her zaman bir oryantasyonu vardır. Eğer cihaz bu yeteneğe sahip ise web uygulamasının arayüzünü korumak veya uyarlamak için ekranı yönetme yeteneğine sahip olması faydalı bir özellik.</p>
+
+<p>Ekran oryantasyonunu yönetebilek için hem CSS&apos;e hem Javascript&apos;e dayanan çeşitli yöntemler mevcut. Bu yöntemlerden ilki <a href="/en-US/docs/CSS/Media_queries#orientation" title="en-US/CSS/Media queries#orientation">orientation media query CSS </a>kullanarak tarayıcının yatay modda (genişliğin yükseklikten uzun olduğu mod) veya dikey modda (yüksekliğin genişlikten uzun olduğu mod) içeriğin ekrandaki yerleşimini ayarlamasını sağlamak.</p>
+
+<p>İkinci yöntem ise Javascript Screen orientation API kullanılarak ekranın mevcut oryantasyonun alınması ve sabitlenmesi.</p>
+
+<h2 id="Adjusting_layout_based_on_the_orientation">Oryantasyona göre yerleşim planını ayarlamak</h2>
+
+<p>Cihazın oryantasyonu değiştiğinde içeriğin ekrandaki yerleşiminin de değişmesi en çok istenilen durumlardan biri. Örneğin buton çubuğunun cihazın oryantasyonu bounca uzamasını istiyoruz. Media query kullanarak kolay ve otomatik bir şekilde yapabiliriz.</p>
+
+<p>Aşağıdaki HTML kodu üzerinden bir örnek yapalım.</p>
+
+<pre class="brush: html">&lt;ul id=&quot;toolbar&quot;&gt;
+  &lt;li&gt;A&lt;/li&gt;
+  &lt;li&gt;B&lt;/li&gt;
+  &lt;li&gt;C&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lacinia nisi nec sem viverra vitae fringilla nulla ultricies. In ac est dolor, quis tincidunt leo. Cras commodo quam non tortor consectetur eget rutrum dolor ultricies. Ut interdum tristique dapibus. Nullam quis malesuada est.&lt;/p&gt;
+</pre>
+
+<p>CSS ekranın oryatasyonuna göre çalışacak özel stiller için media query&apos;lere güveniyor.</p>
+
+<pre class="brush: css">/* Önce ortak stiller tanımlayalım */
+
+html, body {
+  width : 100%;
+  height: 100%;
+}
+
+body {
+  border: 1px solid black;
+
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+p {
+  font   : 1em sans-serif;
+  margin : 0;
+  padding: .5em;
+}
+
+ul {
+  list-style: none;
+
+  font   : 1em monospace;
+  margin : 0;
+  padding: .5em;
+
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  background: black;
+}
+
+li {
+  display: inline-block;
+  margin : 0;
+  padding: 0.5em;
+  background: white;
+}
+</pre>
+
+<p>Ortak stillerimiz hazır olduğuna göre oryantasyona göre çalışacak özel durumları tanımlamaya başlayabiliriz.</p>
+
+<pre class="brush: css">/* Dikey modda buton çubuğunun üstte olmasını istiyoruz */
+
+@media screen and (orientation: portrait) {
+  #toolbar {
+    width: 100%;
+  }
+}
+
+/* Yatay modda buton çubuğunun solda durmasını istiyoruz */
+
+@media screen and (orientation: landscape) {
+  #toolbar {
+    position: fixed;
+    width: 2.65em;
+    height: 100%;
+  }
+
+  p {
+    margin-left: 2em;
+  }
+
+  li + li {
+    margin-top: .5em;
+  }
+}
+</pre>
+
+<p>Ve sonuç:</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Portrait</th>
+   <th scope="col">Landscape</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><iframe src="https://mdn.mozillademos.org/tr/docs/Web/API/CSS_Object_Model/Managing_screen_orientation$samples/Adjusting_layout_based_on_the_orientation?revision=1455179" width="180" id="frame_Adjusting_layout_based_on_the_orientation" height="350" frameborder="0" class="live-sample-frame sample-code-frame"></iframe></td>
+   <td><iframe src="https://mdn.mozillademos.org/tr/docs/Web/API/CSS_Object_Model/Managing_screen_orientation$samples/Adjusting_layout_based_on_the_orientation?revision=1455179" width="350" id="frame_Adjusting_layout_based_on_the_orientation" height="180" frameborder="0" class="live-sample-frame sample-code-frame"></iframe></td>
+  </tr>
+ </tbody>
+</table>
+
+<div class="note">
+<p><strong>Not:</strong> Oryantasyon media query&apos;si  tarayıcı penceresinin(veya iframe&apos;in) oryantasyonuna göre bu stilleri çalıştırıyor cihazın oryantasyonuna göre değil.</p>
+</div>
+
+<h2 id="Locking_the_screen_orientation">Ekran oryantasyonunu sabitlemek</h2>
+
+<div class="warning notecard">
+<p><strong>Warning:</strong> Bu API şu anda deneysel bir çalışma ve <a href="/en-US/docs/Mozilla/Firefox_OS" title="/en-US/docs/Mozilla/Firefox_OS">Firefox OS</a> ile <a href="/en-US/docs/Mozilla/Firefox_for_Android" title="/en-US/docs/Mozilla/Firefox_for_Android">Firefox for Android</a> &apos;de  <code>moz</code> önekiyle, Windows 8.1 ve üstünde Internet Explorer&apos;larda ise ms önekiyle kullanılabilir durumda.</p>
+</div>
+
+<p>Bazı cihazlar (genellikle mobil cihazlar) kullanıcının kendi ekranındakileri her zaman okuyabileceğine garanti vererek ekran oryantasyonunu kendi oryantasyonuna göre dinamik olarak değiştirebiliyor. Bu davranış içerik metinlerden oluşuyorken çok iyi çalışmasına rağmen oryantasyona bağlı oyun gibi içeriklerde uygulamayı tamamen kullanılmaz hale getirebiliyor.</p>
+
+<p>Screen Orientation API bu şekilde negatif etkisi olan değişimlerin engellenmesi için geliştirildi.</p>
+
+<h3 id="Listening_orientation_change">Oryantasyon değişikliğini dinleme</h3>
+
+<p>Cihaz oryantasyonunu her değiştirdiğinde <code><a href="/tr/docs/Web/Reference/Events/orientationchange" title="/tr/docs/Web/Reference/Events/orientationchange">orientationchange</a></code> event&apos;i tetiklenir ve  o anki oryantasyonu <a href="/tr/docs/Web/API/Screen/orientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.orientation</code></a> özelliğiyle okunabilir.</p>
+
+<pre class="brush: js">screen.addEventListener(&quot;orientationchange&quot;, function () {
+  console.log(&quot;Ekranın oryantasyonu: &quot; + screen.orientation);
+});
+</pre>
+
+<h3 id="Preventing_orientation_change">Oryantasyon değişikliğini engelleme</h3>
+
+<p>Bir web uygulaması ekranın oryantasyonunu kendi ihityaçlarına uyacak şekilde sabitleyebilir. Ekranın oryantasyonunu sabitlemek için <a href="/tr/docs/Web/API/Screen/lockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.lockOrientation()</code></a>  metodu kullanılırken sabitlemeyi kaldırmak için ise <a href="/tr/docs/Web/API/Screen/unlockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.unlockOrientation()</code></a> metodu kullanılabilir.</p>
+
+<p><a href="/tr/docs/Web/API/Screen/lockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.lockOrientation()</code></a> parametre olarak ekranın nasıl sabitlenmesi gerektiğine göre String (veya birden çok string) parametre alır. Geçerli parametre değerleri: <code>portrait-primary</code>, <code>portrait-secondary</code>, <code>landscape-primary</code>, <code>landscape-secondary</code>, <code>portrait</code>, <code>landscape</code> . (Bu değerler hakkında detaylı bilgi için Bkz: <a href="/tr/docs/Web/API/Screen/lockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.lockOrientation</code></a>).</p>
+
+<pre class="brush: js">screen.lockOrientation(&apos;landscape&apos;);</pre>
+
+<div class="note">
+<p><strong>Not:</strong>Ekranı sabitlemek web uygulaması bağımlıdır. Eğer uygulama A yatay moda sabitlenmiş ve uygulama B dkey moda sabitlenmiş ise A&apos;dan B&apos;ye ya da B&apos;den A&apos;ya geçildiğinde <code><a href="/tr/docs/Web/Reference/Events/orientationchange" title="/tr/docs/Web/Reference/Events/orientationchange">orientationchange</a></code> event&apos;i tetiklenmez. Çünkü ikisi de kendi oryantasyonlarını korumaktadır.</p>
+
+<p>Ancak oryantasyonu sabitlerken istenen mevcut oryantasyon değişerek sabitlenen oryantasyona geçildiyse <code><a href="/tr/docs/Web/Reference/Events/orientationchange" title="/tr/docs/Web/Reference/Events/orientationchange">orientationchange</a></code> event&apos;i tetiklenir.</p>
+</div>
+
+<h2 id="Firefox_OS_and_Android_Orientation_lock_using_the_manifest">Firefox OS ve Android: Manifest ile oryantasyonu sabitleme</h2>
+
+<p>Firefox OS ve Firefox Android (yakında Firefox masaüstü de) için oryantasyonu sabitlemenin özel bir yolu uygulamanın manifest dosyasının <a href="/en-US/Apps/Build/Manifest#orientation">orientation </a>alanına istenen oryantasyon modunu yazmak. Örneğin dikey mod için:</p>
+
+<pre class="brush: json">&quot;orientation&quot;: &quot;portrait&quot;</pre>
+
+<h2 id="See_also">Ayrıca bakınız</h2>
+
+<ul>
+ <li><a href="/tr/docs/Web/API/Screen/orientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.orientation</code></a></li>
+ <li><a href="/tr/docs/Web/API/Screen/lockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.lockOrientation()</code></a></li>
+ <li><a href="/tr/docs/Web/API/Screen/unlockOrientation" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.unlockOrientation()</code></a></li>
+ <li><a href="/tr/docs/Web/API/Screen/onorientationchange" title="The documentation about this has not yet been written; please consider contributing!"><code>Screen.onorientationchange</code></a></li>
+ <li><a href="/en-US/docs/CSS/Media_queries#orientation" title="en-US/CSS/Media queries#orientation">The orientation media query</a></li>
+ <li><a href="http://hacks.mozilla.org/2009/06/media-queries/" class="external" title="http://hacks.mozilla.org/2009/06/media-queries/">A short introduction to media queries in Firefox 3.5</a></li>
+</ul>

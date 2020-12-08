@@ -1,0 +1,443 @@
+---
+title: Eclipse CDT
+slug: Mozilla/Developer_guide/Eclipse/Eclipse_CDT
+translation_of: Mozilla/Developer_guide/Eclipse/Eclipse_CDT
+---
+<h2 id="Using_Eclipse_CDT_for_Mozilla_development" name="Using_Eclipse_CDT_for_Mozilla_development">Introduction</h2>
+
+<p> </p>
+
+<p>Eclipse CDT (C / C ++ Development Tools)는 고급 코드 지원 (상속 / 콜 그래프 탐색기, 정의로 이동, 리팩토링, 자동 완성, 구문 강조 표시 등)을 사용하여 C 및 C ++ 개발을위한 오픈 소스 IDE입니다.이클립스는 자바 오픈소스 IDE로 유명합니다. 하지만 자바뿐만 아니라 C/C++ 개발도구의 기능도 갖는데요, 이를 이클립스 CDT라고 합니다. 이번 포스팅에서는 윈도우즈 환경에 이클립스 CDT를 설치하는 내용을 다루어보고자 합니다.</p>
+
+<h2 id="System_requirements">System requirements</h2>
+
+<p>Eclipse will use a lot of memory to fully index the Mozilla source tree to provide code assistance features (easily <strong>4 GB of RAM</strong>, although this will drop to just over 1 GB if you restart after indexing is complete). Therefore, it is not recommended if your machine only has 4 GB of RAM.</p>
+
+<h2 id="Installing_Eclipse">Installing Eclipse</h2>
+
+<div class="note">
+<p>Regarding <a class="link-https" href="https://code.google.com/p/llvm4eclipsecdt/" title="https://code.google.com/p/llvm4eclipsecdt/">llvm4eclipsecdt</a>, do not install or select this toolchain for Mozilla development. This plugin is intended mainly for managed projects but we use an unmanaged project for Mozilla (since it has its own build system). Using this plugin will result in parts of the UI described below being hidden or disabled.</p>
+</div>
+
+<p>Download <a class="external" href="http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/oxygenr" title="http://www.eclipse.org/downloads/">Eclipse IDE for C/C++ Developers</a> from the Eclipse download page.</p>
+
+<h3 id="Increase_Eclipses_memory_limits!">Increase Eclipse&apos;s memory limits!</h3>
+
+<div class="warning notecard">
+<p>Make sure you do this!</p>
+</div>
+
+<p>Before you use Eclipse with the Mozilla source you must increase its memory limits. When Eclipse&apos;s indexer tries to process the Mozilla source, Eclipse will need considerably more memory than it allows itself out of the box. You should <a class="external" href="http://wiki.eclipse.org/FAQ_How_do_I_increase_the_heap_size_available_to_Eclipse%3F" title="http://wiki.eclipse.org/FAQ_How_do_I_increase_the_heap_size_available_to_Eclipse%3F">increase its memory limits using the <code>eclipse.ini</code></a> in your installation directory (or in Eclipse.app/Contents/Eclipse/ if you&apos;re on Mac). Set something like <code>-Xms1G -Xmx5G -XX:MaxPermSize=1G</code> (initial heap space of 1 GB, max heap space of 5 GB, max perm-gen space of 1 GB).</p>
+
+<p>If you fail to increase these limits, then you will likely find that Eclipse hangs when you try to index or work with the Mozilla source later on.</p>
+
+<h2 id="Express_setup">Express setup</h2>
+
+<p>For the Eclipse indexer to work well you must first build Mozilla, so that it includes headers from the objdir etc. These can be found and processed by Eclipse.</p>
+
+<div class="warning notecard">
+<p><strong>Note:</strong> Your <a href="/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Configuring_Build_Options#Building_with_an_Objdir">MOZ_OBJDIR</a> must be outside the Mozilla source directory.</p>
+</div>
+
+<p>Once your build is complete then <code>mach</code> can generate a useful Eclipse project on your behalf. Either run:</p>
+
+<pre class="brush: bash"># Create eclipse project and open it:
+./mach ide eclipse
+</pre>
+
+<p>Or else:</p>
+
+<pre class="brush: bash"># Create eclipse project without opening it:
+./mach build-backend -b CppEclipse</pre>
+
+<p>This should take less than a minute. In the case of the <code>build-backend</code> command, instructions on how to open the project will be displayed after the command completes.</p>
+
+<h2 id="Setup_time">Setup time</h2>
+
+<div class="note">
+<p>Some points in the rest of this document below are old and taken care of by the mach commands described above (although some of the project configuration is not done automatically yet). Some of it like the section on building the index and usage tips are still relevant, and other parts still may provide useful background information to understand it in more detail on how Eclipse works.</p>
+</div>
+
+<p>You can expect it to take an hour or so to work through these instructions if you&apos;re doing so for the first time.</p>
+
+<p>(This assumes that you already have a copy of the Mozilla source, and that you have also <a href="/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Simple_Firefox_build" title="Simple Firefox build">built the source</a> so that you have a pre-existing object directory. If that&apos;s not the case, then get your build going now so that it can be running while you continue with the instructions below. FAQ: <a href="#Why_does_Eclipse_need_an_object_directory.3F">Wait, why does Eclipse need an object directory?</a>)</p>
+
+<h2 id="Code_assistance">Code assistance</h2>
+
+<p>Out of the box, Eclipse can provide some code assistance for the Mozilla source, but it will be incomplete and often just plain broken. If you set up Eclipse as detailed below it will do a much, much better job.</p>
+
+<h3 id="Important_background">Important background</h3>
+
+<p>To help you make sense of the instructions that follow (and so that you can modify them to meet your own needs if necessary), this section provides some background on what IDEs need in order to provide advanced code assistance, and what Eclipse CDT needs in particular.</p>
+
+<p>To be able to provide really good code assistance for a project&apos;s source code, IDEs like Eclipse need to carry out a thorough <a class="link-https" href="https://en.wikipedia.org/wiki/Static_program_analysis" title="https://en.wikipedia.org/wiki/Static_program_analysis">static analysis</a> of the project&apos;s source files, to build up a picture of the code (what Eclipse is trying to do when it &quot;indexes&quot; the source.) Static analysis involves parsing the source files, so naturally it can only produce good results if it has a sensible set of preprocessor defines, include paths and pre-include files for each source file. Since Eclipse doesn&apos;t initially have any of this information, the code assistance that it&apos;s able to provide out of the box is pretty broken.<br>
+ <br>
+ For projects the size and complexity of Mozilla, it&apos;s impractical to manually configure Eclipse when there is a valid set of defines and includes paths for each of the different parts of the source code. Happily, Eclipse makes manual configuration unnecessary. Like some other IDEs, that are used with projects like Mozilla that have their own build system. Eclipse provides a tool that can collect the options that are passed to the compiler for each file that&apos;s compiled during an actual build. This process is sometimes called &quot;build option discovery&quot; or &quot;compiler option discovery&quot;.</p>
+
+<p>The way that Eclipse CDT does build option discovery is to scan the console output from a real build looking for lines where a compiler was invoked. For each line that invoked a compiler, it tries to figure out which source file was being built and what its include paths were. <u>If relative paths are used to specify the source file or any of its include paths (common in Mozilla), and if you fail to take steps to make sure the build output specifies which directory the compiler is invoked from, this will not be possible.</u> <em>If</em> Eclipse can successfully identify which source file was being compiled, then it can associate with that file the <em>resolvable</em> include paths, preprocessor defines, and pre-include files that were passed to the compiler.</p>
+
+<p>Note the requirements that this method of build option discovery imposes on us. First, Eclipse needs build console output for a complete build, so that it can find compiler options for as many source files as possible. The build must be explicitly instructed to output information that allows the directory, where the compiler is being invoked from to be identified (i.e., &apos;make&apos; must be instructed to output &quot;Entering directory...&quot;/&quot;Leaving directory...&quot; lines). Finally, the build must not be parallelized, since that would result in the interleaving of build output from different directories (breaking resolution of relative paths by interleaving the &quot;Entering directory...&quot;/&quot;Leaving directory...&quot; lines), and the build must not be silenced/quietened.</p>
+
+<div class="warning notecard">Conversely, note this very carefully: if you configure Eclipse to invoke a build process that is parallelized, silenced, or that fails to identify the directory that the compiler is being run from, then it <strong><u>will</u></strong> mess up the compiler options that Eclipse associates with your files, and that in turn will <strong><u>significantly</u></strong> degrade the quality of the code assistance that Eclipse will provide after it next re-indexes the code.</div>
+
+<p>These requirements aren&apos;t a very good fit with the typical Mozilla developer&apos;s wish to minimize build times, implying parallelized, silenced builds.</p>
+
+<p>The consequences of the above observations are this:</p>
+
+<div class="warning notecard">
+<ul>
+ <li>It is strongly recommended that you invoke your normal (re)builds from the command line, <strong>externally</strong> of Eclipse.</li>
+ <li>Below we will configure Eclipse&apos;s build step so that you use it only occasionally to manually trigger a special &quot;build&quot; (actually a fast script that fakes a build) purely for the purposes of setting/updating the compiler options that Eclipse associates with each source file.</li>
+</ul>
+</div>
+
+<p>(Not using Eclipse to invoke your real builds does lose you some minor benefits that Eclipse has to offer, but these are worth sacrificing for much improved code assistance. See the <a href="#Building_from_Eclipse">Building from Eclipse</a> section below if you&apos;re interested in what you lose. If you&apos;re interested in future improvements to Eclipse that would allow parallel builds to be run from inside Eclipse while still allowing it to obtain the compiler options, see the FAQ <a href="#Isn%27t_there_a_better_method_of_build_option_discovery.3F">Isn&apos;t there a better method of build option discovery?</a> below.)</p>
+
+<h2 id="Initial_workspace_preferences">Initial workspace preferences</h2>
+
+<p>When you open Eclipse, it will ask you to &quot;Select a workspace&quot; (a directory where Eclipse will store files that it generates during indexing, and so on.) It&apos;s recommended that you have a separate workspace containing only a single project for each Mozilla source tree [<a href="#How_can_I_delete_my_Eclipse_project_and_start_over.3F">rational</a>], and that you choose a directory outside the Mozilla source. Something like $HOME/eclipse-workspaces/mozilla-tree-1, for example. After selecting an appropriate directory, click OK, then close the &quot;Welcome&quot; tab when the main Eclipse window opens.</p>
+
+<div class="warning notecard">Before you proceed any further, check that your changes to Eclipse&apos;s memory limits have taken effect and are present in <code>Eclipse/Help &gt; About Eclipse &gt; Installation Details &gt; Configuration</code>.</div>
+
+<p>To avoid confusion in this and the following sections, note that &quot;workspace preferences&quot; and &quot;project properties&quot; are different things (we&apos;ll get to the details below).</p>
+
+<p>Whenever you create a new workspace for a Mozilla source tree, you should be sure to turn off the following two settings in the workspace preferences (<code>Window &gt; Preferences</code>, or <code>Eclipse &gt; Preferences</code>) before creating a project in that workspace:</p>
+
+<ul>
+ <li>in &quot;General &gt; Workspace&quot;, disable &quot;Build automatically&quot;</li>
+ <li>in &quot;C/C++ &gt; Indexer&quot;, disable &quot;Automatically update the index&quot;</li>
+</ul>
+
+<p>Turning off automatic indexing prevents the CPU intensive indexer from running at various stages during the steps below before we&apos;re ready.</p>
+
+<p>Select &quot;General &gt; Content Types&quot;, expand &quot;Text &gt; C Source File &gt; C++ Source File&quot;, click &quot;Add&quot; and add &quot;*.mm&quot;. Eclipse CDT doesn&apos;t currently understand Objective-C files (although there is <a class="external" href="http://code.google.com/p/objectiveclipse/" title="http://code.google.com/p/objectiveclipse/">a project that promises to add Objective-C support</a>), so for now, this is the best we can do to give Eclipse a chance of expanding its understanding of the source into the Objective-C files.</p>
+
+<p>Select &quot;General &gt; Editors &gt; Text Editors&quot;. If you want line numbers, tick &quot;Show line numbers&quot;. If you want a column marker to mark the 80th column to help with formatting code to Mozilla&apos;s 80 character line limit, tick &quot;Show print margin&quot; and set the value to 80.</p>
+
+<p>Select &quot;General &gt; Workspace&quot; and select &quot;Refresh using native hooks or polling&quot; and &quot;Refresh on access&quot; to prevent Eclipse giving you annoying &quot;Resource is out of sync&quot; messages when files change from under it due to Mercurial or other external activity.</p>
+
+<p>Select &quot;C/C++ &gt; Build &gt; Console&quot; and set &quot;Limit console output (number of lines)&quot; to something large, like &quot;1000000&quot;.</p>
+
+<p>Eclipse CDT will try to format C/C++ code that you add as you type. However, its default formats are not a good match to <a href="/en-US/docs/Mozilla/Developer_Guide/Coding_Style" title="Mozilla Coding Style Guide">Mozilla&apos;s style rules</a>. Download this <a href="/@api/deki/files/6241/=eclipse-formatter-for-mozilla.xml" title="https://developer.mozilla.org/@api/deki/files/6241/=eclipse-formatter-for-mozilla.xml">first pass at an Eclipse formatter configuration for Mozilla C/C++ coding style</a>, and install it by opening the workspace preferences, selecting &quot;C/C++ &gt; Code Style &gt; Formatter&quot;, and then using the &quot;Import&quot; button to import that file. The &quot;Active profile&quot; field should then automatically change to &quot;Mozilla&quot;. Depending on the area of the code that you work on, you may need to tweak this configuration using the &quot;Edit&quot; button. (Note that the format settings under &quot;General &gt; Editors &gt; Text Editors&quot; have no effect in C/C++ views, since the C/C++ settings are more specific and override those settings. However, you may still want to tweak those settings if you&apos;ll be editing other file types in Eclipse.)</p>
+
+<p>Select &quot;C/C++ &gt; Editor&quot; and set &quot;Workspace default&quot; to &quot;Doxygen&quot;.</p>
+
+<p>Select &quot;C/C++ &gt; Editor &gt; Content Assist&quot; and set the Auto-Activation delay to 0 so that autocomplete suggestions don&apos;t seem to be laggy. (Sadly, there is no auto-activation option to activate autocomplete suggestion., so as soon as you type any alphabetical character that may begin with a symbol name like there is in other IDEs.)</p>
+
+<p>Select &quot;C/C++ &gt; Editor &gt; Save Actions&quot; and deselect &quot;Ensure newline at the end of file&quot;.</p>
+
+<p>Select &quot;C/C++ &gt; Editor &gt; Scalability&quot; and set &quot;Enable scalability mode when the number of lines in the file is more than:&quot; to something larger, like 100000.</p>
+
+<p>Select &quot;Run/Debug &gt; Console&quot; and deselect &quot;Limit console output&quot;.</p>
+
+<p>If you want to increase the text size in the editor, select &quot;General &gt; Appearance &gt; Colors and Fonts&quot;, select &quot;Basic &gt; Text Font&quot;, and edit the font size.</p>
+
+<h2 id="Creating_an_Eclipse_project">Creating an Eclipse project</h2>
+
+<p>To create an Eclipse project for your Mozilla source tree, select &quot;File &gt; New &gt; Makefile Project with Existing Code&quot;. In the &quot;Import Existing Code&quot; window that opens, enter a meaningful Project Name that identifies your Mozilla source tree, set the code location to the root of your source tree, select an appropriate Toolchain (e.g., &quot;MacOSX GCC&quot;), and click Finish.</p>
+
+<p>The status bar at the bottom right of the window should now show that Eclipse is &quot;Refreshing the workspace&quot; (gathering a list of all the files in the source tree). Click on the little green button beside this message to open the &quot;Progress&quot; tab, and keep an eye on the &quot;Refreshing workspace&quot; item as you continue with the steps below. (If an &quot;indexing&quot; item starts after the &quot;Refreshing the workspace&quot; item has finished, click the little red box beside that item to cancel it, since we want to configure the project before the indexer runs.)</p>
+
+<h2 id="Initial_project_properties">Initial project properties</h2>
+
+<p>So that the indexer will run faster and give better results, and so that Eclipse doesn&apos;t give results for irrelevant files, you should add some resource filters to have Eclipse ignore certain non-source files and directories. Note, <em>you must <u>not</u> make Eclipse ignore your (main) object directory</em>. That object directory is needed to resolve include paths to the various headers that the build process generates/copies there.</p>
+
+<p>To create resource filters, open the project properties (different to the workspace preferences!) by selecting <code>Properties</code> from the context menu for the project (root item) in the Project Explorer tab on the left, or by selecting <code>Project &gt; Properties</code> from the menubar. Select &quot;Resource &gt; Resource Filters&quot; on the left of the window that opens, then use the Add button to add the following filters:</p>
+
+<ul>
+ <li>Add an &quot;Exclude all&quot; filter for folders with a <strong>Project Relative Path</strong> matching &quot;.hg&quot;. (This directory doesn&apos;t show in the Project Explorer tab, but Eclipse still indexes it without this filter!)</li>
+ <li>If you have secondary object directories (object directories that are <strong><u>not</u></strong> your only/the primary object directory) for the source tree and those directories are <strong><u>inside</u></strong> the source tree (or if you might have such object directories in future), then add an &quot;Exclude all&quot;, <strong>regular expression</strong> filter for folders with a <strong>Project Relative Path</strong> matching &quot;obj(?!-debug(?:$|/)).+&quot;. This particular regular expression will exclude all directories beginning with the string &quot;obj&quot; <strong>except</strong> &quot;obj-debug&quot;, so if &quot;obj-debug&quot; is not the name of your main object directory, then adjust the regular expression as necessary.</li>
+ <li>Add a <strong>recursive, regular expression</strong> &quot;Exclude all&quot; filter for files with <strong>Name</strong> matching &quot;\.(?:rej|orig|o|pp|swp)$&quot; to exclude .rej, .orig, .pp, .o, and .swp files.</li>
+ <li>Add &quot;Exclude all&quot; filters for any other non-source directories that you&apos;ve added to your source tree (e.g., Xcode or MSVC project directories).</li>
+</ul>
+
+<p>Click OK to close the filters window, wait for Eclipse to finish processing your resource filters, then make sure the filtered directories and files have disappeared from the Project Explorer tab on the left. Also, if your <strong><u>main</u></strong> object directory is in your source tree, and not somewhere outside it, make sure that it has <u><strong>not</strong></u> disappeared from the Project Explorer tab.</p>
+
+<p>Reopen the project properties window and select &quot;C/C++ Build&quot; from the left of the project properties window. Select the &quot;Builder Settings&quot; tab, untick &quot;Use default build command&quot;, set the build command to &quot;just-print-mozilla-build.py&quot; or, if you&apos;re on Mac, to &quot;bash -l -c &apos;just-print-mozilla-build.py&apos;&quot; (on Mac Eclipse doesn&apos;t seem to pick up the environment properly, so it&apos;s necessary to invoke just-print-mozilla-build.py indirectly through bash). (just-print-mozilla-build.py is a fast script that we&apos;ll download in the next section.) (append &apos;--objdir /path/to/objdir&apos; if your objdir lives outside your tree) Set the build directory to &quot;${ProjDirPath}/path/of/your/objdir/relative/to/the/root/of/your/source&quot;. Select the &quot;Behavior&quot; tab, delete the word &quot;all&quot; from the &quot;Build (incremental build)&quot; field, and disable the Clean checkbox.</p>
+
+<div class="warning notecard">
+<p>If you can&apos;t untick &quot;Use default build command&quot;, you must change the current builder by clicking on &quot;Tool Chain Editor&quot; (in C/C++ Build) and choosing another builder (e.g., &quot;Gnu Make Builder&quot;).</p>
+</div>
+
+<p>If you will not be using Eclipse for debugging, select &quot;C/C++ Build &gt; Settings&quot; on the left, select the &quot;Binary Parsers&quot; tab, and make sure that all the parsers are deselected. This prevents the (useless if not debugging) &quot;Searching for binaries&quot; action from constantly interrupting everything.</p>
+
+<p>If you will be using Eclipse for debugging, select &quot;C/C++ General &gt; Paths and Symbols&quot; and select the &quot;Output Location&quot; tab. You should now add the folder containing your Firefox binary (note on Mac this is inside the .app - so &quot;{your-obj-dir}/dist/NightlyDebug.app/Contents/MacOS/&quot; - and since the UI will only allow you to select to the &apos;dist&apos; folder, you&apos;ll need to type the end of the path in manually). How you add this depends on whether your object directory is inside or outside your source tree. If inside, use the &quot;Add Folder&quot; button; if outside, use the &quot;Link Folder&quot; button and tick the &quot;Link to folder in the file system&quot; checkbox. Once you&apos;ve added this folder, delete the existing output folder that was set to the root of the project. Doing this prevents the &quot;Searching for binaries&quot; which Eclipse constantly starts from taking too long.</p>
+
+<p>Select &quot;C/C++ General &gt; Preprocessor include Paths, Macros, and so on.&quot; Select the Providers tab. Make sure that &quot;CDT GCC Build Output Parser&quot; <strong>is</strong> selected, and that &quot;CDT Managed Build Settings Entries&quot; is not selected. Highlight (select) &quot;CDT GCC Build Output Parser&quot;, then in the &quot;Language Settings Provider Options&quot; that appear below, make sure that &quot;Share setting entries between projects (global provider)&quot; is not ticked.</p>
+
+<div class="warning notecard">
+<p><strong>If the main object directory for your source tree is a Fennec build</strong>: In the &quot;CDT GCC Build Output Parser&quot;, change the compiler command pattern to</p>
+
+<pre>(.*gcc)|(.*[gc]\+\+)|(clang)</pre>
+
+<p>(before this change it should have been &quot;(gcc)|([gc]\+\+)|(clang)&quot;). This pattern is what CDT uses to identify compiler commands when parsing the build output. By default, it recognizes commands of the form &quot;gcc&quot;, &quot;g++&quot;, &quot;c++&quot;, and &quot;clang&quot;. This is fine for a desktop build, where the commands are in fact &quot;gcc&quot; and &quot;g++&quot;. For Fennec builds, however, most of the commands are something like &quot;arm-linux-androideabi-g++&quot;, which will not be recognized by the default regex. The modified regex accepts any command that ends with &quot;gcc&quot; or &quot;g++&quot;. <strong>This may also affect other non-desktop builds besides Fennec.</strong></p>
+</div>
+
+<p class="warning"><strong>Especially important</strong> if the main object directory for your source tree is located somewhere <strong><u>outside</u></strong> your tree&apos;s top source directory: If this applies to you, then select the Entries tab, select &quot;GNU C++&quot;, select &quot;CDT User Settings Entries&quot;, and click &quot;Add&quot;. Change &quot;Project Path&quot; to &quot;Filesystem&quot;, then select the &apos;dist/include&apos; directory that&apos;s in your main object directory and click OK. Repeat these steps, but this time for &quot;GNU C&quot; instead of &quot;GNU C++&quot;. (See the <a href="#Headers_are_only_parsed_once">Headers are only parsed once</a> section below to understand why this step is important for people who have their object directory outside their source tree.)</p>
+
+<h2 id="Getting_code_assistance_working">Getting code assistance working</h2>
+
+<p>You&apos;re now ready to get code assistance working. :-)</p>
+
+<h3 id="Build_option_discovery">Build option discovery</h3>
+
+<div class="note">This section requires that you have already <a href="/en-US/docs/Mozilla/Developer_guide/Build_Instructions/Simple_Firefox_build" title="https://developer.mozilla.org/En/Simple_Firefox_build">built your mozilla source tree</a> (so that you have an object directory for it), and it is strongly recommended that the object directory is up to date so that the just-print-mozilla-build.py script runs quickly.</div>
+
+<p>As explained in the <a href="#Code_assistance">Code assistance</a> section above, to provide good code assistance Eclipse CDT needs to collect build information for the source files by processing a build log from a full, clean build made using -j1 -w. Since such a non-parallel, full build would take a very long time, we&apos;re going to cheat and set Eclipse&apos;s &quot;Build&quot; action to run jwatt&apos;s just-print-mozilla-build.py script instead. This script will complete in about 30 seconds on a warm tree (files cached in RAM) if your object directory is up to date, although Eclipse will take several minutes to process the &quot;build output&quot; that it produces.</p>
+
+<p>Download <a class="link-https" href="https://hg.mozilla.org/users/jwatt_jwatt.org/eclipse-cdt-tools/raw-file/tip/just-print-mozilla-build.py" title="https://hg.mozilla.org/users/jwatt_jwatt.org/eclipse-cdt-tools/raw-file/tip/just-print-mozilla-build.py">just-print-mozilla-build.py</a> and change its permissions to make it executable (&apos;chmod a+x just-print-mozilla-build.py&apos;).</p>
+
+<p class="note">If you don&apos;t put just-print-mozilla-build.py somewhere in your PATH, then go back to the <a href="#Initial_project_properties">Initial project properties</a> section where you set just-print-mozilla-build.py and specify its absolute path instead of just its name.</p>
+
+<p>Now invoke the script by clicking the Build button (the button with the hammer symbol) or by selecting &quot;Project &gt; Build Project&quot; from the main menu. That done, select the &quot;Console&quot; tab at the bottom of the main Eclipse window and you should see the build console output flying by as Eclipse processes it. It should take about 5-10 minutes for Eclipse to finish processing the output.</p>
+
+<h3 id="Additional_discovery_for_C11_mode">Additional discovery for C++11 mode</h3>
+
+<p><a href="/en-US/docs/Using_CXX_in_Mozilla_code" title="/en-US/docs/Using_CXX_in_Mozilla_code">As of Mozilla 25</a>, Mozilla is built in C++11 mode. When GCC is invoked in C++11 mode, it defines pre-processor symbols that enable conditional compilation of C++11 code in its standard library. To correctly parse this code, Eclipse CDT needs to know about these symbols. Unfortunately, the build option discovery process outlined above does not pick up this information, so CDT needs to be told separately about C++11 mode. To do this, go to &quot;Preferences -&gt; C/C++ -&gt; Build -&gt; Settings -&gt; [Discovery] tab -&gt; CDT GCC Built-in Compiler Settings&quot; and add the flag &quot;-std=c++11&quot; at the end of the field labeled &quot;Command to get compiler specs&quot;.</p>
+
+<div class="note">In CDT 8.3 (unreleased as of August 2013), there will be a more user-friendly way to specify this (see <a href="http://wiki.eclipse.org/CDT/User/NewIn83#Toolchains" title="http://wiki.eclipse.org/CDT/User/NewIn83#Toolchains">http://wiki.eclipse.org/CDT/User/NewIn83#Toolchains</a>).</div>
+
+<h3 id="Building_the_index">Building the index</h3>
+
+<p>Once you see the end of the build output in the Console tab and the Build item has disappeared from the Progress tab, you can start indexing the source. If indexing started automatically (see the Progress tab), cancel it, since there seems to be a bug that makes it give bad results when it starts automatically at this stage. Right-click the project root in the Project Explorer tab and select &quot;Index &gt; Rebuild&quot;. You will now see &quot;Indexing...&quot; in the status bar at the bottom right and an Indexing item in the Progress tab. It will take 10 minutes or so on a decent developer machine for a full rebuild of the index.</p>
+
+<div class="warning notecard">Once the indexer has finished (keep an eye on the Progress tab), sanity check that everything went as it should have by right-clicking the project in the Project Explorer tab and selecting &quot;Index &gt; Search For Unresolved Includes&quot;. If you get many more than 2000 unresolved includes (as of May 2012), then things have gone pretty wrong. You should be able to use the list of unresolved includes to help figure out what the problem is (see also the <a href="#Parser_errors">Parser errors</a> section for more troubleshooting tips).</div>
+
+<p>Assuming everything went as expected, you should now find that Eclipse&apos;s code assistance works a whole lot better. :-) To test out the code assistance, see the <a href="#Code_assistance_2">Code assistance</a> subsection of the <a href="#Usage_tips">Usage tips</a> section below.</p>
+
+<p>To improve code assistance even more, see the <a href="#Headers_are_only_parsed_once">Headers are only parsed once</a> subsection of the <a href="#Known_Issues">Known Issues</a> section.</p>
+
+<h3 id="Keeping_the_index_up-to-date">Keeping the index up-to-date</h3>
+
+<p>As the source changes from day-to-day, you&apos;ll want to update the index to keep the code assistance working well.</p>
+
+<p>Since the compiler options used to build the source change relatively infrequently, the &quot;build&quot; step above doesn&apos;t need to be rerun all that often. Rerun it (and then rebuild the index) once a week or so, or as necessary when you start to notice unusual code assistance issues that aren&apos;t fixed by rebuilding the index alone.</p>
+
+<p>Rebuilding the index itself is required much more frequently since the source changes more frequently. In principle, you can set the index to rebuild automatically by opening the workspace preferences, selecting &quot;C/C++ &gt; Indexer&quot;, and reenabling &quot;Automatically update the index&quot;. However, you may find this too disruptive, since re-indexing will then happen very frequently and code assistance can be broken while the index is rebuilding. The alternative is to leave that option disabled and update the index manually as necessary. To update the index manually, use the context menu in the Project Explorer tab on the left side of the window. To rebuild for changes in an individual directory (for example, to take account of some changes that you yourself made) select &quot;Index &gt; Freshen All Files&quot; on that directory. To rebuild the entire index (for example when you pull from mozilla-central) select &quot;Index &gt; Rebuild&quot; on the project root.</p>
+
+<h2 id="Usage_tips">Usage tips</h2>
+
+<p>Below are some of the more useful user tips. (If you&apos;re thinking of adding tips, please first consider how widely useful they&apos;ll be before adding to this already lengthy page.) For further documentation see the official <a class="external" href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/intro/overview.htm" title="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/intro/overview.htm">Eclipse user guide</a> and <a class="external" href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.cdt.doc.user/getting_started/cdt_o_tutorial.htm" title="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.cdt.doc.user/getting_started/cdt_o_tutorial.htm">Eclipse CDT user guide</a>.</p>
+
+<h3 id="Keyboard_shortcuts">Keyboard shortcuts</h3>
+
+<p>Regarding key bindings (keyboard shortcuts), the bindings given below are the defaults. You can change the key bindings by opening the workspace preferences (Eclipse &gt; Preferences, or Window &gt; Preferences) and selecting &quot;General &gt; Keys&quot;. You can set the scheme to &quot;Emacs&quot; or &quot;Microsoft Visual Studio&quot; if that&apos;s your thing, or change individual key bindings. When changing individual key bindings, <u>note that bindings are context sensitive and that any changes you make may be ignored</u> if they conflict with existing bindings, or if they are overridden by a binding for a more specific context. For example, changing the Find Next command to cmd-G/ctrl-G is not sufficient. For that to work you also either need to find the existing bindings for that key combination (using the Bindings column to sort by key combination helps with this) and remove them, or else you need to make your binding very specific by setting the &quot;When&quot; field to &quot;C/C++ Editor&quot; instead of the more general &quot;Editing Text&quot;.</p>
+
+<h3 id="Opening_files">Opening files</h3>
+
+<p>You can quickly open a file by name using Cmd-Shift-R/Ctrl-Shift-R. Although Eclipse doesn&apos;t do fuzzy matching when you type a file name, it does allow you to use wildcards.</p>
+
+<p>To quickly switch between a source file and its header file, use Ctrl-Tab.</p>
+
+<p>To quickly switch to a recently viewed document use Cmd-F6/Ctrl-F6. If you want to change this awkward key binding, the command you need to rebind is &quot;Next Editor&quot;.</p>
+
+<p>To show a filterable list of open documents (similar to the way Emacs gives you a list of open buffers), use Cmd-E/Ctrl-E.</p>
+
+<p>If you click the yellow, double arrow button at the top of the Project Explorer tab on the left, it will keep the selected file in the Project Explorer tab in sync with the file that you&apos;re currently editing.</p>
+
+<h3 id="Organizing_views">Organizing views</h3>
+
+<p>Use Ctrl-M to toggle maximization of the current editor view (the editor must be focused first).</p>
+
+<p>To tab to another view, use Cmd-F7/Ctrl-F7. This is useful if you have maximized the editor using Ctrl-M and you want to quickly see your search results. For example, without un-maximizing the editor.</p>
+
+<p>To side-by-side edit the same file in two different tabs, select the tab of the file that you want to edit, then from the menu bar select &quot;Window &gt; New Editor&quot;. This will open another tab containing the same file. Now simply drag that tab to position it beside, above, or below the original. Changes you make in one editor will be immediately reflected in the other.</p>
+
+<p>Note that the Search, Call Hierarchy, and other tabs have a &quot;Pin&quot; button that allows you to open multiple tabs of these type. This is useful if you want to keep your existing search results open, for example, and have a new search open in a separate tab rather than overriding the contents of the existing Search tab.</p>
+
+<h3 id="Code_assistance_2">Code assistance</h3>
+
+<div class="warning notecard">Note: indexing, by its very nature, is specific to a given compiler configuration. Be aware that when Eclipse gives results for any of the actions that follow, it will not include results for sections of the code that are ifdef&apos;ed out by the configuration used to create your object directory. For example, if you are using a Mac and you search for callers of nsDisplayListBuilder::IsInTransform, the results will not include the caller in nsObjectFrame.cpp because that caller is wrapped in &quot;#ifndef XP_MACOSX&quot;. Just something to keep in mind. ;-)</div>
+
+<p>To jump to the definition of a symbol (or the declaration of a symbol if already at the definition), hover over the symbol, hold down the Ctrl/Cmd key, move the mouse slightly to linkify the symbol, then click on it. (Having to move the mouse slightly is <a class="link-https" href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=26873" title="https://bugs.eclipse.org/bugs/show_bug.cgi?id=26873">Eclipse bug 26873</a>). Alternately, you can jump to the definition of the symbol under the cursor by pressing F3.</p>
+
+<p>To do a C++ symbol search select &quot;Search &gt; C/C++&quot; from the menubar, or use Ctrl-H and select the &quot;C/C++&quot; Search tab.</p>
+
+<p>To quickly find the definition of an enum, class, method, etc. use Ctrl-shift-t/Cmd-shift-t.</p>
+
+<p>To get a list of autocomplete options in an editor tab, start typing the name of an identifier and then type Ctrl-Space. Unfortunately, the autocomplete list cannot (currently) be configured to appear automatically as soon as you start typing a character that might be the start of an identifier name.</p>
+
+<p>To see the callers of a method (and their callers, etc.), select the method and use the context menu to select &quot;Open Call Hierarchy&quot;. Note that there are buttons to the right of the &quot;Open Call Hierarchy&quot; tab that open to switch between &quot;Show Callers&quot; and &quot;Show Callees&quot;.</p>
+
+<p>To see the inheritance tree for a class, select its name in an editor window and select &quot;Open Type Hierarchy&quot; from the context menu. Note that you can switch between &quot;Show the Type Hierarchy&quot;, &quot;Show the Supertype Hierarchy&quot;, and &quot;Show the Subtype Hierarchy&quot; using the buttons to the right of the &quot;Type Hierarchy&quot; tab.</p>
+
+<p>To see the overrides of a virtual method, select that method&apos;s name in an editor window and select &quot;Open Type Hierarchy&quot; or, &quot;Quick Type Hierarchy&quot; from the context menu. The results for &quot;Open Type Hierarchy&quot; will show all classes in the class inheritance tree, and the classes that have methods that override the method will have a triangular red marker beside them. If you select one of these classes, then in the method pane to the right the method you searched for will be highlighted (you may need to scroll to it) - double click to see its definition. The results for &quot;Quick Type Hierarchy&quot; will only show those classes in the inheritance tree that override the method. Double click on a class to go straight to its override&apos;s definition.</p>
+
+<h2 id="Building_from_Eclipse">Building from Eclipse</h2>
+
+<div class="warning notecard">In short, don&apos;t do this. Eclipse doesn&apos;t have good facilities for building incrementally in individual directories in the way that Mozilla developers generally require. More importantly, unless you&apos;re willing to screw up Eclipse&apos;s code assistance (in which case why bother using Eclipse) you&apos;re going to have to set Eclipse&apos;s &quot;Build&quot; step to do a very slow, non-parallel, full rebuild. (See the &quot;Code assistance&quot; section above for why.)</div>
+
+<p>Nevertheless, if you understand the above warning and you still want to configure Eclipse&apos;s &quot;Build&quot; button to invoke a real build, then read on.</p>
+
+<p>Basically, you want to do something similar to the steps in the <a href="#Initial_project_properties">Initial project properties</a> section above, but use &quot;make -j1 -wB&quot; (or just &quot;make&quot; if you don&apos;t care about keeping code assistance working) instead of using just-print-mozilla-build.py.</p>
+
+<p>If you want to invoke &quot;make -f client.mk&quot; from your source directory instead of invoking &apos;make&apos; from your object directory, then in the &quot;C/C++ Build&quot; section of the project properties, set &quot;Build command&quot; to &quot;make -f client.mk&quot; and set &quot;Build directory&quot; to just &quot;${ProjDirPath}&quot; (this is the top of the source tree). Select the Behavior tab and remove the &quot;all&quot; from the &quot;Build (Incremental build)&quot; field. Select &quot;C/C++ Build &gt; Build Variables&quot;, and add a variable &quot;MOZCONFIG&quot;, and set it to the path of your .mozconfig file relative to the top source directory. Set any other environment variables you want to set for the build, then close the project properties window.</p>
+
+<p>Now when you hit the Build button (the little hammer icon), you should see the source build in the Console tab at the bottom of the window.</p>
+
+<p>The benefit of building from inside Eclipse is that build errors will appear in the Problems tab at the bottom of the window, and from there you can double click on the build error and it will take you straight to the source file and line where the problem occurred. For this to work reliably though, you still need to build using slow -j1 -w builds, so that make outputs non-interleaved &quot;Entering&quot;/&quot;Leaving&quot; lines. It also used to be necessary to add the following two lines to your mozconfig to make the compiler output errors all on a single line, but that may not be needed anymore:</p>
+
+<pre>export CFLAGS=&quot;-fmessage-length=0&quot;
+export CPPFLAGS=&quot;-fmessage-length=0&quot;
+</pre>
+
+<h2 id="Debugging">Debugging</h2>
+
+<p class="eval">To create a debug configuration, open the project properties window, and select &quot;Run/Debug Settings&quot; on the left. Click &quot;New&quot;, then select &quot;C/C++ Application&quot;. In the window that opens enter the path to your firefox binary (something like {your-obj-dir}/dist/NightlyDebug.app/Contents/MacOS/firefox) and select &quot;Disable auto build&quot;. Select the Arguments tab and enter any args you want to pass to firefox (such as &quot;--no-remote -p my-testing-profile&quot;). If you&apos;re on Linux, you may also need to set the &quot;Working directory&quot; to {your-obj-dir}/dist/bin, and then select the Environment tab and set LD_LIBRARY_PATH to &quot;.:./plugins:.&quot; and LIBRARY_PATH to &quot;.:./components:.&quot;. (Are these variables really necessary? If so, why? Isn&apos;t LIBRARY_PATH for compile time, not runtime, linking?)</p>
+
+<p>In the workspace preferences, you may want to go to &quot;C/C++ &gt; Debug &gt; GDB&quot; and deselect &quot;Stop on startup at&quot;, so that Eclipse won&apos;t automatically break in main() when it launches Firefox for debugging.</p>
+
+<p>To debug, click the Debug button on the toolbar, or select &quot;Run &gt; Debug&quot; from the menu bar.</p>
+
+<p>It&apos;s not obvious, but <a class="external" href="http://wiki.eclipse.org/CDT/User/FAQ#Since_the_debugger_is_gdb.2C_can_I_simply_access_the_gdb_command_line_interface_.28CLI.29.3F" title="http://wiki.eclipse.org/CDT/User/FAQ#Since_the_debugger_is_gdb.2C_can_I_simply_access_the_gdb_command_line_interface_.28CLI.29.3F">you can get a gdb prompt in the console</a> so that you can type gdb commands directly.</p>
+
+<p>After you&apos;ve finished debugging, you can get back to the C/C++ perspective (i.e. window layout) via the menubar by selecting &quot;Window &gt; Open Perspective &gt; C/C++&quot;.</p>
+
+<h3 id="Upgrading_GDB_on_Mac">Upgrading GDB on Mac</h3>
+
+<p>The ancient, barely maintained Apple fork of GDB that comes with Xcode on Mac is really horrible. If you use Mac, you may want to <a class="external" href="http://sourceware.org/gdb/wiki/BuildingOnDarwin" title="http://sourceware.org/gdb/wiki/BuildingOnDarwin">build the latest FSF version of GDB</a> and set Eclipse to use that GDB for debugging. One suggested configuration for building GDB is &apos;--prefix=&quot;$HOME&quot; --disable-debug --with-python=/usr&apos; (create an optimized build with <a class="external" href="http://sourceware.org/gdb/wiki/PythonGdbTutorial" title="http://sourceware.org/gdb/wiki/PythonGdbTutorial">support for Python</a> (so that you can use python to much better control when you break etc.), and install it in $HOME/bin). That done, open the workspace preferences, select &quot;C/C++ &gt; Debug &gt; GDB&quot;, and set &quot;GDB Debugger&quot; to the full path of your new gdb executable.</p>
+
+<h3 id="GDB_unexpectedly_detaching">GDB unexpectedly detaching</h3>
+
+<p>If GDB starts ignoring your breakpoints, or unexpectedly terminates or detaches from the Firefox process, this may be caused by out of date breakpoints (breakpoints that you set during a previous debug session, after which you&apos;ve since rebuilt). Remove any such breakpoints and restart your debug session.</p>
+
+<h2 id="Known_Issues">Known Issues</h2>
+
+<p>There are various known limitations and bugs when it comes to using Eclipse with Mozilla. Eclipse is open source, of course so if anyone feels like doing a bit of Java hacking to fix these issues that&apos;d be great. </p>
+
+<h3 id="Headers_are_only_parsed_once">Headers are only parsed once</h3>
+
+<p>For performance reasons, Eclipse only processes header files that have include guards once, using the compiler options for the first source file it encounters that includes that header (<a class="link-https" href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=380511" title="https://bugs.eclipse.org/bugs/show_bug.cgi?id=380511">Eclipse bug 380511</a>). This is responsible for most of the parse errors in the source files displayed in Eclipse. One problem with the &quot;parse once&quot; strategy is that the compiler options for the original source file may ifdef out sections of the header, that would not be ifdef&apos;ed out - and in fact are required by - source files in other parts of the tree.</p>
+
+<p>For example, in content/svg/content/src/nsSVGEllipseElement.cpp Eclipse shows a parse error due to NS_DOM_INTERFACE_MAP_ENTRY_CLASSINFO not being defined. This define is in nsDOMClassInfoID.h, which is included via the following include chain:</p>
+
+<pre>content/svg/content/src/nsSVGEllipseElement.cpp
+ content/svg/content/src/nsSVGPathGeometryElement.h
+  content/svg/content/src/nsSVGGraphicElement.h
+   content/svg/content/src/nsSVGStylableElement.h
+    content/svg/content/src/nsSVGElement.h
+     content/base/src/nsGenericElement.h
+      obj-debug/dist/include/nsDOMClassInfoID.h
+</pre>
+
+<p>In nsDOMClassInfoID.h the NS_DOM_INTERFACE_MAP_ENTRY_CLASSINFO define is behind an |ifdef _IMPL_NS_LAYOUT|. The properties for nsSVGEllipseElement.cpp show that this define was picked up by the build option discovery and set on nsSVGEllipseElement.cpp, but somehow it&apos;s not set for nsDOMClassInfoID.h. However, if you right click on nsDOMClassInfoID.h in the Project Explorer and select &quot;Index &gt; Create Parser Log File&quot;, the log shows &quot;Context&quot; is set to &quot;accessible/src/base/AccEvent.cpp&quot;, not &quot;content/svg/content/src/nsSVGEllipseElement.cpp&quot;, and if you check the properties for AccEvent.cpp, indeed it is not built with the _IMPL_NS_LAYOUT define.</p>
+
+<p>One way to mitigate this problem is to explicitly define defines on problem directories. For example, to solve the _IMPL_NS_LAYOUT issue described above, you would use the context menu for the &apos;layout&apos; directory in the Project Explorer tab to open the directory&apos;s properties. You&apos;d select &quot;C/C++ General &gt; Prepocessor Include Paths, Macros etc.&quot;, and select &quot;GNU C++&quot; and &quot;CDT User Settings Entries&quot;. You&apos;d then click &quot;Add&quot;, select &quot;Preprocessor Macro&quot; from the drop-down, and set Name to _IMPL_NS_LAYOUT and leave Value blank. Finally, you&apos;d click OK twice to return to the main Eclipse window, and then use the context menu for the &apos;layout&apos; directory to re-index the &apos;layout&apos; directory, and then to &quot;Run C/C++ Code Analysis&quot; on it to see if the problem is fixed.</p>
+
+<p>This &quot;parse once&quot; strategy can also cause &quot;Unresolved inclusion&quot; errors in headers if the first time Eclipse sees the header is while indexing a file for which it doesn&apos;t have any build output parser data. (Since it then has no explicit include paths to search.) When this happens it frequently causes knock-on errors for the files that include that header (directly or indirectly), since they too now have things missing. People who have their object directory <u>out</u>side their source directory need to take special note of this issue. When the object directory is <u>in</u>side the source directory (and not filtered out by a resource filter), then Eclipse&apos;s &quot;Allow heuristic resolution of includes&quot; option (enabled by default) will generally allow the included headers to be found when Eclipse processes source files, that don&apos;t have any build output parser data. However, when the object directory is <u>out</u>side the source directory, Eclipse doesn&apos;t know about it - or the headers it contains - unless the user takes extra steps to tell it. This is the reason that the instructions in the <a href="#Initial_project_properties">Initial project properties</a> section above instruct users that have their object directory outside their source directory to explicitly add {objdir}/dist/include to the project&apos;s &quot;CDT User Setting Entries&quot;.</p>
+
+<p>Fixing <a class="link-https" href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=381601" title="https://bugs.eclipse.org/bugs/show_bug.cgi?id=381601">Eclipse bug 381601</a> would considerably reduce the impact of the &quot;Unresolved inclusion&quot; issue. (Update 2017-03-28: The option <a href="http://wiki.eclipse.org/CDT/User/NewIn83#Preferences_for_header_variants">Index all header variants</a> has been added in version 8.3.0, as explained in a <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=381601#c17">comment</a> of the mentioned bug. This option allows to have multiple definitions for the same header file, which might fix this issue. Update 2017-11-04 by jwatt: Ticking the &quot;Index all header variants&quot; option caused Eclipse to blow through the 12 GB of RAM I&apos;d given it while indexing before it ran out of memory and crashed.)</p>
+
+<h3 id="There_are_parser_errors">There are parser errors</h3>
+
+<p>It is expected that Eclipse will show parser errors even for a known-good copy of the Mozilla source. Parser errors/warnings are indicated by red/yellow markers on files in the Project Explorer tab, and in the gutter down the right-hand side of open source files. In the case of the latter you can click on the marker to jump to the problem line and then hover over the &quot;bug&quot; icon to get an explanation of what&apos;s wrong.</p>
+
+<p>The parser error indicators don&apos;t seem to show (reliably?) until you open a source file, then error markers will be added for that file. To force all markers to show for a directory in the Project Explorer tab, right-click that directory in the Project Explorer tab and select &quot;Run C/C++ Code Analysis&quot;. As well as adding the markers, this will give you a list of the issues in the Problems tab at the bottom of the window where you can double-click to jump to the location of any given issue.</p>
+
+<p>Many of the parser errors are the result of the <a href="#Headers_are_only_parsed_once">Headers are only parsed once</a> issue, while others are the result of Eclipse trying to do its best to process files that are not built under your configuration (e.g. files compiled only on other platforms) and that therefore have no build output parser data associated with them.</p>
+
+<p>If you are trying to dig into a particular parser errors to figure out what it&apos;s about, here are a few things you can try:</p>
+
+<ol>
+ <li>Select your project in the Project Explorer, then from the context menu select &quot;Index &gt; Search for Unresolved Includes&quot;.</li>
+ <li>For problematic source files, select the file in the Project Explorer and from the context menu select &quot;Index &gt; Create Parser Log File&quot;.</li>
+ <li>Select your project in the Project Explorer, then from the context menu select &quot;Index &gt; Rebuild&quot;. When the indexing is done, open the log using &quot;Window &gt; Show View &gt; Other &gt; General &gt; Error Log&quot; and check the summary and look for exceptions.</li>
+</ol>
+
+<h3 id="Searching">Searching</h3>
+
+<p>Free text search is not backed by a database, so it is <em>extremely</em> slow. Furthermore, the results are not saved so if you immediately search for the exact same text again without any changes to the source files having occurred, Eclipse will do a slow search all over again.</p>
+
+<p>It is not easy to restrict searches to an arbitrary directory, which is pretty annoying given how slow free text search is. (You have to create a new working set containing that directory.)</p>
+
+<p>Search history in a project is not preserved across restarts.</p>
+
+<p>Duplicate searches in history - even consecutive ones - are not coalesced.</p>
+
+<h3 id="Duplicate_files">Duplicate files</h3>
+
+<p>Sometimes when searching for files or symbols you will be given the option between a file in the source tree, and a file of the same name under the object directory. (Some source and header files are copied to the object directory by the build process, so we end up with copies in both places.) This will happen if your object directory is inside the source directory. If you don&apos;t want to switch to using an object directory that&apos;s outside your source tree, then this is just one of those things that you&apos;ll have to live with. (If you do change the location of your object directory, then note the instructions that will then apply to you in the <a href="#Initial_project_properties">Initial project properties</a> section above!) Since the indexer needs to be able to resolve header files in the object directory in order to produce good results, we can&apos;t have Eclipse ignore the object directory. But then there&apos;s no way to tell Eclipse that any given file in the object directory is actually just a copy of a given file in the source directory and that it should always show the user the copy in the source directory while using the file in the object directory for indexing.</p>
+
+<h3 id="Building">Building</h3>
+
+<p>Eclipse&apos;s support for building only in certain directories is non-existent. It would be great if the Console tab gave you a shell prompt so that you could invoke commands to build directly from there.</p>
+
+<p>Failing that, it would be nice if Eclipse could at least pass information about what files have changed to the build process, which could then decide on a faster way to do the build (e.g., &quot;just make in layout/&quot;). I (roc) have actually written a small change to the CDT Make builder that lets you specify that as an option, in which case Eclipse sends the names of all changed files to your build tool. The build tool is a Perl script that figures out if a faster build is possible and if so, does it.</p>
+
+<h2 id="FAQ">FAQ</h2>
+
+<p>Here are some frequently asked questions.</p>
+
+<h3 id="Why_does_Eclipse_need_an_object_directory">Why does Eclipse need an object directory?</h3>
+
+<p>To provide good code assistance Eclipse needs you to have a build directory for two reasons.</p>
+
+<p>First, Eclipse needs to be able to collect a usable set of defines, include paths, and preinclude files for the source files in the tree, as explained in the <a href="#Code_assistance">Code assistance</a> section above.</p>
+
+<p>Second, Eclipse CDT&apos;s indexer needs an object directory because virtually all Mozilla source files include header files (directly or indirectly) that have been copied to or generated in the object directory. Without an object directory, the indexer would find that a lot of header files are missing when processing the source files, which would significantly degrade its ability to index the source and provide good code assistance.</p>
+
+<h3 id="How_can_I_open_Eclipse_for_multiple_trees_at_once">How can I open Eclipse for multiple trees at once?</h3>
+
+<p>To be able to open more than one workspace at a time, you currently need to launch a <em>separate</em> Eclipse process for each workspace.</p>
+
+<p>On Mac, create a script called something like open-my-workspace.py, give it the following contents, replacing the bold paths as appropriate, and make it executable (chmod a+x open-my-workspace.py):</p>
+
+<pre>#!/usr/bin/env python
+import os, subprocess
+eclipse_app_path = <strong>&quot;path/to/Eclipse.app/Contents/MacOS/eclipse&quot;</strong>
+workspace_path = <strong>os.path.join(os.environ[&apos;HOME&apos;], &quot;HOME/relative/path/to/the/directory/of/the/workspace/you/want/to/open&quot;)</strong>
+subprocess.Popen([eclipse_app_path, &quot;-data&quot;, workspace_path])
+# <strong>Uncomment the following line to automatically close the Terminal window</strong>
+# <strong>that opens if you run this script by double clicking it in Finder.</strong>
+#subprocess.Popen([&quot;osascript&quot;, &quot;-e&quot;, &apos;tell application &quot;Terminal&quot;&apos;, &quot;-e&quot;, &quot;close front window&quot;, &quot;-e&quot;, &quot;end tell&quot;])
+</pre>
+
+<p>TODO: add instructions for Linux and Windows.</p>
+
+<h3 id="Is_there_a_Mercurial_plugin_for_Eclipse">Is there a Mercurial plugin for Eclipse?</h3>
+
+<p>There is <a class="external" href="http://www.intland.com/products/mercurialeclipse/download" title="http://www.intland.com/products/mercurialeclipse/download">MercurialEclipse</a>, but probably most Mozilla developers will just prefer to use the command line. If you think we need our own documentation on MercurialEclipse, please consider adding a separate page for that tool since this page is already pretty long.</p>
+
+<h3 id="How_can_I_delete_my_Eclipse_project_and_start_over">How can I delete my Eclipse project and start over?</h3>
+
+<p>If you followed the recommendation above to create one workspace containing only one project for each Mozilla tree, then this is easy. (If you didn&apos;t, and you have projects for more than one source tree entangled in a workspace directory, well, you&apos;re on your own.) Simply delete the <code>.project</code> and <code>.cproject</code> files and the <code>.settings</code> directory (if it exists) from the root of your Mozilla tree, and then delete the workspace directory corresponding to your tree. That&apos;s it; you can now create a new Eclipse workspace and project for your tree from scratch.</p>
+
+<h3 id="Isnt_there_a_better_method_of_build_option_discovery">Isn&apos;t there a better method of build option discovery?</h3>
+
+<p>Yes, but Eclipse doesn&apos;t currently support it. Instead of processing build console output, Eclipse could use something like LD_PRELOAD to load its own little library into all the processes that are invoked as part of the build process. This library could then check whether the process is a compiler instance and, if so, use the processes&apos; current working directory and the arguments that were passed to it to reliably obtain the information it needs for each source file that is compiled. This would eliminate the requirement for non-parallelized, non-silenced builds. You could also build from Eclipse and get the benefits that that brings.</p>
+
+<h3 id="How_can_I_run_a_more_recent_CDT_version">How can I run a more recent CDT version?</h3>
+
+<p>This can be useful if you need to get certain bug fixes, or to help with testing to make sure that new Eclipse bugs that affect its use with Mozilla don&apos;t get shipped. If you&apos;ve downloaded an <a class="external" href="http://www.eclipse.org/downloads/index-developer.php" title="http://www.eclipse.org/downloads/index-developer.php">Eclipse Developer build</a> then you can use Eclipse&apos;s software update mechanism to update your developer snapshot to the latest nightly for that developer branch. To do that, carry out the following steps.</p>
+
+<p>From Eclipse&apos;s &quot;Help&quot; menu select &quot;Install New Software...&quot;, then in the &quot;Install&quot; window that opens, click &quot;Available Software Sites&quot;. In the window that opens, click &quot;Add&quot;, and in the prompt set Name to something like &quot;Nightly&quot; and Location to something like &quot;<a class="external" href="http://download.eclipse.org/tools/cdt/builds/juno/nightly" rel="freelink">http://download.eclipse.org/tools/cd...s/juno/nightly</a>&quot; (change &quot;juno&quot; to the current developer branch). Click &quot;OK&quot;, then &quot;OK&quot; again. Type &quot;Nightly&quot; into the &quot;Work with&quot; field and select the repository that you just added. (If it doesn&apos;t appear, close the window, reopen it from the Help menu, and try again.) A &quot;CDT Main Features&quot; option should now have been added in the area below. Tick this (<em>all</em> of its sub-options should then be ticked), click &quot;Next&quot; twice, accept the license agreement, and then click &quot;Finish&quot;. Eclipse should now update itself and ask you to restart.</p>
+
+<p><strong>Troubleshooting:</strong> If you get an error when trying to update, try clicking &quot;Available Software Sites&quot; in the &quot;Install&quot; window, make sure &quot;Juno&quot; is still unticked, that &quot;Nightly&quot; is ticked, highlight &quot;Nightly&quot;, click &quot;Reload&quot;, &quot;OK&quot;, and then try again.</p>
+
+<h2 id="Troubleshooting">Troubleshooting</h2>
+
+<p>Here is a list of problems people have encountered, and suggestions for solutions.</p>
+
+<h3 id="Problem_Occurred_Java_heap_space">Problem Occurred (Java heap space)</h3>
+
+<p>If Eclipse becomes glacially slow or hangs and then you get this error message, see the <a href="#Increasing_memory_limits">Increasing memory limits</a> section above. If you already carried out the instructions in that section, then double check that your changes to Eclipse&apos;s memory limits actually took effect and are present in <code>Eclipse/Help &gt; About Eclipse &gt; Installation Details &gt; Configuration</code>. If they did, then maybe you need to increase the limits still further for your OS/JVM combination.</p>
+
+<h3 id="Resource_is_out_of_sync_with_the_file_system">Resource is out of sync with the file system</h3>
+
+<p>If you get the message &quot;Resource is out of sync with the file system&quot;, then you didn&apos;t set the &quot;Refresh&quot; options above in the <a href="#Initial_workspace_preferences">Initial workspace preferences</a> section. Either set those, or else refresh the project (or an individual directory/file) manually using the Refresh item from the context menu in the Project Explorer tab.</p>
+
+<h2 id="Old">Old</h2>
+
+<p>Everything that follows is old content that should maybe just be deleted now?</p>
+
+<h3 id="GDB_Timeouts">GDB Timeouts</h3>
+
+<p>I don&apos;t think this old comment from 2007/2008 is an issue anymore.</p>
+
+<p>Out of the box, you may/will get GDB connection timeouts. This is because Eclipse is trying to push every subfolder in GDB&apos;s environment. The easiest way to resolve this issue is to remove any source entry from the debug configuration (Run-&gt;Open Debug Dialog...) in the Source tab. Doing so will, unfortunately, remove the binding between the binaries and the source code. To keep this feature working, you need to add a &quot;Path Mapping&quot; by clicking &quot;Add...&quot; in the Source tab. Once a &quot;Path Mapping&quot; is created, select &quot;Edit...&quot; and add an entry with these values</p>
+
+<pre class="eval"> Compilation path: /
+ Local file system path: /
+</pre>
+
+<p>This is the only known workaround to bind binaries to source files. It has been tested and works perfectly under Eclipse Europa (3.3.2) with Eclipse-CDT (4.0.3).</p>

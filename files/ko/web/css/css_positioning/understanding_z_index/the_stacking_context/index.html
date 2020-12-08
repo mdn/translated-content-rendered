@@ -1,0 +1,240 @@
+---
+title: 쌓임 맥락
+slug: Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+tags:
+  - Advanced
+  - CSS
+  - Guide
+  - Reference
+  - z-index
+translation_of: Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ko/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ko/docs/Web/CSS/Reference">CSS Reference</a></strong></li><li><strong><a href="/ko/docs/Web/CSS/CSS_Positioning">CSS Positioning</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/ko/docs/Web/CSS/CSS_Positioning/Understanding_z_index">CSS z-index 이해하기</a></li></ol></details></li><li class="toggle"><details open><summary>Properties</summary><ol><li><a href="/ko/docs/Web/CSS/bottom"><code>bottom</code></a> <a href="/ko/docs/Web/CSS/bottom$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/CSS/clear"><code>clear</code></a></li><li><a href="/ko/docs/Web/CSS/float"><code>float</code></a></li><li><a href="/ko/docs/Web/CSS/left"><code>left</code></a> <a href="/ko/docs/Web/CSS/left$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/CSS/position"><code>position</code></a></li><li><a href="/ko/docs/Web/CSS/right"><code>right</code></a> <a href="/ko/docs/Web/CSS/right$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/CSS/top"><code>top</code></a> <a href="/ko/docs/Web/CSS/top$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/ko/docs/Web/CSS/z-index"><code>z-index</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary"><strong>쌓임 맥락</strong>(stacking context)은 가상의 Z축을 사용한 HTML 요소의 3차원 개념화입니다.</span> Z축은 사용자 기준이며, 사용자는 뷰포트 혹은 웹페이지를 바라보고 있을 것으로 가정합니다. 각각의 HTML 요소는 자신의 속성에 따른 우선순위를 사용해 3차원 공간을 차지합니다.</p>
+
+<h2 id="쌓임_맥락">쌓임 맥락</h2>
+
+<p>이전 글 <a href="/ko/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Adding_z-index">z-index 사용하기</a>에서 보았듯, 특정 요소의 렌더링 순서는 자신의 <code>z-index</code> 속성 값에 영향을 받습니다. 이는 그 요소들이 가진 특별한 속성으로 인해 <strong>쌓임 맥락</strong>이 생성되기 때문입니다.</p>
+
+<p>쌓임 맥락은, 문서 어디에서나, 다음 조건을 만족하는 요소가 생성합니다.</p>
+
+<ul>
+ <li>문서의 루트 요소. (<code>&lt;html&gt;</code>)</li>
+ <li><a href="/ko/docs/Web/CSS/position" title="CSS position 속성은 문서 상에 요소를 배치하는 방법을 지정합니다. top, right, bottom, left 속성이 요소를 배치할 최종 위치를 결정합니다."><code>position</code></a>이 <code>absolute</code> 또는 <code>relative</code>이고, <a href="/ko/docs/Web/CSS/z-index" title="CSS z-index 속성은 위치 지정 요소와, 그 자손 또는 하위 플렉스 아이템의 Z축 순서를 지정합니다. 더 큰 z-index 값을 가진 요소가 작은 값의 요소 위를 덮습니다."><code>z-index</code></a>가 <code>auto</code>가 아닌 요소.</li>
+ <li><a href="/ko/docs/Web/CSS/position" title="CSS position 속성은 문서 상에 요소를 배치하는 방법을 지정합니다. top, right, bottom, left 속성이 요소를 배치할 최종 위치를 결정합니다."><code>position</code></a>이 <code>fixed</code> 또는 <code>sticky</code>인 요소. (<code>sticky</code>는 모든 모바일 브라우저에서는 해당하지만 구형 데스크톱 브라우저에서는 해당하지 않음)</li>
+ <li>플렉스(<a href="/ko/docs/Web/CSS/flexbox" title="The documentation about this has not yet been written; please consider contributing!"><code>flexbox</code></a>) 컨테이너의 자식 중 <a href="/ko/docs/Web/CSS/z-index" title="CSS z-index 속성은 위치 지정 요소와, 그 자손 또는 하위 플렉스 아이템의 Z축 순서를 지정합니다. 더 큰 z-index 값을 가진 요소가 작은 값의 요소 위를 덮습니다."><code>z-index</code></a>가 <code>auto</code>가 아닌 요소.</li>
+ <li>그리드(<a href="/ko/docs/Web/CSS/grid" title="grid CSS 속성은 shorthand property 입니다. 외재적인 속성인 (grid-template-rows, grid-template-columns, grid-template-areas), 값과 내재적인 속성인 (grid-auto-rows, grid-auto-columns, grid-auto-flow), 값을 한번에 설정합니다."><code>grid</code></a>) 컨테이너의 자식 중 <a href="/ko/docs/Web/CSS/z-index" title="CSS z-index 속성은 위치 지정 요소와, 그 자손 또는 하위 플렉스 아이템의 Z축 순서를 지정합니다. 더 큰 z-index 값을 가진 요소가 작은 값의 요소 위를 덮습니다."><code>z-index</code></a>가 <code>auto</code>가 아닌 요소.</li>
+ <li><a href="/ko/docs/Web/CSS/opacity" title="opacity CSS 속성은 요소의 불투명도를 설정합니다."><code>opacity</code></a>가 1보다 작은 요소. (<a href="http://www.w3.org/TR/css3-color/#transparency">불투명도 명세</a> 참고)</li>
+ <li><a href="/ko/docs/Web/CSS/mix-blend-mode" title="mix-blend-mode CSS 속성은 어느 요소의 콘텐츠가 자신의 배경 및 부모와 어떻게 혼합되어야 하는지 지정합니다."><code>mix-blend-mode</code></a>가 <code>normal</code>이 아닌 요소.</li>
+ <li>다음 속성 중 하나라도 <code>none</code>이 아닌 값을 가진 요소.
+  <ul>
+   <li><a href="/ko/docs/Web/CSS/transform" title="CSS transform 속성으로 요소에 회전, 크기 조절, 기울이기, 이동 효과를 부여할 수 있습니다."><code>transform</code></a></li>
+   <li><a href="/ko/docs/Web/CSS/filter" title="CSS filter 속성은 흐림 효과나 색상 변형 등 그래픽 효과를 요소에 적용합니다."><code>filter</code></a></li>
+   <li><a href="/ko/docs/Web/CSS/perspective" title="The documentation about this has not yet been written; please consider contributing!"><code>perspective</code></a></li>
+   <li><a href="/ko/docs/Web/CSS/clip-path" title="clip-path CSS 속성은 요소의 클리핑 범위를 지정합니다. 클리핑 범위 안의 부분은 보여지고, 바깥은 숨겨집니다."><code>clip-path</code></a></li>
+   <li><a href="/ko/docs/Web/CSS/mask" title="mask CSS 속성은 아이템이 부분적으로만 보여지게 하거나 혹은 완전히 가려서 보여지지 않게 할 수 있는 기능을 가지고 있습니다. 이 속성은 마스킹 혹은 특정한 점을 기준으로 이미지를 잘라내는 기능을 함께 제공합니다."><code>mask</code></a> / <a href="/ko/docs/Web/CSS/mask-image" title="The documentation about this has not yet been written; please consider contributing!"><code>mask-image</code></a> / <a href="/ko/docs/Web/CSS/mask-border" title="The documentation about this has not yet been written; please consider contributing!"><code>mask-border</code></a></li>
+  </ul>
+ </li>
+ <li><a href="/ko/docs/Web/CSS/isolation" title="isolation CSS 속성은 요소가 새로운 쌓임 맥락을 생성해야 하는지 지정합니다."><code>isolation</code></a>이 <code>isolate</code>인 요소.</li>
+ <li><a href="/ko/docs/Web/CSS/-webkit-overflow-scrolling" title="CSS -webkit-overflow-scrolling 속성은 터치 단말기에서 주어진 요소의 모멘텀 기반 스크롤 활성화 여부를 결정합니다."><code>-webkit-overflow-scrolling</code></a>이 <code>touch</code>인 요소.</li>
+ <li><a href="/ko/docs/Web/CSS/will-change" title="will-change CSS 속성은 요소에 예상되는 변화의 종류에 관한 힌트를 브라우저에 제공케 한다.  그래서 실제 요소가 변화되기 전에 미리 브라우저는 적절하게 최적화할 수 있다. 이러한 종류의 최적화는 잠재적으로 성능 비용이 큰 작업을 그것이 실제로 요구되기 전에 미리 실행함으로써 페이지의 반응성을 증가시킬 수 있다."><code>will-change</code></a>의 값으로, 초깃값이 아닐 때 새로운 쌓임 맥락을 생성하는 속성을 지정한 요소.</li>
+ <li><a href="/ko/docs/Web/CSS/contain" title="CSS contain 속성은 특정 요소와 콘텐츠가 문서 트리의 다른 부위와 독립되어있음을 나타낼 때 사용합니다. 브라우저는 이 정보를 사용해 레이아웃, 스타일, 페인트, 크기, 또는 그 조합의 계산을 전체 페이지 DOM 대신 일부에서만 수행할 수 있으므로 뚜렷한 성능 상 이점을 얻을 수 있습니다."><code>contain</code></a>이 <code>layout</code>, <code>paint</code>, 또는 둘 중 하나를 포함하는 값(<code>strict</code>, <code>content</code> 등)인 요소.</li>
+</ul>
+
+<p>쌓임 맥락 안의 자식 요소는 이전에 설명했던 규칙을 동일하게 사용해 쌓입니다. 중요한 것은, 자식의 <code>z-index</code> 값은 부모에게만 의미가 있다는 점입니다. 하나의 쌓임 맥락은 부모 쌓임 맥락 안에서 통째로 하나의 단위로 간주됩니다.</p>
+
+<p>요약하면,</p>
+
+<ul>
+ <li>쌓임 맥락이 다른 쌓임 맥락을 포함할 수 있고, 함께 계층 구조를 이룹니다.</li>
+ <li>쌓임 맥락은 형제 쌓임 맥락과 완전히 분리됩니다. 쌓임을 처리할 땐 자손 요소만 고려합니다.</li>
+ <li>각각의 쌓임 맥락은 독립적입니다. 어느 요소의 콘텐츠를 쌓은 후에는 그 요소를 통째 부모 쌓임 맥락 안에 배치합니다.</li>
+</ul>
+
+<div class="note"><strong>참고:</strong> 모든 요소가 쌓임 맥락을 생성하는 건 아니므로, 쌓임 맥락의 계층 구조는 HTML 요소 계층 구조의 부분집합입니다. 자신의 쌓임 맥락을 만들지 않은 요소는 &apos;부모 쌓임 맥락에 의해 <strong>동화된다</strong>&apos;라고 표현할 수 있겠습니다.</div>
+
+<h2 id="예시"><strong>예시</strong></h2>
+
+<p><img alt="Example of stacking rules modified using z-index" class="internal" src="/@api/deki/files/913/=Understanding_zindex_04.png"></p>
+
+<p>위의 예시에서, 모든 요소는 각자의 포지션과 <code>z-index</code>로 인해 자신의 쌓임 맥락을 형성합니다. 쌓임 맥락의 계층 구조는 다음과 같습니다.</p>
+
+<ul>
+ <li>루트
+  <ul>
+   <li>DIV #1</li>
+   <li>DIV #2</li>
+   <li>DIV #3
+    <ul>
+     <li>DIV #4</li>
+     <li>DIV #5</li>
+     <li>DIV #6</li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+<p>DIV #4, DIV #5, DIV #6은 DIV #3의 자식이므로, DIV #3 내부에서만 셋의 쌓임을 처리했다는 것을 이해하는게 중요합니다. DIV #3 내부의 요소의 쌓기와 렌더링이 끝난 후에는, 전체 DIV #3을 루트 요소의 쌓임 맥락 하에서 형제 DIV와 쌓습니다.</p>
+
+<div class="note">
+<p><strong>참고:</strong></p>
+
+<ul>
+ <li>DIV #4는 DIV #1보다 z-index 속성 값이 더 크지만 DIV #1보다 아래에 렌더링 되었다. 왜냐하면 DIV #1의 z-index 속성 값인 5는 뿌리 엘리먼트의 쌓임 맥락 안에서 유효하나 DIV #4의 z-index 속성 값인 6은 DIV #3의 쌓임 맥락 안에서만 유효하기 때문이다. DIV #4는 자신이 속하는 DIV #3의 z-index 속성 값이 4이므로 DIV #1 아래에 쌓였다.</li>
+ <li>같은 이유로 DIV #2는 DIV #5 아래에 렌더링 되었다. DIV #5는 DIV #2보다 z-index 값이 작지만 뿌리 엘리먼트의 쌓임 맥락안에서 유효한 DIV #5가 속한 DIV #3의 z-index 값이 DIV #2의 z-index 값 보다 더 크기 때문이다.</li>
+ <li>DIV #3의 z-index 속성 값인 4는 DIV #4, DIV #5, DIV #6의 z-index 속성값과 독립적이다. 왜냐하면 다른 쌓임 맥락에 속해있기 때문이다.</li>
+ <li>렌더링 순서를 이해하는 쉬운 방법은 z-index를 &quot;버전 번호&quot; 처럼 생각하는 것이다. 자식 엘리먼트는 부모 엘리먼트 버전 번호의 마이너 버전이다. 이 방법은 왜 z-index가 1인 DIV #5가 z-index가 2인 DIV #2 위에 쌓였는지, z-index가 6인 DIV #4가 z-index가 5인 DIV #1 아래에 쌓였는지 이해하게 해준다. 우리 예제에서는
+  <ul>
+   <li>뿌리 엘리먼트
+    <ul>
+     <li>DIV #2 - z-index가 2</li>
+     <li>DIV #3 - z-index가 4
+      <ul>
+       <li>DIV #5 - z-index가 1인데 z-index가 4인 엘리먼트 아래에서 쌓였으므로 렌더링 순서는 4.1이다.</li>
+       <li>DIV #6 - z-index가 3인데 z-index가 4인 엘리먼트 아래에서 쌓였으므로 렌더링 순서는 4.3이다.</li>
+       <li>DIV #4 - z-index가 6인데 z-index가 4인 엘리먼트 아래에서 쌓였으므로 렌더링 순서는 4.6이다.</li>
+      </ul>
+     </li>
+     <li>DIV #1 - z-index가 5</li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+</div>
+
+<h2 id="예제">예제</h2>
+
+<h3 id="HTML">HTML</h3>
+
+<pre class="brush: html notranslate"><code>&lt;div id=&quot;div1&quot;&gt;
+  &lt;h1&gt;Division Element #1&lt;/h1&gt;
+  &lt;code&gt;position: relative;&lt;br/&gt;
+  z-index: 5;&lt;/code&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;div2&quot;&gt;
+  &lt;h1&gt;Division Element #2&lt;/h1&gt;
+  &lt;code&gt;position: relative;&lt;br/&gt;
+  z-index: 2;&lt;/code&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;div3&quot;&gt;
+  &lt;div id=&quot;div4&quot;&gt;
+    &lt;h1&gt;Division Element #4&lt;/h1&gt;
+    &lt;code&gt;position: relative;&lt;br/&gt;
+    z-index: 6;&lt;/code&gt;
+  &lt;/div&gt;
+
+  &lt;h1&gt;Division Element #3&lt;/h1&gt;
+  &lt;code&gt;position: absolute;&lt;br/&gt;
+  z-index: 4;&lt;/code&gt;
+
+  &lt;div id=&quot;div5&quot;&gt;
+    &lt;h1&gt;Division Element #5&lt;/h1&gt;
+    &lt;code&gt;position: relative;&lt;br/&gt;
+    z-index: 1;&lt;/code&gt;
+  &lt;/div&gt;
+
+  &lt;div id=&quot;div6&quot;&gt;
+    &lt;h1&gt;Division Element #6&lt;/h1&gt;
+    &lt;code&gt;position: absolute;&lt;br/&gt;
+    z-index: 3;&lt;/code&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<h3 id="Division_Element_.231" name="Division_Element_.231">CSS</h3>
+
+<pre class="brush: css notranslate"><code>* {
+  margin: 0;
+}
+html {
+  padding: 20px;
+  font: 12px/20px Arial, sans-serif;
+}
+div {
+  opacity: 0.7;
+  position: relative;
+}
+h1 {
+  font: inherit;
+  font-weight: bold;
+}
+#div1,
+#div2 {
+  border: 1px dashed #696;
+  padding: 10px;
+  background-color: #cfc;
+}
+#div1 {
+  z-index: 5;
+  margin-bottom: 190px;
+}
+#div2 {
+  z-index: 2;
+}
+#div3 {
+  z-index: 4;
+  opacity: 1;
+  position: absolute;
+  top: 40px;
+  left: 180px;
+  width: 330px;
+  border: 1px dashed #900;
+  background-color: #fdd;
+  padding: 40px 20px 20px;
+}
+#div4,
+#div5 {
+  border: 1px dashed #996;
+  background-color: #ffc;
+}
+#div4 {
+  z-index: 6;
+  margin-bottom: 15px;
+  padding: 25px 10px 5px;
+}
+#div5 {
+  z-index: 1;
+  margin-top: 15px;
+  padding: 5px 10px;
+}
+#div6 {
+  z-index: 3;
+  position: absolute;
+  top: 20px;
+  left: 180px;
+  width: 150px;
+  height: 125px;
+  border: 1px dashed #009;
+  padding-top: 125px;
+  background-color: #ddf;
+  text-align: center;
+}</code></pre>
+
+<h3 id="결과">결과</h3>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="396" id="frame_예제" src="https://mdn.mozillademos.org/ko/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context$samples/%EC%98%88%EC%A0%9C?revision=1654836" width="100%"></iframe></p>
+
+<h2 id="같이_보기">같이 보기</h2>
+
+<ul>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_without_z-index">Stacking without the z-index property</a>: The stacking rules that apply when <code>z-index</code> is not used.</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_and_float">Stacking with floated blocks</a>: How floating elements are handled with stacking.</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Adding_z-index">Using z-index</a>: How to use <code>z-index</code> to change default stacking.</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_context_example_1">Stacking context example 1</a>: 2-level HTML hierarchy, <code>z-index</code> on the last level</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_context_example_2">Stacking context example 2</a>: 2-level HTML hierarchy, <code>z-index</code> on all levels</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_context_example_3">Stacking context example 3</a>: 3-level HTML hierarchy, <code>z-index</code> on the second level</li>
+</ul>
+
+<div class="originaldocinfo">
+<h2 id="Original_Document_Information" name="Original_Document_Information">Original Document Information</h2>
+
+<ul>
+ <li>Author(s): Paolo Lombardi</li>
+ <li>This article is the English translation of an article I wrote in Italian for <a class="external" href="http://www.yappy.it">YappY</a>. I grant the right to share all the content under the <a class="external" href="http://creativecommons.org/licenses/by-sa/2.0/">Creative Commons: Attribution-Sharealike license</a>.</li>
+ <li>Last Updated Date: July 9, 2005</li>
+</ul>
+</div>

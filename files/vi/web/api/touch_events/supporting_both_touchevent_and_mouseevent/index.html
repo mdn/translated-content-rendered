@@ -1,0 +1,61 @@
+---
+title: Supporting both TouchEvent and MouseEvent
+slug: Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
+translation_of: Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/vi/docs/Web/API/Touch_events">Touch events</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/vi/docs/Web/API/Touch_events/Multi-touch_interaction">Multi-touch interaction</a> <a style="opacity: 0.5;" href="/vi/docs/Web/API/Touch_events/Multi-touch_interaction$translate">[Translate]</a></li><li><a href="/vi/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent">Supporting both TouchEvent and MouseEvent</a></li><li><a href="/vi/docs/Web/API/Touch_events/Using_Touch_Events">Using Touch Events</a> <a style="opacity: 0.5;" href="/vi/docs/Web/API/Touch_events/Using_Touch_Events$translate">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/vi/docs/Web/API/Touch"><code>Touch</code></a></li><li><a href="/vi/docs/Web/API/TouchEvent"><code>TouchEvent</code></a></li><li><a href="/vi/docs/Web/API/TouchList"><code>TouchList</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/vi/docs/Web/Events/touchstart"><code>touchstart</code></a></li><li><a href="/vi/docs/Web/Events/touchend"><code>touchend</code></a></li><li><a href="/vi/docs/Web/Events/touchmove"><code>touchmove</code></a></li><li><a href="/vi/docs/Web/Events/touchcancel"><code>touchcancel</code></a></li></ol></details></li></ol></section><p></p>
+
+<p><a href="/vi/docs/Web/API/Touch_events" title="In order to provide quality support for touch-based user interfaces, touch events offer the ability to interpret finger (or stylus) activity on touch screens or trackpads."><code>touch</code></a> interface cho phép cung cấp các tương tác với ứng dụng trên thiết bị. Tuy nhiên, sự thật là đa số các web hiện tại được thiết kế để làm việc với trỏ chuột. Thậm chí, khi trình duyệt hổ trợ touch, trình duyệt vẫn phải <em>giả lập</em> sự kiện của chuột.</p>
+
+<h2 id="Event_firing">Event firing</h2>
+
+<p>Touch event đưa ra vài yêu cầu cho trình duyệt (xem <a href="https://w3c.github.io/touch-events/#mouse-events"><em>Interaction with Mouse Events and click</em></a> để xem chi tiết), lưu ý răng <em>trình duyệt có thể fire cả 2 sự kiện touch và mouse để đáp lại cùng một tương tác của user</em>. </p>
+
+<p>Nếu trình duyệt fire cả 2 sự kiện touch và mouse cho cùng tương tác, trình duyệt <em>phải </em> fire <code><a href="/vi/docs/Web/Reference/Events/touchstart" title="/vi/docs/Web/Reference/Events/touchstart">touchstart</a></code> trước khi fire sự kiện mouse. Vì vậy, nếu ứng dụng không muốn sử dụng sự kiện mouse trên một element <a href="/vi/docs/Web/API/Touch/target" title="The documentation about this has not yet been written; please consider contributing!"><code>target</code></a>, chúng ta phải gọi <a href="/vi/docs/Web/API/Event/preventDefault" title="The documentation about this has not yet been written; please consider contributing!"><code>preventDefault()</code></a>.</p>
+
+<p>Đây là một snippet code dùng <code><a href="/vi/docs/Web/Reference/Events/touchmove" title="/vi/docs/Web/Reference/Events/touchmove">touchmove</a></code> event handler và gọi <code>preventDefault()</code>.</p>
+
+<pre class="brush: js">// touchmove handler
+function process_touchmove(ev) {
+  // Call preventDefault() to prevent any further handling
+  ev.preventDefault();
+}
+</pre>
+
+<h2 id="Thứ_tự_Event">Thứ tự Event</h2>
+
+<p>Thứ tự của các sự kiện touch và mouse được định nghĩa như sau:</p>
+
+<ul>
+ <li><code>touchstart</code></li>
+ <li>Zero hoặc các sự kiện <code>touchmove</code> tiếp tục, tùy thuộc user có tiếp tục kéo ngón tay không</li>
+ <li><code>touchend</code></li>
+ <li><code>mousemove</code></li>
+ <li><code>mousedown</code></li>
+ <li><code>mouseup</code></li>
+ <li><code>click</code></li>
+</ul>
+
+<p>Nếu <code><a href="/vi/docs/Web/Reference/Events/touchstart" title="/vi/docs/Web/Reference/Events/touchstart">touchstart</a></code>, <code><a href="/vi/docs/Web/Reference/Events/touchmove" title="/vi/docs/Web/Reference/Events/touchmove">touchmove</a></code> hoặc <code><a href="/vi/docs/Web/Reference/Events/touchend" title="/vi/docs/Web/Reference/Events/touchend">touchend</a></code> được hủy, sẽ không có sự mouse hoặc click nào được fire, thứ tự sẽ là:</p>
+
+<ul>
+ <li><code>touchstart</code></li>
+ <li>Zero hoặc các sự kiện <code>touchmove</code> tiếp tục, tùy thuộc user có tiếp tục kéo ngón tay không</li>
+ <li><code>touchend</code></li>
+</ul>
+
+<h2 id="Community">Community</h2>
+
+<ul>
+ <li><a href="https://github.com/w3c/touch-events">Touch Events Community Group</a></li>
+ <li><a href="https://lists.w3.org/Archives/Public/public-touchevents/">Mail list</a></li>
+ <li><a href="irc://irc.w3.org:6667/">W3C #touchevents IRC channel</a></li>
+</ul>
+
+<h2 id="Related_topics_and_resources">Related topics and resources</h2>
+
+<ul>
+ <li><a href="/Web/API/Touch_events">Touch Events Overview</a></li>
+ <li><a href="/Web/API/Touch_events/Using_Touch_Events">Using Touch Events</a></li>
+ <li><a href="http://www.html5rocks.com/en/mobile/touchandmouse/">Touch and Mouse (Together Again for the First Time)</a></li>
+</ul>

@@ -1,0 +1,124 @@
+---
+title: Przykłady wyrażeń regularnych
+slug: >-
+  Web/JavaScript/Guide/Obsolete_Pages/Przewodnik_po_języku_JavaScript_1.5/Praca_z_wyrażeniami_regularnymi/Przykłady_wyrażeń_regularnych
+tags:
+  - JavaScript
+  - Przewodnik_JavaScript
+  - Wszystkie_kategorie
+---
+<p> </p>
+<h3 id="Przyk.C5.82ady" name="Przyk.C5.82ady">Przykłady</h3>
+<p>Poniższe przykłady prezentują niektóre użycia wyrażeń regularnych.</p>
+<h4 id="Zmiana_kolejno.C5.9Bci_w_.C5.82a.C5.84cuchu_znak.C3.B3w_wej.C5.9Bcia" name="Zmiana_kolejno.C5.9Bci_w_.C5.82a.C5.84cuchu_znak.C3.B3w_wej.C5.9Bcia">Zmiana kolejności w łańcuchu znaków wejścia</h4>
+<p>Następujący przykład ilustruje tworzenie wyrażeń regularnych i użycie <code>string.split()</code> i <code>string.replace()</code>. Czyści on bezwzględnie wejściowy łańcuch znaków zawierający imiona (pierwsze imię jest pierwsze) oddzielone odstępem, tabulatorem i dokładnie jednym średnikiem. Na koniec odwraca on kolejność imion (ostatnie imię jest pierwsze) i sortuje listę.</p>
+<pre>&lt;script type=&quot;text/javascript&quot;&gt;
+
+// Łańcuch znaków z imionami zawiera wiele spacji i tabulatorów,
+// może również zawierać wiele spacji pomiędzy pierwszym a ostatnim imieniem.
+var imiona = &quot;Harry Trump ;Fred Barney; Helen Rigby ; Bill Abel ; Chris Hand &quot;;
+
+var output = new Array(
+  &quot;---------- Oryginalny łańcuch znaków&lt;br&gt;&lt;br&gt;&quot;,
+  imiona + &quot;&lt;br&gt;&lt;br&gt;&quot;);
+
+// Przygotuj dwa wzorce wyrażeń regularnych i tablicę do przechowywania.
+// Podziel łańcuch na elementy tablicy.
+
+// wzorzec: możliwe białe znaki, następnie średnik, potem znów możliwe białe
+var wzor = /\s*;\s*/;
+
+// Rozbij łańcuch znaków na części oddzielone przez powyższy wzorzec
+// i przechowaj je w tablicy o nazwie listaImion
+var listaImion = imiona.split(wzor);
+
+// Nowy wzorzec: jeden lub więcej znaków, następnie spacje, następnie znów znaki.
+// Użyj nawiasów, by &quot;zapamiętać&quot; porcje wzorca.
+// Zapamiętane porcje przydadzą się później.
+var wzor = /(\w+)\s+(\w+)/;
+
+// Nowa tablica do przechowywania przetwarzanych imion.
+var ListaWgNazwisk = new Array();
+
+// Wyświetl nazwę tablicy i wypełnij nową tablicę
+// imionami oddzielonymi za pomocą przecinka, zaczynając od ostatniego.
+//
+// Metoda &quot;zamien&quot; usuwa wszystko pasujące do wzorca
+// i zamienia to z zapamiętanymi porcjami.
+//
+// Zmienne $1 i $2 odwołują się do zapamiętanych porcji
+// podczas porównywania wzorca.
+
+output.push(&quot;---------- Po rozdzieleniu przez wyrażenie regularne&lt;BR&gt;&quot;);
+
+var i, len;
+for (i = 0, len = listaImion.length; i &lt; len; i++)
+{
+  output.push(nameList[i] + &quot;&lt;br&gt;&quot;);
+  ListaWgNazwisk[i] = listaImion[i].replace(wzor, &quot;$2, $1&quot;)
+}
+
+// Wyświetl nową tablicę.
+output.push(&quot;---------- Odwrócone imiona&lt;br&gt;&quot;);
+for (i = 0, len = ListaWgNazwisk.length; i &lt; len; i++)
+{
+  output.push(ListaWgNazwisk[i] + &quot;&lt;br&gt;&quot;)
+}
+
+// Sortuj według ostatniego imienia, następnie wyświetl posortowaną tablicę.
+ListaWgNazwisk.sort();
+output.push(&quot;---------- Posortowano&lt;br&gt;&quot;);
+for (i = 0, len = ListaWgNazwisk.length; i &lt; len; i++)
+{
+  output.push(ListaWgNazwisk[i] + &quot;&lt;br&gt;&quot;)
+}
+
+output.push(&quot;---------- Koniec&lt;br&gt;&quot;);
+
+document.write(output.join(&quot;\n&quot;));
+
+&lt;/script&gt;
+</pre>
+<h4 id="U.C5.BCywanie_specjalnych_znak.C3.B3w_do_sprawdzenia_wej.C5.9Bcia" name="U.C5.BCywanie_specjalnych_znak.C3.B3w_do_sprawdzenia_wej.C5.9Bcia">Używanie specjalnych znaków do sprawdzenia wejścia</h4>
+<p>W następującym przykładzie, użytkownik wprowadza numer telefonu. Gdy użytkownik naciśnie klawisz Enter, skrypt sprawdzi poprawność numeru. Jeśli numer jest poprawny (pasuje do sekwencji znaków określonej przez wyrażenie regularne), skrypt wywoła okno z podziękowaniem użytkownikowi i zatwierdza numer. Jeśli numer nie jest poprawny, skrypt wywoła okno informacji o nieprawidłowym numerze telefonu.</p>
+<p>Wyrażenie regularne szuka zera lub jednego nawiasu otwartego \(?, po którym następują trzy cyfry \d{3}, następnie znów zero lub jeden nawias zamknięty \)?, potem jednego myślnika, ukośnika lub znaku dziesiętnego, a gdy je znajdzie zapamiętuje znaki (<code>-\\/\\.</code>), następujące po nich trzy cyfry i ciąg składający się z myślnika, ukośnika lub znaku dziesiętnego \1 i następujących potem czterech cyfr \d{4}.</p>
+<p>Zdarzenie <code>Change</code> zostaje aktywowane, kiedy użytkownik naciśnie klawisz Enter ustawiając wartość <code>RegExp.input</code>.</p>
+<pre>&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;
+  &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=ISO-8859-2&quot;&gt;
+    &lt;meta http-equiv=&quot;Content-Script-Type&quot; content=&quot;text/javascript&quot;&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+      var re = /\(?\d{3}\)?([-\/\.])\d{3}\1\d{4}/;
+
+      function testInfo(phoneInput)
+      {
+        var OK = re.exec(phoneInput.value);
+
+        if (!OK)
+        {
+          window.alert(RegExp.input + &quot; nie jest wprowadzony numerem kierunkowy!&quot;);
+        }
+        else
+        {
+          window.alert(&quot;Dziękuję, Twój numer telefonu to &quot; + OK[0]);
+        }
+      }
+    &lt;/script&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;p&gt;Wprowadź numer telefonu (z numerem kierunkowym), a następnie naciśnij klawisz Enter.&lt;/p&gt;
+    &lt;form action=&quot;&quot;&gt;
+      &lt;input name=&quot;phone&quot; onchange=&quot;testInfo(this);&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<div class="noinclude">
+ <p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/pl/docs/Przewodnik_po_języku_JavaScript_1.5:Praca_z_wyrażeniami_regularnymi:Globalne_wyszukiwanie,_wielkość_znaków,_wieloliniowe_wejście" class="button">« Poprzedni</a><a href="/pl/docs/Przewodnik_po_języku_JavaScript_1.5:Blok_instrukcji" class="button">Następny  »</a></p>
+</div><p></p>
+</div>
+<p> </p>
