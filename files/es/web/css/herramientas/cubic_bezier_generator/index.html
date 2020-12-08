@@ -1,0 +1,324 @@
+---
+title: Generador de curvas de bézier
+slug: Web/CSS/Herramientas/Cubic_Bezier_Generator
+translation_of: Web/CSS/Tools/Cubic_Bezier_Generator
+---
+<div id="Tool">
+<div style="display: none;">
+<pre class="brush:html">&lt;html&gt;
+    &lt;canvas id=&quot;bezier&quot; width=&quot;336&quot; height=&quot;336&quot;&gt;
+    &lt;/canvas&gt;
+    &lt;form&gt;
+       &lt;label for=&quot;x1&quot;&gt;x1 = &lt;/label&gt;&lt;input onchange=&quot;updateCanvas();&quot; type=&quot;text&quot; maxlength=6 id=&quot;x1&quot; value=&quot;0.79&quot; class=&apos;field&apos;&gt;
+       &lt;label for=&quot;y1&quot;&gt;y1 = &lt;/label&gt;&lt;input onchange=&quot;updateCanvas();return true;&quot;  type=&quot;text&quot; maxlength=6 id=&quot;y1&quot; value=&quot;0.33&quot; class=&apos;field&apos;&gt;
+       &lt;label for=&quot;x2&quot;&gt;x2 = &lt;/label&gt;&lt;input onchange=&quot;updateCanvas();return true;&quot;  type=&quot;text&quot; maxlength=6 id=&quot;x2&quot; value=&quot;0.14&quot; class=&apos;field&apos;&gt;
+       &lt;label for=&quot;y2&quot;&gt;y2 = &lt;/label&gt;&lt;input onchange=&quot;updateCanvas();return true;&quot;  type=&quot;text&quot; maxlength=6 id=&quot;y2&quot; value=&quot;0.53&quot; class=&apos;field&apos;&gt;
+       &lt;br&gt;
+       &lt;output id=&quot;output&quot;&gt;Log&lt;/output&gt;
+    &lt;/form&gt;
+&lt;/html&gt;
+     </pre>
+
+<pre class="brush:css">.field {
+    width: 40px;
+}
+     </pre>
+
+<pre class="brush:js">function updateCanvas() {
+
+    var x1 = document.getElementById(&apos;x1&apos;).value;
+    var y1 = document.getElementById(&apos;y1&apos;).value;
+    var x2 = document.getElementById(&apos;x2&apos;).value;
+    var y2 = document.getElementById(&apos;y2&apos;).value;
+
+    drawBezierCurve(x1, y1, x2, y2);
+}
+
+const radius = 4;
+// Place needed to draw the rulers
+const rulers = 30.5;
+const margin = 10.5;
+const basic_scale_size = 5; // Size of 0.1 tick on the rulers
+var scaling; //LIMITATION: scaling is computed once: if canvas.height/canvas.width change it won&apos;t be recalculated
+var dragSM = 0; // Drag state machine: 0 = nodrag, others = object being dragged
+
+function initCanvas() {
+    // get the canvas element using the DOM
+    var canvas = document.getElementById(&apos;bezier&apos;);
+
+    // Make sure we don&apos;t execute when canvas isn&apos;t supported
+    if (canvas.getContext) {
+        // use getContext to use the canvas for drawing
+        var ctx = canvas.getContext(&apos;2d&apos;);
+
+        scaling = Math.min(canvas.height - rulers - margin, canvas.width - rulers - margin);
+
+        canvas.onmousedown = mouseDown;
+        canvas.onmouseup = mouseUp;
+    } else {
+        alert(&apos;You need Safari or Firefox 1.5+ to see this demo.&apos;);
+    }
+}
+
+function cX(x) {
+    return x * scaling + rulers;
+}
+
+function reverseX(x) {
+    return (x - rulers) / scaling;
+}
+
+function lX(x) {
+    //Used when drawing vertical lines to prevent subpixel blur
+    var result = cX(x);
+    return Math.round(result) == result ? result + 0.5 : result;
+}
+
+function cY(y) {
+
+    return (1 - y) * scaling + margin;
+}
+
+function reverseY(y) {
+    return (margin - y) / scaling + 1;
+}
+
+function lY(y) {
+    // Used when drawing horizontal lines to prevent subpixel blur
+    var result = cY(y);
+    return Math.round(result) == result ? result + 0.5 : result;
+}
+
+function drawBezierCurve(x1, y1, x2, y2) {
+
+    // get the canvas element using the DOM
+    var canvas = document.getElementById(&apos;bezier&apos;);
+
+    // Make sure we don&apos;t execute when canvas isn&apos;t supported
+    if (canvas.getContext) {
+
+        // use getContext to use the canvas for drawing
+        var ctx = canvas.getContext(&apos;2d&apos;);
+
+
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the rulers
+        ctx.beginPath();
+        ctx.strokeStyle = &quot;black&quot;;
+
+        // Draw the Y axis
+        ctx.moveTo(cX(0), cY(0));
+        ctx.lineTo(cX(1), cY(0));
+        ctx.textAlign = &quot;right&quot;;
+
+        for (var i = 0.1; i &lt;= 1; i = i + 0.1) {
+            ctx.moveTo(-basic_scale_size + cX(0), lY(i));
+            if ((i == 0.5) || (i &gt; 0.9)) {
+                ctx.moveTo(-2 * basic_scale_size + cX(0), lY(i));
+                ctx.fillText(Math.round(i * 10) / 10, -3 * basic_scale_size + cX(0), cY(i) + 4);
+                // Limitation the constant 4 should be font size dependant
+            }
+            ctx.lineTo(cX(0), lY(i));
+        }
+        ctx.stroke();
+        ctx.closePath();
+        ctx.beginPath();
+
+        // Draw the Y axis label
+        ctx.save();
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = &quot;left&quot;;
+        ctx.fillText(&quot;Output (Value Ratio)&quot;, -cY(0), -3 * basic_scale_size + cX(0));
+        ctx.restore();
+
+        // Draw the X axis
+        ctx.moveTo(cX(0), cY(0));
+        ctx.lineTo(cX(0), cY(1));
+        ctx.textAlign = &quot;center&quot;;
+        for (i = 0.1; i &lt;= 1; i = i + 0.1) {
+            ctx.moveTo(lX(i), basic_scale_size + cY(0));
+            if ((i == 0.5) || (i &gt; 0.9)) {
+                ctx.moveTo(lX(i), 2 * basic_scale_size + cY(0));
+                ctx.fillText(Math.round(i * 10) / 10, cX(i), 4 * basic_scale_size + cY(0));
+                // Limitation the constant 4 should be dependant of the font size
+            }
+            ctx.lineTo(lX(i), cY(0));
+        }
+
+        // Draw the X axis label
+        ctx.textAlign = &quot;left&quot;;
+        ctx.fillText(&quot;Input (Time Duration Ratio)&quot;, cX(0), 4 * basic_scale_size + cY(0));
+        // Limitation the constant 4 should be dependant of the font size
+        ctx.stroke();
+        ctx.closePath();
+
+        // Draw the Bézier Curve
+        ctx.beginPath();
+        ctx.moveTo(cX(0), cY(0));
+        ctx.strokeStyle = &apos;blue&apos;;
+        ctx.bezierCurveTo(cX(x1), cY(y1), cX(x2), cY(y2), cX(1), cY(1));
+        ctx.stroke();
+        ctx.closePath();
+
+
+
+        // Draw the P2 point (with a line to P0)
+        ctx.beginPath();
+        ctx.strokeStyle = &apos;red&apos;;
+        ctx.moveTo(cX(x1), cY(y1));
+        ctx.lineTo(cX(0), cY(0));
+        ctx.stroke();
+        ctx.closePath();
+        ctx.beginPath();
+        ctx.moveTo(cX(x1), cY(y1));
+        ctx.arc(cX(x1), cY(y1), radius, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.fillStyle = &apos;white&apos;;
+        ctx.fill();
+        ctx.closePath();
+
+
+
+        // Draw the P3 point (with a line to P1)
+        ctx.beginPath();
+        ctx.strokeStyle = &apos;red&apos;;
+        ctx.moveTo(cX(x2), cY(y2));
+        ctx.lineTo(cX(1), cY(1));
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.moveTo(cX(x2), cY(y2));
+        ctx.arc(cX(x2), cY(y2), radius, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+
+        // Draw the P1(1,1) point (with dashed hints)
+        ctx.beginPath();
+        ctx.moveTo(cX(1), cY(1));
+        ctx.strokeStyle = &apos;lightgrey&apos;;
+        ctx.lineTo(cX(0), cY(1));
+        ctx.moveTo(cX(1), cY(1));
+        ctx.lineTo(cX(1), cY(0));
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.strokeStyle = &quot;black&quot;;
+        ctx.fillStyle = &quot;black&quot;;
+        ctx.arc(cX(1), cY(1), radius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+
+
+        // Draw the P0(0,0) point
+        ctx.beginPath();
+        ctx.arc(cX(0), cY(0), radius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+
+
+    } else {
+        alert(&apos;You need Safari or Firefox 1.5+ to see this demo.&apos;);
+    }
+}
+
+function mouseDown(e) {
+
+    var canvas = document.getElementById(&apos;bezier&apos;);
+
+    var x1 = cX(document.getElementById(&apos;x1&apos;).value);
+    var y1 = cY(document.getElementById(&apos;y1&apos;).value);
+
+    var x = e.pageX - canvas.offsetLeft;
+    var y = e.pageY - canvas.offsetTop;
+
+    var output = document.getElementById(&apos;output&apos;);
+    output.value = &quot;(&quot; + x + &quot;,&quot; + y + &quot;) should be (&quot; + x1 + &quot;,&quot; + y1 + &quot;)&quot;;
+
+
+    if ((x1 + radius &gt;= x) &amp;&amp; (x1 - radius &lt;= x) &amp;&amp; (y1 + radius &gt;= y) &amp;&amp; (y1 - radius &lt;= y)) {
+        var output = document.getElementById(&apos;output&apos;);
+        output.value = &quot;P1!&quot;;
+        dragSM = 1;
+    }
+
+    var x2 = cX(document.getElementById(&apos;x2&apos;).value);
+    var y2 = cY(document.getElementById(&apos;y2&apos;).value);
+
+    if ((x2 + radius &gt;= x) &amp;&amp; (x2 - radius &lt;= x) &amp;&amp; (y2 + radius &gt;= y) &amp;&amp; (y2 - radius &lt;= y)) {
+        var output = document.getElementById(&apos;output&apos;);
+        output.value = &quot;P2!&quot;;
+        dragSM = 2;
+    }
+
+    // If we are starting a drag
+    if (dragSM != 0) {
+        canvas.onmousemove = mouseMove;
+    }
+}
+
+function mouseUp(e) {
+
+    var output = document.getElementById(&apos;output&apos;);
+    output.value = &quot;Mouse up!&quot;;
+    dragSM = 0;
+    canvas.onmousemove = null;
+}
+
+function mouseMove(e) {
+    if (dragSM != 0) {
+        var canvas = document.getElementById(&apos;bezier&apos;);
+
+        var x = e.pageX - canvas.offsetLeft;
+        var y = e.pageY - canvas.offsetTop;
+
+        var output = document.getElementById(&apos;output&apos;);
+        output.value = &quot;Drag!&quot;;
+
+        if (dragSM == 1) {
+            var x1 = document.getElementById(&apos;x1&apos;);
+            var y1 = document.getElementById(&apos;y1&apos;);
+            x1.value = reverseX(x);
+            x1.value = Math.round(x1.value * 10000) / 10000;
+            y1.value = reverseY(y);
+            y1.value = Math.round(y1.value * 10000) / 10000;
+            if (x1.value &lt; 0) { x1.value = 0; }
+            if (x1.value &gt; 1) { x1.value = 1; }
+        } else if (dragSM == 2) {
+            var x2 = document.getElementById(&apos;x2&apos;);
+            var y2 = document.getElementById(&apos;y2&apos;);
+            x2.value = reverseX(x);
+            x2.value = Math.round(x2.value * 10000) / 10000;
+            y2.value = reverseY(y);
+            y2.value = Math.round(y2.value * 10000) / 10000;
+            if (x2.value &lt; 0) { x2.value = 0; }
+            if (x2.value &gt; 1) { x2.value = 1; }
+        }
+        updateCanvas();
+    }
+}
+
+initCanvas();
+updateCanvas();
+     </pre>
+</div>
+
+<p></p><div class="draft notecard">
+    <p><strong>Borrador</strong><br>
+    Esta página no está completa.</p>
+
+</div><p></p>
+
+<p>Esta es una herramienta de ejemplo que te permitirá editar y ver de manera gráfica una curva de Bézier. Esta no es una herramienta realmente útil, pero ¡lo será!</p>
+
+<p><iframe src="https://mdn.mozillademos.org/es/docs/Web/CSS/Herramientas/Cubic_Bezier_Generator$samples/Tool?revision=1446071" width="1000" height="2000" frameborder="0" id="frame_Tool" class="live-sample-frame sample-code-frame"></iframe></p>
+</div>
+
+<p> </p>

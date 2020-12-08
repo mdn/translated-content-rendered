@@ -1,0 +1,140 @@
+---
+title: '@supports'
+slug: Web/CSS/@supports
+translation_of: Web/CSS/@supports
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/es/docs/Web/CSS/Reference">Referencia CSS</a></strong></li><li><strong><a href="/es/docs/Web/CSS/CSS_Conditional_Rules">CSS Conditional Rules</a></strong></li><li class="toggle"><details open><summary>Guías</summary><ol><li><a href="/es/docs/Web/CSS/CSS_Conditional_Rules/Using_Feature_Queries">Using feature queries</a> <a href="/es/docs/Web/CSS/CSS_Conditional_Rules/Using_Feature_Queries$translate" style="opacity: 0.5;">[Traducir]</a></li></ol></details></li><li class="toggle"><details open><summary>At-Rules</summary><ol><li><a href="/es/docs/Web/CSS/@document"><code>@document</code></a></li><li><a href="/es/docs/Web/CSS/@media"><code>@media</code></a></li><li><em><code>@supports</code></em></li></ol></details></li></ol></section>
+
+<h2 id="Resumen">Resumen</h2>
+
+<p>La regla &quot;CSS <code>@supports&quot;</code>asocia un conjunto de declaraciones anidadas en un bloque CSS (que está delimitado por corchetes) con una condición consistente en probar declaraciones de CSS (es decir, pares propiedad-valor, así como conjunciones, disjunciones o negaciones abritrarias sobre ellas). A esas condiciones se le llama condición &quot;soporta&quot;<em> (</em><em>supports condition)</em>.</p>
+
+<p><code>@supports</code> otorga la habilidad de realizar consultas que comprueben si ciertas funcionalidades están disponibles <em>(feature query)</em>.</p>
+
+<p>La regla <code>@supports </code>puede ser usada tanto en el nivel superior de una hoja de estilos, como dentro de cualquier <a href="/en/CSS/At-rule#Conditional_Group_Rules" title="en/CSS/At-rule#Conditional_Group_Rules">regla de grupo condicional</a> y se puede acceder a ella a través del modelo de objetos de CSS <a href="/es/docs/Web/API/CSSSupportsRule"><code>CSSSupportsRule</code></a>.</p>
+
+<h2 id="Syntax" name="Syntax">Sintaxis</h2>
+
+<p>Una condición &quot;soporta&quot; <em>(</em><em>supports condition)</em> consiste en una o varias declaraciones combinadas por diferentes operadores lógicos. La precedencia de los operadores puede ser definida usando paréntesis.</p>
+
+<h3 id="Sintaxis_de_una_declaración">Sintaxis de una declaración</h3>
+
+<p>La expresión más simple es una declaración CSS, es decir el nombre de una propiedad CSS seguida por un valor, separada por dos puntos. La siguiente expresión</p>
+
+<pre class="brush:css notranslate">( transform-origin: 5% 5% )</pre>
+
+<p>devuelve &quot;cierto&quot; si la <a href="/es/docs/Web/CSS/transform-origin" title="La propiedad CSS transform-origin le permite modificar el origen de las transformaciones de un elemento. Por ejemplo, el transform-origin de la función rotate() es el centro de rotación. (Esta propiedad es aplicada a la primera translación del elemento por el valor negativo de la propiedad. A continuación, aplicar la transformación del elemento y después trasladar el valor de la propiedad)."><code>transform-origin</code></a> implementa una sintaxis que reconoce <code>5% 5%</code> como válida.</p>
+
+<p>Una declaración CSS está siempre rodeada entre paréntesis.</p>
+
+<h3 id="El_operador_not">El operador &quot;<code>not</code> &quot;</h3>
+
+<p>El operador <code>not</code> puede preceder cualquier expresión para crear una nueva, resultando en la negación de la expresión original. La siguiente expresión</p>
+
+<pre class="brush:css notranslate">not ( transform-origin: 10em 10em 10em )</pre>
+
+<p>devuelve &quot;cierto&quot; si <a href="/es/docs/Web/CSS/transform-origin" title="La propiedad CSS transform-origin le permite modificar el origen de las transformaciones de un elemento. Por ejemplo, el transform-origin de la función rotate() es el centro de rotación. (Esta propiedad es aplicada a la primera translación del elemento por el valor negativo de la propiedad. A continuación, aplicar la transformación del elemento y después trasladar el valor de la propiedad)."><code>transform-origin</code></a> no reconoceo <code>10em 10em 10em</code> como una sintaxis válida.</p>
+
+<p>Como cualquier operador, el operador <code>not</code> puede ser aplicado a una declaración de complejidad arbitraria. Los siguientes ejemplos son todas expresiones válidas:</p>
+
+<pre class="brush:css notranslate">not ( not ( transform-origin: 2px ) )
+(display: flexbox) and ( not (display: inline-grid) )</pre>
+
+<div class="note style-wrap">
+<p><strong>Nota:</strong> no hay necesidad de encerrar el operador <code>not</code> entre paréntesis cuando se encuentra en el nivel superior. Para combinarlo con otros operadores, como <code>and</code> y <code>or</code>, sí se requieren paréntesis</p>
+</div>
+
+<h3 id="El_operador_and">El operador  &quot;<code>and</code>&quot;</h3>
+
+<p>Partiendo de dos expresiones, el operador <code>and</code> crea una nueva expresión consistente en la conjunción de dos originales; la expresión resultante es verdadera si sólo ambas expresiones originales lo son. En este ejemplo, la expresión completa resuelve a true si y sólo si, las dos expresiones son simultáneamente veraderas:</p>
+
+<pre class="brush:css notranslate">(display: table-cell) and (display: list-item)</pre>
+
+<p>Varias conjunciones pueden ser yuxtapuestas sin la necesidad de agregar paréntesis:</p>
+
+<pre class="brush:css notranslate">(display: table-cell) and (display: list-item) and (display:run-in)</pre>
+
+<p>es equivalente a:</p>
+
+<pre class="brush:css notranslate">(display: table-cell) and ((display: list-item) and (display:run-in))</pre>
+
+<h3 id="El_operador_or">El operador &quot;<code>or&quot;</code></h3>
+
+<p>Partiendo de dos expresiones, el operador  <code>or</code> crea una nueva expresión consistente en la disyunción de dos originales; la expresión resultante es verdadera si una o ambas expresiones originales lo son. En este ejemplo, la expresión completa resuelve a true si al menos una de las dos expresiones es veradera:</p>
+
+<pre class="brush:css; notranslate">( transform-style: preserve ) or ( -moz-transform-style: preserve )</pre>
+
+<p>Varias disyunciones pueden ser yuxtapuestas sin la necesidad de agregar paréntesis:</p>
+
+<pre class="brush:css notranslate">( transform-style: preserve ) or ( -moz-transform-style: preserve ) or
+( -o-transform-style: preserve ) or ( -webkit-transform-style: preserve  )</pre>
+
+<p>es equivalente a:</p>
+
+<pre class="brush:css notranslate">( transform-style: preserve-3d ) or (( -moz-transform-style: preserve-3d ) or
+(( -o-transform-style: preserve-3d ) or ( -webkit-transform-style: preserve-3d  )))</pre>
+
+<div class="note style-wrap">
+<p><strong>Nota</strong>: cuando se usan <code>and</code> y <code>or</code>, el paréntesis debe ser usado para definir el orden en el cual aplican. Si no, la condición es inválida provocando que se ignore todo el &quot;at-rule&quot; .</p>
+</div>
+
+<h3 id="Sintaxis_formal">Sintaxis formal</h3>
+
+<pre class="syntaxbox notranslate">@supports <a href="#supports-condition">&lt;supports-condition&gt;</a> {
+  &lt;group-rule-body&gt;
+}<p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="supports-condition">&lt;supports-condition&gt;</span> = not <a href="#supports-in-parens">&lt;supports-in-parens&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#supports-in-parens">&lt;supports-in-parens&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> and <a href="#supports-in-parens">&lt;supports-in-parens&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#supports-in-parens">&lt;supports-in-parens&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> or <a href="#supports-in-parens">&lt;supports-in-parens&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="supports-in-parens">&lt;supports-in-parens&gt;</span> = ( <a href="#supports-condition">&lt;supports-condition&gt;</a> ) <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#supports-feature">&lt;supports-feature&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#general-enclosed">&lt;general-enclosed&gt;</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="supports-feature">&lt;supports-feature&gt;</span> = <a href="#supports-decl">&lt;supports-decl&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#supports-selector-fn">&lt;supports-selector-fn&gt;</a><br><span id="general-enclosed">&lt;general-enclosed&gt;</span> = <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> &lt;function-token&gt; &lt;any-value&gt; ) <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ( <a href="/es/docs/Web/CSS/ident" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !">&lt;ident&gt;</a> &lt;any-value&gt; )</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="supports-decl">&lt;supports-decl&gt;</span> = ( &lt;declaration&gt; )<br><span id="supports-selector-fn">&lt;supports-selector-fn&gt;</span> = selector( <a href="#complex-selector">&lt;complex-selector&gt;</a> )</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="complex-selector">&lt;complex-selector&gt;</span> = <a href="#compound-selector">&lt;compound-selector&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> <a href="#combinator">&lt;combinator&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> <a href="#compound-selector">&lt;compound-selector&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="compound-selector">&lt;compound-selector&gt;</span> = <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> <a href="#type-selector">&lt;type-selector&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> <a href="#subclass-selector">&lt;subclass-selector&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> <a href="#pseudo-element-selector">&lt;pseudo-element-selector&gt;</a> <a href="#pseudo-class-selector">&lt;pseudo-class-selector&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax##Exclamation_point_(!)" title="Exclamation point: the group must produce at least one value">!</a><br><span id="combinator">&lt;combinator&gt;</span> = &apos;&gt;&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Plus_()" title="Plus: the entity may occur one or several times">+</a>&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;~&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Double_bar" title="Double bar: one or several of the entities must be present, in any order">||</a>&apos; <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="type-selector">&lt;type-selector&gt;</span> = <a href="#wq-name">&lt;wq-name&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#ns-prefix">&lt;ns-prefix&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a>&apos;<br><span id="subclass-selector">&lt;subclass-selector&gt;</span> = <a href="#id-selector">&lt;id-selector&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#class-selector">&lt;class-selector&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#attribute-selector">&lt;attribute-selector&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="#pseudo-class-selector">&lt;pseudo-class-selector&gt;</a><br><span id="pseudo-element-selector">&lt;pseudo-element-selector&gt;</span> = &apos;:&apos; <a href="#pseudo-class-selector">&lt;pseudo-class-selector&gt;</a><br><span id="pseudo-class-selector">&lt;pseudo-class-selector&gt;</span> = &apos;:&apos; &lt;ident-token&gt; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;:&apos; &lt;function-token&gt; &lt;any-value&gt; &apos;)&apos;</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="wq-name">&lt;wq-name&gt;</span> = <a href="#ns-prefix">&lt;ns-prefix&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> &lt;ident-token&gt;<br><span id="ns-prefix">&lt;ns-prefix&gt;</span> = <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> &lt;ident-token&gt; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a>&apos; <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a>  <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <br><span id="id-selector">&lt;id-selector&gt;</span> = &lt;hash-token&gt;<br><span id="class-selector">&lt;class-selector&gt;</span> = &apos;.&apos; &lt;ident-token&gt;<br><span id="attribute-selector">&lt;attribute-selector&gt;</span> = &apos;<a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a>&apos; <a href="#wq-name">&lt;wq-name&gt;</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a>&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a>&apos; <a href="#wq-name">&lt;wq-name&gt;</a> <a href="#attr-matcher">&lt;attr-matcher&gt;</a> <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> &lt;string-token&gt; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &lt;ident-token&gt; <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a> <a href="#attr-modifier">&lt;attr-modifier&gt;</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a>&apos;<br></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="attr-matcher">&lt;attr-matcher&gt;</span> = <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a> &apos;~&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a>  <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a>  <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;^&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;$&apos; <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> &apos;<a href="/es/docs/CSS/Value_definition_syntax#Asterisk_(*)" title="Asterisk: the entity may occur zero, one or several times">*</a>&apos; <a href="/es/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/es/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> &apos;=&apos;<br><span id="attr-modifier">&lt;attr-modifier&gt;</span> = i <a href="/es/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> s</code></p></pre>
+
+<h2 id="Ejemplos">Ejemplos</h2>
+
+<h3 id="Prueba_soporta_de_una_propiedad_CSS_determinada">Prueba &quot;soporta&quot; de una propiedad CSS determinada</h3>
+
+<pre class="brush:css; notranslate">@supports (animation-name: test) {
+    … /* specific CSS applied when animations are supported unprefixed */
+    @keyframes { /* @supports being a CSS conditional group at-rule, it can includes other relevant at-rules */
+      …
+    }
+}
+</pre>
+
+<h3 id="Prueba_soporta_de_una_propiedad_CSS_determinada_o_de_una_versión_con_prefijo">Prueba &quot;soporta&quot; de una propiedad CSS determinada o de una versión con prefijo</h3>
+
+<pre class="brush:css; notranslate">@supports ( (perspective: 10px) or (-moz-perspective: 10px) or (-webkit-perspective: 10px) or
+            (-ms-perspective: 10px) or (-o-perspective: 10px) ) {
+    … /* specific CSS applied when 3D transforms, eventually prefixed, are supported */
+}
+</pre>
+
+<h3 id="Prueba_soporta_para_propiedades_customizadas">Prueba &quot;soporta&quot; para propiedades customizadas</h3>
+
+<pre class="brush:css; notranslate">@supports not ((text-align-last:justify) or (-moz-text-align-last:justify) ){
+    … /* specific CSS applied to simulate text-align-last:justify */
+}</pre>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Especificación</th>
+   <th scope="col">Estado</th>
+   <th scope="col">Comentario</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-conditional-3/#at-supports" hreflang="en" lang="en">CSS Conditional Rules Module Level 3<br><small lang="es">La definición de &apos;@supports&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-CR">Candidate Recommendation</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">Compatibilidad con navegadores</h2>
+
+<div class="bc-data" id="bcd:css.at-rules.supports"></div>
+
+<h2 id="Ver_también">Ver también</h2>
+
+<ul>
+ <li>La clase CSSOM <a href="/es/docs/Web/API/CSSSupportsRule"><code>CSSSupportsRule</code></a>, y el método  <a href="/es/docs/Web/API/CSS/supports"><code>CSS.supports</code></a> que permite chequear via JavaScript.</li>
+</ul>

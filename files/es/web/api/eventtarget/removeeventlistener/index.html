@@ -1,0 +1,217 @@
+---
+title: EventTarget.removeEventListener()
+slug: Web/API/EventTarget/removeEventListener
+tags:
+  - API
+  - DOM
+  - Event
+translation_of: Web/API/EventTarget/removeEventListener
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/API/EventTarget"><code>EventTarget</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><a href="/es/docs/Web/API/EventTarget/EventTarget"><code>EventTarget()</code></a> <a href="/es/docs/Web/API/EventTarget/EventTarget$translate" style="opacity: 0.5;">[Traducir]</a></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/es/docs/Web/API/EventTarget/addEventListener"><code>addEventListener</code></a></li><li><a href="/es/docs/Web/API/EventTarget/dispatchEvent"><code>dispatchEvent</code></a></li><li><em><code>removeEventListener()</code></em></li></ol></details></li><li class="toggle"><details open><summary>Páginas relacionadas a DOM Events</summary><ol><li><a href="/es/docs/Web/API/CompositionEvent"><code>CompositionEvent</code></a></li><li><a href="/es/docs/Web/API/Event"><code>Event</code></a></li><li><a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a></li><li><a href="/es/docs/Web/API/FocusEvent"><code>FocusEvent</code></a></li><li><a href="/es/docs/Web/API/InputEvent"><code>InputEvent</code></a></li><li><a href="/es/docs/Web/API/KeyboardEvent"><code>KeyboardEvent</code></a></li><li><a href="/es/docs/Web/API/MouseEvent"><code>MouseEvent</code></a></li><li><a href="/es/docs/Web/API/MouseScrollEvent"><code>MouseScrollEvent</code></a></li><li><a href="/es/docs/Web/API/MouseWheelEvent"><code>MouseWheelEvent</code></a></li><li><a href="/es/docs/Web/API/MutationEvent"><code>MutationEvent</code></a></li><li><a href="/es/docs/Web/API/ProgressEvent"><code>ProgressEvent</code></a></li><li><a href="/es/docs/Web/API/UIEvent"><code>UIEvent</code></a></li><li><a href="/es/docs/Web/API/WheelEvent"><code>WheelEvent</code></a></li></ol></details></li></ol></section>
+
+<p>El método <strong><code>EventTarget.removeEventListener()</code></strong> remueve del <a href="/es/docs/Web/API/EventTarget"><code>EventTarget</code></a> un detector de evento previamente registrado con <a href="/es/docs/Web/API/EventTarget/addEventListener"><code>EventTarget.addEventListener</code></a>. El detector de evento a ser removido es identificado usando una combinación de de tipos de eventos, la misma funcion del detector de eventos, y muchas opciones adicionales que pueden afectar</p>
+
+<h2 id="Syntax" name="Syntax">Sintaxis</h2>
+
+<pre class="syntaxbox notranslate"><var>target</var>.removeEventListener(<var>type</var>, <var>listener</var>[, <var>options</var>]);
+<em>target</em>.removeEventListener(<em>tipo</em>, <em>listener</em>[, <em>useCapture</em>])</pre>
+
+<h3 id="Parámetros">Parámetros</h3>
+
+<dl>
+ <dt><var>tipo</var></dt>
+ <dd>Un string representando el tipo de evento del que se está removiendo un detector de evento.</dd>
+ <dt><var>detector (listener)</var></dt>
+ <dd>La función <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> del manejador de evento a eliminar del objetivo del evento.</dd>
+ <dt><var>options</var> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>Un objeto que especifíca diversas características acerca del detector de eventos. Las opciones disponibles son:
+ <ul>
+  <li><code>capture</code>: Un <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/Boolean"><code>Boolean</code></a> que indica que eventos de este tipo serán enviados al <code>listener</code> antes de ser enviado a cualquier <code>EventTarget</code> debado de éste en el DOM.</li>
+  <li><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span><code> mozSystemGroup</code>: Sólo disponible ejecutando XBL o Firefox&apos; chrome, es un <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/Boolean"><code>Boolean</code></a> que define si el detector es añadido al grupo del sistema.</li>
+ </ul>
+ </dd>
+ <dt><code>useCapture</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>Especifíca si el <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> que se está eliminando fue registrado como un detector de captura o no. Si no se indica, por defecto <code>useCapture</code> asumirá el valor <code>false</code>.</dd>
+ <dd>Si un detector se registro dos veces, uno con captura y otro sin, cada uno debe ser eliminado por separado. La eliminación de un detector de captura no afecta a una versión de &quot;no-captura&quot; del mismo detector, y viceversa.</dd>
+</dl>
+
+<h3 id="Valor_de_retorno">Valor de retorno</h3>
+
+<p><code>undefined</code>.</p>
+
+<h3 id="Coincidiendo_disparadores_de_evento_para_su_eliminación">Coincidiendo disparadores de evento para su eliminación</h3>
+
+<p>Habiendose añadido detector de evento llamando <a href="/es/docs/Web/API/EventTarget/addEventListener"><code>addEventListener()</code></a>, puede llegar un punto donde se requiera eliminar. Obviamente, se necesita especificar los mismos parámetros de <code>tipo</code> y <code>listener</code> a <code>removeEventListener()</code>, pero que hay acerca de los parámetros de <code>options</code> o de <code>useCapture</code>?</p>
+
+<p>Mientras <code>addEventListener()</code> permite añadir el mismo detector más de una vez para el mismo tipo, si la opción es diferente, la única opción que <code>removeEventListener()</code> revisará es la bandera de <code>capture</code>/<code>useCapture</code>. Su valor debe coincidir con <code>removeEventListener()</code> para coincidir, pero otros valores no necesitan corresponder.</p>
+
+<p>Por ejemplo, considerar la siguiente llamada a <code>addEventListener()</code>:</p>
+
+<pre class="brush: js line-numbers language-js notranslate"><code class="language-js">element<span class="punctuation token">.</span><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="boolean token">true</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p>Ahora, considera  <code>removeEventListener()</code>:</p>
+
+<pre class="brush: js line-numbers language-js notranslate"><code class="language-js">element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="boolean token">false</span><span class="punctuation token">)</span><span class="punctuation token">;</span>     <span class="comment token">// Fallo</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="boolean token">true</span><span class="punctuation token">)</span><span class="punctuation token">;</span>      <span class="comment token">// Éxito</span></code></pre>
+
+<p>La primera llamada falla porque el valor de <code>useCapture</code> no coincide. El segundo valor funciona, puesto que <code>useCapture</code> es igual a su valor cuando se añadió el detector.</p>
+
+<p>Ahora considera lo siguiente:</p>
+
+<pre class="brush: js line-numbers language-js notranslate"><code class="language-js">element<span class="punctuation token">.</span><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="punctuation token">{</span> passive<span class="punctuation token">:</span> <span class="boolean token">true</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p>Aqui, especificamos un objeto <code>options</code> en el cual <code>passive</code> esta definido como <code>true</code>, mientras que otras opciones son dejados con su valor por defecto de <code>false</code>.</p>
+
+<p>Vea consecutivamente, cada una de las siguientes llamadas a  <code>removeEventListener()</code>. Cualquiera de éstas donde <code>capture</code> o <code>useCapture</code> es <code>true</code> falla; en todas las demás funciona. Solo la configuración <code>capture</code> importa a <code>removeEventListener()</code>.</p>
+
+<pre class="brush: js line-numbers language-js notranslate"><code class="language-js">element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="punctuation token">{</span> passive<span class="punctuation token">:</span> <span class="boolean token">true</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>     <span class="comment token">// Funciona</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="punctuation token">{</span> capture<span class="punctuation token">:</span> <span class="boolean token">false</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>    <span class="comment token">// Funciona</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="punctuation token">{</span> capture<span class="punctuation token">:</span> <span class="boolean token">true</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>     <span class="comment token">// Falla</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="punctuation token">{</span> passive<span class="punctuation token">:</span> <span class="boolean token">false</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>    <span class="comment token">// Funciona</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="boolean token">false</span><span class="punctuation token">)</span><span class="punctuation token">;</span>                 <span class="comment token">// Funciona</span>
+element<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&quot;mousedown&quot;</span><span class="punctuation token">,</span> handleMouseDown<span class="punctuation token">,</span> <span class="boolean token">true</span><span class="punctuation token">)</span><span class="punctuation token">;</span>                  <span class="comment token">// Falla</span></code></pre>
+
+<p>Vale la pena mencionar que algunos navegadores tienen un comportamiento inconsistente, y a menos que se tengan razones específicas, es probablemente una buena idea usar los mismos valores usados por la llamada a <code>addEventListener()</code> al momento de utilizar <code>removeEventListener()</code>.</p>
+
+<h2 id="Notas">Notas</h2>
+
+<p>Si un <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> es removido de un <a href="/es/docs/Web/API/EventTarget"><code>EventTarget</code></a> cuando aún se está procesando el evento, no será ejecutado. Después de ser removido, un <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> no será invocado por el evento al cual se registró, sin embargo se podrá adjuntar de nuevo a dicho evento.</p>
+
+<p>Llamar <a href="/es/docs/Web/API/&lt;code&gt;removeEventListener&lt;/code&gt;"><code><code>removeEventListener</code></code></a>  en algún <a href="/es/docs/Web/API/EventTarget"><code>EventTarget</code></a> que no contenga el <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> especificado será un acción sin efecto, es decir, se podrá llamar <a href="/es/docs/Web/API/&lt;code&gt;removeEventListener&lt;/code&gt;"><code><code>removeEventListener</code></code></a> sin efectos negativos en los scripts.</p>
+
+<h2 id="Ejemplo">Ejemplo</h2>
+
+<p>Este es un ejemplo en donde se agrega y después se elimina un <a href="/es/docs/Web/API/EventListener"><code>EventListener</code></a> </p>
+
+<pre class="brush: js line-numbers language-js notranslate"><code class="language-js"><span class="keyword token">var</span> body <span class="operator token">=</span> document<span class="punctuation token">.</span><span class="function token">querySelector</span><span class="punctuation token">(</span><span class="string token">&apos;body&apos;</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    clickTarget <span class="operator token">=</span> document<span class="punctuation token">.</span><span class="function token">getElementById</span><span class="punctuation token">(</span><span class="string token">&apos;click-target&apos;</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    mouseOverTarget <span class="operator token">=</span> document<span class="punctuation token">.</span><span class="function token">getElementById</span><span class="punctuation token">(</span><span class="string token">&apos;mouse-over-target&apos;</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    toggle <span class="operator token">=</span> <span class="boolean token">false</span><span class="punctuation token">;</span>
+
+<span class="keyword token">function</span> <span class="function token">makeBackgroundYellow</span><span class="punctuation token">(</span><span class="punctuation token">)</span> <span class="punctuation token">{</span>
+    <span class="string token">&apos;use strict&apos;</span><span class="punctuation token">;</span>
+
+    <span class="keyword token">if</span> <span class="punctuation token">(</span>toggle<span class="punctuation token">)</span> <span class="punctuation token">{</span>
+        body<span class="punctuation token">.</span>style<span class="punctuation token">.</span>backgroundColor <span class="operator token">=</span> <span class="string token">&apos;white&apos;</span><span class="punctuation token">;</span>
+    <span class="punctuation token">}</span> <span class="keyword token">else</span> <span class="punctuation token">{</span>
+        body<span class="punctuation token">.</span>style<span class="punctuation token">.</span>backgroundColor <span class="operator token">=</span> <span class="string token">&apos;yellow&apos;</span><span class="punctuation token">;</span>
+    <span class="punctuation token">}</span>
+
+    toggle <span class="operator token">=</span> <span class="operator token">!</span>toggle<span class="punctuation token">;</span>
+<span class="punctuation token">}</span>
+
+clickTarget<span class="punctuation token">.</span><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&apos;click&apos;</span><span class="punctuation token">,</span>
+    makeBackgroundYellow<span class="punctuation token">,</span>
+    <span class="boolean token">false</span>
+<span class="punctuation token">)</span><span class="punctuation token">;</span>
+
+mouseOverTarget<span class="punctuation token">.</span><span class="function token">addEventListener</span><span class="punctuation token">(</span><span class="string token">&apos;mouseover&apos;</span><span class="punctuation token">,</span> <span class="keyword token">function</span> <span class="punctuation token">(</span><span class="punctuation token">)</span> <span class="punctuation token">{</span>
+    <span class="string token">&apos;use strict&apos;</span><span class="punctuation token">;</span>
+
+    clickTarget<span class="punctuation token">.</span><span class="function token">removeEventListener</span><span class="punctuation token">(</span><span class="string token">&apos;click&apos;</span><span class="punctuation token">,</span>
+        makeBackgroundYellow<span class="punctuation token">,</span>
+        <span class="boolean token">false</span>
+    <span class="punctuation token">)</span><span class="punctuation token">;</span>
+<span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th>Especificación</th>
+   <th>Estado</th>
+   <th>Comentario</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#dom-eventtarget-removeeventlistener" hreflang="en" lang="en">DOM<br><small lang="es">La definición de &apos;EventTarget.removeEventListener()&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/dom/#dom-eventtarget-removeeventlistener" hreflang="en" lang="en">DOM4<br><small lang="es">La definición de &apos;EventTarget.removeEventListener()&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Obsolete">Obsolete</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-removeEventListener" hreflang="en" lang="en">Document Object Model (DOM) Level 2 Events Specification<br><small lang="es">La definición de &apos;EventTarget.removeEventListener()&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Obsolete">Obsolete</span></td>
+   <td>Definición inicial</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">Compatibilidad de los navegadores</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.EventTarget.removeEventListener"></div>
+
+<ul>
+</ul>
+
+<h2 id="Polyfill_to_support_older_browsers">Polyfill to support older browsers</h2>
+
+<p><code>addEventListener()</code> and <code>removeEventListener()</code> are not present in older browsers. You can work around this by inserting the following code at the beginning of your scripts, allowing use of <code>addEventListener()</code> and <code>removeEventListener()</code> in implementations which do not natively support it. However, this method will not work on Internet Explorer 7 or earlier, since extending the Element.prototype was not supported until Internet Explorer 8.</p>
+
+<pre class="brush: js notranslate">if (!Element.prototype.addEventListener) {
+  var oListeners = {};
+  function runListeners(oEvent) {
+    if (!oEvent) { oEvent = window.event; }
+    for (var iLstId = 0, iElId = 0, oEvtListeners = oListeners[oEvent.type]; iElId &lt; oEvtListeners.aEls.length; iElId++) {
+      if (oEvtListeners.aEls[iElId] === this) {
+        for (iLstId; iLstId &lt; oEvtListeners.aEvts[iElId].length; iLstId++) { oEvtListeners.aEvts[iElId][iLstId].call(this, oEvent); }
+        break;
+      }
+    }
+  }
+  Element.prototype.addEventListener = function (sEventType, fListener /*, useCapture (will be ignored!) */) {
+    if (oListeners.hasOwnProperty(sEventType)) {
+      var oEvtListeners = oListeners[sEventType];
+      for (var nElIdx = -1, iElId = 0; iElId &lt; oEvtListeners.aEls.length; iElId++) {
+        if (oEvtListeners.aEls[iElId] === this) { nElIdx = iElId; break; }
+      }
+      if (nElIdx === -1) {
+        oEvtListeners.aEls.push(this);
+        oEvtListeners.aEvts.push([fListener]);
+        this[&quot;on&quot; + sEventType] = runListeners;
+      } else {
+        var aElListeners = oEvtListeners.aEvts[nElIdx];
+        if (this[&quot;on&quot; + sEventType] !== runListeners) {
+          aElListeners.splice(0);
+          this[&quot;on&quot; + sEventType] = runListeners;
+        }
+        for (var iLstId = 0; iLstId &lt; aElListeners.length; iLstId++) {
+          if (aElListeners[iLstId] === fListener) { return; }
+        }
+        aElListeners.push(fListener);
+      }
+    } else {
+      oListeners[sEventType] = { aEls: [this], aEvts: [ [fListener] ] };
+      this[&quot;on&quot; + sEventType] = runListeners;
+    }
+  };
+  Element.prototype.removeEventListener = function (sEventType, fListener /*, useCapture (will be ignored!) */) {
+    if (!oListeners.hasOwnProperty(sEventType)) { return; }
+    var oEvtListeners = oListeners[sEventType];
+    for (var nElIdx = -1, iElId = 0; iElId &lt; oEvtListeners.aEls.length; iElId++) {
+      if (oEvtListeners.aEls[iElId] === this) { nElIdx = iElId; break; }
+    }
+    if (nElIdx === -1) { return; }
+    for (var iLstId = 0, aElListeners = oEvtListeners.aEvts[nElIdx]; iLstId &lt; aElListeners.length; iLstId++) {
+      if (aElListeners[iLstId] === fListener) { aElListeners.splice(iLstId, 1); }
+    }
+  };
+}
+</pre>
+
+<h3 id="Example" name="Example"></h3>
+
+<h2 id="Ver_también">Ver también</h2>
+
+<ul>
+ <li><a href="/es/docs/Web/API/EventTarget/addEventListener"><code>EventTarget.addEventListener()</code></a>.</li>
+ <li><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span><a href="/es/docs/Web/API/EventTarget/detachEvent"><code>EventTarget.detachEvent()</code></a>.</li>
+</ul>

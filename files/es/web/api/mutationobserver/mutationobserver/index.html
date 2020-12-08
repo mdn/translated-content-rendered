@@ -1,0 +1,98 @@
+---
+title: MutationObserver.MutationObserver()
+slug: Web/API/MutationObserver/MutationObserver
+translation_of: Web/API/MutationObserver/MutationObserver
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/API/MutationObserver"><code>MutationObserver</code></a></strong></li><li class="toggle"><details open><summary>Constructor</summary><ol><li><em><code>MutationObserver()</code></em></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/es/docs/Web/API/MutationObserver/disconnect"><code>disconnect()</code></a> <a href="/es/docs/Web/API/MutationObserver/disconnect$translate" style="opacity: 0.5;">[Traducir]</a></li><li><a href="/es/docs/Web/API/MutationObserver/observe"><code>observe()</code></a></li><li><a href="/es/docs/Web/API/MutationObserver/takeRecords"><code>takeRecords()</code></a> <a href="/es/docs/Web/API/MutationObserver/takeRecords$translate" style="opacity: 0.5;">[Traducir]</a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary">El constructor DOM <code><strong>MutationObserver()</strong></code> — parte del interface <a href="/es/docs/Web/API/MutationObserver"><code>MutationObserver</code></a> — </span>crea y devuelve un nuevo objeto <strong>observer </strong>que llamará a la función especificada (callback), cuando tengan lugar cambios sobre el DOM. Estos observadores no se inician inmediatamente; en primer lugar debemos llamar al método <a href="/es/docs/Web/API/MutationObserver/observe"><code>observe()</code></a> para establecer qué parte del DOM observar y que tipo de cambios comunicar.</p>
+
+<h2 id="Sintaxis">Sintaxis</h2>
+
+<pre class="syntaxbox notranslate">var <em>observer</em> = new MutationObserver(<em>callback</em>);</pre>
+
+<h3 id="Parámetros">Parámetros</h3>
+
+<dl>
+ <dt><code>callback</code></dt>
+ <dd>La función que será llamada con cada cambio en el DOM, determinado por el nodo, subárbol y opciones. Esta función toma dos parámetros de entrada: un array de objetos <a href="/es/docs/Web/API/MutationRecord"><code>MutationRecord</code></a>, con los cambios producidos, y el <code>MutationObserver</code> que llamó a la función. Para mas detalles vea <a href="#Example">example</a></dd>
+ <dt> </dt>
+</dl>
+
+<h3 id="Valor_devuelto">Valor devuelto</h3>
+
+<p>Un nuevo objeto <a href="/es/docs/Web/API/MutationObserver"><code>MutationObserver</code></a>, configurado para llamar a una determinada función cuando se producca un cambio en el DOM.</p>
+
+<h2 id="Ejemplo">Ejemplo</h2>
+
+<p>Este ejemplo crea un nuevo <code>MutationObserver</code> configurado para <em>observar </em>a un nodo y a sus hijos (subárbol), cuando se añadan o eliminen elementos al mismo; tambien observa cualquier cambio en los atributos de los elementos del árbol.</p>
+
+<h3 id="La_función_callback">La función callback</h3>
+
+<pre class="brush: js notranslate">function callback(mutationList, observer) {
+  mutationList.forEach((mutation) =&gt; {
+    switch(mutation.type) {
+      case &apos;childList&apos;:
+        /* Uno o mas hijos han sido añadidos y/o eliminados del árbol;
+           vea mutation.addedNodes y mutation.removedNodes */
+        break;
+      case &apos;attributes&apos;:
+        /* El valor de un atributo en mutation.target ha cambiado;
+           El nombre del atributo esta en mutation.attributeName y
+           su valor anterior en mutation.oldValue */
+        break;
+    }
+  });
+}
+</pre>
+
+<p>La función <code>callback()</code> es llamada cuando el <strong>observer </strong>detecta cambios que coinciden con la configuración de consulta especificada cuando llamamos a <a href="/es/docs/Web/API/MutationObserver/observe"><code>observe()</code></a> para que inicie la observación.</p>
+
+<p>El tipo de cambio que se produjo (tanto en la lista de hijos como en los atributos) es detectado observando la propiedad <a href="/es/docs/Web/API/MutationRecord/type"><code>mutation.type</code></a></p>
+
+<h3 id="Crear_e_iniciar_un_observer">Crear e iniciar un  &quot;observer&quot;</h3>
+
+<p>Este código establece el proceso de observación</p>
+
+<pre class="brush: js notranslate">var targetNode = document.querySelector(&quot;#someElement&quot;);
+var observerOptions = {
+  childList: true,
+  attributes: true,
+  subtree: true //Omita o ponga false si no quiere controlar los cambios en los hijos
+}
+
+var observer = new MutationObserver(callback);
+observer.observe(targetNode, observerOptions);</pre>
+
+<p>El subárbol deseado se localiza buscando un elemento cuyo ID es &quot;someElement&quot;. Un conjunto de opciones para el &quot;observer&quot; es establecido en el registro <code>observerOptions</code>. En él, especificamos los valores <code>true </code>tanto para <code>childList</code> como <code>attributes</code>, para obtener la información deseada.</p>
+
+<p>Posteriormente instanciamos el objeto observer, especificando la función <code>callback()</code>, e iniciamos la observación de los nodos del DOM llamando al método <code>observe()</code>, pasandole el nodo y las opciones.</p>
+
+<p>Desde este momento y hasta que se llame al método <a href="/es/docs/Web/API/MutationObserver/disconnect"><code>disconnect()</code></a>, la funcion <code>callback()</code> será llamada cada vez que un elemento sea añadido o eliminado del árbol del DOM, cuya raiz es  <code>targetNode</code>, o uno de sus atributos sea cambiado.</p>
+
+<p> </p>
+
+<h2 id="Specifications" name="Specifications">Especificaciones</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Especificación</th>
+   <th scope="col">Estado</th>
+   <th scope="col">Comentario</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#dom-mutationobserver-mutationobserver" hreflang="en" lang="en">DOM<br><small lang="es">La definición de &apos;MutationObserver()&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidad">Compatibilidad</h2>
+
+<div class="hidden">La tabla de compatibilidad de esta página ha sido generada utilizando datos estructurados. Si desea contribuir, compruebe nuestra <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data </a>y envienos una petición de actualizacion</div>
+
+<div class="bc-data" id="bcd:api.MutationObserver.MutationObserver"></div>

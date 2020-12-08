@@ -1,0 +1,106 @@
+---
+title: Probando media queries
+slug: Web/Guide/CSS/probando_media_queries
+translation_of: Web/CSS/Media_Queries/Testing_media_queries
+---
+<p></p><div class="experimental indicator-warning notecard">
+    <p><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>Esta es una <a href="/en-US/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">tecnología experimental</a></strong><br>Comprueba la <a href="#Browser_compatibility">Tabla de compabilidad de navegadores</a> cuidadosamente antes de usarla en producción.</p>
+</div><p></p>
+<p>El DOM proporciona características que hacen posible probar los resultados de un media query estructuradamente. Esto es hecho usando la interfaz <a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a> y sus métodos y propiedades. Una vez que hayas creado el objeto <a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a>, puedes revisar el resultado del query o, como alternativa, recibir notificaciones automáticamente cuando el resultado cambie.</p>
+<h2 id="Creating_a_media_query_list" name="Creating_a_media_query_list">Creando una media query list</h2>
+<p>Before you can evaluate the results of a query, you need to create the <a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a> object representing the media query. To do this, use the <a href="/es/docs/Web/API/Window/matchMedia" title="Retorna un nuevo objeto MediaQueryList que representa los resultados analizados de la cadena media query ."><code>window.matchMedia</code></a> method.</p>
+<p>For example, if you want to set up a query list that determines whether the device is in landscape or portrait orientation, you can do so like this:</p>
+<pre>var mql = window.matchMedia(&quot;(orientation: portrait)&quot;);
+</pre>
+<h2 id="Checking_the_result_of_a_query" name="Checking_the_result_of_a_query">Revisando el resultado de un query</h2>
+<p>Once your media query list has been created, you can check the result of the query by looking at the value of its <code>matches</code> property, which reflects the result of the query:</p>
+<pre class="brush: js">if (mql.matches) {
+  /* The device is currently in portrait orientation */
+} else {
+  /* The device is currently in landscape orientation */
+}
+</pre>
+<h2 id="Receiving_query_notifications" name="Receiving_query_notifications">Recibiendo notificaciones query</h2>
+<p>If you need to be aware of changes to the evaluated result of the query on an ongoing basis, it&apos;s more efficient to register a listener than to poll the query&apos;s result. To do this, you can call the <code>addListener()</code> method on the <a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a> object, specifying an observer that implements the <a href="/es/docs/Web/API/MediaQueryListListener" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>MediaQueryListListener</code></a> interface:</p>
+<pre class="brush: js">var mql = window.matchMedia(&quot;(orientation: portrait)&quot;);
+mql.addListener(handleOrientationChange);
+handleOrientationChange(mql);
+</pre>
+<p>This code creates the orientation testing media query list, <code>mql</code>, then adds a listener to it. Note that after adding the listener, we actually invoke the listener directly once. This lets our listener perform initial adjustments based on the current device orientation (otherwise, if our code assumes the device is in portrait mode but it&apos;s actually in landscape mode at startup, we could have inconsistencies).</p>
+<p>The <code>handleOrientationChange()</code> method we implement then would look at the result of the query and handle whatever we need to do on an orientation change:</p>
+<pre class="brush: js">function handleOrientationChange(mql) {
+  if (mql.matches) {
+    /* The device is currently in portrait orientation */
+  } else {
+    /* The device is currently in landscape orientation */
+  }
+}
+</pre>
+<h2 id="Ending_query_notifications" name="Ending_query_notifications">Terminando con las notificaciones query </h2>
+<p>Cuando ya no vayas a necesitar recibir las notificaciones sobre los cambios de valro de tu media query, simplemente llama al <code>removeListener()</code> en el <a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a>:</p>
+<pre>mql.removeListener(handleOrientationChange);
+</pre>
+<h2 id="Browser_compatibility" name="Browser_compatibility">Compatibilidad con los navegadores</h2>
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div><p></p>
+<div id="compat-desktop">
+ <table class="compat-table">
+  <tbody>
+   <tr>
+    <th>Feature</th>
+    <th>Chrome</th>
+    <th>Firefox (Gecko)</th>
+    <th>Internet Explorer</th>
+    <th>Opera</th>
+    <th>Safari</th>
+   </tr>
+   <tr>
+    <td>Soporte básico</td>
+    <td>9</td>
+    <td><a href="/en-US/Firefox/Releases/6" title="Publicado en 2011-08-16.">6.0</a> (6.0)</td>
+    <td>10</td>
+    <td>12.1</td>
+    <td>5.1</td>
+   </tr>
+  </tbody>
+ </table>
+</div>
+<div id="compat-mobile">
+ <table class="compat-table">
+  <tbody>
+   <tr>
+    <th>Feature</th>
+    <th>Android</th>
+    <th>Firefox Mobile (Gecko)</th>
+    <th>IE Mobile</th>
+    <th>Opera Mobile</th>
+    <th>Safari Mobile</th>
+   </tr>
+   <tr>
+    <td>Soporte básico</td>
+    <td>3.0</td>
+    <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+    <td>10</td>
+    <td>12.1</td>
+    <td>5</td>
+   </tr>
+  </tbody>
+ </table>
+</div>
+<h2 id="See_also" name="See_also">Ver también</h2>
+<ul>
+ <li><a href="/en-US/docs/CSS/Media_queries" title="CSS/Media queries">Media queries</a></li>
+ <li><a href="/es/docs/Web/API/Window/matchMedia" title="Retorna un nuevo objeto MediaQueryList que representa los resultados analizados de la cadena media query ."><code>window.matchMedia()</code></a></li>
+ <li><a href="/es/docs/Web/API/MediaQueryList" title="Un objeto MediaQueryList almacena información en un media query aplicada a un documento y se encarga de enviar notificaciones a los oyentes cuando cambia el estado de consulta de medios (es decir, cuando la prueba de consulta de medios comienza o deja de evaluarse a true)."><code>MediaQueryList</code></a></li>
+ <li><a href="/es/docs/Web/API/MediaQueryListListener" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>MediaQueryListListener</code></a></li>
+</ul>

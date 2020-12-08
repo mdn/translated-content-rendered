@@ -1,0 +1,243 @@
+---
+title: Uso de geolocalización
+slug: WebAPI/Using_geolocation
+tags:
+  - API
+  - Geolocalización
+  - Guía
+  - clearWatch
+  - watchPosition
+translation_of: Web/API/Geolocation_API
+---
+<p></p><div class="secureContexts notecard"><p><strong>Secure context</strong><br>This feature is available only in <a href="/es/docs/Web/Security/Secure_Contexts">secure contexts</a> (HTTPS), in some or all <a href="#Browser_compatibility">supporting browsers</a>.</p></div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/API/WebAPI"><code>WebAPI</code></a></strong></li><li class="toggle"><details open><summary>Páginas relacionadas a Geolocation API</summary><ol><li><a href="/es/docs/Web/API/Coordinates"><code>Coordinates</code></a></li><li><a href="/es/docs/Web/API/Geolocation"><code>Geolocation</code></a></li><li><a href="/es/docs/Web/API/Navigator/geolocation"><code>Navigator.geolocation</code></a></li><li><a href="/es/docs/Web/API/Position"><code>Position</code></a></li><li><a href="/es/docs/Web/API/PositionError"><code>PositionError</code></a></li><li><a href="/es/docs/Web/API/PositionOptions"><code>PositionOptions</code></a></li></ol></details></li></ol></section><p></p>
+
+<p><span id="result_box" lang="es"><span class="hps">La</span> <strong><span class="hps">API de geolocalización</span></strong> <span class="hps">permite al</span> <span class="hps">usuario compartir su</span> <span class="hps">ubicación</span> <span class="hps">a las aplicaciones web</span> <span class="hps">si</span> <span class="hps">así lo desea.</span> <span class="hps">Por razones de privacidad</span><span>,</span> <span class="hps">al usuario</span> <span class="hps">se le pide que</span> <span class="hps">confirme el permiso</span> <span class="hps">para proporcionar información</span> <span class="hps">de ubicación.</span></span></p>
+
+<h2 id="El_objeto_geolocation">El objeto geolocation</h2>
+
+<p><span id="result_box" lang="es"><span class="hps">La API</span> <span class="hps">de geolocalización</span> <span class="hps">se publica</span> <span class="hps">a través del objeto </span></span><a href="/es/docs/Web/API/Window/navigator/geolocation" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>navigator.geolocation</code></a>.</p>
+
+<p><span id="result_box" lang="es"><span class="hps">Si el objeto existe</span><span>,</span> <span class="hps">los servicios de geolocalización</span> <span class="hps">están disponibles.</span> <span class="hps">Se puede</span> <span class="hps">comprobar la presencia</span> <span class="hps">de la geolocalización</span> <span class="hps">de esta manera:</span></span></p>
+
+<pre class="brush: js">if (&quot;geolocation&quot; in navigator) {
+  /* la geolocalización está disponible */
+} else {
+  /* la geolocalización NO está disponible */
+}
+</pre>
+
+<div class="note notecard">
+<p>Nota: En Firefox 24 y versiones anteriores, <code>&quot;geolocation&quot; in navigator</code> siempre retornaba <code>true</code> incluso si la API se encontraba deshabilitada. Esto ha sido corregido en <a href="https://www.fxsitecompat.com/en-CA/versions/25/">Firefox 25</a> para cumplir con la especificación.  (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=884921" title="FIXED: Align navigator.geolocation with spec">error 884921</a>).</p>
+</div>
+
+<h3 id="Obtención_de_la_ubicación_actual">Obtención de la ubicación actual</h3>
+
+<p><span lang="es"><span class="hps">Para</span> <span class="hps">obtener la ubicación</span> <span class="hps">actual del usuario</span><span>, puede llamar a</span><span class="atn hps">l método </span></span><a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a><span lang="es"><span class="hps">.</span></span></p>
+
+<p><span lang="es"><span class="hps">Esto inicia</span> <span class="hps">una solicitud asíncrona</span> <span class="hps">para detectar</span> <span class="hps">la posición del usuario</span><span>, y</span> <span class="hps">consulta el</span> <span class="hps">hardware</span> <span class="hps">de posicionamiento para</span> <span class="hps">obtener</span><span class="hps"> información actualizada.</span> </span><span id="result_box" lang="es"><span class="hps">Cuando</span> <span class="hps">se determina la posición</span><span>, se ejecuta la función</span> <span class="hps">de callback</span><span class="hps">.</span></span><span lang="es"> <span class="hps">Si lo desea,</span> <span class="hps">puede proporcionar otra función de callback</span><span class="hps"> que se</span> <span class="hps">ejecuta si</span> <span class="hps">se produce un error</span><span>.</span> <span class="hps">Un tercer</span> <span class="hps">parámetro</span> <span class="hps">opcional</span><span>, es un</span> <span class="hps">objeto de opciones</span> <span class="hps">donde se puede establecer</span> <span class="hps">la edad máxima de</span> <span class="hps">la</span> <span class="hps">posición devuelta</span><span>,</span> <span class="hps">el tiempo de espera</span> <span class="hps">para una solicitud</span> <span class="hps">y si se requiere</span> <span class="hps">una alta precisión</span> <span class="hps">para la posición.</span></span></p>
+
+<div class="note">
+<p><strong>Nota:</strong> Por defecto, <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a> intenta responder tan rápido como sea posible con un resultado de baja precisión. Es útil cuando se necesita una respuesta rápida sin importar su exactitud. A los dispositivos con GPS, por ejemplo, les puede tomar más de un minuto obtener una posición, por lo que datos menos precisos (localización por IP o wifi) pueden ser devueltos por <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a>.</p>
+</div>
+
+<pre class="brush: js">navigator.geolocation.getCurrentPosition(function(position) {
+  haz_algo(position.coords.latitude, position.coords.longitude);
+});</pre>
+
+<p>En el ejemplo anterior la función do_something() será ejecutada una vez que se obtiene la posición.</p>
+
+<h3 id="Rastreando_la_posición_actual">Rastreando la posición actual</h3>
+
+<p>Si los datos de ubicación cambian (si el dispositivo se mueve o información geográfica más precisa es recibida), puede definir una función de callback que se ejecuta al cambiar la posición. Esto se logra a través de la función <a href="/es/docs/Web/API/Window/navigator/geolocation/watchPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>watchPosition()</code></a>, que recibe los mismos parámetros que <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a>. La función de callback es ejecutada varias veces, permitiendo al navegador actualizar la ubicación cada vez que cambia, o proporcionar una posición con mayor exactitud utilizando distintas técnicas de geolocalización. La función de callback de error, la cual es opcional como en <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a>, es llamada solo una vez, cuando nunca serán devueltos resultados correctos.</p>
+
+<div class="note">
+<p><strong>Nota:</strong> Es posible usar la función <a href="/es/docs/Web/API/Window/navigator/geolocation/watchPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>watchPosition()</code></a> sin haber ejecutado antes <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a>.</p>
+</div>
+
+<pre class="brush: js">var watchID = navigator.geolocation.watchPosition(function(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+});</pre>
+
+<p>El método <a href="/es/docs/Web/API/Window/navigator/geolocation/watchPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>watchPosition()</code></a> devuelve un número que se utiliza para identificar el rastreador de posición solicitado; este valor se utiliza junto con el método <a href="/es/docs/Web/API/Window/navigator/geolocation/clearWatch" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>clearWatch()</code></a> para dejar de rastrear la posición del usuario.</p>
+
+<pre class="brush: js">navigator.geolocation.clearWatch(watchID);
+</pre>
+
+<h3 id="Afinando_la_respuesta">Afinando la respuesta</h3>
+
+<p>Ambos métodos,  <a href="/es/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>getCurrentPosition()</code></a> y <a href="/es/docs/Web/API/Window/navigator/geolocation/watchPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>watchPosition()</code></a> aceptan una función de callback en caso de éxito, una función callback opcional si ocurre algún error, y un objeto <code>PositionOptions</code> también opcional.</p>
+
+<p></p>
+
+<p>Una llamada a <a href="/es/docs/Web/API/Window/navigator/geolocation/watchPosition" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>watchPosition</code></a> luce como el siguiente ejemplo:</p>
+
+<pre class="brush: js">function geo_success(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+}
+
+function geo_error() {
+  alert(&quot;Sorry, no position available.&quot;);
+}
+
+var geo_options = {
+  enableHighAccuracy: true,
+  maximumAge        : 30000,
+  timeout           : 27000
+};
+
+var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);</pre>
+
+<p><a id="fck_paste_padding">Demo de watchPosition: </a><a class="external" href="http://www.thedotproduct.org/experiments/geo/">http://www.thedotproduct.org/experiments/geo/</a><br>
+ <a id="fck_paste_padding">﻿</a></p>
+
+<h2 id="Describiendo_una_posición">Describiendo una posición</h2>
+
+<p>La ubicación del usuario es descrita con un objeto <code>Position</code> referenciando a un objeto <code>Coordinates</code>.</p>
+
+<p></p>
+
+<p></p>
+
+<h2 id="Manejo_de_errores">Manejo de errores</h2>
+
+<p>La función de callback de error, si existe cuando se llama a <code>getCurrentPosition()</code> o <code>watchPosition()</code>, recibe un objeto  <code>PositionError</code> como su primer parámetro.</p>
+
+<pre class="brush: js">function errorCallback(error) {
+  alert(&apos;ERROR(&apos; + error.code + &apos;): &apos; + error.message);
+};
+</pre>
+
+<p></p>
+
+<h2 id="Ejemplo_de_geolocalización">Ejemplo de geolocalización</h2>
+
+<div class="hidden">
+<pre class="brush: css">body {
+  padding: 20px;
+  background-color:#ffffc9
+}
+
+p { margin : 0; }
+</pre>
+</div>
+
+<h3 id="Contenido_HTML">Contenido HTML</h3>
+
+<pre class="brush: html;">&lt;p&gt;&lt;button onclick=&quot;geoFindMe()&quot;&gt;Show my location&lt;/button&gt;&lt;/p&gt;
+&lt;div id=&quot;out&quot;&gt;&lt;/div&gt;
+</pre>
+
+<h3 id="Contenido_JavaScript">Contenido JavaScript</h3>
+
+<pre class="brush: js;">function geoFindMe() {
+  var output = document.getElementById(&quot;out&quot;);
+
+  if (!navigator.geolocation){
+    output.innerHTML = &quot;&lt;p&gt;Geolocation is not supported by your browser&lt;/p&gt;&quot;;
+    return;
+  }
+
+  function success(position) {
+    var latitude  = position.coords.latitude;
+    var longitude = position.coords.longitude;
+
+    output.innerHTML = &apos;&lt;p&gt;Latitude is &apos; + latitude + &apos;° &lt;br&gt;Longitude is &apos; + longitude + &apos;°&lt;/p&gt;&apos;;
+
+    var img = new Image();
+    img.src = &quot;http://maps.googleapis.com/maps/api/staticmap?center=&quot; + latitude + &quot;,&quot; + longitude + &quot;&amp;zoom=13&amp;size=300x300&amp;sensor=false&quot;;
+
+    output.appendChild(img);
+  };
+
+  function error() {
+    output.innerHTML = &quot;Unable to retrieve your location&quot;;
+  };
+
+  output.innerHTML = &quot;&lt;p&gt;Locating…&lt;/p&gt;&quot;;
+
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+</pre>
+
+<h3 id="Resultado">Resultado</h3>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="410" id="frame_Geolocation_Live_Example" src="https://mdn.mozillademos.org/es/docs/WebAPI/Using_geolocation$samples/Geolocation_Live_Example?revision=1548669" width="350"></iframe></p>
+
+<h2 id="Compatibilidad_entre_navegadores">Compatibilidad entre navegadores</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td>5</td>
+   <td><a href="/en-US/Firefox/Releases/3.5" title="Publicado en 2009-06-30.">3.5</a> (1.9.1)</td>
+   <td>9</td>
+   <td>10.60</td>
+   <td>5</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>4.0 (4)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>10.60</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h3 id="Notas_sobre_Gecko">Notas sobre Gecko</h3>
+
+<p>Firefox incluye soporte para localizar basándose en información de redes inalámbricas, usando Google Location Services. En la transacción entre Firefox y Google, los datos son compartidos incluyendo información del punto de acceso inalámbrico, un token de acceso (similar a una cookie con duración de dos semanas), y la dirección IP del usuario. Para más información, por favor consulte la <a href="http://www.mozilla.com/en-US/legal/privacy/" title="http://www.mozilla.com/en-US/legal/privacy/">Política de Privacidad de Mozilla</a><span class="external"> y la</span> <a href="http://www.google.com/privacy-lsf.html" title="http://www.google.com/privacy-lsf.html">Política de Privacidad de Google</a>, dichos documentos cubren como estos datos pueden ser utilizados.</p>
+
+<p>En Firefox 3.6 (Gecko 1.9.2) fue añadido soporte para utilizar el servicio <a href="http://catb.org/gpsd/" title="http://catb.org/gpsd/">GPSD</a> para geolocalización en sistemas Linux.</p>
+
+<h2 id="Consultar_también">Consultar también</h2>
+
+<ul>
+ <li><a href="/es/docs/Web/API/Window/navigator/geolocation" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>navigator.geolocation</code></a></li>
+ <li><a href="http://www.w3.org/TR/geolocation-API/" title="http://www.w3.org/TR/geolocation-API/">API de Geolocalización en w3.org</a></li>
+ <li><a href="/en-US/demos/tag/tech:geolocation" title="/en-US/demos/tag/tech:geolocation">Demos que utilizan la API de Geolocalización</a></li>
+</ul>
+
+<p> </p>

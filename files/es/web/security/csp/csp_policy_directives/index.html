@@ -1,0 +1,719 @@
+---
+title: Políticas Directivas CSP
+slug: Web/Security/CSP/CSP_policy_directives
+translation_of: Web/HTTP/Headers/Content-Security-Policy
+---
+<p> </p>
+
+<p>Hay varios ámbitos de las políticas que pueden ser definidas por los administradores de las páginas web usando las Normas de Seguridad de Contenido o CSP por sus siglas en ingles. Cualquier combinación de estas políticas puede ser utilizada para satisfacer las necesidades de su sitio web, no es necesario especificar todas ellas..</p>
+
+<h2 id="Fuentes_de_contenido">Fuentes de contenido</h2>
+
+<p>La mayoría de las políticas directivas necesitan de una o más fuentes de contenido. Una fuente de contenido es una cadena que indica una posible fuente de donde el contenido puede ser descargado.</p>
+
+<h3 id="Listas_de_fuentes">Listas de fuentes</h3>
+
+<p>Una lista de fuentes es un cadena que especifica uno o más hosts de internet o direcciones IP, así como un <a href="/en-US/docs/URIs_and_URLs" title="en/URIs and URLs">esquema de URL</a> opcional y/o número de puerto. La dirección del sitio puede incluir un comodín líder (el carácter asterisco, <code>&apos;*&apos;</code>), y puedes usar un comodín (de nuevo, <code>&apos;*&apos;</code>) como el número de puerto, indicando que todos los puertos legales son válidos para la fuente. Los hosts son delimitados por espacio.</p>
+
+<p>Las expresiones validas del host son:</p>
+
+<dl>
+ <dt><span class="nowiki">http://*.foo.com</span></dt>
+ <dd>Junta todos los intentos de carga desde cualquier subdominio de foo.com usando el sistema URL http:.</dd>
+ <dt><span class="nowiki">mail.foo.com:443</span></dt>
+ <dd>Junta todos los intentos de acceso al puerto 443 en mail.foo.com.</dd>
+ <dt><span class="nowiki">https://store.foo.com</span></dt>
+ <dd>Junta todos los intentos para acceder store.foo.com usando https:.</dd>
+</dl>
+
+<p>Si un número de puerto no está especificado, el navegador usara el número de puerto predeterminado para el sistema especificado. Si no hay sistema especificado, el mismo sistema que ha sido usado para acceder al documento protegido será usado.</p>
+
+<dl>
+</dl>
+
+<h3 id="Palabras_claves">Palabras claves</h3>
+
+<p>También existen algunas palabras claves disponibles para describir clases especiales de fuentes de contenido. Estas palabras son las siguientes:</p>
+
+<dl>
+ <dt><code>&apos;none&apos;</code></dt>
+ <dd>Se refiere al conjunto vacío, es decir, no hay URLs que coincidan. Las comillas simples son necesarias.</dd>
+ <dt><code>&apos;self&apos;</code></dt>
+ <dd>Se refiere al origen del cual los documentos protegidos están siendo enviados, incluyendo el mismo sistema de URL y numero de puerto. Las comillas simples deben ser incluidas. Algunos navegadores excluyen específicamente <code>blob</code> y <code>filesystem</code> de las políticas directivas. Sitios que necesitan permitir  este tipo de contenido puede especificarlos usando el Data attribute.</dd>
+ <dt><code>&apos;unsafe-inline&apos;</code></dt>
+ <dd>Permite el uso de recursos alineados como elementos alineados <a href="/es/docs/Web/HTML/Elemento/script" title="El elemento HTML Script (&lt;script&gt;) se utiliza para insertar o hacer referencia a un script ejecutable dentro de un documento HTML o XHTML."><code>&lt;script&gt;</code></a> , <code>javascript:</code> URLs, controladores de eventos alineados e elementos alineados <a href="/es/docs/Web/HTML/Elemento/style" title="style - estilo. Es el elemento encargado de indicar la información de estilo."><code>&lt;style&gt;</code></a> . Las comillas simples deben ser incluidas.</dd>
+ <dt><code>&apos;unsafe-eval&apos;</code></dt>
+ <dd>Permite el uso de <code>eval()</code>y métodos similares para la creación de códigos desde las cadenas de caracteres. Las comillas simples deben ser incluidas.</dd>
+</dl>
+
+<div class="note"><strong>Nota:</strong> &apos;unsafe-inline&apos; y &apos;unsafe-eval&apos; son inseguros y pueden hacer de tu página web vulnerable contra cross-site scripting.</div>
+
+<p>Ejemplo, puedes especificar que el contenido sea cargado desde el origen del documento, así como desde trustedscripts.foo.com de la siguiente manera:</p>
+
+<pre>Content-Security-Policy: default-src &apos;self&apos; trustedscripts.foo.com
+</pre>
+
+<dl>
+</dl>
+
+<h3 id="Data">Data</h3>
+
+<div class="note"><strong>Nota:</strong> data: URIs son inseguras y pueden hacer de tu página web vulnerable contra cross-site scripting si es permitido por las fuentes del script.</div>
+
+<dl>
+ <dt>data:</dt>
+ <dd>Permite que <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs" title="en/data URIs"><code>data:</code> URIs</a> sea usada como fuente de contenido. Esto es inseguro y un atacante puede insertar data: URIs arbitrarias. Utilízala con moderación y definitivamente no para los scripts.</dd>
+ <dt>mediastream:</dt>
+ <dd>Permite que <a href="/en-US/docs/Web/API/MediaStream_API" title="/en/WebRTC/MediaStream_API"><code>mediastream:</code> URIs</a> sea usada como fuente de contenido.</dd>
+ <dt>blob:</dt>
+ <dd>Permite que <a href="/en-US/docs/Web/API/Blob" title="/en/WebRTC/MediaStream_API"><code>blob:</code> URIs</a> sea usada como fuente de contenido.</dd>
+ <dt>filesystem:</dt>
+ <dd>Permite que <a href="/en-US/docs/Web/API/FileSystem" title="/en/WebRTC/MediaStream_API"><code>filesystem:</code> URIs</a> sea usada como fuente de contenido.</dd>
+</dl>
+
+<pre>Content-Security-Policy: default-src &apos;self&apos;; img-src &apos;self&apos; data: blob: filesystem:; media-src mediastream:
+</pre>
+
+<h2 id="Políticas_directivas_soportadas">Políticas directivas soportadas</h2>
+
+<p>Las siguientes políticas directivas están disponibles para controlar la política de seguridad para varias ares de las políticas.</p>
+
+<h3 id="base-uri"><code>base-uri</code></h3>
+
+<p>La directiva &gt;<code>base-uri</code> define las URLs que un agente usuario puede usar como el documento URL base. Si este valor no está presente, cualquier URL está permitido. Si esta directiva no está presente, el agente usuario usara el valor en el elemento <code><a href="/en-US/docs/Web/HTML/Element/base">base</a>.</code></p>
+
+<pre>base-uri <em>source-list</em></pre>
+
+<h3 id="child-src"><code>child-src</code></h3>
+
+<p>La directiva <code>child-src</code> define las fuentes válidas para los trabajadores de la web y contextos de navegación anidados cargados utilizando elementos tales como <a href="/es/docs/Web/HTML/Elemento/frame" title="frame -marcos . Define la organización de los marcos dentro de la ventana del usuario."><code>&lt;frame&gt;</code></a> y <a href="/es/docs/Web/HTML/Elemento/iframe" title="El elemento HTML &lt;iframe&gt; representa un contexto de navegación anidada, el cual permite incorporar otra página HTML en la página actual. Cada elemento &lt;iframe&gt; tiene su propia historial de sesión y su propio objeto Document. El contexto de navegación que incluye el contenido implícito se llama contexto de navegación principal. El contexto de navegación de nivel superior (que no tiene padre) es típicamente la ventana del navegador."><code>&lt;iframe&gt;</code></a>. Esta opción es preferida sobre la directiva <code>frame-src</code><code>, </code><code>la cual es obsoleta. Para los trabajadores, las </code>solicitudes no conformes son tratadas como errores de red fatales por el agente usuario.</p>
+
+<div class="note"><strong>Nota: </strong>Si esta directiva no está presente, el agente usuario buscara la directiva por defecto <code>default-src.</code></div>
+
+<pre><span>​child-src <em>source-list</em></span></pre>
+
+<h3 id="connect-src"><code>connect-src</code></h3>
+
+<p>La directiva <code>connect-src</code> define fuentes válidas para fetch, <a href="/en/nsIXMLHttpRequest" title="en/XMLHttpRequest">XMLHttpRequest</a>, WebSocket y conecciones EventSource.</p>
+
+<div class="note"><strong>Nota: </strong>Si esta directiva no está presente, el agente usuario buscara la directiva por defecto <code>default-src.</code></div>
+
+<div class="note"><strong>Nota: </strong>Antes de la versión Firefox 23, xhr-src  era utilizado en lugar de la directiva connect-src y solo restringía el uso de <a href="/en/nsIXMLHttpRequest" title="en/XMLHttpRequest">XMLHttpRequest</a>.</div>
+
+<pre><code>connect-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="default-src"><code>default-src</code></h3>
+
+<p>La directiva por defecto <code>default-src </code><code>define la política de seguridad para los tipos de contenidos que no están expresamente señalados por otras directivas. Esta directiva abarca las siguientes directivas:</code></p>
+
+<ul>
+ <li><code>child-src</code></li>
+ <li><code>connect-src</code></li>
+ <li><code>font-src</code></li>
+ <li><code>img-src</code></li>
+ <li><code>media-src</code></li>
+ <li><code>object-src</code></li>
+ <li><code>script-src</code></li>
+ <li><code>style-src</code></li>
+</ul>
+
+<pre><code>default-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="font-src"><code>font-src</code></h3>
+
+<p>La directivas <code>font-src</code> especifica las fuentes válidas para los tipos de letras cargadas usando <a href="/es/docs/Web/CSS/@font-face" title="@font-face permite al autor especificar fuentes online para visualizar en sus páginas web. Al permitir a los autores proporcionar sus propias fuentes, @font-face elimina la necesidad de depender del numero limitado de fuentes de usuarios instaladas en sus computadoras."><code>@font-face</code></a>.</p>
+
+<div class="note"><strong>Nota: </strong>Si esta directiva no está presente, el agente usuario buscara la directiva por defecto <code>default-src.</code></div>
+
+<pre><code>font-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="form-action"><code>form-action</code></h3>
+
+<p>La directiva <code>form-action</code><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> especifica criterios de valoración válidos para las sumisiones <a href="/es/docs/Web/HTML/Elemento/form" title="El elemento HTML form (&lt;form&gt;) representa una sección de un documento que contiene controles interactivos que permiten a un usuario enviar información a un servidor web."><code>&lt;form&gt;</code></a>.</p>
+
+<pre id="script-src"><code><code>form-action</code> &gt;<em><code>source-list</code></em></code></pre>
+
+<h3 id="frame-ancestors"><code>frame-ancestors</code></h3>
+
+<p>La directiva <code>frame-ancestors</code><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> especifica padres validos que pueden incustrar una pagina usando elementos  <a href="/es/docs/Web/HTML/Elemento/frame" title="frame -marcos . Define la organización de los marcos dentro de la ventana del usuario."><code>&lt;frame&gt;</code></a> y <a href="/es/docs/Web/HTML/Elemento/frame" title="frame -marcos . Define la organización de los marcos dentro de la ventana del usuario."><code>&lt;frame&gt;</code></a>. Esta directiva no esta soportada en el elemento <code>&lt;meta&gt; </code>o por la cabecera <code>Content-Security-Policy-Report-Only.</code></p>
+
+<pre><code>frame-ancestors</code> <em><code>source-list</code></em></pre>
+
+<h3 id="frame-src_obsolete_inline"><code>frame-src</code> <span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></h3>
+
+<p>The <code>frame-src</code> directive specifies valid sources for web workers and nested browsing contexts loading using elements such as &gt;<a href="/es/docs/Web/HTML/Elemento/frame" title="frame -marcos . Define la organización de los marcos dentro de la ventana del usuario."><code>&lt;frame&gt;</code></a> and <a href="/es/docs/Web/HTML/Elemento/iframe" title="El elemento HTML &lt;iframe&gt; representa un contexto de navegación anidada, el cual permite incorporar otra página HTML en la página actual. Cada elemento &lt;iframe&gt; tiene su propia historial de sesión y su propio objeto Document. El contexto de navegación que incluye el contenido implícito se llama contexto de navegación principal. El contexto de navegación de nivel superior (que no tiene padre) es típicamente la ventana del navegador."><code>&lt;iframe&gt;</code></a>.&gt;</p>
+
+<div class="note">
+<div><strong>Note: </strong>This directive is deprecated. Use <code>child-src</code> instead.</div>
+</div>
+
+<pre>frame-src <em>source-list</em></pre>
+
+<h3 id="img-src"><code>img-src</code></h3>
+
+<p>The <code>img-src</code> directive specifies valid sources of images and favicons. </p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent, the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>img-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="manifest-src"><code>manifest-src</code></h3>
+
+<p>The <code><strong>manifest-src</strong></code> directive specifies which manifest can be applied to the resource.</p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent, the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>manifest-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="media-src"><code>media-src</code></h3>
+
+<p>The <code>media-src</code> directive specifies valid sources for loading media using the <a href="/es/docs/Web/HTML/Elemento/audio" title="El elemento audio se usa para insertar contenido de audio en un documento HTML o XHTML. El elemento audio se agregó como parte de HTML 5."><code>&lt;audio&gt;</code></a> and <a href="/es/docs/Web/HTML/Elemento/video" title="El elemento video se utiliza para incrustar vídeos en un documento HTML o XHTML."><code>&lt;video&gt;</code></a> elements.</p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent, the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>media-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="object-src"><code>object-src</code></h3>
+
+<p>The <code>object-src</code> directive specifies valid sources for the <a href="/es/docs/Web/HTML/Elemento/object" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>&lt;object&gt;</code></a>, <a href="/es/docs/Web/HTML/Elemento/embed" title="El Elemento HTML Embed  ( &lt;embed&gt; ) representa un punto de integración para una aplicación externa o de contenido interactivo (en otras palabras, un plug-in)."><code>&lt;embed&gt;</code></a>, and <a href="/es/docs/Web/HTML/Elemento/applet" title="Permite añadir un applet Java en un documento HTML. Es un elemento Desaprobado En su lugar debe usarse el elemento object, su uso solo es válido declarando el dtd transicional."><code>&lt;applet&gt;</code></a> elements. </p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent, the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>object-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="plugin-types"><code>plugin-types</code></h3>
+
+<p>The <code>plugin-types</code> directive specifies the valid plugins that the user agent may invoke.</p>
+
+<pre>plugin-types <em>type-list</em></pre>
+
+<h3 id="referrer"><code>referrer</code></h3>
+
+<p>The <code>referrer</code> directive specifies information in the referrer header for links away from a page.</p>
+
+<pre>​referrer <em>value</em></pre>
+
+<h3 id="reflected-xss"><code>reflected-xss</code></h3>
+
+<p>The <code>reflected-xss</code> directive instructs a user agent to activate or deactivate any heuristics used to filter or block reflected cross-site scripting attacks. Valid values are <code>allow</code>, <code>block</code>, and <code>filter</code>. This directive is not supported in the <code>&lt;meta&gt;</code> element.</p>
+
+<div class="note"><strong>Note: </strong>This directive is ignored if it is contained in a <code>meta</code> element.</div>
+
+<pre>reflected-xss <em>value</em></pre>
+
+<h3 id="report-uri"><code>report-uri</code></h3>
+
+<p>The <code>report-uri</code> directive instructs the user agent to report attempts to violate the Content Security Policy. These violation reports consist of <a href="/en/JSON" title="en/JSON">JSON</a> documents sent via an HTTP <code>POST</code> request to the specified URI. See <a href="/en/Security/CSP/Using_CSP_violation_reports" title="en/Security/CSP/Using CSP violation reports">Using CSP violation reports</a> for details. This directive is not supported in the <code>&lt;meta&gt;</code> element.</p>
+
+<pre><code>report-uri</code> <em><code><a href="http://tools.ietf.org/html/rfc2396" class="external" title="http://tools.ietf.org/html/rfc2396">uri</a></code></em></pre>
+
+<h3 id="sandbox"><code>sandbox</code></h3>
+
+<p>The <code>sandbox</code> directive applies restrictions to a page&apos;s actions including preventing popups, preventing the execution of plugins and scripts, and enforcing a same-origin policy. This directive is not supported in the <code>&lt;meta&gt;</code> element or by the <code>Content-Security-policy-Report-Only</code> header field.</p>
+
+<pre>sandbox <em>value</em></pre>
+
+<h3 id="script-src_2"><code>script-src</code></h3>
+
+<p>The <code>script-src</code> directive specifies valid sources for JavaScript. When either the <code>script-src</code> or the <code>default-src</code> directive is included, inline script and <code>eval()</code> are disabled unless you specify &apos;unsafe-inline&apos; and &apos;unsafe-eval&apos;, respectively.</p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>script-src</code> <em><code>source-list</code></em></pre>
+
+<h3 id="style-src"><code>style-src</code></h3>
+
+<p>The <code>style-src</code> directive specifies valid sources for stylesheets. This includes both externally-loaded stylesheets and inline use of the <a href="/es/docs/Web/HTML/Elemento/style" title="style - estilo. Es el elemento encargado de indicar la información de estilo."><code>&lt;style&gt;</code></a> element and HTML <code>style</code> attributes. Stylesheets from sources that aren&apos;t included in the source list are not requested or loaded. When either the <code>style-src</code> or the <code>default-src</code> directive is included, inline use of the <a href="/es/docs/Web/HTML/Elemento/style" title="style - estilo. Es el elemento encargado de indicar la información de estilo."><code>&lt;style&gt;</code></a> element and HTML <code>style</code> attributes are disabled unless you specify &apos;unsafe-inline&apos;.</p>
+
+<div class="note"><strong>Note: </strong>If this directive is absent, the user agent will look for the <code>default-src</code> directive.</div>
+
+<pre><code>style-src</code> <em><code>source-list</code></em></pre>
+
+<div class="note"><strong>Note:</strong> Firefox currently requires using the same URL scheme and port for the <code>report-uri</code> as the content being protected by Content Security Policy.</div>
+
+<h3 id="upgrade-insecure-requests"><code>upgrade-insecure-requests</code></h3>
+
+<p>The <code>upgrade-insecure-requests</code> directive instructs user agents to treat all of a site&apos;s unsecure URL&apos;s (those serverd over HTTP) as though they have been replaced with secure URL&apos;s (those served over HTTPS). This directive is intended for web sites with large numbers of unsecure legacy URL&apos;s that need to be rewritten. </p>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Upgrade Insecure Requests&apos;" href="https://w3c.github.io/webappsec-upgrade-insecure-requests/" class="external" hreflang="en">Upgrade Insecure Requests</a></td>
+   <td><span class="spec-CR">Candidate Recommendation</span></td>
+   <td>Adds <code>upgrade-insecure-requests</code>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Content Security Policy Level 2&apos;" href="https://w3c.github.io/webappsec-csp/2/" class="external" hreflang="en">Content Security Policy Level 2</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Adds <code>base-uri</code>, <code>child-src</code>, <code>form-action</code>, <code>frame-ancestors</code>, <code>plugin-types</code>, <code>referrer</code>, <code>reflected-xss</code>, and <code>report-uri</code>. Deprecates <code>frame-src</code>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Content Security Policy 1.0&apos;" href="https://www.w3.org/TR/CSP1/" class="external" hreflang="en">Content Security Policy 1.0</a></td>
+   <td><span class="spec-Obsolete">Obsolete</span></td>
+   <td>Defines <code>connect-src</code>, &gt;<code>default-src</code>, &gt;<code>font-src</code>, &gt;<code>frame-src</code>, &gt;<code>img-src</code>, &gt;<code>media-src</code>, &gt;<code>objects-src</code>, &gt;report-uri,&gt;<code>sandbox</code>, &gt;<code>script-src,</code> and &gt;<code>style-src</code>.&gt;</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop"><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span>
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome<sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_2">[2]</a></sup></th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>
+    <p>14.0 (X-Webkit-CSP)</p>
+
+    <p>25.0</p>
+   </td>
+   <td>
+    <p><a href="/en-US/Firefox/Releases/4" title="Publicado en 2011-03-22.">4.0</a> (2.0) (X-Content-Security-Policy)</p>
+
+    <p><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</p>
+   </td>
+   <td>Edge</td>
+   <td>15</td>
+   <td>
+    <p>6 (X-Webkit-CSP)</p>
+
+    <p>7</p>
+   </td>
+  </tr>
+  <tr>
+   <td><code>base-uri</code></td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/35" title="Publicado en 2015-01-13.">35.0</a> (35.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>child-src</code></td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>connect-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>default-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>font-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>form-action</code></td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/36" title="Publicado en 2015-02-24.">36.0</a> (36.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>frame-ancestors</code></td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/33" title="Publicado en 2014-10-14.">33.0</a> (33.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>frame-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>img-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>manifest-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/41" title="Publicado en 2015-09-22.">41.0</a> (41.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>media-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>object-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>plugin-types</code></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>referrer</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/37" title="Publicado en 2015-04-07.">37.0</a> (37.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>reflected-xss</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>report-uri</code></td>
+   <td>40.0</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>sandbox</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>script-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>style-src</code></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/23" title="Publicado en 2013-08-06.">23.0</a> (23.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td>
+    <p><code>upgrade-insecure-requests</code></p>
+   </td>
+   <td>
+    <p class="p1">43.0</p>
+   </td>
+   <td><a href="/en-US/Firefox/Releases/42" title="Publicado en 2015-11-03.">42.0</a> (42.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android Browser<sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_1">[1]</a></sup></th>
+   <th>Android Webview<sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_2">[2]</a></sup></th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Mobile<sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_2">[2]</a></sup></th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td>4.0 (2.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>iOS 7.1</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>base-uri</code></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td>35.0 (35.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>child-src</code></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>connect-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>default-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>font-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>form-action</code> </td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td>36.0 (36.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>frame-ancestors</code> </td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td>33.0 (33.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>frame-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>img-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>manifest-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/41" title="Publicado en 2015-09-22.">41.0</a> (41.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>media-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>object-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>plugin-types</code></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>referrer</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td>37.0 (37.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>reflected-xss</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>report-uri</code></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>40.0</td>
+  </tr>
+  <tr>
+   <td><code>sandbox</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>script-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>style-src</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+  </tr>
+  <tr>
+   <td><code>upgrade-insecure-requests</code></td>
+   <td>42.0 (42)</td>
+   <td>43.0</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>43.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="sect1"> </h2>
+
+<h2 id="Notes">Notes</h2>
+
+<p><sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_1">[1]</a></sup> Deprecated since Android 4.0.</p>
+
+<p><sup><a href="https://developer.mozilla.org/es/docs/Web/Security/CSP/CSP_policy_directives#endnote_2">[2]</a></sup> Starting with version 45.0, Chrome excludes <code>blob</code> and <code>filesystem</code> from source directives. Sites needing to allow these content types can specify them using the Data attribute.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en/Security/CSP/Introducing_Content_Security_Policy" title="en/Security/CSP/Introducing Content Security Policy">Introducing Content Security Policy</a></li>
+ <li><a href="/en/Security/CSP/Using_Content_Security_Policy" title="en/Security/CSP/Using Content Security Policy">Using Content Security Policy</a></li>
+ <li><a href="/en/Security/CSP/Using_CSP_violation_reports" title="en/Security/CSP/Using CSP violation reports">Using CSP violation reports</a></li>
+</ul>

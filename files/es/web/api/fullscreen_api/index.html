@@ -1,0 +1,308 @@
+---
+title: Fullscreen API
+slug: Web/API/Fullscreen_API
+translation_of: Web/API/Fullscreen_API
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/API/Fullscreen_API">Fullscreen API</a></strong></li><li class="toggle"><details open><summary>Guías</summary><ol><li><a href="/es/docs/Web/API/Fullscreen_API/Guide">Guide to the Fullscreen API</a> <a style="opacity: 0.5;" href="/es/docs/Web/API/Fullscreen_API/Guide$translate">[Traducir]</a></li></ol></details></li><li class="toggle"><details open><summary>Propiedades</summary><ol><li><a href="/es/docs/Web/API/Document/fullscreen"><code>Document.fullscreen</code></a></li><li><a href="/es/docs/Web/API/DocumentOrShadowRoot/fullscreenElement"><code>DocumentOrShadowRoot.fullscreenElement</code></a></li><li><a href="/es/docs/Web/API/Document/onfullscreenchange"><code>Document.onfullscreenchange</code></a></li><li><a href="/es/docs/Web/API/Document/onfullscreenerror"><code>Document.onfullscreenerror</code></a></li><li><a href="/es/docs/Web/API/Element/onfullscreenchange"><code>Element.onfullscreenchange</code></a></li><li><a href="/es/docs/Web/API/Element/onfullscreenerror"><code>Element.onfullscreenerror</code></a></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/es/docs/Web/API/Document/exitFullscreen"><code>Document.exitFullscreen()</code></a></li><li><a href="/es/docs/Web/API/Element/requestFullscreen"><code>Element.requestFullscreen()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Eventos</summary><ol><li><a href="/es/docs/Web/Events/fullscreenchange"><code>fullscreenchange</code></a></li><li><a href="/es/docs/Web/Events/fullscreenerror"><code>fullscreenerror</code></a></li></ol></details></li></ol></section><p></p>
+
+<p class="summary">La <strong><code>API Fullscreen</code></strong> provee una manera fácil de presentar contenido web usando la pantalla completa del usuario. La API permite indicar al navegador que un elemento y sus hijos, si los tiene, ocupar la pantalla completa, ocultando toda la interfaz del usuario y otras aplicaciones de la pantalla mientras se esté en pantalla completa.</p>
+
+<div class="note">
+<p>De momento, no todos los navegadores usan la versión sin prefijo de la API. Consulta la <a href="#Prefijado">tabla que resume las diferencias de prefijos y nombres</a>.</p>
+</div>
+
+<h2 id="Specification" name="Specification">Activando modo de pantalla completa</h2>
+
+<p>Para cualquier elemento que quieras presentar en pantalla completa (como por ejemplo, un elemento <a href="/es/docs/Web/HTML/Elemento/video" title="El elemento video se utiliza para incrustar vídeos en un documento HTML o XHTML."><code>&lt;video&gt;</code></a>), puedes presentarlo en pantalla completa, simplemente invocando a su método <code>requestFullscreen()</code>.</p>
+
+<p>Consideremos este elemento <a href="/es/docs/Web/HTML/Elemento/video" title="El elemento video se utiliza para incrustar vídeos en un documento HTML o XHTML."><code>&lt;video&gt;</code></a>:</p>
+
+<pre class="brush: html">&lt;video controls id=&quot;myvideo&quot;&gt;
+  &lt;source src=&quot;somevideo.webm&quot;&gt;&lt;/source&gt;
+  &lt;source src=&quot;somevideo.mp4&quot;&gt;&lt;/source&gt;
+&lt;/video&gt;
+</pre>
+
+<p>Podemos poner este video en pantalla completa con un script como éste:</p>
+
+<pre class="brush: js">var elem = document.getElementById(&quot;myvideo&quot;);
+if (elem.requestFullscreen) {
+  elem.requestFullscreen();
+}
+</pre>
+
+<h3 id="Diferencias_de_presentación">Diferencias de presentación</h3>
+
+<p>Cabe aclarar una diferencia clave entre las implementaciones de Gecko y WebKit: Gecko automáticamente añade reglas CSS al elemento para ajustarlo a las dimensiones de la pantalla: &quot;<code>width: 100%; height: 100%</code>&quot;. WebKit no hace esto; en su lugar, centra el elemento con su mismo tamaño original en un fondo negro. Para obtener el mismo comportamiento en WebKit, necesitas añadir manualmente las reglas CSS &quot;<code>width: 100%; height: 100%;</code>&quot; al elemento:</p>
+
+<pre class="brush: css">#myvideo:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+}
+</pre>
+
+<p>Por otro lado, si quieres emular el comportamiento de WebKit en Gecko, necesitarías colocar el elemento a presentar dentro de otro elemento, con las reglas CSS necesarias para ajustarlo a la apariencia requerida, y será dicho elemento contenedor el que se establecerá para aparecer en pantalla completa.</p>
+
+<h3 id="Notificación">Notificación</h3>
+
+<p>Cuando el modo de pantalla completa sea invocado exitosamente, el documento que contiene al elemento recibe un evento <code><a href="/es/docs/Web/Reference/Events/fullscreenchange" title="/es/docs/Web/Reference/Events/fullscreenchange">fullscreenchange</a></code>. Cuando se sale del modo de pantalla completa, el documento recibe de nuevo un evento <code><a href="/es/docs/Web/Reference/Events/fullscreenchange" title="/es/docs/Web/Reference/Events/fullscreenchange">fullscreenchange</a></code>. Nótese que el evento <code><a href="/es/docs/Web/Reference/Events/fullscreenchange" title="/es/docs/Web/Reference/Events/fullscreenchange">fullscreenchange</a></code> no provee información alguna sobre si el documento está entrando o saliendo a modo de pantalla completa, pero puedes saber si está en dicho modo si la propiedad <a href="/es/docs/Web/API/Document/fullscreenElement" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>fullscreenElement</code></a> del documento no es nula.</p>
+
+<h3 id="Cuando_la_solicitud_de_pantalla_completa_falla">Cuando la solicitud de pantalla completa falla</h3>
+
+<p>No es garantía que se pueda cambiar a modo de pantalla completa. Por ejemplo, los elementos <a href="/es/docs/Web/HTML/Elemento/iframe" title="El elemento HTML &lt;iframe&gt; representa un contexto de navegación anidada, el cual permite incorporar otra página HTML en la página actual. Cada elemento &lt;iframe&gt; tiene su propia historial de sesión y su propio objeto Document. El contexto de navegación que incluye el contenido implícito se llama contexto de navegación principal. El contexto de navegación de nivel superior (que no tiene padre) es típicamente la ventana del navegador."><code>&lt;iframe&gt;</code></a> tienen un atributo <code><a href="/es/docs/Web/HTML/Element/iframe#attr-allowfullscreen">allowfullscreen</a></code> para decidir si se permitirá que el contenido se muestre en pantalla completa. Además, ciertos tipos de contenido, como plug-ins en ventana, no pueden ser presentados en modo de pantalla completa. Intentar hacerlo con elementos que no lo permitan (o el padre o descendente de un elemento así), no funcionará. En su lugar, el elemento que solicitó la pantalla completa recibirá un evento <code>fullscreenerror</code>. En Firefox, cuando falla una solicitud de pantalla completa, el navegador registrará un mensaje de error en la consola, explicando la falla de la solicitud. En Chrome y versiones recientes de Opera, sin embargo, no se genera ninguna advertencia.</p>
+
+<div class="note">
+<p><strong>Nota:</strong> Las solicitudes de pantalla completa necesitan ser invocadas dentro de un manejador de eventos, o de otro modo, serán denegadas.</p>
+</div>
+
+<h2 id="Saliendo_del_modo_de_pantalla_completa">Saliendo del modo de pantalla completa</h2>
+
+<p>El usuario siempre tendrá la habilidad de salir del modo de pantalla completa por su propia cuenta; véase <a href="#Things_your_users_want_to_know">Cosas que los usuarios querrán saber</a>. Incluso se puede hacer programáticamente, llamando al método <a href="/es/docs/Web/API/ExitFullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>exitFullscreen()</code></a>.</p>
+
+<h2 id="Otra_información">Otra información</h2>
+
+<p>El objeto <a href="/es/docs/Web/API/Document" title="La interfaz Document representa cualquer página web cargada en el navegador y sirve como punto de entrada al contenido de la página (El árbol DOM)."><code>document</code></a> provee información adiciional que puede ser útil al desarrollar aplicaciones de pantalla completa:</p>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/Document/fullscreenElement" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>fullscreenElement</code></a></dt>
+ <dd>El atributo <code>fullscreenElement</code> apunta al <a href="/es/docs/Web/API/Element" title="Varias especificaciones aplicadas a los elementos:"><code>elemento</code></a> actualmente en modo pantalla. Si no es nulo, el documento está en pantalla completa, y si es nulo, no lo está.</dd>
+ <dt><a href="/es/docs/Web/API/Document/fullscreenEnabled" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>fullscreenEnabled</code></a></dt>
+ <dd>El atributo <code>fullscreenEnabled</code> indica si el documento está actualmente en un estado que permitiría solicitudes al modo de pantalla completa.</dd>
+</dl>
+
+<h2 id="Things_your_users_want_to_know" name="Things_your_users_want_to_know">Cosas que los usuarios querrán saber</h2>
+
+<p>Puedes asegurarte de hacer saber a los usuarios que pueden presionar la tecla <kbd>ESC</kbd> (o <kbd>F11</kbd>) para salir del modo de pantalla completa.</p>
+
+<p>Adicionalmente, navegando a otra página, cambiando de pestaña, o cambiando a otra aplicación(usando, por ejemplo, <kbd>Alt</kbd>-<kbd>Tab</kbd>) mientras se está en pantalla completa, también se saldrá de dicho modo.</p>
+
+<h2 id="Specification" name="Specification">Ejemplo</h2>
+
+<p>En este ejemplo, se presenta un video en una página web. Presionando la tecla <kbd>Return</kbd> o <kbd>Enter</kbd> el usuario podrá moverse entre modo de ventana o de pantalla completa para la presentación del video.</p>
+
+<p><a href="/samples/domref/fullscreen.html">Ver ejemplo en vivo</a></p>
+
+<h3 id="Observando_la_tecla_Enter">Observando la tecla <kbd>Enter</kbd></h3>
+
+<p>Cuando la página se carga, este código se ejecuta para establecer un evento para cuando se presione la tecla <kbd>Enter</kbd>.</p>
+
+<pre class="brush: js">document.addEventListener(&quot;keydown&quot;, function(e) {
+  if (e.keyCode == 13) {
+    toggleFullScreen();
+  }
+}, false);
+</pre>
+
+<h3 id="Cambiando_entre_modo_de_pantalla_completa_y_modo_de_ventana">Cambiando entre modo de pantalla completa y modo de ventana</h3>
+
+<p>Este código es llamado cuando el usuario presiona la tecla <kbd>Enter</kbd>, como se ve arriba.</p>
+
+<pre class="brush: js">function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
+</pre>
+
+<p>En este código, primero se observa si el atributo <code>fullscreenElement</code> de <a href="/es/docs/Web/API/Document" title="La interfaz Document representa cualquer página web cargada en el navegador y sirve como punto de entrada al contenido de la página (El árbol DOM)."><code>document</code></a> (comprobando si tiene prefijo <code>moz</code>,<code> ms</code>, o <code>webkit</code>). Si es <code>null</code>, el documento está en modo de ventana actualmente, así que necesitamos cambiarlo a modo de pantalla completa. Esto se hace llamando a la función <a href="/es/docs/Web/API/Element/requestFullscreen" title="Asynchronously requests that the element be made full-screen."><code>element.requestFullscreen()</code></a>.</p>
+
+<p>Si el modo de pantalla completa está activado (<code>fullscreenElement</code> no es <code>null</code>), llamamos a la función <a href="/es/docs/Web/API/Document/exitFullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>document.exitFullscreen()</code></a>.</p>
+
+<h2 id="Prefijado">Prefijado</h2>
+
+<p>De momento, no todos los navegadores están implementando la versión sin prefijo de la API. Aquí está la tabla que resume los prefijos y diferencias de nombres entre ellos:</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Estándar</th>
+   <th scope="col">Blink (Chrome y Opera)</th>
+   <th scope="col">Gecko (Firefox)</th>
+   <th scope="col">Internet Explorer 11</th>
+   <th scope="col">Edge</th>
+   <th scope="col">Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/fullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.fullscreen</code></a></td>
+   <td><code>webkitIsFullScreen</code></td>
+   <td><code>mozFullScreen</code></td>
+   <td><em>-</em></td>
+   <td><code>webkitIsFullScreen</code></td>
+   <td><code>webkitIsFullScreen</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/fullscreenEnabled" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.fullscreenEnabled</code></a></td>
+   <td><code>webkitFullscreenEnabled</code></td>
+   <td><code>mozFullScreenEnabled</code></td>
+   <td><code>msFullscreenEnabled</code></td>
+   <td><code>webkitFullscreenEnabled</code></td>
+   <td><code>webkitFullscreenEnabled</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/fullscreenElement" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.fullscreenElement</code></a></td>
+   <td><code>webkitFullscreenElement</code></td>
+   <td><code>mozFullScreenElement</code></td>
+   <td><code>msFullscreenElement</code></td>
+   <td><code>webkitFullscreenElement</code></td>
+   <td><code>webkitFullscreenElement</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/onfullscreenchange" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.onfullscreenchange</code></a></td>
+   <td><code>onwebkitfullscreenchange</code></td>
+   <td><code>onmozfullscreenchange</code></td>
+   <td><code>onmsfullscreenchange</code></td>
+   <td><code>onwebkitfullscreenchange</code></td>
+   <td><code>onwebkitfullscreenchange</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/onfullscreenerror" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.onfullscreenerror</code></a></td>
+   <td><code>onwebkitfullscreenerror</code></td>
+   <td><code>onmozfullscreenerror</code></td>
+   <td><code>onmsfullscreenerror</code></td>
+   <td><code>onwebkitfullscreenerror</code></td>
+   <td><code>onwebkitfullscreenerror</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Document/exitFullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.exitFullscreen()</code></a></td>
+   <td><code>webkitExitFullscreen()</code></td>
+   <td><code>mozCancelFullScreen()</code></td>
+   <td><code>msExitFullscreen()</code></td>
+   <td><code>webkitExitFullscreen()</code></td>
+   <td><code>webkitExitFullscreen()</code></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/Element/requestFullscreen" title="Asynchronously requests that the element be made full-screen."><code>Element.requestFullscreen()</code></a></td>
+   <td><code>webkitRequestFullscreen()</code></td>
+   <td><code>mozRequestFullScreen()</code></td>
+   <td><code>msRequestFullscreen()</code></td>
+   <td><code>webkitRequestFullscreen()</code></td>
+   <td><code>webkitRequestFullscreen()</code></td>
+  </tr>
+ </thead>
+</table>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Especificación</th>
+   <th scope="col">Estatus</th>
+   <th scope="col">Comentarios</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Fullscreen API&apos;" href="https://fullscreen.spec.whatwg.org/" class="external" hreflang="en">Fullscreen API</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Versión inicial.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">Browser compatibility</h2>
+
+<p>All browsers implement this APIs. Nevertheless some implement it with prefixed names we slightly different spelling: e.g. instead of <code>requestFullscreen()</code>, there is a <code>MozRequestFullScreen()</code>.</p>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td>15 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/9" title="Publicado en 2011-12-20.">9.0</a> (9.0) <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><br>
+    <a href="/en-US/Firefox/Releases/47" title="Publicado en 2016-06-07.">47</a> (47) (behind <code>full-screen-api.unprefix.enabled</code>)</td>
+   <td>11 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-ms&apos; as this browser considers it experimental">-ms</a></span></td>
+   <td>12.10</td>
+   <td>5.0 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+  <tr>
+   <td><code>fullscreenEnabled</code></td>
+   <td>20 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/10" title="Publicado en 2012-01-31.">10.0</a> (10.0) <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><br>
+    <a href="/en-US/Firefox/Releases/47" title="Publicado en 2016-06-07.">47</a> (47) (behind <code>full-screen-api.unprefix.enabled</code>)</td>
+   <td>11 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-ms&apos; as this browser considers it experimental">-ms</a></span></td>
+   <td>12.10</td>
+   <td>5.1 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Android</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>28 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td>9.0 (9.0)<span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-moz&apos; as this browser considers it experimental">-moz</a></span><br>
+    47.0 (47) (behind <code>full-screen-api.unprefix.enabled</code>)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>fullscreenEnabled</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>28 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;-webkit&apos; as this browser considers it experimental">-webkit</a></span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td>10.0 (10.0) <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;moz&apos; as this browser considers it experimental">moz</a></span><br>
+    47.0 (47) (behind <code>full-screen-api.unprefix.enabled</code>)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibilidad desconocida, por favor actualízala.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Véase_también">Véase también</h2>
+
+<ul>
+ <li><a href="/es/docs/Web/API/Element/requestFullscreen" title="Asynchronously requests that the element be made full-screen."><code>Element.requestFullscreen()</code></a></li>
+ <li><a href="/es/docs/Web/API/Document/exitFullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.exitFullscreen()</code></a></li>
+ <li><a href="/es/docs/Web/API/Document/fullscreen" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.fullscreen</code></a></li>
+ <li><a href="/es/docs/Web/API/Document/fullscreenElement" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Document.fullscreenElement</code></a></li>
+ <li><a href="/es/docs/Web/CSS/:fullscreen" title="La pseudo-clase :fullscreen de CSS representa un elemento que se muestra cuando el navegador está en modo de pantalla completa."><code>:fullscreen</code></a>, <a href="/es/docs/Web/CSS/::backdrop" title="Cada uno de los elementos en la pila de la  capa superior posee un  ::backdrop pseudo-element. Este pseudo-elemento es una caja que se muestra inmediatamente debajo del elemento (y sobre el elemento inmediatamente inferior de la pila, si es que hay), dentro de dicha capa superior."><code>::backdrop</code></a></li>
+ <li><code><a href="/es/docs/Web/HTML/Element/iframe#attr-allowfullscreen">allowfullscreen</a></code></li>
+</ul>

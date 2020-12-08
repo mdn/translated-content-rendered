@@ -1,0 +1,237 @@
+---
+title: Web Workers API
+slug: Web/API/Web_Workers_API
+translation_of: Web/API/Web_Workers_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/es/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li class="toggle"><details open><summary>Guías</summary><ol><li><a href="/es/docs/Web/Guide/Performance/Usando_web_workers">Usando Web Workers</a></li><li><a href="/es/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers">Functions and classes available to Web Workers</a> <a href="/es/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers$translate" style="opacity: 0.5;">[Traducir]</a></li><li><a href="/es/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">The structured clone algorithm</a> <a href="/es/docs/Web/API/Web_Workers_API/Structured_clone_algorithm$translate" style="opacity: 0.5;">[Traducir]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/es/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/es/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/es/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/es/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/es/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/es/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li><li><a href="/es/docs/Web/API/Worker"><code>Worker</code></a></li><li><a href="/es/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/es/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/es/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section>
+
+<p class="summary"><strong>Los Web Workers</strong> hacen posible ejecutar la operación de un script en un hilo en segundo plano separado de la ejecución el hilo principal de la aplicación web. La ventaja de esto es que un proceso laborioso puede actuar en un hilo separado, permitiendo al hilo principal (normlamente la UI) ejecutarse sin ser bloqueado o ralentizado.</p>
+
+<h2 id="Web_Workers_conceptos_y_uso">Web Workers conceptos y uso</h2>
+
+<p>Un worker es un objeto que se crea a través del constructor ( <a href="/es/docs/Web/API/Worker/Worker"><code>Worker()</code></a>) este ejecuta un archivo javascript — este fichero contiene los scripts que se van a ejecutan en el hilo del worker; los workers se ejecutan en un contexto global diferente al actual del navegador <a href="/es/docs/Web/API/Window"><code>window</code></a>. Este contexto está representado por el objeto <a href="/es/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a> en el caso de los workers dedicados (los workers standard utilizan un solo script; y los shared workers usan <a href="/es/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a>).</p>
+
+<p>Podemos ejecutar los script que necesitemos dentro del hilo del worker, pero con algunas excepciones. Por ejemplo no se puede manipular directamente el DOM, ni usar algunos métodos y propiedades por defecto del objeto <a href="/es/docs/Web/API/Window"><code>window</code></a>. Pero puede usar un gran número de elementos que están dentro de <code>window</code>, incluyendo <a href="/en-US/docs/WebSockets">WebSockets</a>, y data storage formas de almacenamiento como <a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a> y solo en Firefox OS <a href="/en-US/docs/Web/API/Data_Store_API">Data Store API</a>.  Mira <a href="/en-US/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Funciones y clases disponibles para workers</a> para saber más.</p>
+
+<p>Los datos se comunican entre los workers y el hilo principal a través de un sistema de mensajes — tanto del hilo principal como del worker para enviar un mensaje se invoca al método <code>postMessage()</code> , y a través del listener del evento <code>onmessage</code> se pueden escuchar los mensajes (El mensaje está dentro de la propiedad <code>data</code> del evento) . Los datos se copian en lugar de compartirse.</p>
+
+<p>Los workers también pueden generar nuevos workers, siempre que los workers estén en la misma página que el principal.  Además, los workers pueden usar <a class="internal" href="/en-US/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> para la network I/O, con la excepción de que los atributos <code>responseXML</code> y <code>channel</code> de <code>XMLHttpRequest</code> siempre retornan valor <code>null</code>.</p>
+
+<p>Ademas de los workers dedicados, hay otro tipo de workers:</p>
+
+<ul>
+ <li>Los Shared workers son workers que pueden ser utilizados por multiples scripts corriendo en diferenes ventanas, IFrames, etc., esto siempre que estén en el mismo dominio que el worker. Son un poco más complejos que los workers dedicados— los scripts deben comunicarse a través de un puerto activo. Mira <a href="/es/docs/Web/API/SharedWorker"><code>SharedWorker</code></a> para mas detalles.</li>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorkers</a> esencialmente actuan como servidores proxy que se ubican entre las aplicaciones web, el navegador y la red (cuando están disponibles). Están destinados (entre otras cosas) para poder manejar experiencias y comportamientos offline, interceptando peticiones de red y tomando la acción apropiada tomando en cuenta si la conexión está disponible y actualizando los assets desde el servidor. También notificaciones push y sincronización desde la API en segundo plano.</li>
+ <li>Chrome Workers es un worker solo de Firefox puedes utilizar si estás desarrollando complementos se puede tener acceso a <a href="https://developer.mozilla.org/en/js-ctypes">js-ctypes</a> en el worker. Mira <a href="/es/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a> para mas detalles. </li>
+ <li><a href="/en-US/docs/Web/API/Web_Audio_API#Audio_Workers">Audio Workers</a> nos dan la capacidad de procesar audio directamente dentro del contexto del worker.</li>
+</ul>
+
+<div class="note">
+<p><strong>Note</strong>: Según el <a href="https://html.spec.whatwg.org/multipage/workers.html#runtime-script-errors-2">Web workers Spec</a>, los errores del worker no deberían bubujear (mira <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1188141">error 1188141</a>. Esto está implementado en Firefox 42.</p>
+</div>
+
+<h2 id="Web_Worker_interfaces">Web Worker interfaces</h2>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></dt>
+ <dd>Abstrae todas las propiedades y métodos comunes a toda clase de workers (i.e. <a href="/es/docs/Web/API/Worker"><code>Worker</code></a> or <a href="/es/docs/Web/API/SharedWorker"><code>SharedWorker</code></a>).</dd>
+ <dt><a href="/es/docs/Web/API/Worker"><code>Worker</code></a></dt>
+ <dd>Representa el hilo del worker en ejecución, pudiendo pasar mensajes a este.</dd>
+ <dt><a href="/es/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></dt>
+ <dd>Define la ruta absoluta del script que ejecuta el <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker" title="The Worker interface of the Web Workers API represents a background task that can be easily created and can send messages back to its creator. Creating a worker is as simple as calling the Worker() constructor and specifying a script to be run in the worker thread."><code>Worker</code></a>.</dd>
+</dl>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></dt>
+ <dd>Representa un tipo de worker al que se puede acceder desde distintos contextos de navegación, tanto de varias ventanas, iframes, y otros workers.</dd>
+ <dt><a href="/es/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></dt>
+ <dd>Representa el ámbito genérico de cualquier worker (similar a  <a href="/es/docs/Web/API/Window"><code>Window</code></a> en un contenido web normal). Los diferentes tipos de workers tienen objetos de ámbito que heredan de esta interfaz y añade características más específicas.</dd>
+ <dt><a href="/es/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></dt>
+ <dd>Representa el ámbito de un worker dedicado, hereda de <a href="/es/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a> y añade algunas características.</dd>
+ <dt><a href="/es/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></dt>
+ <dd>Representa el ámbito de un shared worke, hereda de <a href="/es/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a> y añade algunas características.</dd>
+ <dt><a href="/es/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></dt>
+ <dd>Representa la identidad y estado del user agent (El cliente):</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>Hemos creado un par de demostraciones para ver su uso básico:</p>
+
+<ul>
+ <li><a href="https://github.com/mdn/simple-web-worker">Basic dedicated worker example</a> (<a href="http://mdn.github.io/simple-web-worker/">run dedicated worker</a>).</li>
+ <li><a href="https://github.com/mdn/simple-shared-worker">Basic shared worker example</a> (<a href="http://mdn.github.io/simple-shared-worker/">run shared worker</a>).</li>
+</ul>
+
+<p>You can find out more information on how these demos work in <a href="/en-US/docs/Web/API/Web_Workers_API/Using_web_workers">Using web workers</a>.</p>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/#workers" hreflang="en" lang="en" title="La especificación &apos;HTML Living Standard&apos;">HTML Living Standard</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>soporte básico</td>
+   <td>4</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/3.5" title="Publicado en 2009-06-30.">3.5</a> (1.9.1)</td>
+   <td>10.0</td>
+   <td>10.6</td>
+   <td>4</td>
+  </tr>
+  <tr>
+   <td>Shared workers</td>
+   <td>4</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><a href="/en-US/Firefox/Releases/29" title="Publicado en 2014-04-29.">29</a> (29)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>10.6</td>
+   <td>4</td>
+  </tr>
+  <tr>
+   <td>Paso de datos usando structured cloning</td>
+   <td>13</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Publicado en 2011-11-08.">8</a> (8)</td>
+   <td>10.0</td>
+   <td>11.5</td>
+   <td>6</td>
+  </tr>
+  <tr>
+   <td>Paso de datos usando transferable objects</td>
+   <td>17 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;webkit&apos; as this browser considers it experimental">webkit</a></span><br>
+    21</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><a href="/en-US/Firefox/Releases/18" title="Publicado en 2013-01-08.">18</a> (18)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>15</td>
+   <td>6</td>
+  </tr>
+  <tr>
+   <td>Global <a href="/es/docs/Web/API/Window/URL"><code>URL</code></a></td>
+   <td>10<sup>[1]</sup><br>
+    23</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/21" title="Publicado en 2013-05-14.">21</a> (21)</td>
+   <td>11</td>
+   <td>15</td>
+   <td>6<sup>[1]</sup></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td>4.4</td>
+   <td>4</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td>1.0 (1.9.1)</td>
+   <td>1.0.1</td>
+   <td>10.0</td>
+   <td>11.5</td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td>Shared workers</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>4</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>29</td>
+   <td>1.4</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>Pasando datos usando structured cloning</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>4</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td>8</td>
+   <td>1.0.1</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>Pasando datos usando transferable objects</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>18</td>
+   <td>1.0.1</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] As <code>webkitURL</code>.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Web_Workers_API/basic_usage">Using Web Workers</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker">Worker Interface</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker">SharedWorker interface</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/en-US/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Functions and classes available to workers</a></li>
+ <li><a href="/en-US/docs/Web/API/Web_Workers_API/Advanced_concepts_and_examples">Advanced concepts and examples</a></li>
+ <li><a href="/en-US/docs/Web/API/ChromeWorker">ChromeWorker</a>: for using workers in privileged/chrome code</li>
+</ul>

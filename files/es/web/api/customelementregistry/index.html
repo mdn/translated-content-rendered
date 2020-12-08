@@ -1,0 +1,101 @@
+---
+title: CustomElementRegistry
+slug: Web/API/CustomElementRegistry
+tags:
+  - API
+  - CustomElementRegistry
+  - Experimental
+  - Interface
+  - NeedsTranslation
+  - Reference
+  - TopicStub
+  - Web Components
+  - custom elements
+translation_of: Web/API/CustomElementRegistry
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guías</summary><ol><li><a href="/es/docs/Web/Web_Components/Using_custom_elements">Usando elementos personalizados</a></li><li><a href="/es/docs/Web/Web_Components/Using_shadow_DOM">Usando shadow DOM</a></li><li><a href="/es/docs/Web/Web_Components/Using_templates_and_slots">Usando plantillas y slots</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/es/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/es/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/es/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/es/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/es/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/es/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propiedades</summary><ol><li><a href="/es/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/es/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/es/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/es/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/es/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/es/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/es/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/es/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/es/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary">The <strong><code>CustomElementRegistry</code></strong> interface provides methods for registering custom elements and querying registered elements. To get an instance of it, use the <a href="/es/docs/Web/API/Window/customElements"><code>window.customElements</code></a> property.</span></p>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a></dt>
+ <dd>Defines a new <a href="/en-US/docs/Web/Web_Components/Custom_Elements">custom element</a>.</dd>
+ <dt><a href="/es/docs/Web/API/CustomElementRegistry/get"><code>CustomElementRegistry.get()</code></a></dt>
+ <dd>Returns the constuctor for the named custom element, or <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/undefined"><code>undefined</code></a> if the custom element is not defined.</dd>
+ <dt><a href="/es/docs/Web/API/CustomElementRegistry/upgrade"><code>CustomElementRegistry.upgrade()</code></a></dt>
+ <dd>Upgrades a custom element directly, even before it is connected to its shadow root.</dd>
+ <dt><a href="/es/docs/Web/API/CustomElementRegistry/whenDefined"><code>CustomElementRegistry.whenDefined()</code></a></dt>
+ <dd>Returns an empty <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/Promise"><code>promise</code></a> that resolves when a custom element becomes defined with the given name. If such a custom element is already defined, the returned promise is immediately fulfilled.</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>The following code is taken from our <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> example (<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">see it live also</a>). Note how we use the <a href="/es/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> method to define the custom element after creating its class.</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // count words in element&apos;s parent element
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create text node and add word count to it
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // Append it to the shadow root
+    shadow.appendChild(text);
+
+
+    // Update count when element content changes
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// Define the new element
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<div class="note">
+<p><strong>Note:</strong> The <code>CustomElementRegistry</code> is available through the <a href="/es/docs/Web/API/Window/customElements"><code>Window.customElements</code></a> property.</p>
+</div>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#customelementregistry" hreflang="en" lang="en">HTML Living Standard<br><small lang="es">La definición de &apos;CustomElementRegistry&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry"></div>

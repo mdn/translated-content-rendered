@@ -1,0 +1,390 @@
+---
+title: Service Worker API
+slug: Web/API/Service_Worker_API
+tags:
+  - API
+  - Landing
+  - NeedsTranslation
+  - Offline
+  - Overview
+  - Reference
+  - Service Workers
+  - TopicStub
+  - Workers
+translation_of: Web/API/Service_Worker_API
+---
+<div>
+<p></p><section id="Quick_Links">
+ <ol>
+  <li><a href="/es/docs/Web/API/Service_Worker_API"><strong>Service Worker API</strong></a></li>
+  <li class="toggle">
+    <details open>
+        <summary>Service Worker guides</summary>
+        <ol>
+          <li><a href="/es/docs/Web/API/Service_Worker_API/Using_Service_Workers">Using Service Workers</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Interfaces</summary>
+        <ol>
+          <li><a href="/es/docs/Web/API/Cache"><code>Cache</code></a></li>
+          <li><a href="/es/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li>
+          <li><a href="/es/docs/Web/API/Client"><code>Client</code></a></li>
+          <li><a href="/es/docs/Web/API/Clients"><code>Clients</code></a></li>
+          <li><a href="/es/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li>
+          <li><a href="/es/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li>
+          <li><a href="/es/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li>
+          <li><a href="/es/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li>
+          <li><a href="/es/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li>
+          <li><a href="/es/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li>
+          <li><a href="/es/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li>
+          <li><a href="/es/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li>
+          <li><a href="/es/docs/Web/API/SyncManager"><code>SyncManager</code></a></li>
+          <li><a href="/es/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li>
+          <li><a href="/es/docs/Web/API/WindowClient"><code>WindowClient</code></a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Related APIs</summary>
+        <ol>
+          <li><a href="/es/docs/Web/API/Channel_Messaging_API">Channel Messaging API</a></li>
+          <li><a href="/es/docs/Web/API/Notifications_API">Notifications API</a></li>
+          <li><a href="/es/docs/Web/API/Push_API">Push API</a></li>
+          <li><a href="/es/docs/Web/API/Web_Workers_API">Web Workers API</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><strong><a href="/es/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+        <summary>Useful lists</summary>
+        <ol>
+          <li><a href="/es/docs/tag/ServiceWorker">Pages tagged &quot;ServiceWorker&quot;</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Contribute</summary>
+        <ol>
+          <li><a href="/es/docs/MDN/Doc_status/API/ServiceWorkers">Service Worker doc status</a></li>
+          <li><a href="/es/docs/MDN">The MDN project</a></li>
+        </ol>
+    </details>
+  </li>
+ </ol>
+</section><p></p>
+
+<p class="summary">Los Service workers actúan esencialmente como proxy servers asentados entre las aplicaciones web, el navegador y la red (cuando está accesible). Están destinados, entre otras cosas, a permitir la creación de experiencias offline efectivas, interceptando peticiones de red y realizando la acción apropiada si la conexión de red está disponible y hay disponibles contenidos actualizados en el servidor. También permitirán el acceso a notificaciones tipo push y APIs de  sincronización en segundo plano.</p>
+</div>
+
+<h2 id="Conceptos_y_uso_de_Service_worker">Conceptos y uso de Service worker</h2>
+
+<p>Un service worker es un <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker">worker</a> manejado por eventos registrado para una fuente y una ruta. Consiste en un fichero JavaScript que controla la página web (o el sitio) con el que está asociado, interceptando y modificando la navegación y las peticiones de recursos, y cacheando los recursos de manera muy granular para ofrecer un control completo sobre cómo la aplicación debe comportarse en ciertas situaciones (la mas obvia es cuando la red no está disponible).</p>
+
+<p>Un service worker se ejecuta en un contexto worker: por lo tanto no tiene acceso al DOM, y se ejecuta en un hilo distinto al JavaScript principal de la aplicación, de manera que no es bloqueante. Está diseñado para ser completamente asíncrono, por lo que APIs como el <a href="/en-US/docs/Web/API/XMLHttpRequest">XHR</a> asíncrono y <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage">localStorage</a> no se pueden usar dentro de un service worker.</p>
+
+<p>Los service workers solo funcionan sobre HTTPS, por razones de seguridad. Modificar las peticiones de red en abierto permitiría ataques man in the middle realmente peligrosos. En Firefox, las APIs de service worker se ocultan y no pueden ser empleadas cuando el usuario está en <a href="https://support.mozilla.org/en-US/kb/private-browsing-use-firefox-without-history">modo de navegación en privado</a>.</p>
+
+<div class="note">
+<p><strong>Nota</strong>: Los Service Workers mejoran los intentos anteriores en este área tal como <a href="http://alistapart.com/article/application-cache-is-a-douchebag">AppCache</a> puesto que no hacen suposiciones sobre qué se está intentando hacer para luego tener que cortar cuando las suposiciones no son correctas; hay control granular sobre todos los aspectos.</p>
+</div>
+
+<div class="note">
+<p><strong>Nota</strong>: Los Service workers hace un uso intensivo de las <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">promesas</a>, por lo que generalmente esperarán a que lleguen las respuestasas correspondientes, tras lo cual responderán con una acción de éxito o de fracaso. La arquitectura de promesas es ideal en este caso.</p>
+</div>
+
+<h3 id="Registro">Registro</h3>
+
+<p>Un service worker se registra primero mediante el método <a href="/es/docs/Web/API/ServiceWorkerContainer/register" title="The register() method of the ServiceWorkerContainer interface creates or updates a ServiceWorkerRegistration for the given scriptURL."><code>ServiceWorkerContainer.register()</code></a>. Si ha habido éxito, el service worker se descargará al cliente e intentará la instalación/activación (ver más abajo) de las URLs accedidas por el usuario dentro de todo su origen de datos, o dentro de algún subconjunto especificado por el autor.</p>
+
+<h3 id="Descarga_instalación_y_activación">Descarga, instalación y activación</h3>
+
+<p>En este punto, su service worker observará el siguiente ciclo de vida:</p>
+
+<ol>
+ <li>Descarga</li>
+ <li>Instalación</li>
+ <li>Activación</li>
+</ol>
+
+<p>El service worker se descaga inmediatamente cuando un usuario accede por primera vez a un sitio controlado por el mismo.</p>
+
+<p>Después de esto se descarga cada 24 horas aproximadamente. Se puede descargar con más frecuencia, pero <strong>debe</strong> ser descargado cada 24 horas para prevenir que una mala programación sea molesta durante mucho tiempo.</p>
+
+<p>La instalación se realiza cuando el fichero descargado es nuevo, es decir, diferente a otro service worker existente (comparado byte a byte), o si es el primero descargado para esta página/sitio.</p>
+
+<p>Si es la primera vez que el service worker está disponible se intenta la instalación, y tras una instalación satisfactoria se activa.</p>
+
+<p>Si ya existe un service worker disponible la nueva versión se instala en segundo plano, pero no se activa -en ese momento se llama <em>worker in waiting.</em> Sólo se activa cuando ya no hay más páginas cargadas que utilicen el antiguo service worker. En cuanto no hay más páginas de este estilo cargadas, el nuevo service worker se activa (pasando a ser el <em>active worker).</em> La activación se puede realizar antes mediante <a href="/es/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope.skipWaiting()</code></a> y las páginas existentes se pueden llamar por el active worker usando <a href="/es/docs/Web/API/Clients/claim" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Clients.claim()</code></a>.</p>
+
+<p>Presta atención a <a href="/es/docs/Web/API/InstallEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>InstallEvent</code></a>; es habitual preparar tu service worker para usarlo cuando se dispara, por ejemplo creando una caché que utilice la API incorporada de almacenamiento, y colocando los contenidos dentro de ella para poder usarlos con la aplicación offline.</p>
+
+<p>También hay un evento <code>activate</code>. El momento en el que este evento se activa es, en general, un bueno momento para limpiar viejas cachés y demás cosas asociadas con la versión previa de tu service worker.</p>
+
+<p>Tu service worker puede responder a las peticiones usando el evento <a href="/es/docs/Web/API/FetchEvent" title="Este tipo de evento para el evento &quot;fetch&quot; enviado en el  service worker global. Esto contiene la información sobre la búsqueda (fetch), incluyendo la petición y el receptor tratará la respuesta (response)."><code>FetchEvent</code></a>. Puedes modificar la respuesta a estas peticiones de la manera que quieras, usando el método <a href="/es/docs/Web/API/FetchEvent/respondWith" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>FetchEvent.respondWith</code></a>.</p>
+
+<div class="note">
+<p><strong>Nota</strong>: Dado que <code>oninstall</code>/<code>onactivate</code> puede tardar un poco en completarse, la especificación de service worker spec provee un método <code>waitUntil</code> que, cuando es llamado <code>oninstall</code> o <code>onactivate</code>, pasa una promesa. Los eventos funcionales no se envían al service worker hasta que la promesa se resuelve con éxito.</p>
+</div>
+
+<p>Para un tutorial completo que muestra cómo construir tu primer ejemplo básico, lee <a href="/en-US/docs/Web/API/ServiceWorker_API/Using_Service_Workers">Using Service Workers</a>.</p>
+
+<h2 id="Otras_posibilidades">Otras posibilidades</h2>
+
+<p>Los service workers también pueden usarse para cosas como:</p>
+
+<ul>
+ <li>Sincronización de datos en background</li>
+ <li>Responder a peticiones de recursos desde otros orígenes</li>
+ <li>Recibir actualizaciones centralizadas de datos costosos de calcular tales como geolocalización o giroscopio, de manera que muchas páginas puedan hacer uso de un mismo conjunto de datos</li>
+ <li>Compilación Client-side y gestión de dependencias de CoffeeScript, less, CJS/AMD modules, etc. para desarrollo</li>
+ <li>Enlace para servicios en background </li>
+ <li>Plantillas personalizadas basadas en ciertos patrones URL </li>
+ <li>Mejoras de rendimiento, por ejemplo pre-fetching de recursos que es probable que el usuario requiera en un futuro próximo, como las próximas imágenes de un album de fotos.</li>
+</ul>
+
+<p>En el futuro, los service workers podrán hacer una cantidad de cosas útiles para la plataforma web que estarán muy próximos a las aplicaciones nativas. Interesantement, otras especificacions pueden comenzar y lo harán a hacer uso del contexto de service worker, por ejemplo:</p>
+
+<ul>
+ <li><a href="https://github.com/slightlyoff/BackgroundSync">Sincronización en background</a>: Pone en marcha un service worker aunque el usuario no esté en el sitio de manera que las cachés se puedan actualizar, etc.</li>
+ <li><a href="/en-US/docs/Web/API/Push_API">Reacción a mensajes tipo push</a>: Pone en marcha un service worker para enviar a los usuarios un mensaje para notificarles de que hay disponible nuevos contenidos.</li>
+ <li>Reacción ante una fecha y hora determinados.</li>
+ <li>Creación de geo-fronteras</li>
+</ul>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/Cache" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Cache</code></a></dt>
+ <dd>Representa el almacenamiento para un par de objetos <a href="/es/docs/Web/API/Request" title="The Request interface of the Fetch API represents a resource request."><code>Request</code></a> / <a href="/es/docs/Web/API/Response" title="La interfaz Response de la Fetch API representa la respuesta a una petición."><code>Response</code></a> que son cacheados como parte del ciclo de vida de <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a>.</dd>
+ <dt><a href="/es/docs/Web/API/CacheStorage" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>CacheStorage</code></a></dt>
+ <dd>Representa el almacenamiento de objetos <a href="/es/docs/Web/API/Cache" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Cache</code></a>. Proporciona un directorio maestro de todos los nombres de caché a los que puede acceder un <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a> y mantiene un mapa de nombres (strings) correspondientes a objetos <a href="/es/docs/Web/API/Cache" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Cache</code></a>.</dd>
+ <dt><a href="/es/docs/Web/API/Client" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Client</code></a></dt>
+ <dd>Representa el ámbito de un cliente service worker. Un cliente service worker es bien un documento en un contexto de navador, bien un <a href="/es/docs/Web/API/SharedWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>SharedWorker</code></a>, que está controlado por un worker activo.</dd>
+ <dt><a href="/es/docs/Web/API/Clients" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Clients</code></a></dt>
+ <dd>Representa un contenedor para una lista de objetos <a href="/es/docs/Web/API/Client" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Client</code></a>; principal vía de acceso de los clientes service worker al origen actual.</dd>
+ <dt><a href="/es/docs/Web/API/ExtendableEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ExtendableEvent</code></a></dt>
+ <dd>Extiende el tiempo de vida de los eventos<code>install</code> y <code>activate</code> lanzados en <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> como parte del ciclo de vida del service worker. Esto asegura que cualquier evento funcional (como <a href="/es/docs/Web/API/FetchEvent" title="Este tipo de evento para el evento &quot;fetch&quot; enviado en el  service worker global. Esto contiene la información sobre la búsqueda (fetch), incluyendo la petición y el receptor tratará la respuesta (response)."><code>FetchEvent</code></a>) no se despachan al <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a> hasta que actualiza los esquemas de base de datos, borra entradas de caché antiguas, etc.</dd>
+ <dt><a href="/es/docs/Web/API/ExtendableMessageEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ExtendableMessageEvent</code></a></dt>
+ <dd>Es el objeto evento de un <code><a href="/es/docs/Web/Reference/Events/message_(ServiceWorker)" title="/es/docs/Web/Reference/Events/message_(ServiceWorker)">message</a></code> lanzado en un service worker (cuando se recibe un mensaje en el <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> desde otro contexto) — extiende el tiempo de vida de tales eventos.</dd>
+ <dt><a href="/es/docs/Web/API/FetchEvent" title="Este tipo de evento para el evento &quot;fetch&quot; enviado en el  service worker global. Esto contiene la información sobre la búsqueda (fetch), incluyendo la petición y el receptor tratará la respuesta (response)."><code>FetchEvent</code></a></dt>
+ <dd>Parametro pasado en el controlador <a href="/es/docs/Web/API/ServiceWorkerGlobalScope/onfetch" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope.onfetch</code></a>, <code>FetchEvent</code> representa una acción de consulta (fetch) despachada en el <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> de un <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a>. Contiene información sobre la petición y respuesta resultante, y proporciona el método <a href="/es/docs/Web/API/FetchEvent/respondWith" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>FetchEvent.respondWith()</code></a>, que nos permite proporcionar una respuesta arbitraria a la página controlada.</dd>
+ <dt><a href="/es/docs/Web/API/InstallEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>InstallEvent</code></a></dt>
+ <dd>Parámetro pasado en el controlador <a href="/es/docs/Web/API/ServiceWorkerGlobalScope/oninstall" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>oninstall</code></a>, el interfaz<code>InstallEvent</code> representa una acctión de instalación realizada en el <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> de un <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a>. Como hijo de <a href="/es/docs/Web/API/ExtendableEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ExtendableEvent</code></a>, asegura que los eventos funcionales como <a href="/es/docs/Web/API/FetchEvent" title="Este tipo de evento para el evento &quot;fetch&quot; enviado en el  service worker global. Esto contiene la información sobre la búsqueda (fetch), incluyendo la petición y el receptor tratará la respuesta (response)."><code>FetchEvent</code></a> no se llevan a cabo durante la instalación. </dd>
+ <dt><a href="/es/docs/Web/API/Navigator/serviceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Navigator.serviceWorker</code></a></dt>
+ <dd>Devuelve un objeto <a href="/es/docs/Web/API/ServiceWorkerContainer" title="The ServiceWorkerContainer interface of the ServiceWorker API provides an object representing the service worker as an overall unit in the network ecosystem, including facilities to register, unregister and update service workers, and access the state of service workers and their registrations."><code>ServiceWorkerContainer</code></a>, que proporciona acceso al registro, eliminación, actualización y comunicación con los objetos <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a> para el <a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-document-window">documento asociado</a>.</dd>
+ <dt><a href="/es/docs/Web/API/NotificationEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>NotificationEvent</code></a></dt>
+ <dd>Parámetro pasado en el controlador <a href="/es/docs/Web/API/ServiceWorkerGlobalScope/onnotificationclick" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>onnotificationclick</code></a>, el interfaz <code>NotificationEvent</code> representa una notificación del evento click ejecutado en  <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> de un <a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a>.</dd>
+ <dt><a href="/es/docs/Web/API/ServiceWorker" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorker</code></a></dt>
+ <dd>Representa un service worker. Multiples contextos de navegación (e.g. pages, workers, etc.) se pueden asociar con el mismo objeto <code>ServiceWorker</code>.</dd>
+ <dt><a href="/es/docs/Web/API/ServiceWorkerContainer" title="The ServiceWorkerContainer interface of the ServiceWorker API provides an object representing the service worker as an overall unit in the network ecosystem, including facilities to register, unregister and update service workers, and access the state of service workers and their registrations."><code>ServiceWorkerContainer</code></a></dt>
+ <dd>Proporciona un objeto que representa el service worker como una unidad en el ecosistema de red, incluyendo servicios para registrar, eliminar y actualizar los service workers, y acceder al estado de los service workers y sus registros.</dd>
+ <dt><a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a></dt>
+ <dd>Representa el contexto global de ejecución de un service worker.</dd>
+ <dt><a href="/es/docs/Web/API/ServiceWorkerMessageEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerMessageEvent</code></a> <span title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></dt>
+ <dd>Representa un mensaje envaido a un<a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a>. <strong>Observese que este interfaz está considerado obsoleto en navegadores modernos. Los mensajes de service worker no podrán utilizar el interfaz <a href="/es/docs/Web/API/MessageEvent" title="La interface MessageEvent representa un mensaje recibido por un objeto de destino."><code>MessageEvent</code></a>, por consistencia con otras características de mensajería web.</strong></dd>
+ <dt><a href="/es/docs/Web/API/ServiceWorkerRegistration" title="The ServiceWorkerRegistration interface of the ServiceWorker API represents the service worker registration. You register a service worker to control one or more pages that share the same origin."><code>ServiceWorkerRegistration</code></a></dt>
+ <dd>Representa un registro service worker.</dd>
+ <dt><a href="/es/docs/Web/API/SyncEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>SyncEvent</code></a> <span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></dt>
+ <dd>
+ <p>El interfaz SyncEvent representa una acción sync ejecutada en el <a href="/es/docs/Web/API/ServiceWorkerGlobalScope" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerGlobalScope</code></a> de un ServiceWorker. </p>
+ </dd>
+ <dt><a href="/es/docs/Web/API/SyncManager" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>SyncManager</code></a> <span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></dt>
+ <dd>Proporciona un interfaz para registrar y listar registros sync.</dd>
+ <dt><a href="/es/docs/Web/API/WindowClient" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>WindowClient</code></a></dt>
+ <dd>Representa el ámbito de un cliente service worker que es un documento en un contexto de navegador, controlado por un worker activo. Es un tipo especial de objeto <a href="/es/docs/Web/API/Client" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>Client</code></a>, con algunos métodos y propiedades adicionales disponibles.</dd>
+</dl>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Service Workers&apos;" href="https://w3c.github.io/ServiceWorker/" class="external" hreflang="en">Service Workers</a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Definición inicial.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidad_de_navegadores">Compatibilidad de navegadores</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/44" title="Publicado en 2016-01-26.">44.0</a> (44.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>24</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>install/activate events</td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/44" title="Publicado en 2016-01-26.">44.0</a> (44.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>fetch event/request/<br>
+    <code>respondWith()</code></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/44" title="Publicado en 2016-01-26.">44.0</a> (44.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>caches/cache</td>
+   <td>
+    <p class="p1">42.0</p>
+   </td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/39" title="Publicado en 2015-06-30.">39.0</a> (39.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/ServiceWorkerMessageEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerMessageEvent</code></a> deprecated in favour of <a href="/es/docs/Web/API/MessageEvent" title="La interface MessageEvent representa un mensaje recibido por un objeto de destino."><code>MessageEvent</code></a></td>
+   <td>
+    <p class="p1">57.0</p>
+   </td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><a href="/en-US/Firefox/Releases/55" title="Publicado en 2017-08-08.">55.0</a> (55.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android Webview</th>
+   <th>Chrome for Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td>44.0 (44.0)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td> install/activate events</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td>44.0 (44.0)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>fetch event/request/<br>
+    <code>respondWith()</code></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td>44.0 (44.0)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td>caches/cache</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>40.0</td>
+   <td><span style="color: #f00;">Sin soporte</span><sup>[1]</sup></td>
+   <td>39.0 (39.0)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+  <tr>
+   <td><a href="/es/docs/Web/API/ServiceWorkerMessageEvent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>ServiceWorkerMessageEvent</code></a> deprecated in favour of <a href="/es/docs/Web/API/MessageEvent" title="La interface MessageEvent representa un mensaje recibido por un objeto de destino."><code>MessageEvent</code></a></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>
+    <p class="p1">57.0</p>
+   </td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td>55.0 (55.0)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Esta característica aún no está soportada, aunque está  <a href="https://developer.microsoft.com/en-us/microsoft-edge/platform/status/serviceworker/">ya en desarrollo</a>.</p>
+
+<p>[2] Service workers (y <a href="/en-US/docs/Web/API/Push_API">Push</a>) han sido inhabilitados en <a href="https://www.mozilla.org/en-US/firefox/organizations/">Firefox 45 &amp; 52 Extended Support Releases</a> (ESR.)</p>
+
+<h2 id="Ver_también">Ver también</h2>
+
+<ul>
+ <li><a href="https://serviceworke.rs">ServiceWorker Cookbook</a></li>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API/Using_Service_Workers">Using Service Workers</a></li>
+ <li><a href="https://github.com/mdn/sw-test">Service workers basic code example</a></li>
+ <li><a href="https://jakearchibald.github.io/isserviceworkerready/">Is ServiceWorker ready?</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a></li>
+ <li><a href="/en-US/docs/Web/Guide/Performance/Using_web_workers">Using web workers</a></li>
+ <li><a href="https://www.fastly.com/blog/best-practices-for-using-the-vary-header">Best Practices for using the VARY header</a></li>
+</ul>

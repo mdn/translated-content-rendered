@@ -1,0 +1,166 @@
+---
+title: Vibración API
+slug: Web/Guide/API/Vibration
+tags:
+  - API
+  - Firefox OS
+  - Mobile
+  - Principiante
+  - Vibración
+  - Vibrado
+  - Vibrar
+  - WebAPI
+translation_of: Web/API/Vibration_API
+---
+<p>La mayoría de los dispositivos modernos pueden vibrar a través del hardware, esto permite que a través del código de software se pueda emitir estas vibraciones. La <strong>Vibration API</strong>  ofrece a las aplicaciones web la capacidad de acceder a este hardware en caso este lo soporte, caso contrario el dispositivo no hace nada.</p>
+
+<h2 id="Describiendo_vibraciones">Describiendo vibraciones</h2>
+
+<p>Vibración se puede describir como un patrón de prender y apagar pulsos, los cuales pueden variar en longitud. El patrón puede consistir de un sólo número que indica cuantos milisegundos vibrará, o un arreglo de enteros describiendo un patrón de vibraciones y pausas. La vibración es controlada por un solo método:</p>
+
+<p><span style="font-size: 13.63636302948px; line-height: 19.0909080505371px;"><a href="/es/docs/Web/API/Window/navigator/vibrate" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.navigator.vibrate()</code></a>.</span></p>
+
+<h3 id="Vibración_simple">Vibración simple</h3>
+
+<p>Puedes iniciar una sola vibración del hardware pasando como argumento un sólo número, o un arreglo de un sólo número:</p>
+
+<pre class="brush:js">window.navigator.vibrate(200);
+window.navigator.vibrate([200]);
+</pre>
+
+<p>Ambos ejemplos hacen vibrar el dispositivo por 200 ms.</p>
+
+<h3 id="Patrones_de_vibración">Patrones de vibración</h3>
+
+<p>Un arreglo de valores describen que las vibraciones serán por períodos alternados, es decir, el dispositivo vibrará luego no lo hará, así según la secuencia definida. Cada valor en el arreglo es convertido a entero para luego ser interpretado alternadamente como el tiempo que el dispositivo debe vibrar y el tiempo que no debe vibrar. Ejemplo:</p>
+
+<pre class="brush: js">window.navigator.vibrate([200, 100, 200]);
+</pre>
+
+<p>Según este ejemplo el dispositivo vibrará por 200ms, luego se detiene por 100ms y luego vibra 200ms.</p>
+
+<p>Puedes especificar cuantas vibraciones/pausas desees, y el arreglo puede tener un tamaño par o impar. No importa que agregues una pausa como el último valor del arreglo, ya que el celular dejará de vibrar de todas formas al final de cada vibración.</p>
+
+<h3 id="Cancelar_vibraciones_existentes">Cancelar vibraciones existentes</h3>
+
+<p>Llamar <a href="/es/docs/Web/API/Window/navigator/vibrate" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.navigator.vibrate()</code></a> con un valor de <code>0</code>, arreglo vació, o arreglo que contenga 0&apos;s detendrá cualquier vibración en curso.</p>
+
+<h3 id="Vibraciones_continuas">Vibraciones continuas</h3>
+
+<p style="margin: 0px 0px 0.8em; padding: 0px; border: 0px; font-family: &apos;Open Sans&apos;, Arial, sans-serif; line-height: 1.6em; font-size: 16px; vertical-align: baseline;">Algunas básicas acciones son <code style="margin: 0px; padding: 2px 7px; border: 0px; font-family: monospace, sans-serif; font-style: inherit; font-variant: inherit; font-weight: bold; line-height: inherit; font-size: 16px; vertical-align: baseline; background-color: rgb(248, 248, 248); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px;">setInterval</code> y <code style="margin: 0px; padding: 2px 7px; border: 0px; font-family: monospace, sans-serif; font-style: inherit; font-variant: inherit; font-weight: bold; line-height: inherit; font-size: 16px; vertical-align: baseline; background-color: rgb(248, 248, 248); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px;">clearInterval</code> que nos permitirán crear vibraciones persistentes:</p>
+
+<pre style="margin-top: 0.5em; margin-bottom: 0.5em; padding: 1em; border: 0px; font-family: Consolas, Monaco, &apos;Andale Mono&apos;, monospace; line-height: 1.6em; font-size: 0.8em; vertical-align: baseline; background-color: rgb(245, 242, 240); color: black; text-shadow: white 0px 1px; direction: ltr;" class="js  language-js"><code style="margin: 0px; padding: 0px; border: 0px; font-family: Consolas, Monaco, &apos;Andale Mono&apos;, monospace; font-style: inherit; font-variant: inherit; line-height: inherit; font-size: 13px; vertical-align: baseline; text-shadow: white 0px 1px; direction: ltr;" class="language-js"><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">var</span> intervaloDeVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(112, 128, 144);" class="token comment">
+// Iniciar la vibración
+</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">function</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">iniciarVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span>duracion<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">{</span>
+	navigator<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">.</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">vibrate<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span>duracion)<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">}</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(112, 128, 144);" class="token comment">
+// Detiene la vibración
+</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">function</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">detenerVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">{</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(112, 128, 144);" class="token comment">	// Limpiar el intervalo y detener las vibraciones existentes
+</span>	<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">if</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span>intervaloDeVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">clearInterval<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span>intervaloDeVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+	navigator<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">.</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">vibrate<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 0, 85);" class="token number">0</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">}</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(112, 128, 144);" class="token comment">
+// Iniciar las vibraciones con una determinado tiempo e intervalo
+</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(112, 128, 144);" class="token comment">// Asumir que el valor recibido es un entero
+</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">function</span> iniciarVibradoPersistente<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function"><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span>duracion<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">,</span> intervalo<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">{</span>
+	intervaloDeVibrado <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(166, 127, 89); background-color: rgba(255, 255, 255, 0.498039);" class="token operator">=</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">setInterval<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(0, 119, 170);" class="token keyword">function</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span> <span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">{</span>
+		<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline;" class="token function">iniciarVibrado<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">(</span></span>duracion<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+	<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">}</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">,</span> intervalo<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">)</span><span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">;</span>
+<span style="margin: 0px; padding: 0px; border: 0px; font-family: inherit; font-style: inherit; font-variant: inherit; line-height: inherit; vertical-align: baseline; color: rgb(153, 153, 153);" class="token punctuation">}</span></code></pre>
+
+<p style="margin: 0px 0px 0.8em; padding: 0px; border: 0px; font-family: &apos;Open Sans&apos;, Arial, sans-serif; line-height: 1.6em; font-size: 16px; vertical-align: baseline;">Claro que el código de arriba no toma en cuenta el método de utilizar un arreglo de vibración, utilizar un arreglo para vibración persistente necesitaría recalcular la suma de los elementos del arregloo y crear un intervalo basado en esos números (agregando adicionalmente las pausas)</p>
+
+<h3 id="¿Por_qué_utilizar_Vibration_API">¿Por qué utilizar Vibration API?</h3>
+
+<p style="margin: 0px 0px 0.8em; padding: 0px; border: 0px; font-family: &apos;Open Sans&apos;, Arial, sans-serif; line-height: 1.6em; font-size: 16px; vertical-align: baseline;">Esta API es claramente accesible a través de dispositivos móbiles. Vibration API puede servir para alertas en las aplicaciones web del celular, y sería es asombrosa cuando se utiliza en juegos o en aplicaciones pesadas. Imagínate mirando un video en tu celular y durante la escena de explosión,tu teléfono vibra un poco. O la sensación que tendría tu usuario al sentir el estallido de una bomba en el juego Bomberman.</p>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Especificación</th>
+   <th scope="col">Estado</th>
+   <th scope="col">Comentario</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a lang="en" title="La especificación &apos;Vibration API&apos;" href="https://dev.w3.org/2009/dap/vibration/" class="external" hreflang="en">Vibration API</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Especificación inicial.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidad_entre_navegadores">Compatibilidad entre navegadores</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/es/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Escritorio</a></li>
+        <li><a>Móvil</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Caracteŕistica</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;webkit&apos; as this browser considers it experimental">webkit</a></span></td>
+   <td>11.0 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;moz&apos; as this browser considers it experimental">moz</a></span><br>
+    16 (no prefix)</td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Característica</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Soporte básico</td>
+   <td><span style="color: #888;" title="Por favor actualiza esto con la versión más reciente que de soporte.">(Yes)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;webkit&apos; as this browser considers it experimental">webkit</a></span></td>
+   <td>11.0 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/es/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;moz&apos; as this browser considers it experimental">moz</a></span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+   <td><span style="color: #f00;">Sin soporte</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Ver_También">Ver También</h2>
+
+<ul>
+ <li><a href="/es/docs/Web/API/Window/navigator/vibrate" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.navigator.vibrate()</code></a></li>
+ <li><a href="http://davidwalsh.name/vibration-api">Vibration API - David Walsh</a></li>
+</ul>
