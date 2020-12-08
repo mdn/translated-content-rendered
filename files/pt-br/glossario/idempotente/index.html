@@ -1,0 +1,51 @@
+---
+title: Idempotente
+slug: Glossario/Idempotente
+tags:
+  - Glossary
+  - Glossário
+  - Mecânicas da Web
+  - WebMechanics
+translation_of: Glossary/Idempotent
+---
+<p>Um método HTTP é <strong>idempotente</strong> se uma requisição idêntica pode ser feita uma ou mais vezes em sequência com o mesmo efeito enquanto deixa o servidor no mesmo estado. Em outras palavras, um método idempotente não deveria possuir nenhum efeito colateral (exceto para manter estatísticas). Implementados corretamente, o <a href="/pt-BR/docs/Web/HTTP/Methods/GET" title="A tabela de compatibilidade nesta página é gerada a partir de dados estruturados. Se você quiser contribuir com os dados, consulte https://github.com/mdn/browser-compat-data e envie-nos um pull request."><code>GET</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/HEAD" title="O método HTTP HEAD solicita os cabeçalhos retornados de um recurso específico que foi requisitado por um método HTTP GET. Tal solicitação pode ser feita antes de baixar um grande recurso para economizar largura de banda, por exemplo."><code>HEAD</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/PUT" title="O método de requisição HTTP PUT cria um novo recurso ou subsititui uma representação do recurso de destino com os novos dados."><code>PUT</code></a>, e <a href="/pt-BR/docs/Web/HTTP/Methods/DELETE" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>DELETE</code></a> são métodos <strong>idempotentes</strong>, mas não o método <a href="/pt-BR/docs/Web/HTTP/Methods/POST" title="O método HTTP POST envia dados ao servidor. O tipo do corpo da solicitação é indicado pelo cabeçalho Content-Type."><code>POST</code></a>. Todos os métodos  <a class="glossaryLink" href="/pt-BR/docs/Glossario/seguro" title="seguro: Um método HTTP é seguro se ele não altera o estado do servidor. Em outras palavras, um método é seguro se ele leva a uma operação de somente leitura. Diversos métodos de HTTP são seguros: GET, HEAD, ou OPTIONS. Todos os métodos seguros também são idempotent, mas nem todos os métodos idempotentes são seguros. Por exemplo, PUT e DELETE são ambos idempotentes, entretanto são inseguros.">seguro</a>s também são idempotentes.</p>
+
+<p>Para ser idempotente, somente o estado atual do <em>back-end</em> de um servidor deve ser considerado, o código de status retornado por cada requisição pode variar: a primeira chamada de um <a href="/pt-BR/docs/Web/HTTP/Methods/DELETE" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>DELETE</code></a> vai provavelmente retornar um <a href="/pt-BR/docs/Web/HTTP/Status/200" title="O significado de sucesso depende do método de requisição HTTP:"><code>200</code></a>, enquanto as chamadas sucessivas vão provavelmente retornar <a href="/pt-BR/docs/Web/HTTP/Status/404" title="A resposta de erro 404 Not Found indica que o servidor não conseguiu encontrar o recurso solicitado. Normalmente, links que levam para uma página 404 estão quebrados ou desativados, e podem estar sujeitos a link rot."><code>404</code></a>. Outra implicação do <a href="/pt-BR/docs/Web/HTTP/Methods/DELETE" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>DELETE</code></a> ser idempotente é de que os desenvolvedores não deveriam implementar APIs RESTful com a<em> </em>funcionalidade de deleção de última entrada usando o método <code>DELETE</code>.</p>
+
+<p>Note que a idempotência de um método não é garantida pelo servidor, algumas aplicações também podem quebrar a constante de idempotência.</p>
+
+<p><code>GET /pageX HTTP/1.1</code> é idempotente. Chamado diversas vezes em sequência, ele vai retornar o mesmo resultado:</p>
+
+<pre>GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+</pre>
+
+<p><code>POST /add_row HTTP/1.1</code> não é idempotente. Se ele for chamado diversas vezes, ele adicionará novas entradas:</p>
+
+<pre>POST /add_row HTTP/1.1
+POST /add_row HTTP/1.1   -&gt; Adiciona a 2ª linha
+POST /add_row HTTP/1.1   -&gt; Adiciona a 3ª linha
+</pre>
+
+<p><code>DELETE /idX/delete HTTP/1.1</code> é idempotente, mesmo que o código de status mude entre requisições:</p>
+
+<pre>DELETE /idX/delete HTTP/1.1   -&gt; Retorna 200 se idX existe
+DELETE /idX/delete HTTP/1.1   -&gt; Returna 404 como ele acabou de ser deletado
+DELETE /idX/delete HTTP/1.1   -&gt; Returna 404</pre>
+
+<h2 id="Aprenda_mais">Aprenda mais</h2>
+
+<h3 id="Conhecimento_geral">Conhecimento geral</h3>
+
+<ul>
+ <li>Definição de <a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotente</a> na especificação HTTP.</li>
+</ul>
+
+<h3 id="Conhecimento_técnico">Conhecimento técnico</h3>
+
+<ul>
+ <li>Descrição de métodos idempotentes comuns: <a href="/pt-BR/docs/Web/HTTP/Methods/GET" title="A tabela de compatibilidade nesta página é gerada a partir de dados estruturados. Se você quiser contribuir com os dados, consulte https://github.com/mdn/browser-compat-data e envie-nos um pull request."><code>GET</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/HEAD" title="O método HTTP HEAD solicita os cabeçalhos retornados de um recurso específico que foi requisitado por um método HTTP GET. Tal solicitação pode ser feita antes de baixar um grande recurso para economizar largura de banda, por exemplo."><code>HEAD</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/PUT" title="O método de requisição HTTP PUT cria um novo recurso ou subsititui uma representação do recurso de destino com os novos dados."><code>PUT</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/DELETE" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>DELETE</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS" title="O método HTTP OPTIONS é utilizado para que um cliente possa descobrir quais as opções de requisição permitidas para um determinado recurso em um servidor. O cliente pode especificar uma URL específica no método OPTIONS ou um asterisco(*) indicando que se refere ao servidor como um todo para sanar suas dúvidas em relação as opções de requisição permitidas."><code>OPTIONS</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/TRACE" title="O método HTTP TRACE realiza um teste de loopback enviando uma mensagem por todo o caminho até o recurso alvo no qual foi destinado, provendo um mecanismo útil para debug."><code>TRACE</code></a></li>
+ <li>Descrição de métodos não-idempotentes comuns: <a href="/pt-BR/docs/Web/HTTP/Methods/POST" title="O método HTTP POST envia dados ao servidor. O tipo do corpo da solicitação é indicado pelo cabeçalho Content-Type."><code>POST</code></a>,<a href="/pt-BR/docs/Web/HTTP/Methods/PATCH" title="O método de requisição HTTP PATCH aplica modificações parciais a um recurso."><code>PATCH</code></a>, <a href="/pt-BR/docs/Web/HTTP/Methods/CONNECT" title="O médoto HTTP CONNECT começa a comunicação bidirecional com o recurso solicitado. Ele pode ser usado para abrir um túnel."><code>CONNECT</code></a></li>
+</ul>

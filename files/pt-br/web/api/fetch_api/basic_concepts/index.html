@@ -1,0 +1,70 @@
+---
+title: Conceitos básicos de Fetch
+slug: Web/API/Fetch_API/Basic_concepts
+translation_of: Web/API/Fetch_API/Basic_concepts
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-BR/docs/Web/API/Fetch_API">Fetch API</a></strong></li><li class="toggle"><details open><summary>Guias</summary><ol><li><a href="/pt-BR/docs/Web/API/Fetch_API/Using_Fetch">Usando Fetch</a></li><li><a href="/pt-BR/docs/Web/API/Fetch_API/Basic_concepts">Conceitos básicos de Fetch</a></li><li><a href="/pt-BR/docs/Web/API/Fetch_API/Uso_de_busca_Cross-global">Uso de busca Cross-global</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/pt-BR/docs/Web/API/Body"><code>Body</code></a></li><li><a href="/pt-BR/docs/Web/API/Headers"><code>Headers</code></a></li><li><a href="/pt-BR/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/pt-BR/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/pt-BR/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li></ol></details></li></ol></section><div class="draft notecard">
+    <p><strong>Rascunho</strong><br>
+    Esta página está incompleta.</p>
+
+</div>
+
+<div class="summary">
+<p>A <a href="/en-US/docs/Web/API/Fetch_API">Fetch API</a> fornece uma interface para buscar recursos (inclusive pela rede). Parecerá familiar para alguém que já tenha usado <a href="/pt-BR/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest é um objeto que fornece funcionalidade ao cliente para transferir dados entre um cliente e um servidor. Ele fornece uma maneira fácil de recuperar dados de um URL sem ter que fazer uma atualização de página inteira. Isso permite que uma página da Web atualize apenas uma parte do conteúdo sem interromper o que o usuário esteja fazendo. XMLHttpRequest é usado constantemente na programação de AJAX."><code>XMLHttpRequest</code></a>, mas ela fornece um conjunto de recursos mais poderoso e flexível . Este artigo expõe alguns conceitos básicos da API Fetch.</p>
+</div>
+
+<div class="note">
+<p>Este artigo será incrementado ao longo do tempo. Se você achar um conceito em Fetch que parece precisar de uma explicação melhor, informe alguém em <a href="https://discourse.mozilla-community.org/c/mdn">fórum de discussãMDN</a>, or <a href="https://wiki.mozilla.org/IRC">Mozilla IRC</a> (#mdn room.)</p>
+</div>
+
+<h2 id="Em_poucas_palavras">Em poucas palavras</h2>
+
+<p>O coração do Fetch são as abstrações da Interface do HTTP <a href="/pt-BR/docs/Web/API/Request" title="A interface Request da Fetch API representa uma requisição de recursos."><code>Request</code></a>, <a href="/pt-BR/docs/Web/API/Response" title="A interface Response da Fetch API representa a resposta para uma requisição."><code>Response</code></a>, <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a>, e <a href="/pt-BR/docs/Web/API/Body" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Body</code></a> payloads, juntamente com <a href="/pt-BR/docs/Web/API/GlobalFetch/fetch" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>global fetch</code></a> método para iniciar requisições de recursos assíncronos. Como os componentes principais do HTTP são abstraidos como objetos de JavaScript, torna-se fácil APIs fazer uso das funcionalidades.</p>
+
+<p><a href="/en-US/docs/Web/API/ServiceWorker_API">Service Workers</a> é um exemplo de uma API que faz um grande uso de Fecth.</p>
+
+<p>Fetch leva a assincronicidade um passo além. A API é completamente baseada em <a href="/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>.</p>
+
+<h2 id="Guard">Guard</h2>
+
+<p>Guard é uma novidade de objetos <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a>, podendo assumir os valores de <code>immutable</code>, <code>request</code>, <code>request-no-cors</code>, <code>response</code>, ou <code>none</code>, dependendo de onde o cabeçalho é utilizado.</p>
+
+<p>Quando um novo objeto <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a> é criado usando o <a href="/pt-BR/docs/Web/API/Headers/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers()</code></a> <a class="glossaryLink" href="/pt-BR/docs/Glossary/constructor" title="A definição do termo (constructor) ainda não foi escrita; por favor, considere fazer essa contribuição!">constructor</a>, seu guard é configurado como <code>none</code> (o padrão). Quando um objeto <a href="/pt-BR/docs/Web/API/Request" title="A interface Request da Fetch API representa uma requisição de recursos."><code>Request</code></a> ou <a href="/pt-BR/docs/Web/API/Response" title="A interface Response da Fetch API representa a resposta para uma requisição."><code>Response</code></a> é criado, tem um objeto <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a>  associado cujo guard é resumido a seguir:</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="row">Novo tipo de objeto</th>
+   <th scope="col">Construtor criado</th>
+   <th scope="col">Configuração guard associada ao objeto <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a></th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td rowspan="2"><a href="/pt-BR/docs/Web/API/Request" title="A interface Request da Fetch API representa uma requisição de recursos."><code>Request</code></a></td>
+   <td><a href="/pt-BR/docs/Web/API/Request/Request" title="O construtor Request() cria um novo objeto Request."><code>Request()</code></a></td>
+   <td><code>request</code></td>
+  </tr>
+  <tr>
+   <td><a href="/pt-BR/docs/Web/API/Request/Request" title="O construtor Request() cria um novo objeto Request."><code>Request()</code></a> com <a href="/pt-BR/docs/Web/API/Request/mode" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>mode</code></a> de <code>no-cors</code></td>
+   <td><code>request-no-cors</code></td>
+  </tr>
+  <tr>
+   <td rowspan="2"><a href="/pt-BR/docs/Web/API/Response" title="A interface Response da Fetch API representa a resposta para uma requisição."><code>Response</code></a></td>
+   <td><a href="/pt-BR/docs/Web/API/Response/Response" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Response()</code></a></td>
+   <td><code>response</code></td>
+  </tr>
+  <tr>
+   <td>Métodos <a href="/pt-BR/docs/Web/API/Response/error" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>error()</code></a> ou <a href="/pt-BR/docs/Web/API/Response/redirect" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>redirect()</code></a></td>
+   <td><code>immutable</code></td>
+  </tr>
+ </tbody>
+</table>
+
+<p>Um cabeçalho guard afeta os métodos <a href="/pt-BR/docs/Web/API/Headers/set" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>set()</code></a>, <a href="/pt-BR/docs/Web/API/Headers/delete" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>delete()</code></a>, e <a href="/pt-BR/docs/Web/API/Headers/append" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>append()</code></a> os quais mudam o conteúdo do cabeçalho. Um<code>TypeError</code> é lançado se você tentar modificar um objeto <a href="/pt-BR/docs/Web/API/Headers" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>Headers</code></a> objeto cujo &quot;guard&quot; é <code>immutable</code>. De qualquer maneira, a operação vai funcionar se</p>
+
+<ul>
+ <li>guard for um <code title>request</code> e o <var>name</var> de cabeçalho não for <a class="glossaryLink" href="/pt-BR/docs/Glossario/forbidden_header_name" title="forbidden header name: Um nome de cabeçalho proibido é o nome de qualquer cabeçalho HTTP que não pode ser modificado programaticamente; especificamente, um nome de cabeçalho de solicitação HTTP (em contraste com um Forbidden response header name).">forbidden header name</a> .</li>
+ <li>guard for <code title>request-no-cors</code> e os <var>name</var>/<var>value</var> de cabeçalho for <a class="glossaryLink" href="/pt-BR/docs/Glossary/simple_header" title="A definição do termo (simple header) ainda não foi escrita; por favor, considere fazer essa contribuição!">simple header</a> .</li>
+ <li>guard for <code title>response</code> e o <var>name</var> de cabeçalho não for <a class="glossaryLink" href="/pt-BR/docs/Glossario/forbidden_response_header_name" title="forbidden response header name: Um nome de cabeçalho de resposta proibido é um  nome de cabeçalho HTTP  (ou `Set-Cookie` ou ` Set-Cookie2`) que não pode ser modificado programaticamente.">forbidden response header name</a> .</li>
+</ul>

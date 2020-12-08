@@ -1,0 +1,223 @@
+---
+title: Web Components
+slug: Web/Web_Components
+translation_of: Web/Web_Components
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guias</summary><ol><li><a href="/pt-BR/docs/Web/Web_Components/Using_custom_elements">Using custom elements</a> <a href="/pt-BR/docs/Web/Web_Components/Using_custom_elements$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/Web_Components/Using_shadow_DOM">Using shadow DOM</a> <a href="/pt-BR/docs/Web/Web_Components/Using_shadow_DOM$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/Web_Components/Using_templates_and_slots">Using templates and slots</a> <a href="/pt-BR/docs/Web/Web_Components/Using_templates_and_slots$translate" style="opacity: 0.5;">[Traduzir]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/pt-BR/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/pt-BR/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/pt-BR/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/pt-BR/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriedades</summary><ol><li><a href="/pt-BR/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/pt-BR/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/pt-BR/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/pt-BR/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/pt-BR/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/pt-BR/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Métodos</summary><ol><li><a href="/pt-BR/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/pt-BR/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/pt-BR/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<div class="summary">
+<p>Web Components é uma suíte de diferentes tecnologias que permite a criação de elementos customizados reutilizáveis — com a funcionalidade separada do resto do seu código — e que podem ser utilizados em suas aplicações web.</p>
+</div>
+
+<h2 id="Conceitos_e_uso">Conceitos e uso</h2>
+
+<p>Como desenvolvedores, sabemos que é uma boa ideia reutilizar o código o máximo que pudermos. Tradicionalmente, isso não tem sido fácil quando o assunto são estruturas de marcação customizadas — pense no complexo HTML (e estilo e script associados) que, às vezes, deve ser escrito para renderizar controles UI customizados e em como utilizá-los repetidas vezes pode tornar sua página uma bagunça se você não tomar cuidado.</p>
+
+<p>Web Components buscam resolver esses problemas — são formados por três tecnologias principais, que podem ser usadas em conjunto para criar elementos customizados versáteis, com funcionalidade encapsulada, que podem ser reutilizados onde você quiser sem preocupação com conflito de código.</p>
+
+<ul>
+ <li><strong>Elementos customizados</strong>: Um conjunto de APIs JavaScript que permite definir elementos customizados e seus respectivos comportamentos, podendo ser utilizados de diferentes formas na interface da aplicação.</li>
+ <li><strong>Shadow DOM</strong>: Um conjunto de APIs JavaScript para incorporar uma árvore DOM &quot;fantasma&quot; encapsulada a um elemento — que é renderizada separadamente do DOM do documento principal — e controlar a funcionalidade associada. Nesse caso, você pode manter os recursos de um elemento privados, fazendo com que seu comportamento e estilo possam ser escritos sem medo de causar conflito com outras partes do documento.</li>
+ <li><strong>Templates HTML</strong>: Os elementos <a href="/pt-BR/docs/Web/HTML/Element/template" title="O  elemento HTML &lt;template&gt; é um mecanismo para encapsular um conteúdo do lado do cliente que não é renderizado quando a página é carregada, mas que pode ser instanciado posteriormente em tempo de execução usando JavaScript."><code>&lt;template&gt;</code></a> e <a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a> permitem que você escreva templates de marcação que não são exibidas na página. Elas podem então ser reutilizadas várias vezes como modelo de estrutura de um elemento customizado.</li>
+</ul>
+
+<p>A abordagem básica para se implementar um componente web geralmente se parece com isso:</p>
+
+<ol>
+ <li>Crie uma classe na qual você especifica a funcionalidade do seu componente web, usando a sintaxe de classe do ECMAScript 2015 (veja <a href="/en-US/docs/Web/JavaScript/Reference/Classes">Classes</a> para mais informações). </li>
+ <li>Registre seus elemento customizado através do método <a href="/pt-BR/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a>, passando o nome do elemento a ser definido, a classe ou função na qual sua funcionalidade foi especificada, e opcionalmente, de qual elemento ele herda suas propriedades.</li>
+ <li>Se necessário, incorpore um shadow DOM ao elemento customizado usando o método <a href="/pt-BR/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a>. Adicione elementos filhos, listeners, etc., ao shadow DOM usando métodos normais de DOM.</li>
+ <li>Se necessário, defina um template HTML usando <a href="/pt-BR/docs/Web/HTML/Element/template" title="O  elemento HTML &lt;template&gt; é um mecanismo para encapsular um conteúdo do lado do cliente que não é renderizado quando a página é carregada, mas que pode ser instanciado posteriormente em tempo de execução usando JavaScript."><code>&lt;template&gt;</code></a> e <a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a>. Novamente, use os métodos normais de DOM methods para clonar o template e inclui-la ao shadow DOM.</li>
+ <li>Use seu elemento customizado onde você preferir em sua página, da mesma forma que usaria qualquer outro elemento HTML.</li>
+</ol>
+
+<h2 id="Tutoriais">Tutoriais</h2>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/Web_Components/Usando_custom_elements">Usando elementos customizados</a></dt>
+ <dd>Um guia que mostra como usar os recursos de elementos customizados para criar componentes web simples, além de como analisar o ciclo de vida das funções de retorno e outros recursos mais avançados.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Usando shadow DOM</a></dt>
+ <dd>Um guia que analisa os fundamentos do shadow DOM, mostrando como incorporá-lo a um elemento, adicioná-lo à árvore do shadow DOM, estilizá-lo, etc.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_templates_and_slots">Usando templates e slots</a></dt>
+ <dd>Um guia que mostra como definir uma estrutura HTML reutilzável através dos elementos <a href="/pt-BR/docs/Web/HTML/Element/template" title="O  elemento HTML &lt;template&gt; é um mecanismo para encapsular um conteúdo do lado do cliente que não é renderizado quando a página é carregada, mas que pode ser instanciado posteriormente em tempo de execução usando JavaScript."><code>&lt;template&gt;</code></a> e <a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a>, e como utilizar essa estrutura dentro de elementos web.</dd>
+</dl>
+
+<h2 id="Referência">Referência</h2>
+
+<h3 id="Elementos_customizados">Elementos customizados</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></dt>
+ <dd>Contém funcionalidade relacionada a elementos personalizados, principalmente o método <a href="/pt-BR/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> usado para registrar novos elementos personalizados, para que possam ser usados ​​em seu documento.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></dt>
+ <dd>Retorna uma referência ao objeto <code>CustomElementRegistry</code>.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks">Callbacks do ciclo de vida</a></dt>
+ <dd>Funções callback especiais definidas dentro da definição de classe de elemento customizado, afetando seu comportamento:
+ <ul>
+  <li><code>connectedCallback</code>: Invocada quando um elemento customizado é adicionao ao DOM do documento.</li>
+  <li><code>disconnectedCallback</code>: Invocada quando o elemento customizado é desconectado do DOM do documento.</li>
+  <li><code>adoptedCallback</code>: Invocada quando o elemento customizado é movido para um novo documento.</li>
+  <li><code>attributeChangedCallback</code>: Invocada quando um dos atributos de um elemento customizado é adicionado, removido ou alterado.</li>
+ </ul>
+ </dd>
+ <dd>
+ <ul>
+ </ul>
+ </dd>
+</dl>
+
+<dl>
+ <dt>Extensões para criação de elementos built-in customizados</dt>
+ <dd>
+ <ul>
+  <li>O atributo HTML global <code><a href="/pt-BR/docs/Web/HTML/Global_attributes#attr-is">is</a></code>: Permite especificar que um elemento HTML padrão deve se comportar como um elemento built-in customizado registrado.</li>
+  <li>A opção &quot;is&quot; do método <a href="/pt-BR/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a>: Permite criar uma instância de um elemento HTML standard que se comporta como um determinado elemento built-in customizado registrado.</li>
+ </ul>
+ </dd>
+ <dt>CSS pseudo-classes</dt>
+ <dd>Pseudo-classes relacionadas especificamente a elementos customizados:
+ <ul>
+  <li><a href="/pt-BR/docs/Web/CSS/:defined" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>:defined</code></a>: Corresponde a qualquer elemento que está definido, incluindo elementos built-in e elementos customizados que foram definidos com <code>CustomElementRegistry.define()</code>).</li>
+  <li><a href="/pt-BR/docs/Web/CSS/:host" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>:host</code></a>: Seleciona o host fantasma do <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM</a> contendo o CSS utilizado internamente.</li>
+  <li><a href="/pt-BR/docs/Web/CSS/:host()" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>:host()</code></a>: Seleciona o host fantasma do <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM</a> contendo o CSS utilizado internamente (permitindo selecionar um elemento customizado de dentro de seu shadow DOM) — mas somente se o seletor que foi passado via parâmetro da função corresponder ao host fantasma.</li>
+  <li><a href="/pt-BR/docs/Web/CSS/:host-context()" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>:host-context()</code></a>: Seleciona o host fantasma do <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM</a> contendo o CSS utilizado internamente (permitindo selecionar um elemento customizado de dentro de seu shadow DOM) — mas somente se o seletor que foi passado via parâmetro da função corresponder ao(s) ancestral(ais) do host fantasma relativo à posição que ele toma dentro da hierarquida do DOM.</li>
+ </ul>
+ </dd>
+ <dt>CSS pseudo-elementos</dt>
+ <dd>Pseudo-elementos relacionados especificamente a elementos customizados:
+ <ul>
+  <li><a href="/pt-BR/docs/Web/CSS/::part" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>::part</code></a>: Representa qualquer elemento dentro de uma <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow tree</a> que tenha um atributo <code><a href="/pt-BR/docs/Web/HTML/Global_attributes#attr-part">part</a></code> correspondente.</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Shadow_DOM">Shadow DOM</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></dt>
+ <dd>Representa o nó raíz de uma sub-árvore DOM fantasma.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></dt>
+ <dd>Um mixin que define funcionalidades que ficam disponíveis através do documento e das raízes fantasma.</dd>
+ <dt>Extensões <a href="/pt-BR/docs/Web/API/Element"><code>Element</code></a></dt>
+ <dd>Extensões à interface <code>Element</code> relacionado ao shadow DOM:
+ <ul>
+  <li>O método <a href="/pt-BR/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a> vincula uma árvore DOM fantasma ao elemento especificado.</li>
+  <li>A propriedade <a href="/pt-BR/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a> retorna a árvore fantasma raíz vinculada ao elemento especificado, ou <code>null</code> se não existir nenhuma árvore fantasma vinculada.</li>
+ </ul>
+ </dd>
+ <dt>Adições relevantes <a href="/pt-BR/docs/Web/API/Node"><code>Node</code></a></dt>
+ <dd>Adicionais à interface <code>Node</code> pertinentes ao shadow DOM:
+ <ul>
+  <li>O método <a href="/pt-BR/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a> retorna a raíz do objeto contexto, que opcionalmente inclui a &quot;raíz fantasma&quot; (shadow root) se a mesma estiver dispinível.</li>
+  <li>A propriedade <a href="/pt-BR/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a> retorna um boolean indicando se o Nó está ou não conectado (direta ou indiretamente) ao objeto contexto, ex. o objeto <a href="/pt-BR/docs/Web/API/Document"><code>Document</code></a> no caso de um DOM normal, ou o <a href="/pt-BR/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a> no caso de um DOM fantasma (shadow DOM).</li>
+ </ul>
+ </dd>
+ <dt>Extensões <a href="/pt-BR/docs/Web/API/Event"><code>Event</code></a> </dt>
+ <dd>Extensões para a interface de <code>Event</code> relacionado a shadow DOM:
+ <ul>
+  <li><a href="/pt-BR/docs/Web/API/Event/composed"><code>Event.composed</code></a>: Retorna um <a href="/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Boolean"><code>Boolean</code></a> que indica<br>
+   se o evento irá se propagar através dos limites do shadow DOM para dentro do DOM padrão (<code>true</code>), ou não (<code>false</code>).</li>
+  <li><a href="/pt-BR/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a>: Retorna o caminho do evento (objetos nos quais os listeners serão invocados). Não inclui nós na shadow tree se a shadow root foi criada com <a href="/pt-BR/docs/Web/API/ShadowRoot/mode"><code>ShadowRoot.mode</code></a> closed (fechado).</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Templates_HTML">Templates HTML</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/HTML/Element/template" title="O  elemento HTML &lt;template&gt; é um mecanismo para encapsular um conteúdo do lado do cliente que não é renderizado quando a página é carregada, mas que pode ser instanciado posteriormente em tempo de execução usando JavaScript."><code>&lt;template&gt;</code></a></dt>
+ <dd>Contém um fragmento HTML que não é renderizado quando um documento que o contém é inicialmente carregado, mas pode ser exibido em tempo de execução usando JavaScript, geralmente utilizado como base de estruturas de elementos customizados. A interface DOM associada é <a href="/pt-BR/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a>.</dd>
+ <dt><a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a></dt>
+ <dd>Um placeholder dentro de um web component que você pode preencher com seu texto de marcação, permitindo criar árvores DOM separadas e apresentar delas juntas. A interface DOM associada é a <a href="/pt-BR/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a>.</dd>
+ <dt><code>O atributo HTML global <a href="/en-US/docs/Web/HTML/Global_attributes/slot">slot</a></code></dt>
+ <dd>Atribui um slot em uma árvore shadow DOM a um elemento.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/Slotable"><code>Slotable</code></a></dt>
+ <dd>Um mixin implementado por ambos os nós <a href="/pt-BR/docs/Web/API/Element"><code>Element</code></a> e<a href="/pt-BR/docs/Web/API/Text"><code>Text</code></a> definindo funcionalidades que permitem tornar-se conteúdo de um elemento <a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a>. O mixin define um atributo, <a href="/pt-BR/docs/Web/API/Slotable/assignedSlot"><code>Slotable.assignedSlot</code></a>, o qual retorna uma referência do slot em que o nó está sendo inserido.</dd>
+</dl>
+
+<dl>
+ <dt>Extensões <a href="/pt-BR/docs/Web/API/Element"><code>Element</code></a></dt>
+ <dd>Extensões para a interface de <code>Element</code> relacionado a slots:
+ <ul>
+  <li><a href="/pt-BR/docs/Web/API/Element/slot"><code>Element.slot</code></a>: Retorna o nome do slot do shadow DOM associado ao elemento.</li>
+ </ul>
+ </dd>
+ <dt>Pseudo-elementos CSS</dt>
+ <dd>Pseudo-elementos relacionados especificamente a slots:
+ <ul>
+  <li><a href="/pt-BR/docs/Web/CSS/::slotted" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>::slotted</code></a>: Corresponde a qualquer conteúdo inserido naquele slot.</li>
+ </ul>
+ </dd>
+ <dt>O evento <code><a href="/pt-BR/docs/Web/Reference/Events/slotchange" title="/pt-BR/docs/Web/Reference/Events/slotchange">slotchange</a></code></dt>
+ <dd>Disparado em uma instância <a href="/pt-BR/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a> (elemento <a href="/pt-BR/docs/Web/HTML/Element/slot" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>&lt;slot&gt;</code></a>) quando há mudança no nó(s) contido naquele slot.</dd>
+</dl>
+
+<h2 id="Exemplos">Exemplos</h2>
+
+<p>Estamos construindo alguns exemplos em nosso repo do GitHub <a href="https://github.com/mdn/web-components-examples">web-components-examples</a>.<br>
+ Mais exemplos serão adicionados com o passar do tempo.</p>
+
+<h2 id="Especificações">Especificações</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Especificação</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comentário</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/scripting.html#the-template-element" hreflang="en" lang="en">HTML Living Standard<br><small lang="pt-BR">The definition of &apos;&lt;template&gt; element&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Padrão em tempo real</span></td>
+   <td>Definição de <a href="/pt-BR/docs/Web/HTML/Element/template" title="O  elemento HTML &lt;template&gt; é um mecanismo para encapsular um conteúdo do lado do cliente que não é renderizado quando a página é carregada, mas que pode ser instanciado posteriormente em tempo de execução usando JavaScript."><code>&lt;template&gt;</code></a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements" hreflang="en" lang="en">HTML Living Standard<br><small lang="pt-BR">The definition of &apos;custom elements&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Padrão em tempo real</span></td>
+   <td>Definição de <a href="/en-US/docs/Web/Web_Components/Using_custom_elements">Elementos HTML Customizados</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#shadow-trees" hreflang="en" lang="en">DOM<br><small lang="pt-BR">The definition of &apos;shadow trees&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Padrão em tempo real</span></td>
+   <td>Definição de <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/imports/" hreflang="en" lang="en" title="The &apos;HTML Imports&apos; specification">HTML Imports</a></td>
+   <td><span class="spec-WD">Rascunho atual</span></td>
+   <td>Definição inicial de <a href="/en-US/docs/Web/Web_Components/HTML_Imports">HTML Imports</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/shadow/" hreflang="en" lang="en" title="The &apos;Shadow DOM&apos; specification">Shadow DOM</a></td>
+   <td><span class="spec-Obsolete">Obsoleto</span></td>
+   <td>Definição inicial de <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a>.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidade_entre_navegadores">Compatibilidade entre navegadores</h2>
+
+<p>Em geral:</p>
+
+<ul>
+ <li>Web components são suportados por padrão pelo Firefox (versão 63), Chrome, e Opera.</li>
+ <li>Safari suporta muitas das funcionalidades de web component, porém menos do que os navegadores citados acima.</li>
+ <li>Edge está trabalhando na implementação.</li>
+</ul>
+
+<p>Para obter informações detalhadas sobre o suporte de funções específicas nos navegadores, você deve consultar as páginas de referência listadas abaixo.</p>
+
+<h2 id="Veja_também">Veja também</h2>
+
+<ul>
+ <li><a href="https://www.webcomponents.org/">webcomponents.org</a> — site apresentando exemplos de web components, tutoriais e outras informações.</li>
+ <li><a href="https://fast.design/" rel="noopener">FAST</a> é uma biblioteca de web component construída pela Microsoft que oferece vários pacotes para potencializar dependendo das necessidades do seu projeto. <a href="https://github.com/microsoft/fast/tree/master/packages/web-components/fast-element" rel="noopener">Fast Element</a> é um meio fácil de criar Web Components de alto desempenho, com eficiência de memória e em conformidade com os padrões. <a href="https://github.com/microsoft/fast/tree/master/packages/web-components/fast-foundation" rel="noopener">Fast Foundation</a> é uma biblioteca de classes, modelos e outros utilitários de Web Components criados em elementos rápidos destinados a serem compostos em Web Components registrados.</li>
+ <li><a href="https://github.com/hybridsjs/hybrids">Hybrids</a> — Biblioteca web components de código aberto, que favorece objetos simples e funções puras em vez de <code>class</code> e <font face="consolas, Liberation Mono, courier, monospace"><span>this</span></font> sintaxe. Ele fornece uma API simples e funcional para a criação de elementos personalizados.</li>
+ <li><a href="https://www.polymer-project.org/">Polymer</a> — Framework de web components do Google - um conjunto de polyfills, melhorias e exemplos. Atualmente, a maneira mais fácil de usar os web components em vários navegadores.</li>
+ <li><a href="https://github.com/devpunks/snuggsi#readme">Snuggsi</a> — Web Components fáceis com ~1kB <em>Incluindo polyfill</em> — Tudo que você precisa é um navegador e um conhecimento básico de HTML, CSS e classes JavaScript para ser produtivo.</li>
+ <li><a href="https://github.com/slimjs/slim.js">Slim.js</a> — Biblioteca web components de código aberto - uma biblioteca de alto desempenho para criação rápida e fácil de componentes; extensível e plugável e compatível com cross-framework.</li>
+ <li><a href="https://stenciljs.com/">Stencil</a> — Conjunto de ferramentas para a construção de sistemas de design reutilizáveis e escalonáveis em web components.</li>
+</ul>
+
+<div id="gtx-trans" style="position: absolute; left: 155px; top: 1512px;">
+<div class="gtx-trans-icon"></div>
+</div>

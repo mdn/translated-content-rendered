@@ -1,0 +1,115 @@
+---
+title: Using CSS counters
+slug: Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
+translation_of: Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-BR/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/pt-BR/docs/Web/CSS/Reference">CSS Reference</a></strong></li><li><strong><a href="/pt-BR/docs/Web/CSS/CSS_Lists_and_Counters">CSS Lists and Counters</a></strong></li><li class="toggle"><details open><summary>Guias</summary><ol><li><a href="/pt-BR/docs/Web/CSS/CSS_Lists_and_Counters/Consistent_list_indentation">Consistent list indentation</a> <a href="/pt-BR/docs/Web/CSS/CSS_Lists_and_Counters/Consistent_list_indentation$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><em>Using CSS counters</em></li></ol></details></li><li class="toggle"><details open><summary>Propriedades</summary><ol><li><a href="/pt-BR/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a> <a href="/pt-BR/docs/Web/CSS/custom-ident$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/CSS/list-style"><code>list-style</code></a> <a href="/pt-BR/docs/Web/CSS/list-style$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/CSS/list-style-image"><code>list-style-image</code></a> <a href="/pt-BR/docs/Web/CSS/list-style-image$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/CSS/list-style-position"><code>list-style-position</code></a> <a href="/pt-BR/docs/Web/CSS/list-style-position$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/CSS/list-style-type"><code>list-style-type</code></a> <a href="/pt-BR/docs/Web/CSS/list-style-type$translate" style="opacity: 0.5;">[Traduzir]</a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary">Contadores CSS são em essência, as variáveis mantidas pelo CSS cujos valores podem ser incrementado por regras do CSS para controlar quantas vezes eles são usados.Isso permite ajustar a aparência do conteúdo com base na sua colocação no documento.</span> contadores CSS são uma implementação de <a class="external" href="http://www.w3.org/TR/CSS21/generate.html#counters">Contadores automáticos e numeração </a>em CSS 2.1.</p>
+
+<p>O valor de um contador é manipulado através da utilização de  <a href="/pt-BR/docs/Web/CSS/counter-reset" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>counter-reset</code></a>. <a href="/pt-BR/docs/Web/CSS/counter-increment" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>counter-increment</code></a> pode ser exibido em uma página usando o <code>counter()</code> ou <code>counters()</code> função da propriedade de <code><a href="/en-US/docs/CSS/content" title="CSS/content">conteúdo</a></code>.</p>
+
+<h2 id="Using_counters" name="Using_counters">Usando contadores</h2>
+
+<p>Para usar um contador, tem quer definir um valor para ele (ele é 0 default). Para adicionar o valor do contador em um elemento, use a função <code>counter()</code>. O CSS abaixo adiciona &quot;Section [o valor do contador]:&quot; no início de cada elemento h3.</p>
+
+<pre class="brush: css notranslate">body {
+  counter-reset: section;                   /* Set the section counter to 0 */
+}
+h3::before {
+  counter-increment: section;               /* Increment the section counter*/
+  content: &quot;Section&quot; counter(section) &quot;: &quot;; /* Display the counter */
+}
+</pre>
+
+<p>Exemplo:</p>
+
+<pre class="brush: html notranslate">&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;h3&gt;Body&lt;/h3&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="200" id="frame_Using_counters" src="https://mdn.mozillademos.org/pt-BR/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters$samples/Using_counters?revision=1640694" width="300"></iframe></p>
+
+<h2 id="Nesting_counters" name="Nesting_counters">Nesting counters</h2>
+
+<p>Um contador CSS pode ser especialmente útil para fazer listas descritas porque uma nova instância de um contador CSS é criado automaticamente em elementos filho . Usando a função <code>counters()</code>, uma corda pode ser inserido entre diferentes níveis de contadores aninhados. Por exemplo, esta CSS :</p>
+
+<pre class="brush: css notranslate">ol {
+  counter-reset: section;                /* Creates a new instance of the
+                                            section counter with each ol
+                                            element */
+  list-style-type: none;
+}
+li::before {
+  counter-increment: section;            /* Increments only this instance
+                                            of the section counter */
+  content: counters(section,&quot;.&quot;) &quot; &quot;;    /* Adds the value of all instances
+                                            of the section counter separated
+                                            by a &quot;.&quot;. */
+                                         /* if you need to support &lt; IE8 then
+                                            make sure there is no space after
+                                            the &apos;,&apos; */
+}
+</pre>
+
+<p>Combinado com o seguinte HTML:</p>
+
+<pre class="brush: html notranslate">&lt;ol&gt;
+  &lt;li&gt;item&lt;/li&gt;          &lt;!-- 1     --&gt;
+  &lt;li&gt;item               &lt;!-- 2     --&gt;
+    &lt;ol&gt;
+      &lt;li&gt;item&lt;/li&gt;      &lt;!-- 2.1   --&gt;
+      &lt;li&gt;item&lt;/li&gt;      &lt;!-- 2.2   --&gt;
+      &lt;li&gt;item           &lt;!-- 2.3   --&gt;
+        &lt;ol&gt;
+          &lt;li&gt;item&lt;/li&gt;  &lt;!-- 2.3.1 --&gt;
+          &lt;li&gt;item&lt;/li&gt;  &lt;!-- 2.3.2 --&gt;
+        &lt;/ol&gt;
+        &lt;ol&gt;
+          &lt;li&gt;item&lt;/li&gt;  &lt;!-- 2.3.1 --&gt;
+          &lt;li&gt;item&lt;/li&gt;  &lt;!-- 2.3.2 --&gt;
+          &lt;li&gt;item&lt;/li&gt;  &lt;!-- 2.3.3 --&gt;
+        &lt;/ol&gt;
+      &lt;/li&gt;
+      &lt;li&gt;item&lt;/li&gt;      &lt;!-- 2.4   --&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;item&lt;/li&gt;          &lt;!-- 3     --&gt;
+  &lt;li&gt;item&lt;/li&gt;          &lt;!-- 4     --&gt;
+&lt;/ol&gt;
+&lt;ol&gt;
+  &lt;li&gt;item&lt;/li&gt;          &lt;!-- 1     --&gt;
+  &lt;li&gt;item&lt;/li&gt;          &lt;!-- 2     --&gt;
+&lt;/ol&gt;</pre>
+
+<p>Produz este resultado:</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="100%" id="frame_Nesting_counters" src="https://mdn.mozillademos.org/pt-BR/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters$samples/Nesting_counters?revision=1640694" width="400"></iframe></p>
+
+<h2 id="Specifications" name="Specifications">Especificações</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS2/generate.html#generate.html#counters" hreflang="en" lang="en">CSS Level 2 (Revision 1)<br><small lang="pt-BR">The definition of &apos;counter-reset&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recomendação</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="See_also" name="See_also">Veja mais</h2>
+
+<ul>
+ <li><a href="/en-US/docs/CSS/counter-reset" title="CSS/counter-reset">counter-reset</a></li>
+ <li><a href="/en-US/docs/CSS/counter-increment" title="CSS/counter-increment">counter-increment</a></li>
+</ul>
+
+<p><em>There is an additional example available at <a class="external" href="http://www.mezzoblue.com/archives/2006/11/01/counter_intu/" rel="freelink">http://www.mezzoblue.com/archives/20.../counter_intu/</a>. This blog entry was posted on November 01, 2006, but appears to be accurate.</em></p>

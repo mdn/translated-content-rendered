@@ -1,0 +1,361 @@
+---
+title: Exemplo de Composição
+slug: Web/Guide/HTML/Canvas_tutorial/Compositing/Exemplo
+tags:
+  - Canvas
+  - Example
+  - HTML5
+  - Tutorial
+translation_of: Web/API/Canvas_API/Tutorial/Compositing/Example
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/pt-BR/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/pt-BR/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/pt-BR/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/pt-BR/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/pt-BR/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>Esse exemplo demonstra várias <a href="/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation">operações de composição</a>. A saída se parece assim:</p>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-BR/docs/Web/Guide/HTML/Canvas_tutorial/Compositing/Exemplo$samples/Exemplo_de_composi%C3%A7%C3%A3o?revision=1370625" id="frame_Exemplo_de_composição" class="live-sample-frame sample-code-frame" height="7240px" frameborder="0"></iframe></p>
+
+<h2 id="Exemplo_de_composição">Exemplo de composição</h2>
+
+<p><span lang="pt" id="result_box"><span>Este código configura os valores globais usados pelo restante do programa.</span></span></p>
+
+<pre class="brush: js">var canvas1 = document.createElement(&quot;canvas&quot;);
+var canvas2 = document.createElement(&quot;canvas&quot;);
+var gco = [ &apos;Source-over&apos;,&apos;Source-in&apos;,&apos;Source-out&apos;,&apos;Source-atop&apos;,
+            &apos;Destination-over&apos;,&apos;Destination-in&apos;,&apos;Destination-out&apos;,&apos;Destination-atop&apos;,
+            &apos;Lighter&apos;, &apos;Copy&apos;,&apos;XOR&apos;, &apos;Multiply&apos;, &apos;Screen&apos;, &apos;Overlay&apos;, &apos;Darken&apos;,
+            &apos;Lighten&apos;, &apos;Color-dodge&apos;, &apos;Color-burn&apos;, &apos;Hard-light&apos;, &apos;Soft-light&apos;,
+            &apos;Difference&apos;, &apos;Exclusion&apos;, &apos;HUE&apos;, &apos;Saturation&apos;, &apos;Color&apos;, &apos;Luminosity&apos;
+          ].reverse();
+var gcoText = [
+&apos;<span lang="pt" id="result_box"><span>Essa é a configuração padrão e desenha novas formas sobre o conteúdo da tela (canvas) existente</span></span>.&apos;,
+&apos;<span lang="pt" id="result_box"><span class="alt-edited">A nova forma é desenhada apenas onde a nova forma e a tela (canvas) de destino se sobrepõem.</span> <span class="alt-edited">Todo o resto é transparente.</span></span> &apos;,
+&apos;A nova forma é desenhada onde ela não sobrepõe o conteúdo da tela (canvas) existente.&apos;,
+&apos;A nova forma é somente desenahda onde ela sobrepõe o conteúdo da tela (canvas) existente.&apos;,
+&apos;Novas formas são desenhadas por trás do conteúdo da tela (canvas) existente.&apos;,
+&apos;O conteúdo da tela (canvas) existente é mantido onde ambos, a nova forma e o conteúdo da tela (canvas) existente, se sobrepõe. Todo o resto é transparente.&apos;,
+&apos;O conteúdo existente é mantido onde ele não sobrepõe a nova forma.&apos;,
+&apos;A tela (canvas) existente só é mantida onde ela sobrepõe a nova forma. A nova forma é desenahda por trás do conteúdo canvas.&apos;,
+&apos;Onde ambas formas se sebrepõem a cor é determinada adicionando seus respectivos valores de cores.&apos;,
+&apos;Somente a nova forma é mostrada.&apos;,
+&apos;Formas são feitas transparentes onde ambos se sobrepõem e todo o resto é desenhado normalmente.&apos;,
+&apos;<span lang="pt" id="result_box"><span>Os pixels da camada superior são multiplicados pelo pixel correspondente da camada inferior.</span> <span>Uma imagem mais escura é o resultado.</span></span> &apos;,
+&apos;<span lang="pt" id="result_box"><span>Os pixels são invertidos, multiplicados e invertidos novamente.</span> <span>Uma imagem mais clara é o resultado (oposto de multiplicar)</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Uma combinação de multiplicação e tela.</span> <span>As partes escuras na camada base tornam-se mais escuras e as partes claras tornam-se mais claras.</span></span>&apos;,
+&apos;Mantêm os pixels mais escuro de ambas camadas.&apos;,
+&apos;Mantêm os pixels mais claro de ambas camadas.&apos;,
+&apos;<span lang="pt" id="result_box"><span>Divide a camada inferior pela camada superior invertida.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Divide a camada inferior invertida pela camada superior e, em seguida, inverte o resultado.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Uma combinação de multiplicação e tela como sobreposição, mas com a camada superior e inferior trocada.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Uma versão mais suave da luz.</span> <span>Preto ou branco puro não resulta em preto ou branco puro.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Subtrai a camada inferior da camada superior ou vice-versa para obter sempre um valor positivo.</span></span>&apos;,
+&apos;<span lang="pt" class="short_text" id="result_box"><span>Como diferença, mas com menor contraste.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Preserva o luma e o croma da camada inferior, enquanto adota a tonalidade da camada superior.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Preserva o luma e a tonalidade da camada inferior, enquanto adota o croma da camada superior.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Preserva a luma da camada inferior, enquanto adota a tonalidade e o croma da camada superior.</span></span>&apos;,
+&apos;<span lang="pt" id="result_box"><span>Preserva a tonalidade e o croma da camada inferior, enquanto adota a luma da camada superior.</span></span>&apos;
+          ].reverse();
+var width = 320;
+var height = 340;</pre>
+
+<h3 id="Programa_principal">Programa principal</h3>
+
+<p><span lang="pt" id="result_box"><span>Quando a página é carregada, esse código é executado para configurar e executar o exemplo:</span></span></p>
+
+<pre class="brush: js">window.onload = function() {
+    // lum em sRGB
+    var lum = {
+        r: 0.33,
+        g: 0.33,
+        b: 0.33
+    };
+    // redimensiona canvas
+    canvas1.width = width;
+    canvas1.height = height;
+    canvas2.width = width;
+    canvas2.height = height;
+    lightMix();
+    colorSphere();
+    runComposite();
+    return;
+};
+</pre>
+
+<p><span lang="pt" id="result_box"><span>E esse código, <code>runComposite ()</code>, manipula a maior parte do trabalho, contando com várias funções utilitárias para fazer as partes difíceis.</span></span></p>
+
+<pre class="brush: js">function createCanvas() {
+    var canvas = document.createElement(&quot;canvas&quot;);
+    canvas.style.background = &quot;url(&quot;+op_8x8.data+&quot;)&quot;;
+    canvas.style.border = &quot;1px solid #000&quot;;
+    canvas.style.margin = &quot;5px&quot;;
+    canvas.width = width/2;
+    canvas.height = height/2;
+    return canvas;
+}
+
+function runComposite() {
+    var dl = document.createElement(&quot;dl&quot;);
+    document.body.appendChild(dl);
+    while(gco.length) {
+        var pop = gco.pop();
+        var dt = document.createElement(&quot;dt&quot;);
+        dt.textContent = pop;
+        dl.appendChild(dt);
+        var dd = document.createElement(&quot;dd&quot;);
+        var p = document.createElement(&quot;p&quot;);
+        p.textContent = gcoText.pop();
+        dd.appendChild(p);
+
+        var canvasToDrawOn = createCanvas();
+        var canvasToDrawFrom = createCanvas();
+        var canvasToDrawResult = createCanvas();
+
+        var ctx = canvasToDrawResult.getContext(&apos;2d&apos;);
+        ctx.clearRect(0, 0, width, height)
+        ctx.save();
+        ctx.drawImage(canvas1, 0, 0, width/2, height/2);
+        ctx.globalCompositeOperation = pop;
+        ctx.drawImage(canvas2, 0, 0, width/2, height/2);
+        ctx.globalCompositeOperation = &quot;source-over&quot;;
+        ctx.fillStyle = &quot;rgba(0,0,0,0.8)&quot;;
+        ctx.fillRect(0, height/2 - 20, width/2, 20);
+        ctx.fillStyle = &quot;#FFF&quot;;
+        ctx.font = &quot;14px arial&quot;;
+        ctx.fillText(pop, 5, height/2 - 5);
+        ctx.restore();
+
+        var ctx = canvasToDrawOn.getContext(&apos;2d&apos;);
+        ctx.clearRect(0, 0, width, height)
+        ctx.save();
+        ctx.drawImage(canvas1, 0, 0, width/2, height/2);
+        ctx.fillStyle = &quot;rgba(0,0,0,0.8)&quot;;
+        ctx.fillRect(0, height/2 - 20, width/2, 20);
+        ctx.fillStyle = &quot;#FFF&quot;;
+        ctx.font = &quot;14px arial&quot;;
+        ctx.fillText(&apos;Conteúdo existente&apos;, 5, height/2 - 5);
+        ctx.restore();
+
+        var ctx = canvasToDrawFrom.getContext(&apos;2d&apos;);
+        ctx.clearRect(0, 0, width, height)
+        ctx.save();
+        ctx.drawImage(canvas2, 0, 0, width/2, height/2);
+        ctx.fillStyle = &quot;rgba(0,0,0,0.8)&quot;;
+        ctx.fillRect(0, height/2 - 20, width/2, 20);
+        ctx.fillStyle = &quot;#FFF&quot;;
+        ctx.font = &quot;14px arial&quot;;
+        ctx.fillText(&apos;Novo conteúdo&apos;, 5, height/2 - 5);
+        ctx.restore();
+
+        dd.appendChild(canvasToDrawOn);
+        dd.appendChild(canvasToDrawFrom);
+        dd.appendChild(canvasToDrawResult);
+
+        dl.appendChild(dd);
+    }
+};
+</pre>
+
+<h3 id="Funções_Utilitárias">Funções Utilitárias</h3>
+
+<p><span lang="pt" id="result_box"><span>O programa depende de várias funções utilitárias.</span></span></p>
+
+<pre class="brush: js">var lightMix = function() {
+    var ctx = canvas2.getContext(&quot;2d&quot;);
+    ctx.save();
+    ctx.globalCompositeOperation = &quot;lighter&quot;;
+    ctx.beginPath();
+    ctx.fillStyle = &quot;rgba(255,0,0,1)&quot;;
+    ctx.arc(100, 200, 100, Math.PI*2, 0, false);
+    ctx.fill()
+    ctx.beginPath();
+    ctx.fillStyle = &quot;rgba(0,0,255,1)&quot;;
+    ctx.arc(220, 200, 100, Math.PI*2, 0, false);
+    ctx.fill()
+    ctx.beginPath();
+    ctx.fillStyle = &quot;rgba(0,255,0,1)&quot;;
+    ctx.arc(160, 100, 100, Math.PI*2, 0, false);
+    ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+    ctx.fillStyle = &quot;#f00&quot;;
+    ctx.fillRect(0,0,30,30)
+    ctx.fill();
+};
+</pre>
+
+<pre class="brush: js">var colorSphere = function(element) {
+    var ctx = canvas1.getContext(&quot;2d&quot;);
+    var width = 360;
+    var halfWidth = width / 2;
+    var rotate = (1 / 360) * Math.PI * 2; // per degree
+    var offset = 0; // scrollbar offset
+    var oleft = -20;
+    var otop = -20;
+    for (var n = 0; n &lt;= 359; n ++) {
+        var gradient = ctx.createLinearGradient(oleft + halfWidth, otop, oleft + halfWidth, otop + halfWidth);
+        var color = Color.HSV_RGB({ H: (n + 300) % 360, S: 100, V: 100 });
+        gradient.addColorStop(0, &quot;rgba(0,0,0,0)&quot;);
+        gradient.addColorStop(0.7, &quot;rgba(&quot;+color.R+&quot;,&quot;+color.G+&quot;,&quot;+color.B+&quot;,1)&quot;);
+        gradient.addColorStop(1, &quot;rgba(255,255,255,1)&quot;);
+        ctx.beginPath();
+        ctx.moveTo(oleft + halfWidth, otop);
+        ctx.lineTo(oleft + halfWidth, otop + halfWidth);
+        ctx.lineTo(oleft + halfWidth + 6, otop);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        ctx.translate(oleft + halfWidth, otop + halfWidth);
+        ctx.rotate(rotate);
+        ctx.translate(-(oleft + halfWidth), -(otop + halfWidth));
+    }
+    ctx.beginPath();
+    ctx.fillStyle = &quot;#00f&quot;;
+    ctx.fillRect(15,15,30,30)
+    ctx.fill();
+    return ctx.canvas;
+};
+</pre>
+
+<pre class="brush: js">// HSV (1978) = H: Hue (tom)
+//              S: Saturation (Saturação)
+//              V: Value (Valor)
+Color = {};
+Color.HSV_RGB = function (o) {
+    var H = o.H / 360,
+        S = o.S / 100,
+        V = o.V / 100,
+        R, G, B;
+    var A, B, C, D;
+    if (S == 0) {
+        R = G = B = Math.round(V * 255);
+    } else {
+        if (H &gt;= 1) H = 0;
+        H = 6 * H;
+        D = H - Math.floor(H);
+        A = Math.round(255 * V * (1 - S));
+        B = Math.round(255 * V * (1 - (S * D)));
+        C = Math.round(255 * V * (1 - (S * (1 - D))));
+        V = Math.round(255 * V);
+        switch (Math.floor(H)) {
+            case 0:
+                R = V;
+                G = C;
+                B = A;
+                break;
+            case 1:
+                R = B;
+                G = V;
+                B = A;
+                break;
+            case 2:
+                R = A;
+                G = V;
+                B = C;
+                break;
+            case 3:
+                R = A;
+                G = B;
+                B = V;
+                break;
+            case 4:
+                R = C;
+                G = A;
+                B = V;
+                break;
+            case 5:
+                R = V;
+                G = A;
+                B = B;
+                break;
+        }
+    }
+    return {
+        R: R,
+        G: G,
+        B: B
+    };
+};
+
+var createInterlace = function (size, color1, color2) {
+    var proto = document.createElement(&quot;canvas&quot;).getContext(&quot;2d&quot;);
+    proto.canvas.width = size * 2;
+    proto.canvas.height = size * 2;
+    proto.fillStyle = color1; // top-left
+    proto.fillRect(0, 0, size, size);
+    proto.fillStyle = color2; // top-right
+    proto.fillRect(size, 0, size, size);
+    proto.fillStyle = color2; // bottom-left
+    proto.fillRect(0, size, size, size);
+    proto.fillStyle = color1; // bottom-right
+    proto.fillRect(size, size, size, size);
+    var pattern = proto.createPattern(proto.canvas, &quot;repeat&quot;);
+    pattern.data = proto.canvas.toDataURL();
+    return pattern;
+};
+
+var op_8x8 = createInterlace(8, &quot;#FFF&quot;, &quot;#eee&quot;);</pre>

@@ -1,0 +1,91 @@
+---
+title: Arrastar e soltar arquivos
+slug: DragDrop/Drag_and_Drop/Arrastar_e_soltar_arquivos
+translation_of: Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></strong></li><li class="toggle"><details open><summary>Guias</summary><ol><li><a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop">File drag and drop</a> <a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations">Drag Operations</a> <a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items">Dragging and Dropping Multiple Items</a> <a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/Guide/HTML/Tipos_de_Drag_recomendados">Tipos de Drag recomendados</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/pt-BR/docs/Web/API/DataTransfer"><code>DataTransfer</code></a></li><li><a href="/pt-BR/docs/Web/API/DataTransferItem"><code>DataTransferItem</code></a></li><li><a href="/pt-BR/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a></li><li><a href="/pt-BR/docs/Web/API/DragEvent"><code>DragEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>Eventos</summary><ol><li><a href="/pt-BR/docs/Web/API/HTMLElement/drag_event"><code>HTMLElement</code>: <code>drag</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragend_event"><code>HTMLElement</code>: <code>dragend</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragenter_event"><code>HTMLElement</code>: <code>dragenter</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragexit_event"><code>HTMLElement</code>: <code>dragexit</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragleave_event"><code>HTMLElement</code>: <code>dragleave</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragover_event"><code>HTMLElement</code>: <code>dragover</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/dragstart_event"><code>HTMLElement</code>: <code>dragstart</code></a></li><li><a href="/pt-BR/docs/Web/API/HTMLElement/drop_event"><code>HTMLElement</code>: <code>drop</code></a></li></ol></details></li></ol></section>
+
+<p>As interfaces HTML Drag and Drop permitem que os aplicativos da Web arrastem e soltem arquivos em uma página da Web. Este documento descreve como um aplicativo pode aceitar um ou mais arquivos que são arrastados do <em>gerenciador de arquivos da plataforma subjacente</em> e soltado s em uma página da Web.</p>
+
+<p>Os principais passos para o drag and drop é definir a <em>drop zone</em> (ou seja  definir um elemento para a queda dos arquivos) e definir  event handlers para os eventos <code><a href="/pt-BR/docs/Web/Reference/Events/drop" title="/pt-BR/docs/Web/Reference/Events/drop">drop</a></code> e <code><a href="/pt-BR/docs/Web/Reference/Events/dragover" title="/pt-BR/docs/Web/Reference/Events/dragover">dragover</a></code> . Essas etapas são descritas abaixo, incluindo exemplos de trechos de código. O codigo fonte esta disponivel em <a href="https://github.com/mdn/dom-examples/tree/master/drag-and-drop">MDN&apos;s drag-and-drop repository</a> (pull requests e/ou issues são bem-vindas).</p>
+
+<p class="note">Nota: <a href="/pt-BR/docs/Web/API/HTML_Drag_and_Drop_API"><code>HTML drag and drop</code></a>Define duas APIs diferentes para suportar arrastar e soltar arquivos. Uma API é a interface <a href="/pt-BR/docs/Web/API/DataTransfer"><code>DataTransfer</code></a> e a segunda API é a interface <a href="/pt-BR/docs/Web/API/DataTransferItem"><code>DataTransferItem</code></a> e <a href="/pt-BR/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a>. Este exemplo ilustra o uso de ambas as APIs (e não usa nehuma interface específica do Gecko).</p>
+
+<h2 id="Definindo_a_drop_zone">Definindo a drop <em>zone</em></h2>
+
+<p>O elemento de destino do evento <code><a href="/pt-BR/docs/Web/Reference/Events/drop" title="/pt-BR/docs/Web/Reference/Events/drop">drop</a></code> precisa de um event handler global  <a href="/pt-BR/docs/Web/API/GlobalEventHandlers/ondrop"><code>ondrop</code></a> O seguinte trecho de código mostra como isso é feito com um elemento: <a href="/pt-BR/docs/Web/HTML/Element/div" title="O elemento de divisão HTML &lt;div&gt; é um container genérico para conteúdo de fluxo, que de certa forma não representa nada. Ele pode ser utilizado para agrupar elementos para fins de estilos (usando class ou id), ou porque eles compartilham valores de atributos, como lang. Ele deve ser utilizado somente quando não tiver outro elemento de semântica (tal como &lt;article&gt; ou &lt;nav&gt;)."><code>&lt;div&gt;</code></a></p>
+
+<pre class="brush: html">&lt;div id=&quot;drop_zone&quot; ondrop=&quot;dropHandler(event);&quot;&gt;
+  &lt;p&gt;Drag one or more files to this Drop Zone ...&lt;/p&gt;
+&lt;/div&gt;</pre>
+
+<p>Normalmente, um aplicativo inclui um event handler <code><a href="/pt-BR/docs/Web/Reference/Events/dragover" title="/pt-BR/docs/Web/Reference/Events/dragover">dragover</a></code> no elemento de destino do drop e esse manipulador desativará o comportamento de arraste padrão do navegador. Para adicionar esse handler, você precisa incluir um event handler global <a href="/pt-BR/docs/Web/API/GlobalEventHandlers/ondragover"><code>ondragover</code></a>:</p>
+
+<pre class="brush: html">&lt;div id=&quot;drop_zone&quot; ondrop=&quot;dropHandler(event);&quot; ondragover=&quot;dragOverHandler(event);&quot;&gt;
+  &lt;p&gt;Drag one or more files to this Drop Zone ...&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Por fim, um aplicativo pode querer estilizar o elemento da drop zone para indicar visualmente que o elemento é uma drop zone. Neste exemplo, o elemento da drop zone usa o seguinte estilo:</p>
+
+<pre class="brush: css">#drop_zone {
+  border: 5px solid blue;
+  width:  200px;
+  height: 100px;
+}
+</pre>
+
+<div class="note">
+<p>Nota: Observe que os eventos <code>dragstart</code> e <code>dragend</code> não são acionados ao arrastar um arquivo para o navegador do OS.</p>
+</div>
+
+<h2 id="Processo_de_drop">Processo de drop</h2>
+
+<p>O evento <code><a href="/pt-BR/docs/Web/Reference/Events/drop" title="/pt-BR/docs/Web/Reference/Events/drop">drop</a></code> é acionado quando o usuário solta o(s) arquivo(s)  no drop handler, se o navegador suportar a interface <a href="/pt-BR/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a> o metodo <a href="/pt-BR/docs/Web/API/DataTransferItem/getAsFile"><code>getAsFile()</code></a> será usado para acessar cada arquivo; caso contrário, a interface <a href="/pt-BR/docs/Web/API/DataTransfer"><code>DataTransfer</code></a> usara a propriedade <a href="/pt-BR/docs/Web/API/DataTransfer/files"><code>files</code></a> para acessar cada arquivo.</p>
+
+<p>Este exemplo mostra como escrever o nome de cada arquivo arrastado,  no console. Em um aplicativo real, um aplicativo pode querer processar um arquivo usando o <a href="/pt-BR/docs/Web/API/File"><code>File API</code></a>.</p>
+
+<p>Observe que neste exemplo, Qualquer item de arrasto que não seja um arquivo é ignorado.</p>
+
+<pre class="brush: js">function dropHandler(ev) {
+  console.log(&apos;File(s) dropped&apos;);
+
+  // Impedir o comportamento padrão (impedir que o arquivo seja aberto)
+  ev.preventDefault();
+
+  if (ev.dataTransfer.items) {
+    // Use a interface DataTransferItemList para acessar o (s) arquivo (s)
+    for (var i = 0; i &lt; ev.dataTransfer.items.length; i++) {
+      // Se os itens soltos não forem arquivos, rejeite-os
+      if (ev.dataTransfer.items[i].kind === &apos;file&apos;) {
+        var file = ev.dataTransfer.items[i].getAsFile();
+        console.log(&apos;... file[&apos; + i + &apos;].name = &apos; + file.name);
+      }
+    }
+  } else {
+    // Use a interface DataTransfer para acessar o (s) arquivo (s)
+    for (var i = 0; i &lt; ev.dataTransfer.files.length; i++) {
+      console.log(&apos;... file[&apos; + i + &apos;].name = &apos; + ev.dataTransfer.files[i].name);
+    }
+  }
+}</pre>
+
+<h2 id="Impedir_o_evento_de_arrastar_padrão_do_navegador">Impedir o evento de arrastar padrão do navegador</h2>
+
+<p>O seguinte event handler <code><a href="/pt-BR/docs/Web/Reference/Events/dragover" title="/pt-BR/docs/Web/Reference/Events/dragover">dragover</a></code> chama <a href="/pt-BR/docs/Web/API/Event/preventDefault"><code>preventDefault()</code></a> para desativar o manipulador padrão de arrastar e soltar do navegador.</p>
+
+<pre class="brush: js">function dragOverHandler(ev) {
+  console.log(&apos;File(s) in drop zone&apos;);
+
+  // Impedir o comportamento padrão (impedir que o arquivo seja aberto)
+  ev.preventDefault();
+}
+</pre>
+
+<h2 id="See_also" name="See_also">Veja também</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></li>
+ <li><a class="internal" href="/Web/Guide/HTML/Drag_operations" title="Drag Operations">Drag Operations</a></li>
+ <li><a href="https://html.spec.whatwg.org/multipage/interaction.html#dnd" title="Drag and Drop Standard">HTML5 Living Standard: Drag and Drop</a></li>
+</ul>

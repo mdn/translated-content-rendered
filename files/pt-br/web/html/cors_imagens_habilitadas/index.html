@@ -1,0 +1,124 @@
+---
+title: CORS_habilitar_imagens
+slug: Web/HTML/CORS_imagens_habilitadas
+tags:
+  - CORS
+  - Canvas problems
+  - Crossorigin
+  - Segurança do Canvas
+translation_of: Web/HTML/CORS_enabled_image
+---
+<p><span class="seoSummary">The HTML specification introduces a <code><a href="/pt-BR/docs/Web/HTML/Element/img#attr-crossorigin">crossorigin</a></code> attribute for images that, in combination with an appropriate <a href="/pt-BR/docs/Glossary/CORS" class="glossaryLink" title="The definition of that term (CORS) has not been written yet; please consider contributing it!">CORS</a> header, allows images defined by the <a href="/pt-BR/docs/Web/HTML/Element/img" title="O elemento HTML &lt;img&gt;  (or HTML Image Element) representa a inserção de imagem no documento, sendo implementado também pelo HTML5 para uma melhor experiência com o elemento &lt;figure&gt; e &lt;figcaption&gt;."><code>&lt;img&gt;</code></a> element that are loaded from foreign origins to be used in canvas as if they were being loaded from the current origin.</span></p>
+
+<p>See <a href="/en/HTML/CORS_settings_attributes" title="CORS settings attributes">CORS settings attributes</a> for details on how the <code>crossorigin</code> attribute is used.</p>
+
+<h2 id="O_que_é_um_contaminado_canvas">O que é um &quot;contaminado&quot; canvas?</h2>
+
+<p>Embora você possa usar imagens sem aprovação do CORS em seu canvas, criando contaminação ao canvas. Uma vez o canvas tenhya sido &quot;contaminado&quot; você não pode mais &quot;puxar&quot; informações do canvas.Por exemplo, você pode não mais usar os métodos canvas toBlob(), toDataURL(), ou getImageData(), fazendo isto você irá lançar um erro de sergurança.</p>
+
+<p>Esta proteção de usuário tem tido dados expostos por uso de informações de imagens de site web remoto sem permissão.</p>
+
+<h2 id="Exemplo_Armazenando_uma_imagem_de_uma_origem_estrangeira">Exemplo: Armazenando uma imagem de uma origem estrangeira</h2>
+
+<p> </p>
+
+<p>Você precisa ter um servidor hospedando as imagenscom o apropriado Access-Control-Allow-Origin cabeçalho. Adicionando atributos crossOrigin faz uma requisição ao cabeçalho. Você pode usar este exemplo das <a href="https://github.com/h5bp/server-configs-apache/blob/fc379c45f52a09dd41279dbf4e60ae281110a5b0/src/.htaccess#L36-L53">Configurações Apache Server HTML5 Boilerplate</a> para aproximadamente responder com este cabeçalho de resposta.</p>
+
+<pre class="brush:xml">&lt;IfModule mod_setenvif.c&gt;
+    &lt;IfModule mod_headers.c&gt;
+        <span class="nt">&lt;FilesMatch</span> <span class="s">&quot;\.(cur|gif|ico|jpe?g|png|svgz?|webp)$&quot;</span><span class="nt">&gt;</span>
+            SetEnvIf Origin &quot;:&quot; IS_CORS
+            Header set Access-Control-Allow-Origin &quot;*&quot; env=IS_CORS
+        &lt;/FilesMatch&gt;
+    &lt;/IfModule&gt;
+&lt;/IfModule&gt;</pre>
+
+<p>Dado que está tudo classificado, você permiti salvar àquelas imagens no <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage">Armazenamento DOM</a></p>
+
+<pre class="brush: js">var img = new Image,
+    canvas = document.createElement(&quot;canvas&quot;),
+    ctx = canvas.getContext(&quot;2d&quot;),
+    src = &quot;http://example.com/image&quot;; // insert image url here
+
+img.crossOrigin = &quot;Anonymous&quot;;
+
+img.onload = function() {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage( img, 0, 0 );
+    localStorage.setItem( &quot;savedImageData&quot;, canvas.toDataURL(&quot;image/png&quot;) );
+}
+img.src = src;
+// make sure the load event fires for cached images too
+if ( img.complete || img.complete === undefined ) {
+    img.src = &quot;data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==&quot;;
+    img.src = src;
+}</pre>
+
+<h2 id="Compatiibilidade_do_Browser">Compatiibilidade do Browser</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Estamos convertendo nossos dados de compatibilidade para o formato JSON</a></strong>.
+            Esta tabela de compatibilidade ainda usa o formato antigo,
+            pois ainda não convertemos os dados que ela contém.
+            <strong><a href="/pt-BR/docs/MDN/Contribute/Structures/Compatibility_tables">Descubra como você pode ajudar!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Dispositivo móvel</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>13</td>
+   <td>8</td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Veja_também">Veja também</h2>
+
+<ul>
+ <li><a href="http://blog.chromium.org/2011/07/using-cross-domain-images-in-webgl-and.html">Usando imagens de Cross-domínio em WebGL e Chrome 13</a></li>
+ <li><a href="http://whatwg.org/html#attr-img-crossorigin">Especificações HTML - o atributo crossorigin</a></li>
+</ul>

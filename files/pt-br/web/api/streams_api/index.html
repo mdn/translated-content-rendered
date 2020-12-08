@@ -1,0 +1,159 @@
+---
+title: Streams API
+slug: Web/API/Streams_API
+tags:
+  - API
+  - Experimental
+  - Landing
+  - NeedsTranslation
+  - Reference
+  - Streams
+  - TopicStub
+translation_of: Web/API/Streams_API
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><strong>Esta é uma <a href="/pt-BR/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">tecnologia experimental</a></strong><br>Verifique a <a href="#Compatibilidade_de_navegadores">tabela de compatibilidade entre Navegadores</a> cuidadosamente antes de usar essa funcionalidade em produção.</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-BR/docs/Web/API/Streams_API">Streams API</a></strong></li><li><strong><a href="/pt-BR/docs/Web/API/Streams_API"><code>Streams_API</code></a></strong></li><li class="toggle"><details open><summary>Páginas relacionadas a Streams</summary><ol><li><a href="/pt-BR/docs/Web/API/Body/body"><code>Body.body</code></a></li><li><a href="/pt-BR/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></li><li><a href="/pt-BR/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></li><li><a href="/pt-BR/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></li><li><a href="/pt-BR/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li><li><a href="/pt-BR/docs/Web/API/WritableStream"><code>WritableStream</code></a></li><li><a href="/pt-BR/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></li><li><a href="/pt-BR/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></li></ol></details></li></ol></section></div>
+
+<div>A API Streams permite que o JavaScript acesse programaticamente fluxos de dados recebidos pela rede e os processe conforme desejado pelo desenvolvedor.</div>
+
+<p class="summary"></p>
+
+<h2 id="Conceitos_e_Uso">Conceitos e Uso</h2>
+
+
+
+<p>O streaming envolve a divisão de um recurso que você deseja receber pela rede em pequenos blocos e, em seguida, processa esses blocos aos poucos. Isso é algo que os navegadores fazem de qualquer maneira ao receber recursos para serem exibidos em páginas da web — o buffer de vídeos e mais está gradualmente disponível para reprodução, e às vezes você verá imagens sendo exibidas gradualmente conforme mais é carregado.</p>
+
+<p>Mas isto nunca esteve disponível para JavaScript antes. Anteriormente, se quiséssemos processar um recurso de algum tipo (seja ele um vídeo, ou um arquivo de texto, etc.), Teríamos que baixar o arquivo inteiro, espera até que seja desserializado em um formato adequado, então processa todo o lote após ser totalmente recebido.</p>
+
+<p>Com o Streams disponível para JavaScript, tudo isso muda - agora você pode começar a processar dados brutos com JavaScript bit a bit assim que estiverem disponíveis no lado do cliente, sem a necessidade de gerar um buffer, string ou blob.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/15817/Concept.png" style="display: block; height: 382px; margin: 0px auto; width: 1000px;"></p>
+
+
+
+<p>Também há mais vantagens - você pode detectar quando os fluxos começam ou terminam, encadeia os fluxos juntos, trata os erros e cancela os fluxos quando necessário e reage à velocidade em que o fluxo está sendo lido.</p>
+
+<p>O uso básico de Streams gira em torno de tornar as respostas disponíveis como streams. Por exemplo, a resposta <a href="/pt-BR/docs/Web/API/Body"><code>Body</code></a> retornada com sucesso de uma <a href="/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch request</a> pode ser exposta como um <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>, e você pode lê-lo usando um leitor criado com <a href="/pt-BR/docs/Web/API/ReadableStream/getReader"><code>ReadableStream.getReader()</code></a>, cancela-lo com <a href="/pt-BR/docs/Web/API/ReadableStream/cancel"><code>ReadableStream.cancel()</code></a>, etc.</p>
+
+
+
+<p>Usos mais complicados envolvem a criação de seu próprio fluxo usando o contrutor <a href="/pt-BR/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a>, por exemplo para processar dados dentro de um <a href="/en-US/docs/Web/API/Service_Worker_API">service worker</a>.</p>
+
+<p>Você também pode gravar dados em streams usando <a href="/pt-BR/docs/Web/API/WritableStream"><code>WritableStream</code></a>.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Você pode encontrar muito mais detalhes sobre a teoria e prática de streams em nossos artigos — <a href="/en-US/docs/Web/API/Streams_API/Concepts">Streams API concepts</a>, <a href="/en-US/docs/Web/API/Streams_API/Using_readable_streams">Using readable streams</a>, e <a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">Using writable streams</a>.</p>
+</div>
+
+<h2 id="Stream_interfaces">Stream interfaces</h2>
+
+<h3 id="Readable_streams">Readable streams</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></dt>
+ <dd>Represents a readable stream of data. It can be used to handle response streams of the <a href="/en-US/docs/Web/API/Fetch_API">Fetch API</a>, or developer-defined streams (e.g. a custom <a href="/pt-BR/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a> constructor).</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></dt>
+ <dd>Represents a default reader that can be used to read stream data supplied from a network (e.g. a fetch request).</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></dt>
+ <dd>Represents a controller allowing control of a <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>&apos;s state and internal queue. Default controllers are for streams that are not byte streams.</dd>
+</dl>
+
+<h3 id="Writable_streams">Writable streams</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/WritableStream"><code>WritableStream</code></a></dt>
+ <dd>Provides a standard abstraction for writing streaming data to a destination, known as a sink. This object comes with built-in backpressure and queuing.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></dt>
+ <dd>Represents a default writable stream writer that can be used to write chunks of data to a writable stream.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></dt>
+ <dd>Represents a controller allowing control of a <a href="/pt-BR/docs/Web/API/WritableStream"><code>WritableStream</code></a>&apos;s state. When constructing a <code>WritableStream</code>, the underlying sink is given a corresponding <code>WritableStreamDefaultController</code> instance to manipulate.</dd>
+</dl>
+
+<h3 id="Related_stream_APIs_and_operations">Related stream APIs and operations</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></dt>
+ <dd>Provides a built-in byte length queuing strategy that can be used when constructing streams.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></dt>
+ <dd>Provides a built-in chunk counting queuing strategy that can be used when constructing streams.</dd>
+</dl>
+
+<h3 id="Extensions_to_other_APIs">Extensions to other APIs</h3>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/Request"><code>Request</code></a></dt>
+ <dd>When a new <code>Request</code> object is constructed, you can pass it a <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> in the <code>body</code> property of its <code>RequestInit</code> dictionary.  This <code>Request</code> could then be passed to a <a href="/pt-BR/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a> to commence fetching the stream.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/Body"><code>Body</code></a></dt>
+ <dd>The response <a href="/pt-BR/docs/Web/API/Body"><code>Body</code></a> returned by a successful <a href="/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch">fetch request</a> is exposed by default as a <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>, and can have a reader attached to it, etc.</dd>
+</dl>
+
+<h3 id="ByteStream-related_interfaces">ByteStream-related interfaces</h3>
+
+<div class="warning notecard">
+<p><strong>Important</strong>: these are not implemented anywhere as yet, and questions have been raised as to whether the spec details are in a finished enough state for them to be implemented. This may change over time.</p>
+</div>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></dt>
+ <dd>Represents a BYOB (&quot;bring your own buffer&quot;) reader that can be used to read stream data supplied by the developer (e.g. a custom <a href="/pt-BR/docs/Web/API/ReadableStream/ReadableStream"><code>ReadableStream()</code></a> constructor).</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></dt>
+ <dd>Represents a controller allowing control of a <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a>&apos;s state and internal queue. Byte stream controllers are for byte streams.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></dt>
+ <dd>Represents a pull into request in a <a href="/pt-BR/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a>.</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>We have created a directory of examples to go along with the Streams API documentation — see <a href="https://github.com/mdn/dom-examples/tree/master/streams">mdn/dom-examples/streams</a>. The examples are as follows:</p>
+
+<ul>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-pump/">Simple stream pump</a>: This example shows how to consume a ReadableStream and pass its data to another.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/grayscale-png/">Grayscale a PNG</a>: This example shows how a ReadableStream of a PNG can be turned into grayscale.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-random-stream/">Simple random stream</a>: This example shows how to use a custom stream to generate random strings, enqueue them as chunks, and then read them back out again.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-tee-example/">Simple tee example</a>: This example extends the Simple random stream example, showing how a stream can be teed and both resulting streams can be read independently.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/simple-writer/">Simple writer</a>: This example shows how to to write to a writable stream, then decode the stream and write the contents to the UI.</li>
+ <li><a href="http://mdn.github.io/dom-examples/streams/png-transform-stream/">Unpack chunks of a PNG</a>: This example shows how <a href="https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/pipeThrough"><code>pipeThrough()</code></a> can be used to transform a ReadableStream into a stream of other data types by transforming a data of a PNG file into a stream of PNG chunks.</li>
+</ul>
+
+<p>Examples from other developers:</p>
+
+<ul>
+ <li><a href="https://fetch-progress.anthum.com/">Progress Indicators with Streams, Service Workers, &amp; Fetch</a>.</li>
+</ul>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://streams.spec.whatwg.org/" hreflang="en" lang="en" title="The &apos;Streams&apos; specification">Streams</a></td>
+   <td><span class="spec-Living">Padrão em tempo real</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<h3 id="WritableStream">WritableStream</h3>
+
+<div class="bc-data" id="bcd:api.WritableStream"></div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Concepts">Streams API concepts</a></li>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Using_readable_streams">Using readable streams</a></li>
+ <li><a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">Using writable streams</a></li>
+</ul>
