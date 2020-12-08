@@ -1,0 +1,261 @@
+---
+title: ממשק שירותי מיקום
+slug: Web/API/Geolocation/ממשק_שירותי_מיקום
+translation_of: Web/API/Geolocation_API
+---
+<p style="direction: rtl;">ממשק שירותי המיקום, geolocation API, מאפשר למשתמש לשתף את המיקום שלו עם אפליקציות ברשת. כדי להגן על הפרטיות, המשתמש נדרש להסכים לשתף את שירותי המיקום שלו.</p>
+<p style="direction: rtl;"><span style="font-size: 2.142857142857143rem; font-weight: 700; letter-spacing: -1px; line-height: 30px;">אובייקט ה- geolocation </span></p>
+<p style="direction: rtl;">ממשק שירותי המיקום נגיש באמצעות אובייקט:<span style="line-height: 1.5;"><a href="/he/docs/Web/API/Window/navigator/geolocation" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>navigator.geolocation</bdi></code></a> .</span></p>
+<p style="direction: rtl;">אם האובייקט קיים, ממשק שירותי המיקום נתמך: ניתן לבדוק אם ממשק שירותי המיקום נתמך באמצעות: </p>
+<pre class="brush: js">if (&quot;geolocation&quot; in navigator) {
+  /* הממשק נתמך*/
+} else {
+  /* הממשק אינו נתמך */
+}הערה
+</pre>
+<div class="note">
+ <p style="direction: rtl;"><strong>הערה:</strong> מגרסה מס&apos; 24 של FireFox ומטה, הפקודה geolocation&quot; in navigator&quot; מחזירה true אפילו אם הממשק אינו נתמך. באג זה תוקן ב<a href="/en-US/docs/Mozilla/Firefox/Releases/25/Site_Compatibility">גרסה 25 של FireFox</a> על מנת לעמוד בתקן. (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=884921" title="FIXED: Align navigator.geolocation with spec">bug 884921</a>).</p>
+</div>
+<h3 style="direction: rtl;" id="קבלת_המיקום_הנוכחי">קבלת המיקום הנוכחי</h3>
+<p dir="rtl">כדי לקבל את נתוני המיקום הנוכחי של המשתמש, ניתן לקרוא לפונקציה: <span style="line-height: 1.5;"> <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a>. הפונקציה יוצרת קריאה אסינכרונית על מנת לאחזר את המיקום של המשתמש ובודקת את החומרה על מנת לקבל את המיקום העדכני ביותר. כאשר נתוני המיקום חוזרים כתוצאה מהקריאה, פונקציית המטרה (באנגלית: callback) נקראת. אפשר להעביר לקריאה פרמטר נוסף, פרמטר שני: פונקציית מטרה לטיפול במיקרה של שגיאה. אפשר להעביר פרמטר שלישי לקריאה: אובייקט options שבו אפשר להגדיר מהו הוותק המכסימלי לערכי המיקום המוחזרים, משך הזמן המכסימלי להמתנה עד שנתוני המיקום יתקבלו ורמת הדיוק של נתוני המיקום. </span></p>
+<div class="note">
+ <p style="direction: rtl;"><strong>הערה</strong>: כברירת מחדל, הפונקציה<span style="line-height: 1.5;">, <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a> מנסה להחזיר את נתוני המיקום במהירות האפשרית, אך ברמת דיוק מינימלית. צורה זו שימושית אם רוצים לקבל את הנתונים במהירות הגבוהה האפשרית תוך התפשרות על רמת הדיוק. במכשירים עם מנגנון GPS משך הזמן לקבלת נתונים יכול לקחת דקה ויותר, לכן הפונקציה </span><span style="line-height: 1.5;"> <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a> יכולה לקבל בחזרה נתונים שיש בהם מידה מסוימת של שגיאה (אם המיקום חושב על בסיס כתובת IP על בסיס מיקום נקודת wifi).</span></p>
+</div>
+<pre class="brush: js">navigator.geolocation.getCurrentPosition(function(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+});</pre>
+<p style="direction: rtl;">הקוד בדוגמא שלעיל יגרום לפונקצייה, ()do_something, להתבצע כאשר נתוני המיקום חזרו.</p>
+<p> </p>
+<p style="direction: rtl;"><span style="font-size: 1.714285714285714rem; letter-spacing: -0.5px; line-height: 24px;">מעקב אחר המיקום הנוכחי</span></p>
+<p style="direction: rtl;"><span style="line-height: 1.5;">אם נתוני המיקום משתנים (בגלל שהדפדפן נמצא בתנועה, או אם הגיעו נתוני מיקום מדוייקים יותר), אפשר להגדיר פונקציית מטרה (באנגלית: callback), המקבלת נתוני מיקום מעודכנים יותר. עושים זאת באמצעות הפונקציה: </span><span style="line-height: 1.5;"><a href="/he/docs/Web/API/Window/navigator/geolocation/watchPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>watchPosition()</bdi></code></a> שיש לה את אותם פרמטרים כמו הפונקציה: </span><span style="line-height: 1.5;"> <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a>. פונקציית המטרה מתבצעת מס&apos; כלשהו של פעמים ומאפשרת לדפדפן לעדכן את המיקום של המשתמש תוך כדי תנועה, או לעדכן את מיקומו בנתונים מעודכנים יותר שהגיעו על ידי טכניקות זיהוי מיקום מדוייקות יותר. ניתן להגדיר פונקציית מטרה נוספת למקרה של שגיאה שתיקרא בכל פעם שתתרחש שגיאה כפי שקורה במיקרה של: </span><span style="line-height: 1.5;"> <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a>.</span></p>
+<div class="note">
+ <p style="direction: rtl;"><strong>הערה</strong>: ניתן להשתמש בפונקציה: <span style="line-height: 1.5;"><a href="/he/docs/Web/API/Window/navigator/geolocation/watchPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>watchPosition()</bdi></code></a> מבלי צורך לקרוא לפני כן לפונקציה: <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a> .</span></p>
+</div>
+<pre class="brush: js">var watchID = navigator.geolocation.watchPosition(function(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+});</pre>
+<p style="direction: rtl;">הפונקציה <span style="line-height: 1.5;"><a href="/he/docs/Web/API/Window/navigator/geolocation/watchPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>watchPosition()</bdi></code></a> מחזירה id שמזהה את הפונקציה שעוקבת אחר המיקום. ניתן לאחר מכן להשתמש בו כדי לקרוא לפונקציה </span><span style="line-height: 1.5;"> <a href="/he/docs/Web/API/Window/navigator/geolocation/clearWatch" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>clearWatch()</bdi></code></a> על מנת להפסיק את פעולת המעקב אחרי תנועת המשתמש.</span></p>
+<pre class="brush: js">navigator.geolocation.clearWatch(watchID);
+</pre>
+<h3 style="direction: rtl;" id="כיול_התוצאות">כיול התוצאות</h3>
+<p style="direction: rtl;">הן הפונקציה <a href="/he/docs/Web/API/Window/navigator/geolocation/getCurrentPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>getCurrentPosition()</bdi></code></a> והן הפונקציה <a href="/he/docs/Web/API/Window/navigator/geolocation/watchPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>watchPosition()</bdi></code></a> מקבלות פרמטר פונקציית מטרה למקרה הצלחה בקבלת נתונים, מקבלות פרמטר אופציונאלי למקרה של שגיאה בקבלת נתוני מיקום ופרמטר אופציונאלי שלישי: אובייקט <span style="line-height: 1.5;"> </span><code style="font-style: normal; line-height: 1.5;">PositionOptions</code><span style="line-height: 1.5;">.</span></p>
+<p></p>
+<p style="direction: rtl;">קריאה ל: <a href="/he/docs/Web/API/Window/navigator/geolocation/watchPosition" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>watchPosition</bdi></code></a> יכולה להיראות כך:</p>
+<pre class="brush: js">function geo_success(position) {
+  do_something(position.coords.latitude, position.coords.longitude);
+}
+
+function geo_error() {
+  alert(&quot;Sorry, no position available.&quot;);
+}
+
+var geo_options = {
+  enableHighAccuracy: true,
+  maximumAge        : 30000,
+  timeout           : 27000
+};
+
+var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);</pre>
+<p><a id="fck_paste_padding">A demo of watchPosition in use: </a><a href="http://www.thedotproduct.org/experiments/geo/" class="external">http://www.thedotproduct.org/experiments/geo/</a><br>
+ <a id="fck_paste_padding">﻿</a></p>
+<h2 style="direction: rtl;" id="נתוני_המיקום">נתוני המיקום</h2>
+<p style="direction: rtl;">המיקום של המשתמש הוא אובייקט <code>Position</code> שמכיל בתוכו אובייקט <code>Coordinates</code>.</p>
+<p><span style="line-height: 1.5;"></span></p>
+<p></p>
+<h2 style="direction: rtl;" id="טיפול_בשגיאות">טיפול בשגיאות</h2>
+<p style="direction: rtl;"><span style="font-size: 14px; font-weight: normal; line-height: 1.5;">פונקציית המטרה לטיפול בשגיאות נגישה גם בקריאה לפונקציה ()</span><code><span style="font-size: 14px; line-height: 1.5;"><font face="Courier New, Andale Mono, monospace">getCurrentPosition</font></span></code><span style="line-height: 1.5;"><code> </code>וגם בקריאה ל ()<code>watchPosition</code><strong><code>, </code></strong></span>ומקבלת כפרמטר ראשון אובייקט <code>PositionError</code>. </p>
+<pre class="brush: js">function errorCallback(error) {
+  alert(&apos;ERROR(&apos; + error.code + &apos;): &apos; + error.message);
+};
+</pre>
+<p></p>
+<h2 style="direction: rtl;" id="דוגמא_שלמה_לממשק_שירותי_מיקום">דוגמא שלמה לממשק שירותי מיקום</h2>
+<div class="hidden">
+ <pre class="brush: css">body {
+  padding: 20px;
+  background-color:#ffffc9
+}
+
+p { margin : 0; }
+</pre>
+</div>
+<h3 style="direction: rtl;" id="HTML">HTML: </h3>
+<pre class="brush: html;">&lt;p&gt;&lt;button onclick=&quot;geoFindMe()&quot;&gt;Show my location&lt;/button&gt;&lt;/p&gt;
+&lt;div id=&quot;out&quot;&gt;&lt;/div&gt;
+</pre>
+<h3 style="direction: rtl;" id="JavaScript">JavaScript:</h3>
+<pre class="brush: js;">function geoFindMe() {
+  var output = document.getElementById(&quot;out&quot;);
+
+  if (!navigator.geolocation){
+    output.innerHTML = &quot;&lt;p&gt;Geolocation is not supported by your browser&lt;/p&gt;&quot;;
+    return;
+  }
+
+  function success(position) {
+    var latitude  = position.coords.latitude;
+    var longitude = position.coords.longitude;
+
+    output.innerHTML = &apos;&lt;p&gt;Latitude is &apos; + latitude + &apos;° &lt;br&gt;Longitude is &apos; + longitude + &apos;°&lt;/p&gt;&apos;;
+
+    var img = new Image();
+    img.src = &quot;http://maps.googleapis.com/maps/api/staticmap?center=&quot; + latitude + &quot;,&quot; + longitude + &quot;&amp;zoom=13&amp;size=300x300&amp;sensor=false&quot;;
+
+    output.appendChild(img);
+  };
+
+  function error() {
+    output.innerHTML = &quot;Unable to retrieve your location&quot;;
+  };
+
+  output.innerHTML = &quot;&lt;p&gt;Locating…&lt;/p&gt;&quot;;
+
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+</pre>
+<h3 style="direction: rtl;" id="תוצאות_של_הדוגמא_לעיל">תוצאות של הדוגמא לעיל:</h3>
+<p><iframe src="https://mdn.mozillademos.org/he/docs/Web/API/Geolocation/%D7%9E%D7%9E%D7%A9%D7%A7_%D7%A9%D7%99%D7%A8%D7%95%D7%AA%D7%99_%D7%9E%D7%99%D7%A7%D7%95%D7%9D$samples/Geolocation_Live_Example?revision=653803" width="350" class="live-sample-frame sample-code-frame" height="410" frameborder="0" id="frame_Geolocation_Live_Example"></iframe></p>
+<h2 style="direction: rtl;" id="הצגת_הודעה_לבקשת_רשות">הצגת הודעה לבקשת רשות</h2>
+<p style="direction: rtl;">כל תוסף המשתייך ל addons.mozilla.org המשתמש בממשק שירותי המיקום חייב לקבל אישור מהמשתמש לגשת לממשק על ידי בקשת רשות מפורשת. הפונקציה הבאה תבקש אישור באופן שזהה לבקשת האישור המוצגת לדפים ברשת. הבחירה של המשתמש תישמר בהעדפות באמצעות פרמטר <code>pref </code>או הוא מאופשר. הפונקציה המוצבעת על ידי פרמטר <code>callback </code>תיקרא עם פרמטר בוליאני המציין את בחירת המשתמש. אם הערך <code>true </code>יש לתוסף הרשאה לגשת לנתוני המיקום. </p>
+<pre class="brush: js">function prompt(window, pref, message, callback) {
+    let branch = Components.classes[&quot;@mozilla.org/preferences-service;1&quot;]
+                           .getService(Components.interfaces.nsIPrefBranch);
+
+    if (branch.getPrefType(pref) === branch.PREF_STRING) {
+        switch (branch.getCharPref(pref)) {
+        case &quot;always&quot;:
+            return callback(true);
+        case &quot;never&quot;:
+            return callback(false);
+        }
+    }
+
+    let done = false;
+
+    function remember(value, result) {
+        return function() {
+            done = true;
+            branch.setCharPref(pref, value);
+            callback(result);
+        }
+    }
+
+    let self = window.PopupNotifications.show(
+        window.gBrowser.selectedBrowser,
+        &quot;geolocation&quot;,
+        message,
+        &quot;geo-notification-icon&quot;,
+        {
+            label: &quot;Share Location&quot;,
+            accessKey: &quot;S&quot;,
+            callback: function(notification) {
+                done = true;
+                callback(true);
+            }
+        }, [
+            {
+                label: &quot;Always Share&quot;,
+                accessKey: &quot;A&quot;,
+                callback: remember(&quot;always&quot;, true)
+            },
+            {
+                label: &quot;Never Share&quot;,
+                accessKey: &quot;N&quot;,
+                callback: remember(&quot;never&quot;, false)
+            }
+        ], {
+            eventCallback: function(event) {
+                if (event === &quot;dismissed&quot;) {
+                    if (!done) callback(false);
+                    done = true;
+                    window.PopupNotifications.remove(self);
+                }
+            },
+            persistWhileVisible: true
+        });
+}
+
+prompt(window,
+       &quot;extensions.foo-addon.allowGeolocation&quot;,
+       &quot;Foo Add-on wants to know your location.&quot;,
+       function callback(allowed) { alert(allowed); });
+</pre>
+<h2 id="תאימות_דפדפנים">תאימות דפדפנים</h2>
+<div>
+ <div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/he/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+<div>
+  </div>
+<div id="compat-desktop">
+ <table class="compat-table">
+  <tbody>
+   <tr>
+    <th>Feature</th>
+    <th>Chrome</th>
+    <th>Firefox (Gecko)</th>
+    <th>Internet Explorer</th>
+    <th>Opera</th>
+    <th>Safari</th>
+   </tr>
+   <tr>
+    <td>Basic support</td>
+    <td>5</td>
+    <td><a href="/en-US/Firefox/Releases/3.5" title="Released on 2009-06-30.">3.5</a> (1.9.1)</td>
+    <td>9</td>
+    <td>10.60<br>
+     Removed in 15.0<br>
+     Reintroduced in 16.0</td>
+    <td>5</td>
+   </tr>
+  </tbody>
+ </table>
+</div>
+<div id="compat-mobile">
+ <table class="compat-table">
+  <tbody>
+   <tr>
+    <th>Feature</th>
+    <th>Android</th>
+    <th>Chrome for Android</th>
+    <th>Firefox Mobile (Gecko)</th>
+    <th>Firefox OS</th>
+    <th>IE Mobile</th>
+    <th>Opera Mobile</th>
+    <th>Safari Mobile</th>
+   </tr>
+   <tr>
+    <td>Basic support</td>
+    <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+    <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+    <td>4.0 (4)</td>
+    <td>1.0.1</td>
+    <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+    <td>10.60<br>
+     Removed in 15.0<br>
+     Reintroduced in 16.0</td>
+    <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   </tr>
+  </tbody>
+ </table>
+</div>
+<h3 style="direction: rtl;" id="הערות_לגבי_Gecko">הערות לגבי Gecko</h3>
+<p style="direction: rtl;">דפדפן FireFox תומך בקבלת נתוני המיקום בהתבסס על מידע WiFi באמצעות שירותי המיקום של גוגל. בטרנזאקציה שבין FireFox ל Google, המידע שמועבר כולל מידע על נקודת הגישה ל WiFi, כולל access token (שדומה לcookie בעלת תוקף למשך שבועיים) וכולל את כתובת ה IP של המשתמש. למידע נוסף יש התעדכן ב<a href="http://www.mozilla.com/en-US/legal/privacy/">תנאי הפרטיות</a> של Mozilla וב<a href="http://www.google.com/privacy-lsf.html">תנאי הפרטיות</a> של גוגל המפרטים באיזה אופן נתונים אלה ניתנים לשימוש. </p>
+<p style="direction: rtl;">FireFox גרסת 3.6 (Gecko 1.9.2) הוסיף תמיכה לשימוש בשירות GPSD (GPS daemon) בשביל שירותי מיקום עבור Linux. </p>
+<p style="direction: rtl;"><span style="font-size: 2.142857142857143rem; font-weight: 700; letter-spacing: -1px; line-height: 30px;">לעיון נוסף</span></p>
+<ul>
+ <li><a href="/he/docs/Web/API/Window/navigator/geolocation" title="The documentation about this has not yet been written; please consider contributing!"><code><bdi>navigator.geolocation</bdi></code></a></li>
+ <li><a href="/en-US/Apps/Build/gather_and_modify_data/Plotting_yourself_on_the_map">צייר את עצמך על המפה</a></li>
+ <li><a href="http://www.w3.org/TR/geolocation-API/">ממשק שירותי המיקום ב:w3.org</a></li>
+ <li><a href="/en-US/demos/tag/tech:geolocation">דוגמאות לשימוש במשק נתוני המיקום</a></li>
+ <li><a href="https://hacks.mozilla.org/2013/10/who-moved-my-geolocation/">Who moved my geolocation?</a> (Hacks blog)</li>
+</ul>

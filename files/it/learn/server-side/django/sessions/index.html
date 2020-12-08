@@ -1,0 +1,622 @@
+---
+title: 'Django Tutorial Part 7: Sessions framework'
+slug: Learn/Server-side/Django/Sessions
+tags:
+  - Articolo
+  - Principiante
+  - Python
+  - Server
+  - django
+  - sessioni
+translation_of: Learn/Server-side/Django/Sessions
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/it/docs/Learn/Getting_started_with_the_web"><strong>Complete beginners start here!</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Getting started with the Web</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web">Getting started with the Web overview</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Installing_basic_software">Installing basic software</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">What will your website look like?</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Dealing_with_files">Dealing with files</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/HTML_basics">HTML basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/CSS_basics">CSS basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Publishing_your_website">Publishing your website</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/How_the_Web_works">How the Web works</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/HTML"><strong>HTML — Structuring the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Introduction to HTML</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML">Introduction to HTML overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Getting started with HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">What&apos;s in the head? Metadata in HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">HTML text fundamentals</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">Creating hyperlinks</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Advanced text formatting</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Document and website structure</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Debugging HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Assessment: Marking up a letter</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Assessment: Structuring a page of content</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Multimedia and embedding</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding">Multimedia and embedding overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Images in HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Video and audio content</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">From object to iframe — other embedding technologies</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Adding vector graphics to the Web</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Responsive images</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Assessment: Mozilla splash page</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/CSS"><strong>CSS — Styling the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Styling text</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/Styling_text">Styling text overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Fundamentals">Fundamental text and font styling</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Styling_lists">Styling lists</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Styling_links">Styling links</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Web_fonts">Web fonts</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Assessment: Typesetting a community school homepage</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS layout</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout">CSS layout overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Introduction">Introduction</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Grids">Grids</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Floats">Floats</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Positioning">Positioning</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/JavaScript"><strong>JavaScript — Dynamic client-side scripting</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript first steps</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps">JavaScript first steps overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/What_is_JavaScript">What is JavaScript?</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/A_first_splash">A first splash into JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/What_went_wrong">What went wrong? Troubleshooting JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Variables">Storing the information you need — Variables</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Math">Basic math in JavaScript — Numbers and operators</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Strings">Handling text — Strings in JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Useful_string_methods">Useful string methods</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Arrays">Arrays</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Silly_story_generator">Assessment: Silly story generator</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript building blocks</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/conditionals">Making decisions in your code — Conditionals</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Looping_code">Looping code</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Functions">Functions — Reusable blocks of code</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Build your own function</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Return_values">Function return values</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Events">Introduction to events</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Image_gallery">Assessment: Image gallery</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Introducing JavaScript objects</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/Objects">Introducing JavaScript objects overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Basics">Object basics</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object-oriented_JS">Object-oriented JavaScript for beginners</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object_prototypes">Object prototypes</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Inheritance">Inheritance in JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/JSON">Working with JSON data</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object_building_practice">Object building practice</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Assessment: Adding features to our bouncing balls demo</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/it/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/it/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/it/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/it/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/it/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/it/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/it/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/it/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/it/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/it/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Tools_and_testing"><strong>Tools and testing</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Cross browser testing</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing">Cross browser testing overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="open"><a href="/it/docs/Learn/Server-side"><strong>Server-side website programming</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>First steps</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/First_steps">First steps overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Introduction">Introduction to the server-side</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-Server overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Web_frameworks">Server-side web frameworks</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Website_security">Website security</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Django web framework (Python)</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/Django">Django web framework (Python) overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Introduction">Introduction</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/development_environment">Setting up a development environment</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Tutorial_local_library_website">Tutorial: The Local Library website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/skeleton_website">Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Models">Tutorial Part 3: Using models</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Admin_site">Tutorial Part 4: Django admin site</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Home_page">Tutorial Part 5: Creating our home page</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Generic_views">Tutorial Part 6: Generic list and detail views</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Sessions">Tutorial Part 7: Sessions framework</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Authentication">Tutorial Part 8: User authentication and permissions</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Forms">Tutorial Part 9: Working with forms</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Testing">Tutorial Part 10: Testing a Django web application</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Deployment">Tutorial Part 11: Deploying Django to production</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/web_application_security">Web application security</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/django_assessment_blog">Assessment: DIY mini blog</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Further resources</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Common questions</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/HTML/Howto">HTML questions</a></li>
+          <li><a href="/it/docs/Learn/CSS/Howto">CSS questions</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#How_the_Web_works">How the Web works</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#Tools_and_setup">Tools and setup</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#Design_and_accessibility">Design and accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/How_to_contribute">How to contribute</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/it/docs/Learn/Server-side/Django/Generic_views" class="button"><i class="icon-arrow-left"></i><span class="label"> Previous </span></a><a href="/it/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Overview: Django</a><a href="/it/docs/Learn/Server-side/Django/authentication_and_sessions" class="button"><span class="label"> Next  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">Questo tutorial estende il nostro sito <a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">LocalLibrary</a>, aggiungendo un contatore di visite session-based alla home page. Questo è un esempio relativamente semplice, ma mostra come si può usare il session framework per fornire comportamento persistente per utenti anonimi nei tuoi siti.</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">Prerequisiti:</th>
+   <td>Completa tutti gli argomenti dei tutorial precedenti, compreso <a href="/en-US/docs/Learn/Server-side/Django/Generic_views">Django Tutorial Part 6: Generic list and detail views</a></td>
+  </tr>
+  <tr>
+   <th scope="row">Obiettivo:</th>
+   <td>Capire come vengono utilizzate le sessioni.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Panoramica">Panoramica</h2>
+
+<p>Il sito <a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">LocalLibrary</a> che abbiamo creato nei precedenti tutorial permette agli utenti di navigare tra i libri e gli autori nel catalogo. Anche se il contenuto viene generato dinamicamente dal database, ogni utente essenzialmente avrà accesso alle stesse pagine e e gli stessi tipi di informazione quando utilizzano il sito.</p>
+
+<p>In una biblioteca &quot;reale&quot; potresti desiderare di fornire agli utenti individuali una esperienza customizzata, basata sul loro precedente utilizzo del sito, preferenze, ecc. Per esempio, potresti nascondere messaggi di avviso di cui gli utenti hanno già preso conoscenza la prossima volta che essi visitano il sito, o archiviare e rispettare le loro preferenze (ad esempio, il numero di risultati di ricerca che vogliono mostrato su ogni pagina). </p>
+
+<p>Il session framework ti consente di implementare questo tipo di comportamento, permettendoti di memorizzare e recuperare dati arbitrari su una base di visitstore per sito (per-site-visitor). </p>
+
+<h2 id="Cosa_sono_le_sessioni">Cosa sono le sessioni?</h2>
+
+<p>Tutte le comunicazioni tra browser web e i server avvengono attraverso il prootocollo HTTP, che è <em>stateless</em>. Il fatto che il protocollo sia stateless significa che i messagggi tra il client e il server sono completamente indipendenti da ciascuno degli altri— non esiste la nozione di &quot;sequenza&quot; o comportamento basato sui precedenti messaggi. Di conseguenza, se vuoi avere un sito che tenga traccia delle relazioni che sono in attive con un client, hai bisogno di implementarlo tu stesso.</p>
+
+<p>Le sessioni sono il meccanismo utilizzato da Django (e dalla maggior parte dell&apos;Internet) per tenere traccia dello &quot;stato&quot; tra il sito e un particolare browser. Le sessioni ti consentono di memorizzare dati arbitrari per browser, e avere questi dati disponibili per il sito ogni volta che il browser si connette. Item individuali di dati associati con la sessione sono quindi referenziati con una &quot;key&quot;, la quale è utilizzata sia per rchiviare che per recuperare i dati.</p>
+
+<p>Django utilizza un cookie contenente uno speciale <em>session id</em> per identificare ciascun browser e la sua sessione associata col sito. I <em>dati</em> della sessione effettiva sono archiviati nel database del sito di default (questo è più sicuro del memorizzare i dati in un cookie, dove sono più vulnerabili a utenti malevoli). Si può configurare Django per memorizzare i dati della sessione in altre posizioni (nella cache, nei file, nei &quot;secure&quot; cookie), ma la posizione di default è una opzione buona e relativamente sicura.</p>
+
+<h2 id="Abilitare_le_sessioni">Abilitare le sessioni</h2>
+
+<p>Le sessioni sono state abilitate automaticamente quando abbiamo <a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">creato lo scheletro del sito web</a> (nel tutorial 2).</p>
+
+<p>La configurazione è imnpostata nelle sezioni <code>INSTALLED_APPS</code> e <code>MIDDLEWARE</code> del file di progetto (<strong>locallibrary/locallibrary/settings.py</strong>), come mostrato qui sotto:</p>
+
+<pre class="brush: python notranslate">INSTALLED_APPS = [
+    ...
+<strong>    &apos;django.contrib.sessions&apos;,</strong>
+    ....
+
+MIDDLEWARE = [
+    ...
+<strong>    &apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,</strong>
+    ....</pre>
+
+<h2 id="Utilizzo_delle_sessioni">Utilizzo delle sessioni</h2>
+
+<p>Si può accedere all&apos;attributo <code>session</code> nell view dal parametro <code>request</code> (una <code>HttpRequest</code> passata dentro come primo argomento alla view). Questo attributo sessione rappresenta la connessione specifica con l&apos;utente attuale (o per essere più precisi, la connessione al browser attuale, come identificato dal session id nel cookie del browser per questo sito).</p>
+
+<p>L&apos;attributo <code>session</code> è un oggetto simile a un dizionario (dictionary-like) che puoi leggere e scrivere quante volte vuoi nella tua view, modificandolo come desiderato. Si possono effettuare tutte le normali operazioni dei dictionary, inclusa la cancellazione di tutti i dati, testare se una chiave è presente, ciclare sui dati, ecc. Il più delle volte userete solo l&apos;API standard &quot;dictionary&quot; per ottenere valori e impostare valori.</p>
+
+<p>I frammenti di codice sotto mostrano come si può ottenere, impostare, e cancellare alcuni dati con la key &quot;<code>my_car</code>&quot;, associata alla sessione corrente (browser). </p>
+
+<div class="note">
+<p><strong>Nota</strong>: Una delle cose belle di Django è che non c&apos;è bisogno di pensare ai meccanismi che legano la sessione alla tua attuale richiesta nella tua view. Se dovessimo usare i frammenti di codice qui sotto nella nostra view, sapremmo che l&apos;informazione su <code>my_car</code> è associata solo al browser che ha inviato la richiesta corrente.</p>
+</div>
+
+<pre class="brush: python notranslate"># Get a session value by its key (e.g. &apos;my_car&apos;), raising a KeyError if the key is not present
+my_car = request.session[&apos;my_car&apos;]
+
+# Get a session value, setting a default if it is not present (&apos;mini&apos;)
+my_car = request.session.get(&apos;my_car&apos;, &apos;mini&apos;)
+
+# Set a session value
+request.session[&apos;my_car&apos;] = &apos;mini&apos;
+
+# Delete a session value
+del request.session[&apos;my_car&apos;]
+</pre>
+
+<p>L&apos;API offre anche un certo numero di altri metodi che sono usati principalmente per gestire il cookie associato alla sessione. Per esampio, ci sono metodi per testare che i cookie sono supportati nel browser client, per impostare e controllare la data di scadenza del cookie, e per cancellare le sessioni scadute dal data store. Puoi trovare informazioni sulla API completa in <a href="https://docs.djangoproject.com/en/2.1/topics/http/sessions/">How to use sessions</a> (Django docs).</p>
+
+<h2 id="Salvare_i_dati_di_sessione">Salvare i dati di sessione</h2>
+
+<p>Di default, Django salva solamente il database di sessione e invia il session cookie al client quando la sessione è stata <em>modificata</em> (assegnata) o<em>cancellata</em>. Se si sta aggiornando qualche dato utilizzando la sua session key come mostrato nella precedente sezione, allora non devi preoccuparti di questo! Per esempio:</p>
+
+<pre class="brush: python notranslate"># This is detected as an update to the session, so session data is saved.
+request.session[&apos;my_car&apos;] = &apos;mini&apos;</pre>
+
+<p>Se si stanno aggiornando alcune informazioni <em>all&apos;interno</em> dei dati di sessione, allora Django non riconoscerà che hai fatto una modifica alla sessione e salva i dati (per esempio, se dovessi modificare i dati &quot;<code>wheels</code>&quot; all&apos;interno dei tuoi dati &quot;<code>my_car</code>&quot;, come mostrato sotto). In questo caso avrai bisogno di contrassegnare esplicitamente la sessione come modificata.</p>
+
+<pre class="brush: python notranslate"># Session object not directly modified, only data within the session. Session changes not saved!
+request.session[&apos;my_car&apos;][&apos;wheels&apos;] = &apos;alloy&apos;
+
+# Set session as modified to force data updates/cookie to be saved.
+<code>request.session.modified = True</code>
+</pre>
+
+<div class="note">
+<p><strong>Nota</strong>: Si può modificare il comportamento in modo che il sito aggiorni il database/invii cookie su ciascuna request aggiungendo <code>SESSION_SAVE_EVERY_REQUEST = True</code> nelle tue impostazioni di progetto (<strong>locallibrary/locallibrary/settings.py</strong>).</p>
+</div>
+
+<h2 id="Semplice_esempio_—_ottenere_il_conteggio_delle_visite">Semplice esempio — ottenere il conteggio delle visite</h2>
+
+<p>Come esempio semplice del mondio reale, aggiorneremo la nostra biblioteca per dire all&apos;utente attuale quante volte essi hanno visitato la home page della <em>LocalLibrary</em>. </p>
+
+<p>Apri <strong>/locallibrary/catalog/views.py</strong>, e effettua le modifiche mostrate in grassetto sotto. </p>
+
+<pre class="brush: python notranslate">def index(request):
+    ...
+
+    num_authors = Author.objects.count()  # The &apos;all()&apos; is implied by default.
+
+<strong>    # Number of visits to this view, as counted in the session variable.
+    num_visits = request.session.get(&apos;num_visits&apos;, 0)
+    request.session[&apos;num_visits&apos;] = num_visits + 1</strong>
+
+<strong>    context = {
+        &apos;num_books&apos;: num_books,
+        &apos;num_instances&apos;: num_instances,
+        &apos;num_instances_available&apos;: num_instances_available,
+        &apos;num_authors&apos;: num_authors,
+        &apos;num_visits&apos;: num_visits,
+    }</strong>
+
+    # Render the HTML template index.html with the data in the context variable.
+    return render(request, &apos;index.html&apos;, context=context)</pre>
+
+<p>Qui prima otteniamo il valore della session key <code>&apos;num_visits&apos;</code>, impostiamo il valore a 0 se esso non è stato precedentemente impostato. Ogni volta che viene ricevuta una richiesta, allora si incrementa il valore e lo si memorizza di nuovo nella sessione (per la prossima volta che l&apos;utente visita la pagina). La variabile <code>num_visits</code> viene quindi passata al template nella nostra variabile context.</p>
+
+<div class="note">
+<p><strong>Nota</strong>: Potremmo anche verificare se i cookie sono anche supportati nel browser qui (vedi <a href="https://docs.djangoproject.com/en/2.1/topics/http/sessions/">How to use sessions</a> per esempi) o progettare la nostra UI in modo che non importa se i cookie sono supportati o meno.</p>
+</div>
+
+<p>Aggiungi la linea che trovi alla fine del blocco qui sotto al tuo template HTML principale (<strong>/locallibrary/catalog/templates/index.html</strong>) alla fine della sezione &quot;Dynamic content&quot; per mostrare la variabile context:</p>
+
+<pre class="brush: html notranslate">&lt;h2&gt;Dynamic content&lt;/h2&gt;
+
+&lt;p&gt;The library has the following record counts:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Books:&lt;/strong&gt; {{ num_books }}&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Copies:&lt;/strong&gt; {{ num_instances }}&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Copies available:&lt;/strong&gt; {{ num_instances_available }}&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Authors:&lt;/strong&gt; {{ num_authors }}&lt;/li&gt;
+&lt;/ul&gt;
+
+<strong>&lt;p&gt;You have visited this page {{ num_visits }}{% if num_visits == 1 %} time{% else %} times{% endif %}.&lt;/p&gt;</strong>
+</pre>
+
+<p>Salva le modifiche e riavvia il server di test. Ogni volta che tu farai un refresh della pagina, il numero dovrebbe aggiornarsi.</p>
+
+<ul>
+</ul>
+
+<h2 id="Riepilogo">Riepilogo</h2>
+
+<p>Ora sai come è facile utilizzare per migliorare la tua interazione con utenti <em>anonimi</em>. </p>
+
+<p>Nei nostri prossimi articoli spiegheremo il framework per l&apos;autenticazione ed autorizzazione (permessi), e ti mostreremo come supportare gli account user.</p>
+
+<h2 id="Vedi_anche">Vedi anche</h2>
+
+<ul>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/http/sessions/">How to use sessions</a> (Django docs)</li>
+</ul>
+
+<div class="prevnext">
+  <a href="/it/docs/Learn/Server-side/Django/Generic_views" class="button"><i class="icon-arrow-left"></i><span class="label"> Previous </span></a><a href="/it/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Overview: Django</a><a href="/it/docs/Learn/Server-side/Django/Authentication" class="button"><span class="label"> Next  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<h2 id="In_questo_modulo">In questo modulo</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Introduction">Django introduction</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/development_environment">Setting up a Django development environment</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">Django Tutorial: The Local Library website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">Django Tutorial Part 2: Creating a skeleton website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Models">Django Tutorial Part 3: Using models</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Admin_site">Django Tutorial Part 4: Django admin site</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Home_page">Django Tutorial Part 5: Creating our home page</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Generic_views">Django Tutorial Part 6: Generic list and detail views</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Sessions">Django Tutorial Part 7: Sessions framework</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Authentication">Django Tutorial Part 8: User authentication and permissions</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Forms">Django Tutorial Part 9: Working with forms</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Testing">Django Tutorial Part 10: Testing a Django web application</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Deployment">Django Tutorial Part 11: Deploying Django to production</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/web_application_security">Django web application security</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/django_assessment_blog">DIY Django mini blog</a></li>
+</ul>

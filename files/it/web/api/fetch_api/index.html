@@ -1,0 +1,183 @@
+---
+title: Fetch API
+slug: Web/API/Fetch_API
+tags:
+  - API
+  - Documentazione
+  - Fetch
+  - Response
+  - Sperimentale
+  - XMLHttpRequest
+  - request
+translation_of: Web/API/Fetch_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/it/docs/Web/API/Fetch_API">Fetch API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/it/docs/Web/API/Fetch_API/Using_Fetch">Using Fetch</a></li><li><a href="/it/docs/Web/API/Fetch_API/Basic_concepts">Fetch basic concepts</a> <a href="/it/docs/Web/API/Fetch_API/Basic_concepts$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/it/docs/Web/API/Fetch_API/Cross-global_fetch_usage">Cross-global fetch usage</a> <a href="/it/docs/Web/API/Fetch_API/Cross-global_fetch_usage$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/it/docs/Web/API/Body"><code>Body</code></a></li><li><a href="/it/docs/Web/API/Headers"><code>Headers</code></a></li><li><a href="/it/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/it/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li><li class="toggle"><details open><summary>Metodi</summary><ol><li><a href="/it/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>This is an <a href="/en-US/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">experimental technology</a></strong><br>Check the <a href="#Browser_compatibility">Browser compatibility table</a> carefully before using this in production.</p>
+</div>
+
+<p>La Fetch API fornisce un&apos;interfaccia per ottenere risorse (anche attraverso la rete). Sembrerá familiare a tutti coloro che hanno usato <a href="/it/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest"><code>XMLHttpRequest</code></a>, ma la nuova API fornisce un&apos;insieme piú potente e flessibile di funzionalitá.</p>
+
+<h2 id="Concetti_e_uso">Concetti e uso</h2>
+
+<p>Fetch fornisce una definizione generica di oggetti <a href="/it/docs/Web/API/Request" title="The documentation about this has not yet been written; please consider contributing!"><code>Request</code></a> e <a href="/it/docs/Web/API/Response" title="The documentation about this has not yet been written; please consider contributing!"><code>Response</code></a> (e altri inclusi nelle richieste di rete). Questo permette loro di essere usati ovunque necessari, in futuro, sia che servano per service workers, Cache API e altri oggetti simili che usano o modificano richieste e risposte, sia per qualunque altro caso d&apos;uso che richieda di generare le proprie risposte via codice.</p>
+
+<p>Esso fornisce anche una definizione per concetti correlati come CORS e la semantica degli header HTTP di tipo origin, ovviando alla necessità di doverli definire separatamente altrove.</p>
+
+<p>Per effettuare una richiesta e ottenere una risorsa, si usa il metodo <a href="/it/docs/Web/API/GlobalFetch/fetch" title="The documentation about this has not yet been written; please consider contributing!"><code>GlobalFetch.fetch</code></a>. Esso è implementato in piú interfacce (specificatamente <a href="/it/docs/Web/API/Window" title="documentDOM document ( documento DOM ) caricato in quella pagina"><code>Window</code></a> e <a href="/it/docs/Web/API/WorkerGlobalScope" title="The documentation about this has not yet been written; please consider contributing!"><code>WorkerGlobalScope</code></a>). Questo lo rende disponibile all&apos;incirca in ogni contesto in cui si puó voler ottenere risorse.</p>
+
+<p>Il metodo <code>fetch()</code> richiede un parametro obbligatorio, il percorso (path) alla risorsa che si vuole ottenere, e ritorna una <a href="/it/docs/Web/API/Promise" title="The documentation about this has not yet been written; please consider contributing!"><code>Promise</code></a> che risolve la <a href="/it/docs/Web/API/Response" title="The documentation about this has not yet been written; please consider contributing!"><code>Response</code></a> a quella richiesta, sia essa stata eseguita con successo oppure no. Si puó anche passare in via opzionale un oggetto <code>init</code> (per definire opzioni facoltative) come secondo parametro (per l&apos;elenco completo delle opzioni visitare <a href="/it/docs/Web/API/Request" title="The documentation about this has not yet been written; please consider contributing!"><code>Request</code></a>).</p>
+
+<p>Non appena una <a href="/it/docs/Web/API/Response" title="The documentation about this has not yet been written; please consider contributing!"><code>Response</code></a> è recuperata, vi è un certo numero di metodi disponibile allo scopo di definire cosa sia il corpo della risposta e come dovrebbe essere gestito (in dettaglio : <a href="/it/docs/Web/API/Body" title="The documentation about this has not yet been written; please consider contributing!"><code>Body</code></a>.)</p>
+
+<p>È possibile creare una richiesta e una risposta direttamente usando i costruttori delle classi <a href="/it/docs/Web/API/Request/Request" title="The documentation about this has not yet been written; please consider contributing!"><code>Request()</code></a> e <a href="/it/docs/Web/API/Response/Response" title="The documentation about this has not yet been written; please consider contributing!"><code>Response()</code></a>, ma non e&apos; una pratica comune. Invece, e&apos; piu&apos; frequente che essi vengano creati come risultato delle altre azioni della API (ad esempio, <a href="/it/docs/Web/API/FetchEvent/respondWith" title="The documentation about this has not yet been written; please consider contributing!"><code>FetchEvent.respondWith</code></a> dei service workers.)</p>
+
+<div class="note">
+<p><strong>Note</strong>: Puoi trovare informazioni aggiuntive riguardo l&apos;uso di fetch sulla pagina <a href="/docs/Web/API/Fetch_API/Using_Fetch">Using Fetch</a>, e studiare i concetti sulla pagina <a href="/docs/Web/API/Fetch_API/Basic_concepts">Fetch basic concepts</a>.</p>
+</div>
+
+<h3 id="Annullare_un_fetch">Annullare un fetch</h3>
+
+<p>I browsers hanno cominciato a supportare in via sperimentale le interfacce <a href="/it/docs/Web/API/AbortController" title="The documentation about this has not yet been written; please consider contributing!"><code>AbortController</code></a> e <a href="/it/docs/Web/API/AbortSignal" title="The documentation about this has not yet been written; please consider contributing!"><code>AbortSignal</code></a> (meglio note come Abort API), che permettono di annullare operazioni come Fetch e XHR quando non sono ancora state completate. Per maggiori informazioni controlla la pagina con la descrizione delle interfacce.</p>
+
+<h2 id="Fetch_Interfaces">Fetch Interfaces</h2>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/GlobalFetch" title="The documentation about this has not yet been written; please consider contributing!"><code>GlobalFetch</code></a></dt>
+ <dd>Contiene il metodo globale <code>fetch()</code> usato per ottenere una risorsa.</dd>
+ <dt><a href="/it/docs/Web/API/Headers" title="The documentation about this has not yet been written; please consider contributing!"><code>Headers</code></a></dt>
+ <dd>Rappresenta un header di richiesta/risposta, permettendo di interrogarlo ed eseguire azioni differenti in base ai risultati.</dd>
+ <dt><a href="/it/docs/Web/API/Request" title="The documentation about this has not yet been written; please consider contributing!"><code>Request</code></a></dt>
+ <dd>Rappresenta una richiesta.</dd>
+ <dt><a href="/it/docs/Web/API/Response" title="The documentation about this has not yet been written; please consider contributing!"><code>Response</code></a></dt>
+ <dd>Rappresenta una risposta a una richiesta.</dd>
+</dl>
+
+<h2 id="Fetch_mixin">Fetch mixin</h2>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/Body" title="The documentation about this has not yet been written; please consider contributing!"><code>Body</code></a></dt>
+ <dd>Fornisce metodi relativi al corpo di una richiesta/risposta permettendo di dichiarare quale sia il tipo di contenuto e come dovrebbe essere gestito.</dd>
+</dl>
+
+<h2 id="Specifiche">Specifiche</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specifiche</th>
+   <th scope="col">Stato</th>
+   <th scope="col">Commento</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/" hreflang="en" lang="en" title="The &apos;Fetch&apos; specification">Fetch</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Definizione di cui sopra</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilitá_coi_Browsers">Compatibilitá coi Browsers</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/it/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>IE</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Supporto base</td>
+   <td>42</td>
+   <td>14</td>
+   <td><a href="/en-US/Firefox/Releases/39" title="Released on 2015-06-30.">39</a> (39)<br>
+    34<sup>[1]</sup><br>
+    <a href="/en-US/Firefox/Releases/52" title="Released on 2017-03-07.">52</a> (52)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>29<br>
+    28<sup>[1]</sup></td>
+   <td>10.1</td>
+  </tr>
+  <tr>
+   <td><a href="/it/docs/Web/API/ReadableStream" title="The documentation about this has not yet been written; please consider contributing!"><code>ReadableStream</code></a></td>
+   <td>43</td>
+   <td>14</td>
+   <td><span style="color: #f00;">No support</span><sup>[3]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android Webview</th>
+   <th>Chrome for Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Supporto base</td>
+   <td>42</td>
+   <td>42</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>10.1</td>
+  </tr>
+  <tr>
+   <td><a href="/it/docs/Web/API/ReadableStream" title="The documentation about this has not yet been written; please consider contributing!"><code>ReadableStream</code></a></td>
+   <td>43</td>
+   <td>43</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #f00;">No support</span><sup>[3]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Questa API è implementata ma dev&apos;essere abilitata da un&apos;opzione di Firefox.</p>
+
+<p>[2] Per le versioni di Firefox precedenti la 52, <code>get()</code> ottiene solamente il primo valore nell&apos;header specificato, mentre <code>getAll()</code> ottiene tutti i valori. Dalla versione 52 in avanti, <code>get()</code> ottiene tutti i valori e <code>getAll()</code> è stato eliminato.</p>
+
+<p>[3] La lettura degli streams è disponibile nell&apos;attuale versione di Firefox, ma deve essere abilitata tramite le opzioni <code>dom.streams.enabled</code> e <code>javascript.options.streams</code>.</p>
+
+<h2 id="Guarda_anche">Guarda anche</h2>
+
+<ul>
+ <li><a href="/docs/Web/API/Fetch_API/Using_Fetch">Using Fetch</a></li>
+ <li><a href="/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/docs/Web/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/docs/Web/HTTP">HTTP</a></li>
+ <li><a href="https://github.com/github/fetch">Fetch polyfill</a></li>
+ <li><a href="/docs/Web/API/Fetch_API/Basic_concepts">Fetch basic concepts</a></li>
+</ul>

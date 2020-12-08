@@ -1,0 +1,254 @@
+---
+title: IndexedDB
+slug: Web/API/IndexedDB_API
+translation_of: Web/API/IndexedDB_API
+---
+<div class="summary">
+<p>IndexedDB è una API per la memorizzazione client-side di una considerevole quantità di dati strutturati (inclusi file e blob) e per una ricerca performante su questi dati mediante gli indici. Se <a href="/it/docs/Web/API/Web_Storage_API" title="en-US/docs/DOM/Storage">Web Storage</a> è utile per memorizzare piccole quantità di dati, non lo è invece per memorizzare grandi quantità di dati strutturati. IndexedDB fornisce la soluzione. Questa è la pagina principale su IndexedDB di MDN — qui vengono forniti link a tutti i riferimenti API e guide all&apos;uso, dettagli di supporto al browser ed alcune spiegazioni dei concetti chiave.</p>
+</div>
+
+<h2 id="Concetti_chiave_ed_uso">Concetti chiave ed uso</h2>
+
+<p>IndexedDB è un sistema di database transazionale, che inizialmente potrebbe creare confusione se si è abituati a lavorare solo con i database relazionali, ma presto diverrà abbastanza chiaro. IndexedDB permette di memorizzare e recuperare oggetti indicizzati con una <strong>chiave</strong>. E&apos; necessario specificare lo schema del database, aprire una connessione al proprio database e poi recuperare ed aggiornare i dati attraverso una serie di <strong>transazioni</strong>.</p>
+
+<ul>
+ <li>Apprendere maggiori info sui <a href="/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB">concetti dietro a IndexedDB</a>.</li>
+ <li>Imparare ad usare IndexedDB in modo asincrono dai primi principi con la nostra guida <a href="/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB">Usare IndexedDB</a>.</li>
+ <li>Trova le raccomandazioni degli sviluppatori per far lavorare le apps web offline alla pagina <a href="/en-US/Apps/Build/Offline">Offline Apps</a>.</li>
+</ul>
+
+<div class="note">
+<p><strong>Nota</strong>: Come molte soluzioni web storage, IndexedDB segue una <a class="external" href="http://www.w3.org/Security/wiki/Same_Origin_Policy" title="http://www.w3.org/Security/wiki/Same_Origin_Policy">same-origin policy</a>. Quindi mentre si può accedere ai dati memorizzati sotto un dominio, non è possibile accedere ai dati attraverso domini differenti.</p>
+</div>
+
+<h3 id="Sincrono_e_asincrono">Sincrono e asincrono</h3>
+
+<p>IndexedDB include sia una API asincrona che una API sincrona. La API asincrona può essere usata in molti casi, incluso <a href="https://developer.mozilla.org/En/DOM/Using_web_workers" title="https://developer.mozilla.org/En/Using_web_workers">WebWorkers</a>, mentre la API sincrona è designata ad essere utilizzata solo con <a href="/en-US/docs/Web/Guide/Performance/Using_web_workers">Web Workers</a> e sarà usata molto raramente.</p>
+
+<div class="note">
+<p><strong>Nota</strong>: Attualmente, nessuno dei principali browser supporta la API sincrona.</p>
+</div>
+
+<h3 id="Limiti_di_memorizzazione">Limiti di memorizzazione</h3>
+
+<p>Non c&apos;è alcun limite alla dimensione di un singolo elemento del database, tuttavia ci potrebbe essere un limite ad ogni dimensione complessiva del database IndexedDB. Questo limite (ed il modo con cui l&apos;interfaccia utente lo supporterà) potrebbe variare da un browser ad un altro:</p>
+
+<ul>
+ <li>Firefox non ha limite sulla dimensione del database IndexedDB. The user interface will just ask permission for storing blobs bigger than 50 MB. This size quota can be customized through the <code>dom.indexedDB.warningQuota</code> preference (which is defined in <a href="http://mxr.mozilla.org/mozilla-central/source/modules/libpref/src/init/all.js" title="http://mxr.mozilla.org/mozilla-central/source/modules/libpref/src/init/all.js">http://mxr.mozilla.org/mozilla-central/source/modules/libpref/src/init/all.js</a>).</li>
+ <li>Google Chrome: see <a class="link-https" href="https://developers.google.com/chrome/whitepapers/storage#temporary" rel="freelink">https://developers.google.com/chrome...rage#temporary</a>.</li>
+</ul>
+
+<h2 id="Asynchronous_API">Asynchronous API</h2>
+
+<p>The asynchronous API methods return without blocking the calling thread. To get asynchronous access to a database, call <a href="/en-US/docs/Web/API/IDBFactory.open"><code>open()</code></a> on the <a href="/en-US/docs/Web/API/IDBEnvironment.indexedDB"><code>indexedDB</code></a> attribute of a <a href="/en-US/docs/DOM/window" title="en-US/docs/DOM/window">window</a> object. This method returns an <a href="/it/docs/Web/API/IDBRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBRequest</code></a> object; asynchronous operations communicate to the calling application by firing events on <a href="/it/docs/Web/API/IDBRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBRequest</code></a> objects.</p>
+
+<h3 id="Connecting_to_a_database">Connecting to a database</h3>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/IDBEnvironment" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBEnvironment</code></a></dt>
+ <dd>Provides access to a client-side database. It is implemented by the <a href="/it/docs/Web/API/Window" title="documentDOM document ( documento DOM ) caricato in quella pagina"><code>window</code></a> and <a href="/it/docs/Web/API/Worker" title="L&apos;interfaccia Worker delle Web Workers API rappresenta un processo in background che può essere facilmente generato e in grado di inviare messaggi al creatore. Per creare un worker basta specificare nel metodo costruttore Worker() lo script che sarà incaricato di eseguire."><code>worker</code></a> objects.</dd>
+ <dt><a href="/it/docs/Web/API/IDBFactory" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBFactory</code></a></dt>
+ <dd>Provides access to a database. This is the interface implemented by the global object <a href="/en-US/docs/Web/API/IDBEnvironment.indexedDB"><code>indexedDB</code></a> and is therefore the entry point for the API.</dd>
+ <dt><a href="/it/docs/Web/API/IDBOpenDBRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBOpenDBRequest</code></a></dt>
+ <dd>Represents a request to open a database.</dd>
+ <dt><a href="/it/docs/Web/API/IDBDatabase" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBDatabase</code></a></dt>
+ <dd>Represents a connection to a database. It&apos;s the only way to get a transaction on the database.</dd>
+</dl>
+
+<h3 id="Accessing_results_of_database_requests">Accessing results of database requests</h3>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/IDBRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBRequest</code></a></dt>
+ <dd>Provides access to results of asynchronous requests to databases and database objects. It is what you get when you call an asynchronous method.</dd>
+</dl>
+
+<h3 id="Retrieving_and_modifying_data">Retrieving and modifying data</h3>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/IDBTransaction" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBTransaction</code></a></dt>
+ <dd>Represents a transaction. You create a transaction on a database, specify the scope (such as which object stores you want to access), and determine the kind of access (read only or write) that you want.</dd>
+ <dt><a href="/it/docs/Web/API/IDBObjectStore" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBObjectStore</code></a></dt>
+ <dd>Represents an object store.</dd>
+ <dt><a href="/it/docs/Web/API/IDBIndex" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBIndex</code></a></dt>
+ <dd>Provides access to the metadata of an index.</dd>
+ <dt><a href="/it/docs/Web/API/IDBCursor" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBCursor</code></a></dt>
+ <dd>Iterates over object stores and indexes.</dd>
+ <dt><a href="/it/docs/Web/API/IDBCursorWithValue" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBCursorWithValue</code></a></dt>
+ <dd>Iterates over object stores and indexes and returns the cursor&apos;s current value.</dd>
+ <dt><a href="/it/docs/Web/API/IDBKeyRange" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBKeyRange</code></a></dt>
+ <dd>Defines a range of keys.</dd>
+</dl>
+
+<h3 id="Deprecated_interfaces">Deprecated interfaces</h3>
+
+<p>An early version of the specification also defined these now removed interfaces. They are still documented in case you need to update previously written code:</p>
+
+<dl>
+ <dt><a href="/it/docs/Web/API/IDBVersionChangeRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBVersionChangeRequest</code></a></dt>
+ <dd>Represents a request to change the version of a database. The way to change the version of the database has since changed (by calling <a href="/it/docs/Web/API/IDBFactory/open" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBFactory.open</code></a> without also calling <a href="/it/docs/Web/API/IDBDatabase/setVersion" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBDatabase.setVersion</code></a>), and the interface <a href="/it/docs/Web/API/IDBOpenDBRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBOpenDBRequest</code></a> now has the functionality of the removed <a href="/it/docs/Web/API/IDBVersionChangeRequest" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBVersionChangeRequest</code></a>.</dd>
+ <dt><a href="/it/docs/Web/API/IDBDatabaseException" title="The documentation about this has not yet been written; please consider contributing!"><code>IDBDatabaseException</code></a>  <span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></dt>
+ <dd>Represents exception conditions that can be encountered while performing database operations.</dd>
+</dl>
+
+<h2 id="Synchronous_API">Synchronous API</h2>
+
+<div class="warning notecard">
+<p><strong>Important</strong>: This is a reminder that the synchronous version of IndexedDB is not yet implemented in any browser.</p>
+</div>
+
+<p>To get synchronous access to a database, call <a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBFactorySync#open" title="en-US/docs/IndexedDB/IDBFactorySync#open"><code>open()</code></a> on the <span class="unimplemented unimplementedInline notecard inline">Unimplemented</span> <a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBEnvironmentSync#indexedDBSync" title="en-US/docs/IndexedDB/EnvironmentSync#indexedDBSync"><code>indexedDBSync</code></a> attribute of a <a href="https://developer.mozilla.org/en-US/docs/DOM/Worker" title="en-US/docs/DOM/Worker">worker</a> object. This returns an <code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBDatabaseSync" title="en-US/docs/IndexedDB/DatabaseSync">IDBDatabaseSync</a></code> object, which enables you to create, open, and remove object stores and indexes, set the version of the database, and create transactions.</p>
+
+<ul>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBCursorSync" title="en-US/docs/IndexedDB/IDBCursorSync">IDBCursorSync</a></code> iterates over object stores and indexes.</li>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBDatabaseSync" title="en-US/docs/IndexedDB/DatabaseSync">IDBDatabaseSync</a></code> represents a connection to a database. It&apos;s the only way to get a transaction on the database.</li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBEnvironmentSync" title="IDBEnvironmentSync"><code>IDBEnvironmentSync</code></a> provides access to a client-side database. It is implemented by <a class="new" href="https://developer.mozilla.org/en-US/docs/Web/API/en-US/docs/DOM/Worker" title="en-US/docs/DOM/Worker">worker</a> objects.</li>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBFactorySync" title="en-US/docs/IndexedDB/IndexedDatabase">IDBFactorySync </a></code>provides access to a database.</li>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBIndexSync" title="en-US/docs/IndexedDB/IndexSync">IDBIndexSync</a></code> provides access to the metadata of an index.</li>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBObjectStoreSync" title="en-US/docs/IndexedDB/ObjectStoreSync">IDBObjectStoreSync</a></code> represents an object store.</li>
+ <li><code><a href="https://developer.mozilla.org/en-US/docs/IndexedDB/IDBTransactionSync" title="en-US/docs/IndexedDB/TransactionSync">IDBTransactionSync</a></code> creates a transaction in the database.</li>
+</ul>
+
+<h2 id="Example" name="Example">Examples</h2>
+
+<ul>
+ <li><a href="/en-US/demos/detail/elibri" title="https://developer.mozilla.org/en-US/demos/detail/elibri">eLibri:</a> A powerful library and eBook reader application, written by Marco Castelluccio, winner of the IndexedDB Mozilla DevDerby.</li>
+ <li><a class="external" href="https://github.com/chrisdavidmills/to-do-notifications/tree/gh-pages">To-do Notifications</a> (<a class="external" href="http://chrisdavidmills.github.io/to-do-notifications/">view example live</a>): The reference application for the examples in the reference docs: Not every snippet appears in this example, but every example uses the same data structure and syntax, and will make sense in the context of this application.</li>
+ <li><a class="external" href="http://hacks.mozilla.org/2012/02/storing-images-and-files-in-indexeddb/" title="http://hacks.mozilla.org/2012/02/storing-images-and-files-in-indexeddb/">Storing images and files in IndexedDB</a></li>
+ <li><a class="external" href="http://nparashuram.com/IndexedDB/trialtool/index.html" title="http://nparashuram.com/IndexedDB/trialtool/index.html">IndexedDB Examples</a></li>
+</ul>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">Browser compatibility</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/it/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Asynchronous API</td>
+   <td>
+    <p>11.0 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/it/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;webkit&apos; as this browser considers it experimental">webkit</a></span><br>
+     24</p>
+   </td>
+   <td><a href="/en-US/Firefox/Releases/4" title="Released on 2011-03-22.">4.0</a> (2.0) <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/it/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;moz&apos; as this browser considers it experimental">moz</a></span><br>
+    <a href="/en-US/Firefox/Releases/16" title="Released on 2012-10-09.">16.0</a> (16.0)</td>
+   <td>10</td>
+   <td>17</td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+  <tr>
+   <td>Synchronous API<br>
+    (used with <a href="/en-US/docs/DOM/Using_web_workers" title="https://developer.mozilla.org/en-US/docs/Using_web_workers">WebWorkers</a>)</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span><br>
+    See <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=701634" title="FIXED: IndexedDB: Support database access from worker threads">bug 701634</a></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Asynchronous API</td>
+   <td>4.4</td>
+   <td><a href="/en-US/Firefox/Releases/6" title="Released on 2011-08-16.">6.0</a> (6.0) <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/it/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;moz&apos; as this browser considers it experimental">moz</a></span><br>
+    <a href="/en-US/Firefox/Releases/16" title="Released on 2012-10-09.">16.0</a> (16.0)</td>
+   <td>10</td>
+   <td>17</td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Some browsers don&apos;t yet support IndexedDB but <a href="http://caniuse.com/sql-storage" title="http://caniuse.com/sql-storage">do support WebSQL</a>, most notably Safari/Webkit on desktop and iOS. One way around this problem is to use an IndexedDB Polyfill or Shim that falls back to <a href="http://www.w3.org/TR/webdatabase/">WebSQL</a> or even <a href="/en-US/docs/Web/Guide/API/DOM/Storage#localStorage">localStorage</a> for non-supporting browsers. The best available polyfill at present is <a href="https://github.com/mozilla/localForage">localForage</a>.</p>
+</div>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/IndexedDB/#idl-def-IDBEnvironment" hreflang="en" lang="en">Indexed Database API<br><small lang="it">The definition of &apos;IDBEnvironment&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<section id="Quick_Links">
+<ol>
+ <li data-default-state="open"><strong><a href="#">Guides and recommendations</a></strong>
+
+  <ol>
+   <li><a href="/en-US/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB">Basic concepts behind IndexedDB</a></li>
+   <li><a href="/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB">Using IndexedDB</a></li>
+   <li><a href="/en-US/Apps/Build/Offline">Offline guide on App Center</a></li>
+  </ol>
+ </li>
+ <li data-default-state="open"><strong><a href="#">Asynchronous interfaces</a></strong>
+  <ol>
+   <li><a href="/it/docs/Web/API/IDBCursor"><code>IDBCursor</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBCursorWithValue"><code>IDBCursorWithValue</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBDatabase"><code>IDBDatabase</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBEnvironment"><code>IDBEnvironment</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBFactory"><code>IDBFactory</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBIndex"><code>IDBIndex</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBKeyRange"><code>IDBKeyRange</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBObjectStore"><code>IDBObjectStore</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBOpenDBRequest"><code>IDBOpenDBRequest</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBRequest"><code>IDBRequest</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBTransaction"><code>IDBTransaction</code></a></li>
+  </ol>
+ </li>
+ <li data-default-state="open"><strong><a href="#">Synchronous interfaces</a></strong>
+  <ol>
+   <li><a href="/it/docs/Web/API/IDBCursorSync"><code>IDBCursorSync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBDatabaseSync"><code>IDBDatabaseSync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBEnvironmentSync"><code>IDBEnvironmentSync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBFactorySync"><code>IDBFactorySync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBIndexSync"><code>IDBIndexSync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBObjectStoreSync"><code>IDBObjectStoreSync</code></a></li>
+   <li><a href="/it/docs/Web/API/IDBTransactionSync"><code>IDBTransactionSync</code></a></li>
+  </ol>
+ </li>
+</ol>
+</section>

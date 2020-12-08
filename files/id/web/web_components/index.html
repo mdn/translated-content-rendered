@@ -1,0 +1,230 @@
+---
+title: Web Components
+slug: Web/Web_Components
+tags:
+  - Artikel Web
+  - Gambaran
+  - HTML Imports
+  - JavaScript
+  - Landing
+  - Pengembangan Web
+  - Template
+  - Web Components
+  - component
+  - custom elements
+  - shadow dom
+  - slot
+translation_of: Web/Web_Components
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/id/docs/Web/Web_Components/Using_custom_elements">Using custom elements</a> <a href="/id/docs/Web/Web_Components/Using_custom_elements$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/id/docs/Web/Web_Components/Using_shadow_DOM">Using shadow DOM</a> <a href="/id/docs/Web/Web_Components/Using_shadow_DOM$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/id/docs/Web/Web_Components/Using_templates_and_slots">Using templates and slots</a> <a href="/id/docs/Web/Web_Components/Using_templates_and_slots$translate" style="opacity: 0.5;">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/id/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/id/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/id/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/id/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/id/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/id/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Properties</summary><ol><li><a href="/id/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/id/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/id/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/id/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/id/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/id/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Methods</summary><ol><li><a href="/id/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/id/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/id/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<div class="summary">
+<p>Web Components adalah kumpulan fitur teknologi yang memungkinkan Anda membuat elemen khusus yang dapat digunakan kembali dengan fungsionalitasnya yang dikemas jauh dari sisa kode Anda dan menggunakannya di aplikasi web Anda.</p>
+</div>
+
+<h2 id="Konsep_dan_penggunaan">Konsep dan penggunaan</h2>
+
+<p>Sebagai pengembang, kita semua tahu bahwa menggunakan kembali kode sebanyak mungkin merupakan ide yang bagus. Hal ini biasanya tidak mudah untuk struktur <em>markup </em>kustom memikirkan HTML kompleks (serta gaya dan skrip terkait) yang terkadang harus Anda tulis untuk memnuat kontrol UI khusus, dan bagaimana menggunakannya beberapa kali dapat mengubah halaman Anda menjadi berantankan jika Anda tidak berhati-hati.</p>
+
+<p>Web Components bertujun untuk menyelesaikan masalah yang terdiri dari tiga teknologi utama, yang dapat digunakan bersama untuk membuat elemen kustom serbaguna dengan fungsionalitas terenkapsulasi yang dapat digunakan kembali di mana pun Anda suka tanpa takut benturan kode.</p>
+
+<ul>
+ <li><strong>Custom elements</strong>: Sekumpulan API JavaScript yang memungkinkan Anda menentukan <em>custom element </em>dan perilakunya, yang kemudian dapat digunakan sesuai keinginan di antarmuka pengguna Anda.</li>
+ <li><strong>Shadow DOM</strong>: Sekumpulan API JavaScript untuk melampirkan pohon DOM &quot;bayangan&quot; yang dienkapsulasi ke elemen yang dirender secara terpisah dari dokumen utama DOM dan mengontrol fungsionalitas terkait. Dengan cara ini, Anda dapat membuat fitur elemen tetap bersifat pribadi, sehingga fitur tersebut dapat ditulis dan diberi gaya tanpa takut bertabrakan dengan bagian lain dari dokumen.</li>
+ <li><strong>HTML templates</strong>: Elemen <a href="/id/docs/Web/HTML/Element/template" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;template&gt;</code></a> dan <a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a> memungkinkan Anda menulis template markup yang tidak ditampilkan di halaman yang dirender. Ini kemudian dapat digunakan kembali beberapa kali sebagai dasar struktur elemen kustom.</li>
+</ul>
+
+<p>Pendekatan dasar untuk mengimplementasikan <em>web component</em> biasanya terlihat seperti ini:</p>
+
+<ol>
+ <li>Buat kelas di mana Anda menentukan fungsionalitas <em>web component</em> Anda, menggunakan sintaks kelas ECMAScript 2015 (lihat <a href="https://wiki.developer.mozilla.org/id/docs/Web/JavaScript/Reference/Classes">Kelas</a> untuk informasi lebih lanjut).</li>
+ <li>Daftarkan elemen kustom baru Anda menggunakan metode <a href="/id/docs/Web/API/CustomElementRegistry/define_"><code>CustomElementRegistry.define ()</code></a>, meneruskan nama elemen yang akan ditentukan, kelas atau fungsi di mana fungsionalitasnya ditentukan, dan secara opsional, elemen apa yang diwarisi dari.</li>
+ <li>Jika perlu, lampirkan shadow DOM ke elemen khusus menggunakan metode <a href="/id/docs/Web/API/Element/attachShadow_"><code>Element.attachShadow ()</code></a>. Tambahkan child element, event listener, dll., Ke shadow DOM menggunakan metode DOM biasa.</li>
+ <li>Jika perlu, tentukan template HTML menggunakan <a href="/id/docs/Web/HTML/Element/template" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;template&gt;</code></a> dan <a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a>. Sekali lagi gunakan metode DOM biasa untuk mengkloning template dan melampirkannya ke shadow DOM Anda.</li>
+ <li>Gunakan elemen kustom Anda di mana pun Anda suka di halaman Anda, seperti yang Anda lakukan pada elemen HTML biasa.</li>
+</ol>
+
+<h2 id="Tutorial">Tutorial</h2>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_custom_elements">Menggunakan custom element</a></dt>
+ <dd>Panduan yang menunjukkan cara menggunakan fitur elemen khusus untuk membuat komponen web sederhana, serta melihat callback siklus proses dan beberapa fitur lanjutan lainnya.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Menggunakan shadow DOM</a></dt>
+ <dd>Panduan yang mempelajari dasar-dasar shadow DOM, menunjukkan cara melampirkan shadow DOM ke elemen, menambahkan ke shadow DOM tree, menatanya, dan banyak lagi.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_templates_and_slots">Menggunakan templates and slots</a></dt>
+ <dd>Panduan yang menunjukkan cara menentukan struktur HTML yang dapat digunakan kembali menggunakan elemen <a href="/id/docs/Web/HTML/Element/template" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;template&gt;</code></a> dan <a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a>, lalu menggunakan struktur tersebut di dalam komponen web Anda.</dd>
+</dl>
+
+<h2 id="Referensi">Referensi</h2>
+
+<h3 id="Custom_elements">Custom elements</h3>
+
+<dl>
+ <dt><a href="/id/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></dt>
+ <dd>Berisi fungsionalitas yang terkait dengan elemen kustom, terutama metode <a href="/id/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> yang digunakan untuk mendaftarkan elemen kustom baru sehingga dapat digunakan di dokumen Anda.</dd>
+ <dt><a href="/id/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></dt>
+ <dd>Mengembalikan referensi ke objek <a href="/id/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a>.</dd>
+ <dt><a href="/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks">Life cycle callbacks</a></dt>
+ <dd>Fungsi panggilan balik khusus yang ditentukan di dalam definisi kelas elemen khusus, yang memengaruhi perilakunya:
+ <ul>
+  <li><code>connectedCallback</code>: Dipanggil saat elemen khusus pertama kali dihubungkan ke DOM dokumen.</li>
+  <li><code>disconnectedCallback</code>: Dipanggil ketika elemen khusus terputus dari DOM dokumen.</li>
+  <li><code>adoptedCallback</code>: Dipanggil ketika elemen kustom dipindahkan ke dokumen baru.</li>
+  <li><code>attributeChangedCallback</code>: Dipanggil ketika salah satu atribut elemen khusus ditambahkan, dihapus, atau diubah.</li>
+ </ul>
+ </dd>
+ <dd>
+ <ul>
+ </ul>
+ </dd>
+</dl>
+
+<dl>
+ <dt>Ekstensi untuk membuat elemen bawaan khusus</dt>
+ <dd>
+ <ul>
+  <li>Atribut HTML global <code><a href="/id/docs/Web/HTML/Global_attributes#attr-is">is</a></code>: Memungkinkan Anda menentukan bahwa elemen HTML standar harus berperilaku seperti elemen bawaan khusus terdaftar.</li>
+  <li>Opsi &quot;is&quot; dari metode <a href="/id/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a>: Memungkinkan Anda membuat instance elemen HTML standar yang berperilaku seperti elemen bawaan khusus terdaftar yang diberikan.</li>
+ </ul>
+ </dd>
+ <dt>CSS pseudo-classes</dt>
+ <dd>Pseudo-classes yang berkaitan secara khusus dengan elemen khusus:
+ <ul>
+  <li><a href="/id/docs/Web/CSS/:defined" title="The documentation about this has not yet been written; please consider contributing!"><code>:defined</code></a>: Mencocokkan elemen apa pun yang ditentukan, termasuk elemen bawaan dan elemen khusus yang ditentukan dengan <code>CustomElementRegistry.define()</code>).</li>
+  <li><a href="/id/docs/Web/CSS/:host" title="The documentation about this has not yet been written; please consider contributing!"><code>:host</code></a>: Memilih shadow host dari shadow DOM yang berisi CSS yang digunakan di dalamnya.</li>
+  <li><a href="/id/docs/Web/CSS/:host()" title="The documentation about this has not yet been written; please consider contributing!"><code>:host()</code></a>: Memilih shadow host dari <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM</a> yang berisi CSS yang digunakan di dalamnya (sehingga Anda dapat memilih elemen khusus dari dalam shadow DOM-nya) tetapi hanya jika pemilih yang diberikan sebagai parameter fungsi cocok dengan shadow host.</li>
+  <li><a href="/id/docs/Web/CSS/:host-context()" title="The documentation about this has not yet been written; please consider contributing!"><code>:host-context()</code></a>: Memilih shadow host dari <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM</a> yang berisi CSS yang digunakan di dalamnya (sehingga Anda dapat memilih elemen khusus dari dalam shadow DOM-nya) tetapi hanya jika pemilih yang diberikan sebagai parameter fungsi cocok dengan leluhur host bayangan di tempat itu itu berada di dalam hierarki DOM.</li>
+ </ul>
+ </dd>
+ <dd>Pseudo-elements yang berkaitan secara khusus dengan elemen khusus:
+ <ul>
+  <li><a href="/id/docs/Web/CSS/::part" title="The documentation about this has not yet been written; please consider contributing!"><code>::part</code></a>: Merepresentasikan elemen apa pun dalam <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">shadow tree</a> yang memiliki atribut <code><a href="/id/docs/Web/HTML/Global_attributes#attr-part">part</a></code> yang cocok.</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Shadow_DOM">Shadow DOM</h3>
+
+<dl>
+ <dt><a href="/id/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></dt>
+ <dd>Merepresentasikan root node dari shadow DOM subtree.</dd>
+ <dt><a href="/id/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></dt>
+ <dd>Fitur penentu mixin yang tersedia di seluruh dokumen dan shadow roots.</dd>
+ <dt>Ekstensi <a href="/id/docs/Web/API/Element"><code>Element</code></a></dt>
+ <dd>Ekstensi ke antarmuka <code>Element</code> yang terkait dengan shadow DOM:
+ <ul>
+  <li>Metode <a href="/id/docs/Web/API/Element/attachShadow_"><code>Element.attachShadow ()</code></a> melampirkan shadow DOM tree ke elemen yang ditentukan.</li>
+  <li>Properti <a href="/id/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a> mengembalikan shadow root yang dilampirkan ke elemen yang ditentukan, atau <code>null</code> jika tidak ada shadow root yang terpasang.</li>
+ </ul>
+ </dd>
+ <dt>Penambahan <a href="/id/docs/Web/API/Node"><code>Node</code></a> yang relevan</dt>
+ <dd>Penambahan antarmuka <code>Node</code> yang relevan dengan shadow DOM:
+ <ul>
+  <li>Metode <a href="/id/docs/Web/API/Node/getRootNode_"><code>Node.getRootNode ()</code></a> mengembalikan root objek konteks, yang secara opsional menyertakan shadow root jika tersedia.</li>
+  <li>Properti <a href="/id/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a> mengembalikan boolean yang menunjukkan apakah Node terhubung (langsung atau tidak langsung) ke objek konteks atau tidak, misalnya objek <a href="/id/docs/Web/API/Document"><code>Document</code></a> dalam kasus DOM normal, atau <a href="/id/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a> untuk shadow DOM.</li>
+ </ul>
+ </dd>
+ <dt>Ekstensi <a href="/id/docs/Web/API/Event"><code>Event</code></a></dt>
+ <dd>Ekstensi ke antarmuka <code>Event</code> yang terkait dengan shadow DOM:
+ <ul>
+  <li><a href="/id/docs/Web/API/Event/composed"><code>Event.composed</code></a>: Mengembalikan <a href="/id/docs/Web/JavaScript/Reference/Boolean"><code>Boolean</code></a> yang menunjukkan apakah acara akan menyebar melintasi batas shadow DOM ke DOM standar (<code>true</code>), atau tidak (<font face="consolas, Liberation Mono, courier, monospace"><span style="background-color: rgba(220, 220, 220, 0.5);">false</span></font>).</li>
+  <li><a href="/id/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a>: Mengembalikan event&apos;s path (objek tempat pemroses akan dipanggil). Ini tidak termasuk node dalam shadow tree jika shadow root dibuat dengan <a href="/id/docs/Web/API/ShadowRoot/mode"><code>ShadowRoot.mode</code></a> ditutup.</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="HTML_templates">HTML templates</h3>
+
+<dl>
+ <dt><a href="/id/docs/Web/HTML/Element/template" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;template&gt;</code></a></dt>
+ <dd>Berisi fragmen HTML yang tidak dirender saat dokumen penampung awalnya dimuat, tetapi dapat ditampilkan saat runtime menggunakan JavaScript, terutama digunakan sebagai dasar struktur elemen khusus. Antarmuka DOM terkait adalah <a href="/id/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a>.</dd>
+ <dt><a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a></dt>
+ <dd>Placeholder di dalam web component yang dapat Anda isi dengan markup Anda sendiri, yang memungkinkan Anda membuat DOM tree terpisah dan menyajikannya bersama-sama. Antarmuka DOM terkait adalah <a href="/id/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></dd>
+ <dt>Atribut HTML global <code><a href="/en-US/docs/Web/HTML/Global_attributes/slot">slot</a></code></dt>
+ <dd>Menetapkan slot di shadow tree shadow DOM ke sebuah elemen.</dd>
+ <dt><a href="/id/docs/Web/API/Slotable"><code>Slotable</code></a></dt>
+ <dd>Mixin yang diimplementasikan oleh node <a href="/id/docs/Web/API/Element"><code>Element</code></a> dan <a href="/id/docs/Web/API/Text"><code>Text</code></a>, mendefinisikan fitur yang memungkinkan mereka menjadi konten elemen <a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a>. Mixin mendefinisikan satu atribut, <a href="/id/docs/Web/API/Slotable/assignedSlot"><code>Slotable.assignedSlot</code></a>, yang mengembalikan referensi ke slot tempat node disisipkan.</dd>
+</dl>
+
+<dl>
+ <dt>Ekstensi <a href="/id/docs/Web/API/Element"><code>Element</code></a></dt>
+ <dd>Extensions ke antarmuka <code>Element</code> yang terkait dengan slot:
+ <ul>
+  <li><a href="/id/docs/Web/API/Element/slot"><code>Element.slot</code></a>: Mengembalikan nama slot shadow DOM yang dilampirkan ke elemen.</li>
+ </ul>
+ </dd>
+ <dt>CSS pseudo-elements</dt>
+ <dd>Pseudo-elements yang berkaitan secara khusus dengan slot:
+ <ul>
+  <li><a href="/id/docs/Web/CSS/::slotted" title="The documentation about this has not yet been written; please consider contributing!"><code>::slotted</code></a>: Mencocokkan konten apa pun yang dimasukkan ke dalam slot.</li>
+ </ul>
+ </dd>
+ <dt>Event <code><a href="/id/docs/Web/Reference/Events/slotchange" title="/id/docs/Web/Reference/Events/slotchange">slotchange</a></code></dt>
+ <dd>Diaktifkan pada instance <a href="/id/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a> (elemen <a href="/id/docs/Web/HTML/Element/slot" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;slot&gt;</code></a>) saat node yang ada di slot itu berubah.</dd>
+</dl>
+
+<h2 id="Contoh">Contoh</h2>
+
+<p>Kami sedang membangun sejumlah contoh dalam repo GitHub <a href="https://github.com/mdn/web-components-examples">contoh komponen web</a> kami. Lebih banyak akan ditambahkan seiring berjalannya waktu.</p>
+
+<h2 id="Spesifikasi">Spesifikasi</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spesifikasi</th>
+   <th scope="col">Status</th>
+   <th scope="col">Komentar</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/scripting.html#the-template-element" hreflang="en" lang="en">HTML Living Standard<br><small lang="id">The definition of &apos;&lt;template&gt; element&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Definisi dari <a href="/id/docs/Web/HTML/Element/template" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;template&gt;</code></a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements" hreflang="en" lang="en">HTML Living Standard<br><small lang="id">The definition of &apos;custom elements&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Definisi dari <a href="/en-US/docs/Web/Web_Components/Using_custom_elements">HTML Custom Elements</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#shadow-trees" hreflang="en" lang="en">DOM<br><small lang="id">The definition of &apos;shadow trees&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>Definisi dari <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/imports/" hreflang="en" lang="en" title="The &apos;HTML Imports&apos; specification">HTML Imports</a></td>
+   <td><span class="spec-WD">Working Draft</span></td>
+   <td>Definisi <a href="/en-US/docs/Web/Web_Components/HTML_Imports">Impor HTML</a> awal.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/shadow/" hreflang="en" lang="en" title="The &apos;Shadow DOM&apos; specification">Shadow DOM</a></td>
+   <td><span class="spec-Obsolete">Obsolete</span></td>
+   <td>Definisi <a href="/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> awal.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Kompabilitas_browser">Kompabilitas browser</h2>
+
+<p>Umumnya:</p>
+
+<ul>
+ <li>Komponen web didukung secara default di Firefox (versi 63), Chrome, dan Opera.</li>
+ <li>Safari mendukung sejumlah fitur komponen web, tetapi kurang dari browser di atas.</li>
+ <li>Edge sedang berada implementasi pengerjaan.</li>
+</ul>
+
+<p>Untuk dukungan browser mendetail dari fitur tertentu, Anda harus membaca halaman referensi yang tercantum di atas.</p>
+
+<h2 id="Lihat_juga">Lihat juga</h2>
+
+<ul>
+ <li><a href="https://www.webcomponents.org/">webcomponents.org</a> situs yang menampilkan contoh komponen web, tutorial, dan informasi lainnya.</li>
+ <li><a href="https://www.dataformsjs.com/">DataFormsJS</a> Pustaka web component terbuka — Kumpulan Web Component yang dapat digunakan untuk membangun Single Page Apps(SPA), Menampilkan data JSON dari API dan Web service, dan mengikat data ke berbagai elemen di layar. Semua Web Component adalah JavaScript biasa dan tidak memerlukan proses pembuatan.</li>
+ <li><a href="https://fast.design/" rel="noopener">FAST</a> adalah pustaka komponen web yang dibangun oleh Microsoft yang menawarkan beberapa paket untuk dimanfaatkan tergantung pada kebutuhan proyek Anda. Fast Element adalah cara yang ringan untuk dengan mudah membangun Web Component yang berkinerja, hemat memori, dan memenuhi standar. Fast Foundation adalah pustaka kelas WebComponent, templat, dan utilitas lain yang dibangun di atas elemen cepat yang dimaksudkan untuk disusun menjadi Web Component terdaftar.</li>
+ <li><a href="https://github.com/hybridsjs/hybrids">Hybrids</a> Pustaka web component sumber terbuka, yang mendukung objek biasa dan fungsi murni di atas <code>class</code> dan sintaks <code><font face="consolas, Liberation Mono, courier, monospace">this</font></code>. Ini menyediakan API sederhana dan fungsional untuk membuat elemen khusus.</li>
+ <li><a href="https://www.polymer-project.org/">Polymer</a> framework web component Google, satu set polyfill, penyempurnaan, dan contoh. Saat ini cara termudah untuk menggunakan komponen web lintas browser.</li>
+ <li><a href="https://github.com/devpunks/snuggsi#readme">Snuggsi</a> Web Component Mudah dalam ~ 1kB Termasuk polyfill - Yang Anda butuhkan hanyalah browser dan pemahaman dasar tentang kelas HTML, CSS, dan JavaScript agar produktif.</li>
+ <li><a href="https://github.com/slimjs/slim.js">Slim.js</a> Pustaka web component sumber terbuka, pustaka berkinerja tinggi untuk pembuatan komponen yang cepat dan mudah; dapat diperluas dan <em>pluggable</em> dan kompatibel <em>cross-framwork</em>.</li>
+ <li><a href="https://stenciljs.com/">Stencil</a> — TToolchain untuk membangun sistem desain yang dapat digunakan kembali dan terukur dalam web component.</li>
+</ul>

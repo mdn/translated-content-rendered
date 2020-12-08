@@ -1,0 +1,1127 @@
+---
+title: 'Django Tutorial Part 8: User authentication and permissions'
+slug: Learn/Server-side/Django/Authentication
+tags:
+  - Articolo
+  - Forms
+  - Python
+  - Server
+  - Tutorial
+  - autenticazione
+  - django
+  - form
+  - sessione
+  - sessioni
+translation_of: Learn/Server-side/Django/Authentication
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/it/docs/Learn/Getting_started_with_the_web"><strong>Complete beginners start here!</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Getting started with the Web</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web">Getting started with the Web overview</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Installing_basic_software">Installing basic software</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">What will your website look like?</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Dealing_with_files">Dealing with files</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/HTML_basics">HTML basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/CSS_basics">CSS basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/Publishing_your_website">Publishing your website</a></li>
+            <li><a href="/it/docs/Learn/Getting_started_with_the_web/How_the_Web_works">How the Web works</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/HTML"><strong>HTML — Structuring the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Introduction to HTML</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML">Introduction to HTML overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Getting started with HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">What&apos;s in the head? Metadata in HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">HTML text fundamentals</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">Creating hyperlinks</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Advanced text formatting</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Document and website structure</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Debugging HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Assessment: Marking up a letter</a></li>
+            <li><a href="/it/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Assessment: Structuring a page of content</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Multimedia and embedding</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding">Multimedia and embedding overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Images in HTML</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Video and audio content</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">From object to iframe — other embedding technologies</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Adding vector graphics to the Web</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Responsive images</a></li>
+            <li><a href="/it/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Assessment: Mozilla splash page</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/it/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/CSS"><strong>CSS — Styling the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/it/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/it/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Styling text</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/Styling_text">Styling text overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Fundamentals">Fundamental text and font styling</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Styling_lists">Styling lists</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Styling_links">Styling links</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Web_fonts">Web fonts</a></li>
+            <li><a href="/it/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Assessment: Typesetting a community school homepage</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS layout</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout">CSS layout overview</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Introduction">Introduction</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Grids">Grids</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Floats">Floats</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Positioning">Positioning</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/it/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/JavaScript"><strong>JavaScript — Dynamic client-side scripting</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript first steps</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps">JavaScript first steps overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/What_is_JavaScript">What is JavaScript?</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/A_first_splash">A first splash into JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/What_went_wrong">What went wrong? Troubleshooting JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Variables">Storing the information you need — Variables</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Math">Basic math in JavaScript — Numbers and operators</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Strings">Handling text — Strings in JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Useful_string_methods">Useful string methods</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Arrays">Arrays</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/First_steps/Silly_story_generator">Assessment: Silly story generator</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript building blocks</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/conditionals">Making decisions in your code — Conditionals</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Looping_code">Looping code</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Functions">Functions — Reusable blocks of code</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Build your own function</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Return_values">Function return values</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Events">Introduction to events</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Building_blocks/Image_gallery">Assessment: Image gallery</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Introducing JavaScript objects</summary>
+          <ol>
+            <li><a href="/it/docs/Learn/JavaScript/Objects">Introducing JavaScript objects overview</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Basics">Object basics</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object-oriented_JS">Object-oriented JavaScript for beginners</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object_prototypes">Object prototypes</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Inheritance">Inheritance in JavaScript</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/JSON">Working with JSON data</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Object_building_practice">Object building practice</a></li>
+            <li><a href="/it/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Assessment: Adding features to our bouncing balls demo</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/it/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/it/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/it/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/it/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/it/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/it/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/it/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/it/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/it/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/it/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/it/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/it/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/it/docs/Learn/Tools_and_testing"><strong>Tools and testing</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Cross browser testing</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing">Cross browser testing overview</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+          <li><a href="/it/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="open"><a href="/it/docs/Learn/Server-side"><strong>Server-side website programming</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>First steps</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/First_steps">First steps overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Introduction">Introduction to the server-side</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-Server overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Web_frameworks">Server-side web frameworks</a></li>
+          <li><a href="/it/docs/Learn/Server-side/First_steps/Website_security">Website security</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Django web framework (Python)</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/Django">Django web framework (Python) overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Introduction">Introduction</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/development_environment">Setting up a development environment</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Tutorial_local_library_website">Tutorial: The Local Library website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/skeleton_website">Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Models">Tutorial Part 3: Using models</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Admin_site">Tutorial Part 4: Django admin site</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Home_page">Tutorial Part 5: Creating our home page</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Generic_views">Tutorial Part 6: Generic list and detail views</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Sessions">Tutorial Part 7: Sessions framework</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Authentication">Tutorial Part 8: User authentication and permissions</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Forms">Tutorial Part 9: Working with forms</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Testing">Tutorial Part 10: Testing a Django web application</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/Deployment">Tutorial Part 11: Deploying Django to production</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/web_application_security">Web application security</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Django/django_assessment_blog">Assessment: DIY mini blog</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/it/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Further resources</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Common questions</summary>
+        <ol>
+          <li><a href="/it/docs/Learn/HTML/Howto">HTML questions</a></li>
+          <li><a href="/it/docs/Learn/CSS/Howto">CSS questions</a></li>
+          <li><a href="/it/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#How_the_Web_works">How the Web works</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#Tools_and_setup">Tools and setup</a></li>
+          <li><a href="/it/docs/Learn/Common_questions#Design_and_accessibility">Design and accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/it/docs/Learn/How_to_contribute">How to contribute</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/it/docs/Learn/Server-side/Django/Sessions" class="button"><i class="icon-arrow-left"></i><span class="label"> Previous </span></a><a href="/it/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Overview: Django</a><a href="/it/docs/Learn/Server-side/Django/Forms" class="button"><span class="label"> Next  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">In questo tutorial ti mostreremo come consentire agli utenti di accedere al tuo sito con i propri account e come controllare cosa possono fare e vedere in base al fatto che abbiano effettuato l&apos;accesso e le relative autorizzazioni. Come parte di questa dimostrazione, estenderemo il sito Web LocalLibrary, aggiungendo pagine di accesso e disconnessione e pagine specifiche per utente e personale per la visualizzazione di libri presi in prestito.</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">Prerequisiti:</th>
+   <td>Completare tutti i precedenti argomentioltre che il capitolo <a href="/en-US/docs/Learn/Server-side/Django/Sessions">Django Tutorial Part 7: Sessions framework</a>.</td>
+  </tr>
+  <tr>
+   <th scope="row">Obiettivi:</th>
+   <td>Per capire come impostare e utilizzare l&apos;autenticazione utente e le autorizzazioni.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Panoramica">Panoramica</h2>
+
+<p>Django fornisce un sistema di autenticazioni e permessi, costruito sulla base del framework delle sessioni discusso nel <a href="/en-US/docs/Learn/Server-side/Django/Sessions">precedente tutorial</a>, che consente di verificare le credenziali dell&apos;utente e definire le azioni che ogni utente può eseguire. Il framework include modelli integrati per <code>utenti</code> e <code>gruppi </code>(un modo generico di applicare le autorizzazioni a più di un utente alla volta), permessi / flag che indicano se un utente può eseguire un&apos;attività, formee viste per l&apos;accesso degli utenti e strumenti di visualizzazione per limitare il contenuto.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Secondo Django il sistema di autenticazione mira ad essere molto generico, e quindi non fornisce alcune funzionalità fornite in altri sistemi di autenticazione web. Le soluzioni per alcuni problemi comuni sono disponibili come pacchetti di terze parti. Ad esempio, limitazione dei tentativi di accesso e autenticazione contro terze parti (ad esempio OAuth).</p>
+</div>
+
+<p>In questa esercitazione ti mostreremo come abilitare l&apos;autenticazione utente nel sito Web LocalLibrary, creare le tue pagine di accesso e di disconnessione, aggiungere autorizzazioni ai tuoi modelli e controllare l&apos;accesso alle pagine. Useremo l&apos;autenticazione / le autorizzazioni per visualizzare elenchi di libri presi in prestito sia per gli utenti che per i bibliotecari.</p>
+
+<p>Il sistema di autenticazione è molto flessibile e, se lo desideri, puoi creare da zero URL, forms, viste e templates, basta chiamare l&apos;API fornita per accedere all&apos;utente.</p>
+
+<p>Tuttavia, in questo articolo, utilizzeremo le viste di autenticazione &quot;immagazzinate&quot; in Django e i moduli per le nostre pagine di accesso e di disconnessione. Avremo ancora bisogno di creare alcuni modelli, ma è abbastanza facile. Ti mostreremo anche come creare le autorizzazioni e controllare lo stato e le autorizzazioni di accesso sia nelle viste che nei modelli.</p>
+
+<h2 id="Abilitare_lautenticazione">Abilitare l&apos;autenticazione</h2>
+
+<p>L&apos;autenticazione è stata abilitata automaticamente (nel tutorial 2), quindi non è necessario fare altro in questo punto.</p>
+
+<div class="note">
+<p><strong>Note</strong>: La configurazione necessaria è stata fatta per noi quando abbiamo creato l&apos;app utilizzando il comando startproject di django-admin. Le tabelle del database per gli utenti e le autorizzazioni del modello sono state create quando abbiamo inizialmente chiamato <code>python manage.py migrate.</code></p>
+</div>
+
+<p>La configurazione è visibile nelle sezioni INSTALLED_APPS e MIDDLEWARE del file di progetto (locallibrary / locallibrary / settings.py), come mostrato di seguito:</p>
+
+<pre class="brush: python notranslate">INSTALLED_APPS = [
+    ...
+<strong>    &apos;django.contrib.auth&apos;,  </strong>#Core authentication framework and its default models.
+<strong>    &apos;django.contrib.contenttypes&apos;,  #</strong>Django content type system (allows permissions to be associated with models).
+    ....
+
+MIDDLEWARE = [
+    ...
+<strong>    &apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,</strong>  #Manages sessions across requests
+    ...
+<strong>    &apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;,</strong>  #Associates users with requests using sessions.
+    ....
+</pre>
+
+<h2 id="Creazione_di_utenti_e_gruppi">Creazione di utenti e gruppi</h2>
+
+<p>Hai già creato il tuo primo utente quando abbiamo consultato il sito di amministrazione di Django nel tutorial 4 (questo era un superutente, creato con il comando python manage.py createsuperuser). Il nostro superutente è già autenticato e ha tutte le autorizzazioni, quindi avremo bisogno di creare un utente di prova per rappresentare un utente normale del sito. Useremo il sito di amministrazione per creare i nostri gruppi locali e gli accessi al sito Web, poiché è uno dei modi più rapidi per farlo.</p>
+
+<div class="note">
+<p>Note: Puoi anche creare utenti a livello di programmazione, come mostrato di seguito. Dovresti farlo, ad esempio, se sviluppi un&apos;interfaccia per consentire agli utenti di iscriversi da soli (non si dovrebbe consentire agli utenti di accedere al sito di amministrazione).</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.models import User
+
+# Create user and save to the database
+user = User.objects.create_user(&apos;myusername&apos;, &apos;myemail@crazymail.com&apos;, &apos;mypassword&apos;)
+
+# Update fields and then save again
+user.first_name = &apos;John&apos;
+user.last_name = &apos;Citizen&apos;
+user.save()
+</pre>
+</div>
+
+<p>Di seguito creeremo prima un gruppo e poi un utente. Anche se non abbiamo ancora nessuna autorizzazione da aggiungere per i membri della nostra biblioteca, se è necessario in seguito, sarà molto più facile aggiungerli una volta al gruppo rispetto a ciascun membro. Avviare il server di sviluppo e accedere al sito di amministrazione nel proprio browser Web locale (<code>http:/127.0.0.1:8000/admin/</code>). Accedi al sito usando le credenziali per il tuo account superuser. Il livello principale del sito di amministrazione mostra tutti i tuoi modelli, ordinati per &quot;Applicazione Django&quot;. Dalla sezione Autenticazione e autorizzazione, è possibile fare clic sui collegamenti Utenti o Gruppi per visualizzare i record esistenti.</p>
+
+<p><img alt="Admin site - add groups or users" src="https://mdn.mozillademos.org/files/14091/admin_authentication_add.png" style="border-style: solid; border-width: 1px; display: block; height: 364px; margin: 0px auto; width: 661px;"></p>
+
+<p>Creiamo un nuovo gruppo per i membri della libreria.</p>
+
+<ol>
+ <li>Fare clic sul pulsante Aggiungi (accanto a Gruppo) per creare un nuovo gruppo; inserire il nome &quot;Membri libreria&quot; per il gruppo.<img alt="Admin site - add group" src="https://mdn.mozillademos.org/files/14093/admin_authentication_add_group.png" style="border-style: solid; border-width: 1px; display: block; height: 561px; margin: 0px auto; width: 800px;"></li>
+ <li>Non abbiamo bisogno di permessi per il gruppo, quindi basta premere SALVA (verrai indirizzato a un elenco di gruppi).</li>
+</ol>
+
+<p>Ora creiamo un utente:</p>
+
+<ol>
+ <li>Torna alla home page del sito admin.</li>
+ <li>Fai clic sul pulsante Aggiungi accanto a Utenti per aprire la finestra di dialogo Aggiungi utente.<img alt="Admin site - add user pt1" src="https://mdn.mozillademos.org/files/14095/admin_authentication_add_user_prt1.png" style="border-style: solid; border-width: 1px; display: block; height: 409px; margin: 0px auto; width: 800px;"></li>
+ <li>Immettere un nome utente e una password / conferma appropriati per l&apos;utente del test</li>
+ <li>Premi <strong>SALVA</strong>.<br>
+  <br>
+  Il sito di amministrazione creerà il nuovo utente e ti condurrà immediatamente a una schermata Cambia utente in cui è possibile modificare il nome utente e aggiungere informazioni per i campi facoltativi del modello Utente. Questi campi includono il nome, il cognome, l&apos;indirizzo e-mail e lo stato e le autorizzazioni dell&apos;utente (deve essere impostato solo il flag Attivo). Più in basso è possibile specificare i gruppi e le autorizzazioni dell&apos;utente e visualizzare date importanti relative all&apos;utente (ad esempio la data di iscrizione e l&apos;ultima data di accesso).<img alt="Admin site - add user pt2" src="https://mdn.mozillademos.org/files/14097/admin_authentication_add_user_prt2.png" style="border-style: solid; border-width: 1px; display: block; height: 635px; margin: 0px auto; width: 800px;"></li>
+ <li>Nella sezione Gruppi, seleziona Gruppo di membri della biblioteca dall&apos;elenco di Gruppi disponibili, quindi premi la freccia destra tra le caselle per spostarlo nella casella Gruppi scelti.<img alt="Admin site - add user to group" src="https://mdn.mozillademos.org/files/14099/admin_authentication_user_add_group.png" style="border-style: solid; border-width: 1px; display: block; height: 414px; margin: 0px auto; width: 933px;"></li>
+ <li>Non abbiamo bisogno di fare altro qui, quindi seleziona di nuovo SALVA, per andare alla lista degli utenti.</li>
+</ol>
+
+<p>Questo è tutto! Ora hai un account &quot;membro della libreria normale&quot; che potrai utilizzare per il test (una volta implementate le pagine per consentire loro di accedere).</p>
+
+<div class="note">
+<p><strong>Note</strong>: Dovresti provare a creare un altro utente membro della libreria. Inoltre, crea un gruppo per i bibliotecari e aggiungi un utente anche a quello!</p>
+</div>
+
+<h2 id="Impostazione_delle_viste_di_autenticazione">Impostazione delle viste di autenticazione</h2>
+
+<p>Django fornisce quasi tutto ciò che è necessario per creare pagine di autenticazione per gestire login, logout e gestione delle password &quot;out of the box&quot;. Ciò include un mappatore di URL, viste e forms, ma non include i template - dobbiamo creare il nostro! In questa sezione, mostreremo come integrare il sistema predefinito nel sito Web di LocalLibrary e creare i modelli. Li inseriremo negli URL principali del progetto.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Non è necessario utilizzare alcun codice, ma è probabile che lo si desideri perché rende le cose molto più semplici. Dovrai quasi certamente cambiare il codice di gestione del modulo se cambi il tuo modello utente (un argomento avanzato!), Ma anche così, sarai comunque in grado di utilizzare le funzioni di visualizzazione in stock.</p>
+</div>
+
+<div class="note">
+<p><strong>Note: </strong>In questo caso, potremmo inserire ragionevolmente le pagine di autenticazione, inclusi gli URL e i modelli, all&apos;interno della nostra applicazione di catalogo. Tuttavia, se avessimo più applicazioni sarebbe meglio separare questo comportamento di accesso condiviso e renderlo disponibile su tutto il sito, è quello che faremo qui!</p>
+</div>
+
+<h3 id="URL_del_progetto">URL del progetto</h3>
+
+<p>Aggiungi quanto segue alla fine del file urls.py del progetto (locallibrary / locallibrary / urls.py):</p>
+
+<pre class="brush: python notranslate">#Add Django site authentication urls (for login, logout, password management)
+urlpatterns += [
+    path(&apos;accounts/&apos;, include(&apos;django.contrib.auth.urls&apos;)),
+]
+</pre>
+
+<p>Vai a http://127.0.0.1:8000/accounts/ (nota la barra finale in avanti!) E Django mostrerà un errore dicendo che non è stato in grado di trovare questo URL e elenca tutti gli URL che ha provato. Da questo puoi vedere gli URL che funzioneranno, ad esempio:</p>
+
+<div class="note">
+<p><strong>Note: </strong>Usando il metodo precedente si aggiungono i seguenti URL con i nomi tra parentesi quadre, che possono essere utilizzati per invertire i mapping degli URL. Non è necessario implementare nient&apos;altro: la mappatura degli URL di cui sopra esegue automaticamente la mappatura degli URL sottostanti.</p>
+
+<pre class="brush: python notranslate">accounts/ login/ [name=&apos;login&apos;]
+accounts/ logout/ [name=&apos;logout&apos;]
+accounts/ password_change/ [name=&apos;password_change&apos;]
+accounts/ password_change/done/ [name=&apos;password_change_done&apos;]
+accounts/ password_reset/ [name=&apos;password_reset&apos;]
+accounts/ password_reset/done/ [name=&apos;password_reset_done&apos;]
+accounts/ reset/&lt;uidb64&gt;/&lt;token&gt;/ [name=&apos;password_reset_confirm&apos;]
+accounts/ reset/done/ [name=&apos;password_reset_complete&apos;]</pre>
+</div>
+
+<p>Ora prova a navigare verso l&apos;URL di accesso (http://127.0.0.1:8000/accounts/login/). Ciò fallirà di nuovo, ma con un errore che ti dice che ci manca il modello richiesto (registration / login.html) sul percorso di ricerca del modello. Vedrai le seguenti righe elencate nella sezione gialla in alto:</p>
+
+<pre class="brush: python notranslate">Exception Type:    TemplateDoesNotExist
+Exception Value:    <strong>registration/login.html</strong></pre>
+
+<p>Il passo successivo è creare una directory di registrazione sul percorso di ricerca e quindi aggiungere il file login.html.</p>
+
+<h3 id="Directory_template">Directory template</h3>
+
+<p>Gli URL (e le viste implicite) che abbiamo appena aggiunto si aspettano di trovare i loro template associati in una directory /<strong>registration</strong>/ da qualche parte nel percorso di ricerca dei template. Per questo sito, inseriremo le nostre pagine HTML nella cartella <strong>templates / registration /</strong>. Questa directory dovrebbe essere nella directory principale del progetto, cioè nella stessa directory delle cartelle del <strong>catalogo </strong>e della <strong>localibrary</strong>). Si prega di creare queste cartelle ora.</p>
+
+<div class="note">
+<p><strong>Note:</strong> La struttura delle cartelle dovrebbe essere:<br>
+ locallibrary (Django project folder)<br>
+    |_catalog<br>
+    |_locallibrary<br>
+    |_templates <strong>(new)</strong><br>
+                 |_registration</p>
+</div>
+
+<p>Per rendere queste directory visibili al caricatore di template (ovvero per inserire questa directory nel percorso di ricerca del modello), aprire le impostazioni del progetto (/locallibrary/locallibrary/settings.py) e aggiornare la riga &apos;DIRS&apos; della sezione TEMPLATES come mostrato.</p>
+
+<pre class="brush: python notranslate">TEMPLATES = [
+    {
+        ...
+<strong>        &apos;DIRS&apos;: [os.path.join(BASE_DIR, &apos;templates&apos;)],</strong>
+        &apos;APP_DIRS&apos;: True,
+        ...
+</pre>
+
+<h3 id="Login_template">Login template</h3>
+
+<div class="warning notecard">
+<p><strong>Importante</strong>: I modelli di autenticazione forniti in questo articolo sono una versione molto semplice / leggermente modificata dei modelli di login dimostrativi di Django. Potrebbe essere necessario personalizzarli per uso personale!</p>
+</div>
+
+<p>Crea un nuovo file HTML chiamato /locallibrary/templates/registration/login.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+
+{% if form.errors %}
+  &lt;p&gt;Your username and password didn&apos;t match. Please try again.&lt;/p&gt;
+{% endif %}
+
+{% if next %}
+  {% if user.is_authenticated %}
+    &lt;p&gt;Your account doesn&apos;t have access to this page. To proceed,
+    please login with an account that has access.&lt;/p&gt;
+  {% else %}
+    &lt;p&gt;Please login to see this page.&lt;/p&gt;
+  {% endif %}
+{% endif %}
+
+&lt;form method=&quot;post&quot; action=&quot;{% url &apos;login&apos; %}&quot;&gt;
+{% csrf_token %}
+&lt;table&gt;
+
+&lt;tr&gt;
+  &lt;td&gt;{{ form.username.label_tag }}&lt;/td&gt;
+  &lt;td&gt;{{ form.username }}&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+  &lt;td&gt;{{ form.password.label_tag }}&lt;/td&gt;
+  &lt;td&gt;{{ form.password }}&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;input type=&quot;submit&quot; value=&quot;login&quot; /&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;next&quot; value=&quot;{{ next }}&quot; /&gt;
+&lt;/form&gt;
+
+{# Assumes you setup the password_reset view in your URLconf #}
+&lt;p&gt;&lt;a href=&quot;{% url &apos;password_reset&apos; %}&quot;&gt;Lost password?&lt;/a&gt;&lt;/p&gt;
+
+{% endblock %}</pre>
+
+<p id="sect1">Questo modello condivide alcune somiglianze con quelli che abbiamo visto prima: estende il nostro template di base e sovrascrive il blocco del contenuto. Il resto del codice è un codice di gestione della forma abbastanza standard, di cui parleremo in un successivo tutorial. Tutto quello che devi sapere per ora è che questo mostrerà un modulo in cui puoi inserire il tuo nome utente e password, e che se inserisci valori non validi ti verrà chiesto di inserire valori corretti quando la pagina si aggiorna.</p>
+
+<p>Naviga indietro alla login page (<a href="http://127.0.0.1:8000/accounts/login/">http://127.0.0.1:8000/accounts/login/</a>) una volta salvato il modello, dovresti vedere qualcosa del genere:</p>
+
+<p><img alt="Library login page v1" src="https://mdn.mozillademos.org/files/14101/library_login.png" style="border-style: solid; border-width: 1px; display: block; height: 173px; margin: 0px auto; width: 441px;"></p>
+
+<p>Se si tenta di accedere con esito positivo l&apos;utente verrà reindirizzato a un&apos;altra pagina (per impostazione predefinita sarà questa <a href="http://127.0.0.1:8000/accounts/profile/">http://127.0.0.1:8000/accounts/profile/</a>). Il problema qui è che, per impostazione predefinita, Django si aspetta che dopo l&apos;accesso si desideri essere indirizzati a una pagina del profilo, che può essere o non essere il caso. Poiché non hai ancora definito questa pagina, riceverai un altro errore!</p>
+
+<p>Apri le impostazioni del progetto (/locallibrary/locallibrary/settings.py) e aggiungi il testo in basso alla fine. Ora quando accedi devi essere reindirizzato alla homepage del sito per impostazione predefinita.</p>
+
+<pre class="brush: python notranslate"># Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = &apos;/&apos;
+</pre>
+
+<h3 id="Logout_template">Logout template</h3>
+
+<p>Se navighi verso l&apos;URL di disconnessione (http://127.0.0.1:8000/accounts/logout/), vedrai qualche comportamento strano: l&apos;utente verrà disconnesso, ma sarai indirizzato pagina di logout dell&apos;Amministratore. Non è quello che vuoi, se non altro perché il link di accesso su quella pagina ti porta alla schermata di accesso dell&apos;amministratore (e questo è disponibile solo per gli utenti che hanno il permesso is_staff).</p>
+
+<p>Crea e apri /locallibrary/templates/registration/logged_out.html. Copia il testo qui sotto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+  &lt;p&gt;Logged out!&lt;/p&gt;
+  &lt;a href=&quot;{% url &apos;login&apos;%}&quot;&gt;Click here to login again.&lt;/a&gt;
+{% endblock %}</pre>
+
+<p>Questo modello è molto semplice. Visualizza semplicemente un messaggio che informa che sei stato disconnesso e fornisce un collegamento che puoi premere per tornare alla schermata di accesso. Se vai di nuovo all&apos;URL di logout dovresti vedere questa pagina:</p>
+
+<p><img alt="Library logout page v1" src="https://mdn.mozillademos.org/files/14103/library_logout.png" style="border-style: solid; border-width: 1px; display: block; height: 169px; margin: 0px auto; width: 385px;"></p>
+
+<h3 id="Password_reset_templates">Password reset templates</h3>
+
+<p>Il sistema di reimpostazione della password predefinito utilizza la posta elettronica per inviare all&apos;utente un link di ripristino. È necessario creare moduli per ottenere l&apos;indirizzo e-mail dell&apos;utente, inviare l&apos;e-mail, consentire loro di immettere una nuova password e prendere nota del completamento dell&apos;intero processo.</p>
+
+<p>I seguenti modelli possono essere utilizzati come punto di partenza.</p>
+
+<h4 id="Password_reset_form">Password reset form</h4>
+
+<p>Questo è il modulo utilizzato per ottenere l&apos;indirizzo e-mail dell&apos;utente (per inviare l&apos;e-mail di reimpostazione della password). Crea /locallibrary/templates/registration/password_reset_form.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+  &lt;form action=&quot;&quot; method=&quot;post&quot;&gt;
+  {% csrf_token %}
+  {% if form.email.errors %}
+    {{ form.email.errors }}
+  {% endif %}
+      &lt;p&gt;{{ form.email }}&lt;/p&gt;
+    &lt;input type=&quot;submit&quot; class=&quot;btn btn-default btn-lg&quot; value=&quot;Reset password&quot;&gt;
+  &lt;/form&gt;
+{% endblock %}
+</pre>
+
+<h4 id="Password_reset_eseguito">Password reset eseguito</h4>
+
+<p>Questo modulo viene visualizzato dopo che il tuo indirizzo email è stato raccolto. Crea /locallibrary/templates/registration/password_reset_done.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+  &lt;p&gt;We&apos;ve emailed you instructions for setting your password. If they haven&apos;t arrived in a few minutes, check your spam folder.&lt;/p&gt;
+{% endblock %}
+</pre>
+
+<h4 id="Password_reset_email">Password reset email</h4>
+
+<p>Questo modello fornisce il testo dell&apos;email HTML contenente il link di ripristino che invieremo agli utenti. Crea /locallibrary/templates/registration/password_reset_email.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">Someone asked for password reset for email {{ email }}. Follow the link below:
+{{ protocol}}://{{ domain }}{% url &apos;password_reset_confirm&apos; uidb64=uid token=token %}
+</pre>
+
+<h4 id="Password_reset_confirm">Password reset confirm</h4>
+
+<p>Questo modello fornisce il testo dell&apos;email HTML contenente il link di ripristino che invieremo agli utenti. Crea /locallibrary/templates/registration/password_reset_email.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+    {% if validlink %}
+        &lt;p&gt;Please enter (and confirm) your new password.&lt;/p&gt;
+        &lt;form action=&quot;&quot; method=&quot;post&quot;&gt;
+        {% csrf_token %}
+            &lt;table&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;{{ form.new_password1.errors }}
+                        &lt;label for=&quot;id_new_password1&quot;&gt;New password:&lt;/label&gt;&lt;/td&gt;
+                    &lt;td&gt;{{ form.new_password1 }}&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;{{ form.new_password2.errors }}
+                        &lt;label for=&quot;id_new_password2&quot;&gt;Confirm password:&lt;/label&gt;&lt;/td&gt;
+                    &lt;td&gt;{{ form.new_password2 }}&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;input type=&quot;submit&quot; value=&quot;Change my password&quot; /&gt;&lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/table&gt;
+        &lt;/form&gt;
+    {% else %}
+        &lt;h1&gt;Password reset failed&lt;/h1&gt;
+        &lt;p&gt;The password reset link was invalid, possibly because it has already been used. Please request a new password reset.&lt;/p&gt;
+    {% endif %}
+{% endblock %}
+</pre>
+
+<h4 id="Password_reset_completato">Password reset completato</h4>
+
+<p>Questo è l&apos;ultimo modello di reimpostazione della password, che viene visualizzato per avvisarti quando la reimpostazione della password è riuscita. Crea /locallibrary/templates/registration/password_reset_complete.html e dagli il seguente contenuto:</p>
+
+<pre class="brush: html notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+  &lt;h1&gt;The password has been changed!&lt;/h1&gt;
+  &lt;p&gt;&lt;a href=&quot;{% url &apos;login&apos; %}&quot;&gt;log in again?&lt;/a&gt;&lt;/p&gt;
+{% endblock %}</pre>
+
+<h3 id="Testare_la_nuova_pagina_di_autenticazione">Testare la nuova pagina di autenticazione</h3>
+
+<p>Ora che hai aggiunto la configurazione dell&apos;URL e creato tutti questi modelli, le pagine di autenticazione ora dovrebbero funzionare!</p>
+
+<p>Puoi testare le nuove pagine di autenticazione usando questi URL:</p>
+
+<ul>
+ <li><a href="http://127.0.0.1:8000/accounts/login/">http://127.0.0.1:8000/accounts/login/</a></li>
+ <li><a href="http://127.0.0.1:8000/accounts/logout/">http://127.0.0.1:8000/accounts/logout/</a></li>
+</ul>
+
+<p>Sarai in grado di testare la funzionalità di reimpostazione della password dal link nella pagina di accesso. Tieni presente che Django invierà solo e-mail di ripristino a indirizzi (utenti) già memorizzati nel suo database!</p>
+
+<div class="note">
+<p><strong>Note</strong>: Il sistema di reimpostazione della password richiede che il tuo sito Web supporti la posta elettronica, che va oltre lo scopo di questo articolo, quindi questa parte non funzionerà ancora. Per consentire il test, inserisci la seguente riga alla fine del tuo file settings.py. Questo registra tutte le e-mail inviate alla console (in questo modo è possibile copiare il link per la reimpostazione della password dalla console).</p>
+
+<pre class="brush: python notranslate">EMAIL_BACKEND = &apos;django.core.mail.backends.console.EmailBackend&apos;
+</pre>
+
+<p>Vedi <a href="https://docs.djangoproject.com/en/2.1/topics/email/">Servizi email</a> (Django docs).</p>
+</div>
+
+<h2 id="Test_verso_utenti_autenticati">Test verso utenti autenticati</h2>
+
+<p>Questa sezione esamina cosa possiamo fare per controllare selettivamente il contenuto che l&apos;utente vede in base al fatto che sia connesso o meno.</p>
+
+<h3 id="Testing_nei_templates">Testing nei templates</h3>
+
+<p>Puoi ottenere informazioni sull&apos;utente attualmente connesso nei modelli con la variabile di modello <code>{{user}}</code> (questo viene aggiunto al contesto del modello per impostazione predefinita quando imposti il progetto come abbiamo fatto nel nostro scheletro).</p>
+
+<p>In genere testerai innanzitutto la variabile di modello <code>{{user.is_authenticated}}</code> per determinare se l&apos;utente è idoneo a vedere contenuti specifici. Per dimostrarlo, aggiorneremo la nostra barra laterale per visualizzare un collegamento &quot;Accedi&quot; se l&apos;utente è disconnesso e un collegamento &quot;Disconnetti&quot; se sono connessi.</p>
+
+<p>Apri il template (<strong>/locallibrary/catalog/templates/base_generic.html</strong>) e copia il seguente testo nel blocco della barra laterale, immediatamente prima del tag <code>endblock</code>.</p>
+
+<pre class="brush: html notranslate">  &lt;ul class=&quot;sidebar-nav&quot;&gt;
+
+    ...
+
+   <strong>{% if user.is_authenticated %}</strong>
+     &lt;li&gt;User: <strong>{{ user.get_username }}</strong>&lt;/li&gt;
+     &lt;li&gt;&lt;a href=&quot;{% url &apos;logout&apos;%}?next={{request.path}}&quot;&gt;Logout&lt;/a&gt;&lt;/li&gt;
+   <strong>{% else %}</strong>
+     &lt;li&gt;&lt;a href=&quot;{% url &apos;login&apos;%}?next={{request.path}}&quot;&gt;Login&lt;/a&gt;&lt;/li&gt;
+   <strong>{% endif %} </strong>
+  &lt;/ul&gt;</pre>
+
+<p>Come puoi vedere, utilizziamo i tag if-else-endif per visualizzare in modo condizionale il testo in base al fatto che {{user.is_authenticated}} sia vero. Se l&apos;utente è autenticato, sappiamo che abbiamo un utente valido, quindi chiamiamo {{user.get_username}} per visualizzare il loro nome.</p>
+
+<p>Creiamo gli URL di collegamento di accesso e di disconnessione utilizzando il tag <code>URL</code> e i nomi delle rispettive configurazioni di URL. Nota anche come abbiamo aggiunto <code>?next={{request.path}}</code>. Ciò che fa è aggiungere un parametro URL <font face="Consolas, Liberation Mono, Courier, monospace">next</font> contenente l&apos;indirizzo (URL) della pagina corrente, alla fine dell&apos;URL collegato. Dopo che l&apos;utente ha effettuato correttamente l&apos;accesso / uscita, le viste useranno questo valore &quot;<code>next</code>&quot; per reindirizzare l&apos;utente alla pagina in cui hanno prima fatto clic sul collegamento login / logout.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Provalo! Se ti trovi nella home page e fai clic su Accedi / Esci nella barra laterale, dopo il completamento dell&apos;operazione dovresti tornare alla stessa pagina.</p>
+</div>
+
+<h3 id="Testing_nelle_views">Testing nelle views</h3>
+
+<p>Se si utilizzano le viste basate sulle funzioni, il modo più semplice per limitare l&apos;accesso alle funzioni è applicare il decoratore login_required alla funzione di visualizzazione, come mostrato di seguito. Se l&apos;utente ha effettuato l&apos;accesso, il codice di visualizzazione verrà eseguito normalmente. Se l&apos;utente non ha effettuato l&apos;accesso, verrà reindirizzato all&apos;URL di accesso definito nelle impostazioni del progetto (settings.LOGIN_URL), passando il percorso assoluto corrente come parametro successivo. Se l&apos;utente riesce ad accedere, verrà riportato a questa pagina, ma questa volta autenticato.</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.decorators import login_required
+
+@login_required
+def my_view(request):
+    ...</pre>
+
+<div class="note">
+<p><strong>Note:</strong> Puoi fare lo stesso genere di cose manualmente testando su request.user.is_authenticated, ma il decoratore è molto più conveniente!</p>
+</div>
+
+<p>Analogamente, il modo più semplice per limitare l&apos;accesso agli utenti che hanno eseguito l&apos;accesso nelle viste basate su classi è derivare da LoginRequiredMixin. Devi dichiarare questo mixin nella prima lista della superclasse, prima della classe della vista principale.</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.mixins import LoginRequiredMixin
+
+class MyView(LoginRequiredMixin, View):
+    ...</pre>
+
+<p>È inoltre possibile specificare un percorso alternativo per reindirizzare l&apos;utente se non sono autenticati (login_url) e un nome parametro URL invece di &quot;next&quot; per inserire il percorso assoluto corrente (redirect_field_name).</p>
+
+<pre class="brush: python notranslate">class MyView(LoginRequiredMixin, View):
+    login_url = &apos;/login/&apos;
+    redirect_field_name = &apos;redirect_to&apos;
+</pre>
+
+<p>Per informazioni ulteriori, consultare <a href="https://docs.djangoproject.com/en/2.1/topics/auth/default/#limiting-access-to-logged-in-users">Django docs here</a>.</p>
+
+<h2 id="Esempio_—_Elencare_i_libri_correnti_dello_user">Esempio — Elencare i libri correnti dello user</h2>
+
+<p>Ora che sappiamo come limitare una pagina a un particolare utente, creiamo una vista dei libri che l&apos;utente corrente ha preso in prestito.</p>
+
+<p>Sfortunatamente, non abbiamo ancora modo per gli utenti di prendere in prestito libri! Quindi, prima di poter creare l&apos;elenco dei libri, estenderemo innanzitutto il modello <code>BookInstance </code>per supportare il concetto di prestito e utilizzare l&apos;applicazione Django Admin per prestare diversi libri al nostro utente di test.</p>
+
+<h3 id="Models">Models</h3>
+
+<p>Innanzitutto, dovremo rendere possibile agli utenti un prestito di BookInstance (abbiamo già uno stato e una data di scadenza, ma non abbiamo ancora alcuna associazione tra questo modello e un utente. creane uno usando un campo ForeignKey (uno-a-molti). Abbiamo anche bisogno di un meccanismo semplice per verificare se un libro in prestito è in ritardo.</p>
+
+<p>Apri <strong>catalog/models.py</strong>, ed importa il modello <code>User</code> model da <code>django.contrib.auth.models:</code></p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.models import User
+</pre>
+
+<p>Successivamente, aggiungi il campo del mutuatario al modello BookInstance:</p>
+
+<pre class="brush: python notranslate">borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+</pre>
+
+<p>Mentre siamo qui, aggiungiamo una <a href="https://docs.python.org/3/library/functions.html#property">property</a> che possiamo chiamare dai nostri modelli per capire se una determinata istanza di un libro è in ritardo. Mentre potremmo calcolare questo nel modello stesso, usare una proprietà come mostrato di seguito sarà molto più efficiente.</p>
+
+<p>Aggiungi questo da qualche parte vicino alla parte superiore del file:</p>
+
+<pre class="brush: python notranslate">from datetime import date</pre>
+
+<p class="brush: python">Ora aggiungi la seguente definizione di proprietà alla classe BookInstance:</p>
+
+<pre class="brush: python notranslate">@property
+def is_overdue(self):
+    if self.due_back and date.today() &gt; self.due_back:
+        return True
+    return False</pre>
+
+<div class="note">
+<p><strong>Note</strong>: Verifichiamo se due_back è vuoto prima di fare un confronto. Un campo vuoto forza Django a lanciare un errore invece di mostrare la pagina: i valori vuoti non sono confrontabili. Questo non è qualcosa che vorremmo far provare ai nostri utenti!</p>
+</div>
+
+<p>Ora che abbiamo aggiornato i nostri modelli, dovremo effettuare nuove migrazioni sul progetto e quindi applicare tali migrazioni:</p>
+
+<pre class="brush: bash notranslate">python3 manage.py makemigrations
+python3 manage.py migrate
+</pre>
+
+<h3 id="Admin">Admin</h3>
+
+<p>Ora apri il <code>catalogo/admin.py</code> e aggiungi il campo del mutuatario alla classe <code>BookInstanceAdmin </code>sia in <code>list_display </code>che in <code>fielsets</code>, come mostrato di seguito. Questo renderà il campo visibile nella sezione Amministrazione, permettendoci di assegnare un <code>Utente</code> a una <code>BookInstance</code> quando necessario.</p>
+
+<pre class="brush: python notranslate">@admin.register(BookInstance)
+class BookInstanceAdmin(admin.ModelAdmin):
+    list_display = (&apos;book&apos;, &apos;status&apos;<strong>, &apos;borrower&apos;</strong>, &apos;due_back&apos;, &apos;id&apos;)
+    list_filter = (&apos;status&apos;, &apos;due_back&apos;)
+
+    fieldsets = (
+        (None, {
+            &apos;fields&apos;: (&apos;book&apos;,&apos;imprint&apos;, &apos;id&apos;)
+        }),
+        (&apos;Availability&apos;, {
+            &apos;fields&apos;: (&apos;status&apos;, &apos;due_back&apos;<strong>,&apos;borrower&apos;</strong>)
+        }),
+    )</pre>
+
+<h3 id="Prestiamo_qualche_libro">Prestiamo qualche libro</h3>
+
+<p>Ora che è possibile noleggiare libri a un utente specifico, vai a prestare un certo numero di record su BookInstance. Imposta il campo preso in prestito all&apos;utente di test, imposta lo stato &quot;In prestito&quot; e imposta le scadenze sia nel futuro che nel passato.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Non spiegheremo nuovamente il processo, poiché sai già come utilizzare il sito di amministrazione!</p>
+</div>
+
+<h3 id="View_dei_prestiti">View dei prestiti</h3>
+
+<p>Ora aggiungeremo una vista per ottenere l&apos;elenco di tutti i libri che sono stati prestati all&apos;utente corrente. Useremo la stessa visualizzazione di elenco generica basata sulla classe che conosciamo, ma questa volta importeremo e deriverà da LoginRequiredMixin, in modo che solo un utente che ha effettuato l&apos;accesso possa chiamare questa vista. Scegliamo anche di dichiarare un template_name, piuttosto che usare l&apos;impostazione predefinita, perché potremmo finire per avere alcuni elenchi diversi di record di BookInstance, con visualizzazioni e modelli diversi.</p>
+
+<p>Aggiungi quanto segue al catalog/views.py:</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
+    &quot;&quot;&quot;Generic class-based view listing books on loan to current user.&quot;&quot;&quot;
+    model = BookInstance
+    template_name =&apos;catalog/bookinstance_list_borrowed_user.html&apos;
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact=&apos;o&apos;).order_by(&apos;due_back&apos;)</pre>
+
+<p>Per limitare la nostra query solo agli oggetti BookInstance per l&apos;utente corrente, re-implementiamo get_queryset () come mostrato sopra. Si noti che &quot;o&quot; è il codice memorizzato per &quot;in prestito&quot; e ordiniamo per data di restituzione, in modo che gli elementi più vecchi vengano visualizzati per primi.</p>
+
+<h3 id="Conf._URL_per_libri_in_prestito">Conf. URL per libri in prestito</h3>
+
+<p>Ora apri /catalog/urls.py e aggiungi un <code>path()</code> che punta alla vista precedente (puoi semplicemente copiare il testo qui sotto alla fine del file).</p>
+
+<pre class="brush: python notranslate">urlpatterns += [
+    path(&apos;mybooks/&apos;, views.LoanedBooksByUserListView.as_view(), name=&apos;my-borrowed&apos;),
+]</pre>
+
+<h3 id="Template_per_i_libri_in_prestito">Template per i libri in prestito</h3>
+
+<p>Ora, tutto ciò che dobbiamo fare per questa pagina è aggiungere un template. Per prima cosa, crea il file template <code>/catalog/templates/catalog/bookinstance_list_borrowed_user.html</code> e dagli il seguente contenuto:</p>
+
+<pre class="brush: python notranslate">{% extends &quot;base_generic.html&quot; %}
+
+{% block content %}
+    &lt;h1&gt;Borrowed books&lt;/h1&gt;
+
+    {% if bookinstance_list %}
+    &lt;ul&gt;
+
+      {% for bookinst in bookinstance_list %}
+      &lt;li class=&quot;{% if bookinst.is_overdue %}text-danger{% endif %}&quot;&gt;
+        &lt;a href=&quot;{% url &apos;book-detail&apos; bookinst.book.pk %}&quot;&gt;{{bookinst.book.title}}&lt;/a&gt; ({{ bookinst.due_back }})
+      &lt;/li&gt;
+      {% endfor %}
+    &lt;/ul&gt;
+
+    {% else %}
+      &lt;p&gt;There are no books borrowed.&lt;/p&gt;
+    {% endif %}
+{% endblock %}</pre>
+
+<p>Questo modello è molto simile a quelli che abbiamo creato precedentemente per gli oggetti Libro e Autore. L&apos;unica cosa &quot;nuova&quot; qui è che controlliamo il metodo che abbiamo aggiunto nel modello (bookinst.is_overdue) e lo usiamo per cambiare il colore degli elementi scaduti.</p>
+
+<p>Quando il server di sviluppo è in esecuzione, dovresti essere in grado di visualizzare l&apos;elenco per un utente che ha effettuato l&apos;accesso nel tuo browser all&apos;indirizzo http://127.0.0.1:8000/catalog/mybooks/. Provalo con il tuo utente loggato e disconnesso (nel secondo caso, dovresti essere reindirizzato alla pagina di login).</p>
+
+<h3 id="Aggiungi_lelenco_alla_barra_laterale">Aggiungi l&apos;elenco alla barra laterale</h3>
+
+<p>L&apos;ultimo passo è aggiungere un link per questa nuova pagina nella barra laterale. Inseriremo questo nella stessa sezione in cui vengono visualizzate altre informazioni per l&apos;utente che ha effettuato l&apos;accesso. Aprire il modello di base (/locallibrary/catalog/templates/base_generic.html) e aggiungere la linea in grassetto alla barra laterale come mostrato.</p>
+
+<pre class="brush: python notranslate"> &lt;ul class=&quot;sidebar-nav&quot;&gt;
+   {% if user.is_authenticated %}
+   &lt;li&gt;User: {{ user.get_username }}&lt;/li&gt;
+<strong>   &lt;li&gt;&lt;a href=&quot;{% url &apos;my-borrowed&apos; %}&quot;&gt;My Borrowed&lt;/a&gt;&lt;/li&gt;</strong>
+   &lt;li&gt;&lt;a href=&quot;{% url &apos;logout&apos;%}?next={{request.path}}&quot;&gt;Logout&lt;/a&gt;&lt;/li&gt;
+   {% else %}
+   &lt;li&gt;&lt;a href=&quot;{% url &apos;login&apos;%}?next={{request.path}}&quot;&gt;Login&lt;/a&gt;&lt;/li&gt;
+   {% endif %}
+ &lt;/ul&gt;
+</pre>
+
+<h3 id="Che_cosa_vedo">Che cosa vedo?</h3>
+
+<p>Quando un utente ha effettuato l&apos;accesso, vedrà il link I miei prestiti nella barra laterale e l&apos;elenco dei libri visualizzati come segue (il primo libro non ha una data di scadenza, che è un bug che speriamo di risolvere in un tutorial successivo!).</p>
+
+<p><img alt="Library - borrowed books by user" src="https://mdn.mozillademos.org/files/14105/library_borrowed_by_user.png" style="border-style: solid; border-width: 1px; display: block; height: 215px; margin: 0px auto; width: 530px;"></p>
+
+<h2 id="Permessi">Permessi</h2>
+
+<p>Le autorizzazioni sono associate ai modelli e definiscono le operazioni che possono essere eseguite su un&apos;istanza del modello da un utente che dispone dell&apos;autorizzazione. Per impostazione predefinita, Django aggiunge automaticamente autorizzazioni di aggiunta, modifica ed eliminazione a tutti i modelli, che consentono agli utenti con le autorizzazioni di eseguire le azioni associate tramite il sito di amministrazione. È possibile definire le proprie autorizzazioni per i modelli e concederle ad utenti specifici. È inoltre possibile modificare le autorizzazioni associate a diverse istanze dello stesso modello.</p>
+
+<p>I test sulle autorizzazioni nelle viste e nei modelli sono quindi molto simili per il test sullo stato di autenticazione (e infatti, il test per un&apos;autorizzazione verifica anche l&apos;autenticazione).</p>
+
+<h3 id="Models_2">Models</h3>
+
+<p>Dfeinire permessi è un&apos;azione svolta tramite la sezione &quot;<code>class Meta</code>&quot;, utilizzando il campo <code>permissions</code>. È possibile specificare tutte le autorizzazioni necessarie in una tupla, ogni autorizzazione viene definita in una tupla nidificata contenente il nome di autorizzazione e il valore di visualizzazione delle autorizzazioni. Ad esempio, potremmo definire un&apos;autorizzazione per consentire a un utente di contrassegnare che un libro è stato restituito come mostrato:</p>
+
+<pre class="brush: python notranslate">class BookInstance(models.Model):
+    ...
+    class Meta:
+        ...
+<strong>        permissions = ((&quot;can_mark_returned&quot;, &quot;Set book as returned&quot;),)  </strong> </pre>
+
+<p>Potremmo quindi assegnare l&apos;autorizzazione a un gruppo &quot;Bibliotecario&quot; nel sito di amministrazione. Apri il catalogo / models.py e aggiungi l&apos;autorizzazione come mostrato sopra. Dovrai rieseguire le tue migrazioni (esegui <code>python3 manage.py makemigrations</code> e <code>python3 manage.py migrate</code>) per aggiornare il database.</p>
+
+<h3 id="Templates">Templates</h3>
+
+<p>I permessi correnti di un utente sono storati in una variabile <code>{{ perms }}</code>. Puoi verificare se l&apos;utente corrente ha un permesso particolare usando il nome specifico della variabile all&apos;interno della &quot;app&quot; Django associata, ad es. <code>{{ perms.catalog.can_mark_returned }}</code> sarà <code>True</code> se lo user ha i permessi, e <code>False</code> altrimenti. Tipicamente testiamo i permessi utilizzando il tag <code>{% if %}</code> come mostrato:</p>
+
+<pre class="brush: python notranslate">{% if perms.catalog.can_mark_returned %}
+    &lt;!-- We can mark a BookInstance as returned. --&gt;
+    &lt;!-- Perhaps add code to link to a &quot;book return&quot; view here. --&gt;
+{% endif %}
+</pre>
+
+<h3 id="Views">Views</h3>
+
+<p>Le autorizzazioni possono essere verificate nella funzione vista utilizzando il decoratore <code>permission_required</code> o in una visualizzazione basata su classi che utilizza <code>PermissionRequiredMixin</code>. Lo schema e il comportamento sono gli stessi dell&apos;autenticazione di accesso, anche se, naturalmente, è possibile che sia necessario aggiungere multiple autorizzazioni.</p>
+
+<p>Decoratore:</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.decorators import permission_required
+
+@permission_required(&apos;catalog.can_mark_returned&apos;)
+@permission_required(&apos;catalog.can_edit&apos;)
+def my_view(request):
+    ...</pre>
+
+<p>Views.</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.mixins import PermissionRequiredMixin
+
+class MyView(PermissionRequiredMixin, View):
+    permission_required = &apos;catalog.can_mark_returned&apos;
+    # Or multiple permissions
+    permission_required = (&apos;catalog.can_mark_returned&apos;, &apos;catalog.can_edit&apos;)
+    # Note that &apos;catalog.can_edit&apos; is just an example
+    # the catalog application doesn&apos;t have such permission!</pre>
+
+<h3 id="Esempio">Esempio</h3>
+
+<p>Non aggiorneremo la LocalLibrary qui; forse nel prossimo tutorial!</p>
+
+<h2 id="Prova_tu">Prova tu</h2>
+
+<p>In precedenza in questo articolo, vi abbiamo mostrato come creare una pagina per l&apos;utente corrente che elenca i libri che hanno preso in prestito. La sfida ora è creare una pagina simile che sia visibile solo per i bibliotecari, che mostri tutti i libri presi in prestito e che includa il nome di ciascun mutuatario.</p>
+
+<p>Dovresti essere in grado di seguire lo stesso schema dell&apos;altra vista. La differenza principale è che dovrai limitare la visualizzazione solo ai bibliotecari. Puoi farlo a seconda che l&apos;utente sia un membro del personale (decoratore di funzioni: <code>staff_member_required</code>, template variabile: <code>user.is_staff</code>) ma ti raccomandiamo invece di utilizzare il permesso <code>can_mark_returned</code> e <code>PermissionRequiredMixin</code>, come descritto sopra nella sezione precedente.</p>
+
+<div class="warning notecard">
+<p><strong>Importante</strong>: Ricordati di non utilizzare il superutente per i test basati sulle autorizzazioni (i controlli delle autorizzazioni restituiscono sempre true per i superutenti, anche se non è ancora stata definita un&apos;autorizzazione!). Invece, crea un utente di libreria e aggiungi il permesso richiesto.</p>
+</div>
+
+<p>Quando hai finito, la tua pagina dovrebbe apparire come lo screenshot qui sotto.</p>
+
+<p><img alt="All borrowed books, restricted to librarian" src="https://mdn.mozillademos.org/files/14115/library_borrowed_all.png" style="border-style: solid; border-width: 1px; display: block; height: 283px; margin: 0px auto; width: 500px;"></p>
+
+<ul>
+</ul>
+
+<h2 id="Sommario">Sommario</h2>
+
+<p>Lavoro eccellente: ora hai creato un sito Web in cui i membri della biblioteca possono accedere e visualizzare il proprio contenuto e che i bibliotecari (con il permesso corretto) possono utilizzare per visualizzare tutti i libri in prestito ei loro mutuatari. Al momento stiamo ancora solo visualizzando i contenuti, ma gli stessi principi e tecniche sono utilizzati quando si desidera iniziare a modificare e aggiungere dati.</p>
+
+<p>Nel nostro prossimo articolo, vedremo come è possibile utilizzare i moduli di Django per raccogliere input dell&apos;utente e quindi iniziare a modificare alcuni dei nostri dati memorizzati.</p>
+
+<h2 id="Vedi_anche">Vedi anche</h2>
+
+<ul>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/auth/">User authentication in Django</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/auth/default//">Using the (default) Django authentication system</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/class-based-views/intro/#decorating-class-based-views">Introduction to class-based views &gt; Decorating class-based views</a> (Django docs)</li>
+</ul>
+
+<div class="prevnext">
+  <a href="/it/docs/Learn/Server-side/Django/Sessions" class="button"><i class="icon-arrow-left"></i><span class="label"> Previous </span></a><a href="/it/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Overview: Django</a><a href="/it/docs/Learn/Server-side/Django/Forms" class="button"><span class="label"> Next  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<p> </p>
+
+<h2 id="In_questo_modulo">In questo modulo</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Introduction">Django introduction</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/development_environment">Setting up a Django development environment</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">Django Tutorial: The Local Library website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">Django Tutorial Part 2: Creating a skeleton website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Models">Django Tutorial Part 3: Using models</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Admin_site">Django Tutorial Part 4: Django admin site</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Home_page">Django Tutorial Part 5: Creating our home page</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Generic_views">Django Tutorial Part 6: Generic list and detail views</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Sessions">Django Tutorial Part 7: Sessions framework</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Authentication">Django Tutorial Part 8: User authentication and permissions</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Forms">Django Tutorial Part 9: Working with forms</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Testing">Django Tutorial Part 10: Testing a Django web application</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Deployment">Django Tutorial Part 11: Deploying Django to production</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/web_application_security">Django web application security</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/django_assessment_blog">DIY Django mini blog</a></li>
+</ul>
+
+<p> </p>
