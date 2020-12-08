@@ -1,0 +1,94 @@
+---
+title: Client.postMessage()
+slug: Web/API/Client/postMessage
+tags:
+  - API
+  - Client
+  - Method
+  - Reference
+  - Service Workers
+  - Service worker API
+  - ServiceWorker
+  - postMessage
+translation_of: Web/API/Client/postMessage
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Client"><code>Client</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Client/frameType"><code>frameType</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Client/id"><code>id</code></a></li><li><a href="/ja/docs/Web/API/Client/type"><code>type</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Client/url"><code>url</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><em><code>postMessage()</code></em></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary"><strong><code>postMessage()</code></strong> は <a href="/ja/docs/Web/API/Client"><code>Client</code></a> インターフェイスのメソッドで、サービスワーカーがクライアント (<a href="/ja/docs/Web/API/Window"><code>Window</code></a>, <a href="/ja/docs/Web/API/Worker"><code>Worker</code></a>, <a href="/ja/docs/Web/API/SharedWorker"><code>SharedWorker</code></a>) にメッセージを送信することができます。 メッセージは、 <a href="/ja/docs/Web/API/ServiceWorkerContainer"><code>navigator.serviceWorker</code></a> の &quot;<code>message</code>&quot; イベントで受信されます。</span></p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate"><var>client</var>.postMessage(<var>message</var>[, <var>transfer</var>]);
+<var>client</var>.postMessage(<var>message</var>[, { transfer }]);
+</pre>
+
+<h3 id="Parameters" name="Parameters">引数</h3>
+
+<dl>
+ <dt><code><var>message</var></code></dt>
+ <dd>クライアントに送信するメッセージです。これは、任意の<a href="/ja/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">複製可能な構造化型</a>にすることができます。</dd>
+ <dt><code><var>transfer</var></code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>メッセージとともに<a href="/ja/docs/Web/API/Transferable">転送</a>されるオブジェクトのシーケンスです。 これらのオブジェクトの所有権は宛先側に与えられ、送信側では使用できなくなります。</dd>
+</dl>
+
+<h3 id="Return_value" name="Return_value">返値</h3>
+
+<p><code>undefined</code>。</p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>サービスワーカーからクライアントへのメッセージの送信</p>
+
+<pre class="brush: js notranslate">addEventListener(&apos;fetch&apos;, event =&gt; {
+  event.waitUntil(async function() {
+    // クライアントにアクセスできない場合は、早期に終了します。
+    // 例えば、クロスオリジンの場合。
+    if (!event.clientId) return;
+
+    // クライアントを取得します。
+    const client = await clients.get(event.clientId);
+    // クライアントを取得できない場合は、早期に終了します。
+    // 例えば、閉じている場合。
+    if (!client) return;
+
+    // クライアントにメッセージを送信します。
+    client.postMessage({
+      msg: &quot;私はあなたからフェッチされましたよ！&quot;,
+      url: event.request.url
+    });
+
+  }());
+});</pre>
+
+<p>そのメッセージの受け取り</p>
+
+<pre class="brush: js notranslate">navigator.serviceWorker.addEventListener(&apos;message&apos;, event =&gt; {
+  console.log(event.data.msg, event.data.url);
+});</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#dom-client-postmessage-message-options" hreflang="en" lang="en">Service Workers<br><small lang="ja">postMessage() の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.Client.postMessage"></div>
+</div>

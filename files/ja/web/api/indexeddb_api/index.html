@@ -1,0 +1,159 @@
+---
+title: IndexedDB API
+slug: Web/API/IndexedDB_API
+tags:
+  - API
+  - Advanced
+  - Database
+  - IndexedDB
+  - Landing
+  - Reference
+  - Storage
+translation_of: Web/API/IndexedDB_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/IndexedDB_API">IndexedDB API</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/API/IndexedDB_API/Using_IndexedDB">IndexedDB を使用する</a></li><li><a href="/ja/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB">基本的な概念</a></li><li><a href="/ja/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria">ブラウザーのストレージ制限と削除基準</a></li><li><a href="/ja/docs/Web/API/IndexedDB_API/Checking_when_a_deadline_is_due">Checking when a deadline is due</a> <a href="/ja/docs/Web/API/IndexedDB_API/Checking_when_a_deadline_is_due$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/IDBCursor"><code>IDBCursor</code></a></li><li><a href="/ja/docs/Web/API/IDBCursorSync"><code>IDBCursorSync</code></a></li><li><a href="/ja/docs/Web/API/IDBCursorWithValue"><code>IDBCursorWithValue</code></a></li><li><a href="/ja/docs/Web/API/IDBDatabase"><code>IDBDatabase</code></a></li><li><a href="/ja/docs/Web/API/IDBDatabaseException"><code>IDBDatabaseException</code></a></li><li><a href="/ja/docs/Web/API/IDBDatabaseSync"><code>IDBDatabaseSync</code></a></li><li><a href="/ja/docs/Web/API/IDBEnvironment"><code>IDBEnvironment</code></a></li><li><a href="/ja/docs/Web/API/IDBEnvironmentSync"><code>IDBEnvironmentSync</code></a></li><li><a href="/ja/docs/Web/API/IDBFactory"><code>IDBFactory</code></a></li><li><a href="/ja/docs/Web/API/IDBFactorySync"><code>IDBFactorySync</code></a></li><li><a href="/ja/docs/Web/API/IDBIndex"><code>IDBIndex</code></a></li><li><a href="/ja/docs/Web/API/IDBIndexSync"><code>IDBIndexSync</code></a></li><li><a href="/ja/docs/Web/API/IDBKeyRange"><code>IDBKeyRange</code></a></li><li><a href="/ja/docs/Web/API/IDBObjectStore"><code>IDBObjectStore</code></a></li><li><a href="/ja/docs/Web/API/IDBObjectStoreSync"><code>IDBObjectStoreSync</code></a></li><li><a href="/ja/docs/Web/API/IDBOpenDBRequest"><code>IDBOpenDBRequest</code></a></li><li><a href="/ja/docs/Web/API/IDBRequest"><code>IDBRequest</code></a></li><li><a href="/ja/docs/Web/API/IDBTransaction"><code>IDBTransaction</code></a></li><li><a href="/ja/docs/Web/API/IDBTransactionSync"><code>IDBTransactionSync</code></a></li><li><a href="/ja/docs/Web/API/IDBVersionChangeEvent"><code>IDBVersionChangeEvent</code></a></li><li><a href="/ja/docs/Web/API/IDBVersionChangeRequest"><code>IDBVersionChangeRequest</code></a></li></ol></details></li></ol></section></div>
+
+<p>IndexedDB は、ファイルや blob を含む構造化された多くのデータを保存する、クライアントサイドのローレベル API です。この API は高パフォーマンスなデータの検索を行うために、インデックスを使用します。<a href="/ja/docs/Web/API/Web_Storage_API">Web Storage</a> は比較的少量のデータを保存するのに有用ではありますが、構造化された非常に多くのデータを扱うには不十分です。IndexedDB が解決策を提供します。本ページは、MDN における IndexedDB のランディングページです。ここでは API リファレンスへのリンク、使用ガイド、ブラウザーのサポート状況、主要なコンセプトの説明を掲載します。</p>
+
+<div class="note notecard"><strong>註:</strong> この機能は <a href="/ja/docs/Web/API/Web_Workers_API">Web Workers</a> 内で利用可能です。</div>
+
+<div class="note">
+<p><strong>メモ</strong>: IndexedDB API は強力ですが、シンプルな用途にとってはとても複雑に見えるかもしれません。シンプルな API が好ましいのでしたら、IndexedDB をより開発者フレンドリーに扱える <a href="https://localforage.github.io/localForage/">localForage</a> や <a href="http://www.dexie.org/">dexie.js</a>、<a href="https://github.com/erikolson186/zangodb">ZangoDB</a>、<a href="https://pouchdb.com/">PouchDB</a>、<a href="http://jsstore.net/">JsStore</a> などのライブラリを検討してください。</p>
+</div>
+
+<h2 id="Key_concepts_and_usage" name="Key_concepts_and_usage">主要概念と使用法</h2>
+
+<p>IndexedDB は SQL ベースの RDBMS に似たトランザクショナルデータベースシステムですが、SQL ベース の RDBMS が固定された列を持つテーブルを使用するのに対して、IndexedDB は JavaScript ベースのオブジェクト指向データベースです。IndexedDB では、<strong>キー</strong>でインデックス付けされたオブジェクトを保存および取り出すことができます。<a href="/ja/docs/Web/Guide/API/DOM/The_structured_clone_algorithm">Structured Clone アルゴリズム</a>がサポートする、任意のオブジェクトを保存できます。データベースのスキーマを定義する、データベースへの接続を確立する、そして一連の<strong>トランザクション</strong>でデータの取り出しや更新を行うことが必要です。</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB">IndexedDB のコンセプト</a>を詳しく知る</li>
+ <li><a href="/ja/docs/Web/API/IndexedDB_API/Using_IndexedDB">IndexedDB 使用ガイド</a>で、非同期に IndexedDB を扱い方法を基本原理から学ぶ</li>
+ <li><a href="/ja/docs/Web/Progressive_web_apps/Offline_Service_workers">Service Worker により PWA をオフラインで動作させる</a>で概説されているように、データをオフラインに格納する IndexedDB と資産をオフラインに格納する Service Worker を組み合わせる。</li>
+</ul>
+
+<div class="note">
+<p><strong>メモ</strong>: たいていのウェブストレージ技術と同様に、IndexedDB も<a class="external" href="http://www.w3.org/Security/wiki/Same_Origin_Policy">同一オリジンポリシー</a>に従います。よって、保存済みデータは同一ドメイン内からアクセスできますが、異なるドメインにまたがってデータへアクセスすることはできません。</p>
+</div>
+
+<h3 id="Synchronous_and_asynchronous" name="Synchronous_and_asynchronous">同期と非同期</h3>
+
+<p>IndexedDB を扱う操作は非同期に実行しますので、他のアプリケーションを妨げません。 IndexedDB は元々同期 API と<span style="background-color: #f5f6f5;">非同期</span> API の両方を提供していました。同期 API は <a href="/ja/docs/Web/Guide/Performance/Using_web_workers">Web Worker</a> 内でのみの使用を意図していましたが、必要性に疑問があったため仕様から削除されました。ただし、<span style="background-color: #f5f6f5;">同期 API</span> はウェブ開発者から十分な要望がある場合は、将来再び導入される可能性があります。</p>
+
+<h3 id="Storage_limits_and_eviction_criteria" name="Storage_limits_and_eviction_criteria">ストレージの上限と破棄基準</h3>
+
+<p>クライアントサイド (すなわちローカルディスク) に何らかのデータを保存するウェブ技術がいくつかあり、IndexedDB はそのような技術としてもっともよく語られます。ブラウザーがどれだけの容量をウェブデータストレージに割り当てるかや、容量の上限に達したときにどのデータを削除するかのプロセスは単純ではなく、またブラウザーにより異なります。<a href="/ja/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria">Browser storage limits and eviction criteria</a> で、少なくとも Firefox ではどのようにしているかを説明しようとしています。</p>
+
+<h2 id="Interfaces" name="Interfaces">インターフェイス</h2>
+
+<p>データベースへのアクセスを行いたい場合は、<a href="/ja/docs/DOM/window" title="DOM/window">window</a> オブジェクトの <a href="/ja/docs/Web/API/IDBEnvironment.indexedDB"><code>indexedDB</code></a> 属性上の <a href="/ja/docs/Web/API/IDBFactory.open"><code>open()</code></a> を呼び出してください。このメソッドは <a href="/ja/docs/Web/API/IDBRequest" title="The request object does not initially contain any information about the result of the operation, but once information becomes available, an event is fired on the request, and the information becomes available through the properties of the IDBRequest instance."><code>IDBRequest</code></a> オブジェクトを返します。<a href="/ja/docs/Web/API/IDBRequest" title="The request object does not initially contain any information about the result of the operation, but once information becomes available, an event is fired on the request, and the information becomes available through the properties of the IDBRequest instance."><code>IDBRequest</code></a> オブジェクト上で発火したイベントによってアプリケーションが呼び出されることにより、非同期操作が行われます。</p>
+
+<h3 id="Connecting_to_a_database" name="Connecting_to_a_database">データベースへの接続</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/IDBEnvironment" title="IndexedDB API の IDBEnvironment インタフェースには、IndexedDB の機能へアクセスするための indexedDB プロパティがあります。これは、window と Workerオブジェクトによって実装された、最上位の IndexedDB インタフェースです。"><code>IDBEnvironment</code></a></dt>
+ <dd>IndexedDB 機能へのアクセスを提供します。<a href="/ja/docs/Web/API/Window" title="Window インターフェイスは、DOM document を収めるウィンドウを表します。document プロパティは、そのウィンドウに読み込まれた DOM の document オブジェクト を指します。"><code>window</code></a> および <a href="/ja/docs/Web/API/Worker" title="Web Workers API の Worker インターフェイスはバックグラウンドで行われるタスクを実行することができ、そのタスクは簡単に生成され、かつ作成元にメッセージを送り返すことができます。Worker() コンストラクターを呼び出しワーカースレッドを走らせるスクリプトを特定してあげるだけでワーカーオブジェクトを作成することができます。"><code>worker</code></a> オブジェクトによって実装されています。このインターフェイスは 2.0 仕様の一部ではありません。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBFactory" title="次のコードスニペットでは、 データベースを開く要求をし、 成功の場合と失敗の場合のイベントハンドラーを登録しています。完全に動作する例は、To-do Notifications app (view example live.) を見てください。"><code>IDBFactory</code></a></dt>
+ <dd>データベースへのアクセスを提供します。<a href="/ja/docs/Web/API/IDBEnvironment.indexedDB"><code>indexedDB</code></a> グローバルオブジェクトによって実装されており、従って API へのエントリーポイントになります。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBOpenDBRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBOpenDBRequest</code></a></dt>
+ <dd>データベースを開くリクエストを表します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBDatabase" title="Inherits from: EventTarget"><code>IDBDatabase</code></a></dt>
+ <dd>データベース接続を表します。データベースとのトランザクション処理を行うためのみに使用されます。</dd>
+</dl>
+
+<h3 id="Retrieving_and_modifying_data" name="Retrieving_and_modifying_data">データの取り出しと変更</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/IDBTransaction" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBTransaction</code></a></dt>
+ <dd>トランザクションを表します。(アクセスしたいオブジェクトストアの) スコープを指定し、(読み取り専用または読み書き可能といった) アクセスの種類を定義して、データベースへのトランザクションを作成します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBRequest" title="The request object does not initially contain any information about the result of the operation, but once information becomes available, an event is fired on the request, and the information becomes available through the properties of the IDBRequest instance."><code>IDBRequest</code></a></dt>
+ <dd>データベースへのリクエストの処理、および結果へのアクセスを提供する汎用インターフェイスです。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBObjectStore" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBObjectStore</code></a></dt>
+ <dd>IndexedDB 内のデータセットにアクセスできるオブジェクトストアを表し、主キーを使用して探索します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBIndex" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBIndex</code></a></dt>
+ <dd>こちらも IndexedDB データベース内のデータのサブセットにアクセスできますが、レコードの探索に主キーではなくインデックスを使用します。<a href="/ja/docs/Web/API/IDBObjectStore" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBObjectStore</code></a> より高速に動作する場合があります。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBCursor" title="IndexedDB API の IDBCursor インターフェイスはデータベースの複数レコードを横断したり繰り返すためのカーソルです。"><code>IDBCursor</code></a></dt>
+ <dd>オブジェクトストアとインデックスをイテレートします。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBCursorWithValue" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBCursorWithValue</code></a></dt>
+ <dd>オブジェクトストアとインデックスをイテレートして、カーソルの現在の値を返します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBKeyRange" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBKeyRange</code></a></dt>
+ <dd>データベースから一定の範囲のデータを取り出すために使用可能な、キーの範囲を定義します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBLocaleAwareKeyRange" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBLocaleAwareKeyRange</code></a> <span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></dt>
+ <dd>データベースから一定の範囲のデータを取り出すために使用可能な、インデックス用に指定したロケール (<a href="/ja/docs/Web/API/IDBObjectStore/createIndex#Parameters"><code>createIndex()</code> の optionalParameters</a> をご覧ください) の規則によって並べ替えたキーの範囲を定義します。</dd>
+</dl>
+
+<h3 id="Custom_event_interfaces" name="Custom_event_interfaces">カスタムイベントインターフェイス</h3>
+
+<p>本仕様では、以下のカスタムインターフェイスでイベントが発生します:</p>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/IDBVersionChangeEvent" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBVersionChangeEvent</code></a></dt>
+ <dd><code>IDBVersionChangeEvent</code> インターフェイスは、<a href="/ja/docs/Web/API/IDBOpenDBRequest/onupgradeneeded" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBOpenDBRequest.onupgradeneeded</code></a> イベントハンドラ関数によってデータベースのバージョンが変更されたことを表します。</dd>
+</dl>
+
+<h3 id="Obsolete_interfaces" name="Obsolete_interfaces">廃止インターフェイス</h3>
+
+<p>仕様の早期段階で定義されていたインターフェイスの一部が、現在、削除されています。以前書いたコードを最新の仕様に合わせて更新する際に必要になるであろうことから、削除されたインターフェイスに関するドキュメントは残してあります:</p>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/IDBVersionChangeRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBVersionChangeRequest</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>データベースのバージョンの変更リクエストを表現します。データベースのバージョンを変更する方法が (<a href="/ja/docs/Web/API/IDBDatabase/setVersion" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBDatabase.setVersion</code></a> ではなく <a href="/ja/docs/Web/API/IDBFactory/open" title="データベースとの接続の間にエラーが発生した場合、このメソッドで返される request オブジェクトで、 error イベントが発生します。"><code>IDBFactory.open</code></a> を呼び出すように) 変わりました。また削除された <a href="/ja/docs/Web/API/IDBVersionChangeRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBVersionChangeRequest</code></a> に代わり <a href="/ja/docs/Web/API/IDBOpenDBRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBOpenDBRequest</code></a> インターフェイスが用意されています。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBDatabaseException" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBDatabaseException</code></a>  <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>データベース操作が実行されている間に発生した例外状況を表します。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBTransactionSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBTransactionSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBTransaction" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBTransaction</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBObjectStoreSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBObjectStoreSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBObjectStore" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBObjectStore</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBIndexSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBIndexSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBIndex" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBIndex</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBFactorySync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBFactorySync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBFactory" title="次のコードスニペットでは、 データベースを開く要求をし、 成功の場合と失敗の場合のイベントハンドラーを登録しています。完全に動作する例は、To-do Notifications app (view example live.) を見てください。"><code>IDBFactory</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBEnvironmentSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBEnvironmentSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBEnvironment" title="IndexedDB API の IDBEnvironment インタフェースには、IndexedDB の機能へアクセスするための indexedDB プロパティがあります。これは、window と Workerオブジェクトによって実装された、最上位の IndexedDB インタフェースです。"><code>IDBEnvironment</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBDatabaseSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBDatabaseSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBDatabase" title="Inherits from: EventTarget"><code>IDBDatabase</code></a> です。</dd>
+ <dt><a href="/ja/docs/Web/API/IDBCursorSync" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBCursorSync</code></a> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></dt>
+ <dd>同期型の <a href="/ja/docs/Web/API/IDBCursor" title="IndexedDB API の IDBCursor インターフェイスはデータベースの複数レコードを横断したり繰り返すためのカーソルです。"><code>IDBCursor</code></a> です。</dd>
+</dl>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<ul>
+ <li><a href="http://marco-c.github.io/eLibri/">eLibri:</a> Marco Castelluccio が作成した、高度なライブラリおよび電子書籍リーダーアプリケーションです。IndexedDB Mozilla DevDerby の最優秀作品です。</li>
+ <li><a href="https://github.com/chrisdavidmills/to-do-notifications/tree/gh-pages">To-do Notifications</a> (<a href="http://mdn.github.io/to-do-notifications/">ライブデモ</a>): リファレンスドキュメントで例示している、参考アプリケーションです。</li>
+ <li><a href="http://hacks.mozilla.org/2012/02/storing-images-and-files-in-indexeddb/" title="http://hacks.mozilla.org/2012/02/storing-images-and-files-in-indexeddb/">Storing images and files in IndexedDB</a></li>
+</ul>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/IndexedDB/" hreflang="en" lang="en" title="Indexed Database API Draftの仕様書">Indexed Database API Draft</a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/IndexedDB/" hreflang="en" lang="en" title="Indexed Database API 2.0の仕様書">Indexed Database API 2.0</a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a class="external" href="https://localforage.github.io/localForage/">localForage</a>: クライアントサイドのデータストレージ向けに、シンプルな name:value 形式の構文を提供する Polyfill です。バックグラウンドで IndexedDB を使用しますが、IndexedDB をサポートしないブラウザーでは WebSQL や localStorage にフォールバックします。</li>
+ <li><a href="http://www.dexie.org/">dexie.js</a>: 優良でシンプルな構文により高速なコード開発を可能にする、IndexedDB のラッパーです。</li>
+ <li><a href="https://github.com/erikolson186/zangodb">ZangoDB</a>: IndexedDB の MongoDB ライクなインターフェイスで、MongoDB でおなじみのフィルターリング、射影、ソート、アップデート、集計をサポートしています。</li>
+ <li><a href="http://jsstore.net/">JsStore</a>: SQL 風の構文による IndexedDB のラッパーです。</li>
+ <li><a href="https://github.com/mWater/minimongo">MiniMongo</a>: クライアントサイドのインメモリーの mongodb で localstorage と server sync over http を元にしたもの。MiniMongo は MeteorJS で使われています。</li>
+ <li><a href="https://pouchdb.com">PouchDB</a>: クライアントサイドのブラウザー内の CouchDB 実装で IndexedDB を使っています。</li>
+</ul>

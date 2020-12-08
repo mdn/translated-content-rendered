@@ -1,0 +1,87 @@
+---
+title: WritableStreamDefaultWriter.ready
+slug: Web/API/WritableStreamDefaultWriter/ready
+tags:
+  - API
+  - Property
+  - Ready
+  - Reference
+  - Streams
+  - Streams API
+  - WritableStream
+  - WritableStreamDefaultWriter
+translation_of: Web/API/WritableStreamDefaultWriter/ready
+---
+<div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Streams_API">Streams API</a></strong></li><li><strong><a href="/ja/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></strong></li><li class="toggle"><details open><summary>コンストラクター</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter()</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/closed"><code>closed</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/desiredSize"><code>desiredSize</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/abort"><code>abort()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/close"><code>close()</code></a></li><li><em><code>ready</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/releaseLock"><code>releaseLock()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WritableStreamDefaultWriter/write"><code>write()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Streams に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Body/body"><code>Body.body</code></a></li><li><a href="/ja/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></li><li><a href="/ja/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></li><li><a href="/ja/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></li><li><a href="/ja/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></li><li><a href="/ja/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li><li><a href="/ja/docs/Web/API/WritableStream"><code>WritableStream</code></a></li><li><a href="/ja/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></li></ol></details></li></ol></section>
+
+<p><a href="/ja/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a> インターフェイスの <strong><code>ready</code></strong> 読み取り専用プロパティは、ストリームの内部キューの目的のサイズが非正から正に移行したときに解決する <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> を返し、バックプレッシャーが適用されなくなったことを通知します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">var <em>promise</em> = <em>writableStreamDefaultWriter</em>.ready;</pre>
+
+<h3 id="Value" name="Value">値</h3>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>。</p>
+
+<h2 id="Example" name="Example">例</h2>
+
+<p>次の例は、<code>ready</code> プロパティの2つの使用法を示しています。 最初は <code>ready</code> を使用して、<code>WritableStream</code> が書き込みを完了し、バイナリチャンクを送信する前にデータを受信できるようにします。 2番目も、<code>WritableStream</code> の書き込みが完了しているかどうかをチェックしますが、今度はライターを閉じる前に書き込みを終了する必要があるためです。</p>
+
+<pre class="brush: js notranslate">function sendMessage(message, writableStream) {
+  // defaultWriter は WritableStreamDefaultWriter 型です
+  var defaultWriter = writableStream.getWriter();
+  var encoder = new TextEncoder();
+  var encoded = encoder.encode(message, {stream: true});
+  encoded.forEach(function(chunk) {
+    // ストリームとそのライターがデータを
+    // 受信できることを確認します。
+    defaultWriter.ready
+    .then(function() {
+      defaultWriter.write(chunk)
+      .then(function() {
+        console.log(&quot;Chunk written to sink.);
+      })
+      .catch(function(err) {
+        console.log(&quot;Chunk error: &quot; + err);
+      });
+    });
+    // ライターを閉じる前にすべてのチャンクが
+    // 確実に書き込まれるように、ready を再度呼び出します。
+    defaultWriter.ready
+    .then(function() {
+      defaultWriter.close()
+      .then(function() {
+        console.log(&quot;All chunks written&quot;);
+      })
+      .catch(function(err) {
+        console.log(&quot;Stream error: &quot; + err);
+      });
+    });
+  });
+}</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://streams.spec.whatwg.org/#default-writer-ready" hreflang="en" lang="en">Streams<br><small lang="ja">ready の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.WritableStreamDefaultWriter.ready"></div>

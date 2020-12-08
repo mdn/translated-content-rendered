@@ -1,0 +1,140 @@
+---
+title: SVG animation with SMIL
+slug: Web/SVG/SVG_animation_with_SMIL
+translation_of: Web/SVG/SVG_animation_with_SMIL
+---
+<p>Firefox 4 より、<a href="http://www.w3.org/TR/REC-smil" class="external" title="http://www.w3.org/TR/REC-smil">Synchronized Multimedia Integration Language</a> (SMIL) を用いた <a href="/ja/SVG" title="ja/SVG">SVG</a> のアニメーションをサポートしています。SMIL では以下のようなことができます:</p>
+
+<ul>
+ <li>要素の数値属性 (x, y など) のアニメーション</li>
+ <li>トランスフォーム属性 (translation または rotation) のアニメーション</li>
+ <li>色属性のアニメーション</li>
+ <li>モーションパスに従う</li>
+</ul>
+
+<p>これらは <a href="/ja/docs/Web/SVG/Element/animate" title="animate 要素は図形要素の中に入れ、animate要素の属性には、アニメーションによってどのように変化するかを定義します。属性で指定された時間の間、初期値から終了値まで変化します。"><code>&lt;animate&gt;</code></a> のような SVG 要素を、アニメーションさせる SVG 要素の中に追加することで実現します。以下は、4 つのアニメーション方法を例として示します。</p>
+
+<h2 id="要素の属性のアニメーション">要素の属性のアニメーション</h2>
+
+<p>以下の例は、円 (circle) の <strong>cx</strong> 属性のアニメーションを行います。そのために、<a href="/ja/docs/Web/SVG/Element/circle" title="&lt;circle> SVG 要素は SVG の基本的な図形を表すものであり、中心座標と半径を指定して円を描画します。"><code>&lt;circle&gt;</code></a> 要素の内部に <a href="/ja/docs/Web/SVG/Element/animate" title="animate 要素は図形要素の中に入れ、animate要素の属性には、アニメーションによってどのように変化するかを定義します。属性で指定された時間の間、初期値から終了値まで変化します。"><code>&lt;animate&gt;</code></a> 要素を追加します。<a href="/ja/docs/Web/SVG/Element/animate" title="animate 要素は図形要素の中に入れ、animate要素の属性には、アニメーションによってどのように変化するかを定義します。属性で指定された時間の間、初期値から終了値まで変化します。"><code>&lt;animate&gt;</code></a> の重要な属性は以下のとおりです:</p>
+
+<dl>
+ <dt><strong>attributeName</strong></dt>
+ <dd>アニメーションを行う属性名</dd>
+ <dt>from</dt>
+ <dd>属性の初期状態の値</dd>
+ <dt>to</dt>
+ <dd>属性の最後の値</dd>
+ <dt>dur</dt>
+ <dd>アニメーションを行う時間 (例えば、5秒の場合は '5s' と書く)</dd>
+</dl>
+
+<p>同じ要素でより多くの属性のアニメーションを行いたい場合は、<a href="/ja/docs/Web/SVG/Element/animate" title="animate 要素は図形要素の中に入れ、animate要素の属性には、アニメーションによってどのように変化するかを定義します。属性で指定された時間の間、初期値から終了値まで変化します。"><code>&lt;animate&gt;</code></a> 要素を追加してください。</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Attribute Animation with SMIL&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+     &lt;svg width="300px" height="100px"&gt;
+       &lt;rect x="0" y="0" width="300" height="100" stroke="black" stroke-width="1" /&gt;
+       &lt;circle cx="0" cy="50" r="15" fill="blue" stroke="black" stroke-width="1"&gt;
+            &lt;animate attributeName="cx" from="0" to="100" dur="5s" repeatCount="indefinite" /&gt;
+       &lt;/circle&gt;
+     &lt;/svg&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="トランスフォーム属性のアニメーション">トランスフォーム属性のアニメーション</h2>
+
+<p><a href="/ja/docs/Web/SVG/Element/animateTransform" title="animateTransform 要素は、 ターゲット要素に対して変換属性をアニメーション化し、これにより変形、スケーリング、回転およびまたはゆがみのアニメーションを制御することができます。"><code>&lt;animateTransform&gt;</code></a> 要素は、<strong>トランスフォーム</strong> 属性のアニメーションを可能にします。数値をとる <strong>x</strong> のような、単純な属性のアニメーションを行うのではないため、この新しい要素が必要です。Rotation 属性はこのようなものです: <code>rotation(theta, x, y)</code>。ここで <code>theta</code> は角度、<code>x</code> および <code>y</code> は絶対位置を示します。以下の例では、回転の中心位置と角度のアニメーションを行います。</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;SVG SMIL Animate with transform&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+     &lt;svg width="300px" height="100px"&gt;
+       &lt;rect x="0" y="0" width="300" height="100" stroke="black" stroke-width="1" /&gt;
+       &lt;rect x="0" y="50" width="15" height="34" fill="blue" stroke="black" stroke-width="1" transform="rotation"&gt;
+
+			&lt;animateTransform
+            attributeName="transform"
+            begin="0s"
+            dur="20s"
+            type="rotate"
+            &lt;!-- 0 度から 360 度までの回転と、x 方向に 60 から 100 への移動を行う --&gt;
+            from="0 60 60"
+            to="360 100 60"
+            &lt;!-- 図形が存在しなくなるまでアニメーションを続ける --&gt;
+            repeatCount="indefinite"
+			/&gt;
+       &lt;/rect&gt;
+     &lt;/svg&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="パスに従うアニメーション">パスに従うアニメーション</h2>
+
+<p>The <a href="/ja/docs/Web/SVG/Element/animateMotion" title="animateMotion 要素は、元となる要素を参照しモーションパスに沿って移動します。"><code>&lt;animateMotion&gt;</code></a> 要素は、パスに従った SVG 要素の位置や回転のアニメーションを可能にします。パスは <a href="/ja/docs/Web/SVG/Element/path" title="path 要素は図形を定義する汎用的な要素です。全ての基本図形は path 要素によって定義されます。"><code>&lt;path&gt;</code></a> と同じ方法で定義されます。オブジェクトがパスの接線に沿って回転するかを定義する属性を設定することができます。</p>
+
+<h3 id="例_1_直線的な移動">例 1: 直線的な移動</h3>
+
+<p>この例では、青い円 (circle) が黒い四角形の左端と右端をバウンドするように、無限に行き来します。このアニメーションは <a href="/ja/docs/Web/SVG/Element/animateMotion" title="animateMotion 要素は、元となる要素を参照しモーションパスに沿って移動します。"><code>&lt;animateMotion&gt;</code></a> 要素で制御されます。ここでは、アニメーションの始点を定義する <strong>M</strong>oveTo コマンド、円を 300 ピクセル右へ移動する <strong>H</strong>orizontal-line コマンド、そしてパスを閉じて始点へ戻ることを定義する <strong>Z</strong> コマンドで構成されるパスを指定しています。<strong>repeatCount</strong> 属性の値を <code>indefinite</code> にすることで、SVG 画像が存在する間は永久にアニメーションを繰り返すよう指定します。</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;SVG SMIL Animate with Path&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+     &lt;svg width="300px" height="100px"&gt;
+       &lt;rect x="0" y="0" width="300" height="100" stroke="black" stroke-width="1" /&gt;
+       &lt;rect x="0" y="50" width="15" height="34" fill="blue" stroke="black" stroke-width="1" transform="rotation"&gt;
+
+			&lt;svg xmlns="http://www.w3.org/2000/svg" width="300px" height="100px"&gt;
+				&lt;rect x="0" y="0" width="300" height="100" stroke="black" stroke-width="1" /&gt;
+				&lt;circle cx="0" cy="50" r="15" fill="blue" stroke="black" stroke-width="1"&gt;
+					&lt;animateMotion path="M 0 0 H 300 Z" dur="3s" repeatCount="indefinite" /&gt;
+				&lt;/circle&gt;
+			&lt;/svg&gt;
+       &lt;/rect&gt;
+     &lt;/svg&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p><a href="https://developer.mozilla.org/samples/svg/svganimdemo1.html">View live sample</a></p>
+
+<h3 id="例_2_曲線状の移動">例 2: 曲線状の移動</h3>
+
+<p>前と同様の例を、曲線状のパスを用い、またパスの方向に従い回転するようにしたものです。</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;SVG SMIL Animate with Path&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+     &lt;svg width="300px" height="100px"&gt;
+        &lt;rect x="0" y="0" width="300" height="100" stroke="black" stroke-width="1" /&gt;
+        &lt;rect x="0" y="0" width="20" height="50" fill="blue" stroke="black" stroke-width="1"&gt;
+            &lt;animateMotion path="M 50,100 Q40,75 90,70Q95,60 95,50Q180,40 170,100Z"
+				    dur="3s" repeatCount="indefinite" rotate="auto"&gt;
+        &lt;/rect&gt;
+    &lt;/svg&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="参考情報">参考情報</h2>
+
+<ul>
+ <li><a href="/ja/SVG" title="en/SVG">SVG</a></li>
+ <li><a href="http://www.w3.org/TR/SVG/animate.html" class="external" title="http://www.w3.org/TR/SVG/animate.html">SVG Animation Specification</a></li>
+ <li><a href="http://www.w3.org/TR/REC-smil" class="external" title="http://www.w3.org/TR/REC-smil">SMIL Specification</a></li>
+</ul>

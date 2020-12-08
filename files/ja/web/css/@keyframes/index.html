@@ -1,0 +1,149 @@
+---
+title: '@keyframes'
+slug: Web/CSS/@keyframes
+tags:
+  - '@-規則'
+  - CSS
+  - CSS アニメーション
+  - Reference
+  - アニメーション
+translation_of: Web/CSS/@keyframes
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/Reference">CSS リファレンス</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/CSS_Animations">CSS Animations</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/CSS/CSS_Animations/Tips">CSS アニメーションのヒントとコツ</a></li><li><a href="/ja/docs/Web/CSS/CSS_Animations/Detecting_CSS_animation_support">CSS アニメーション対応の検出</a></li><li><a href="/ja/docs/Web/CSS/CSS_Animations/Using_CSS_animations">CSS アニメーションの使用</a></li></ol></details></li><li class="toggle"><details open><summary>@規則</summary><ol><li><em><code>@keyframes</code></em></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a></li><li><a href="/ja/docs/Web/CSS/animation"><code>animation</code></a></li><li><a href="/ja/docs/Web/CSS/animation-delay"><code>animation-delay</code></a></li><li><a href="/ja/docs/Web/CSS/animation-direction"><code>animation-direction</code></a></li><li><a href="/ja/docs/Web/CSS/animation-duration"><code>animation-duration</code></a></li><li><a href="/ja/docs/Web/CSS/animation-fill-mode"><code>animation-fill-mode</code></a></li><li><a href="/ja/docs/Web/CSS/animation-iteration-count"><code>animation-iteration-count</code></a></li><li><a href="/ja/docs/Web/CSS/animation-name"><code>animation-name</code></a></li><li><a href="/ja/docs/Web/CSS/animation-play-state"><code>animation-play-state</code></a></li><li><a href="/ja/docs/Web/CSS/animation-timing-function"><code>animation-timing-function</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary">CSS の <strong><code>@keyframes</code></strong> <a href="/ja/docs/Web/CSS/At-rule">@-規則</a>は、アニメーションの流れに沿ったキーフレーム (または中間地点) のスタイルを定義することによって、一連の CSS アニメーションの中間ステップを制御します。</span>これにより、アニメーションの中間ステップを <a href="/ja/docs/Web/CSS/CSS_Transitions">CSS トランジション</a>よりも詳細に制御できます。</p>
+
+<pre class="brush: css no-line-numbers notranslate">@keyframes slidein {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}</pre>
+
+<p>JavaScript は、 CSS オブジェクトモデルのインターフェイス <a href="/ja/docs/Web/API/CSSKeyframesRule"><code>CSSKeyframesRule</code></a> によって <code>@keyframes</code> @-規則にアクセスできます。</p>
+
+<p>キーフレームを使うには、アニメーションとそのキーフレームを一致させるために、 <a href="/ja/docs/Web/CSS/animation-name" title="CSS の animation-name プロパティは、要素に適用される1つまたは複数のアニメーションを設定します。それぞれの名前はアニメーションシーケンスのプロパティ値を定義する @keyframes @-規則を設定します。"><code>animation-name</code></a> プロパティで指定したものと同じ名前がついた <code>@keyframes</code> 規則を作成します。それぞれの <code>@keyframes</code> 規則は、キーフレームセレクターのスタイルリストを含んでいます。それは、そのキーフレームが作動する時のアニメーションのパーセント値と、そのキーフレームでのスタイルを指定するブロックとで構成されています。</p>
+
+<p>キーフレームは任意の順番で並べることができます。それらは、作動する時を示すパーセント値の順番に従って制御されます。</p>
+
+<h3 id="Valid_keyframe_lists" name="Valid_keyframe_lists">有効なキーフレームのリスト</h3>
+
+<p>キーフレーム規則にアニメーションの開始と終了の状態 (<code>0%</code>/<code>from</code> と <code>100%</code>/<code>to</code>) を明示しない場合、ブラウザはその要素の既存のスタイルを開始・終了の状態として用います。これは、その要素を初期状態からアニメーションさせて元に戻すという処理に利用できます。</p>
+
+<p>キーフレーム規則にアニメーションができないプロパティを含めた場合、そのプロパティは無視されますが、他のアニメーションが可能なプロパティについてはアニメーションが実行されます。</p>
+
+<h3 id="Resolving_duplicates" name="Resolving_duplicates">重複の解決</h3>
+
+<p>複数のキーフレームに同じ名前が付けられている場合、最後に宣言されたものが使用されます。 <code>@keyframes</code> 規則がカスケード的に継承されることはないため、アニメーションが複数の規則セットによるキーフレームをもとにして行われることはありません。</p>
+
+<p>指定されたアニメーションのタイムオフセットが重複している場合は、 <code>@keyframes</code> 規則内のそのパーセント値を持つすべてのキーフレームがそのフレームに使用されます。 <code>@keyframes</code> 規則の中で、同じパーセント値を指定した複数のキーフレームがカスケード的に継承されます。</p>
+
+<h3 id="When_properties_are_left_out_of_some_keyframes" name="When_properties_are_left_out_of_some_keyframes">一部のキーフレームでプロパティが指定されていない場合</h3>
+
+<p>一部のキーフレームでしか指定されていないプロパティは、補完されます (ただし、補完することができないプロパティは除きます。このようなプロパティは、アニメーションされません)。例えば:</p>
+
+<pre class="brush: css notranslate">@keyframes identifier {
+  0% { top: 0; left: 0; }
+  30% { top: 50px; }
+  68%, 72% { left: 50px; }
+  100% { top: 100px; left: 100%; }
+}
+</pre>
+
+<p>この例では、 <a href="/ja/docs/Web/CSS/top" title="top は CSS のプロパティで、位置指定要素 (positioned elements) の垂直位置の決定に関与します。位置指定されていない要素には効果はありません。"><code>top</code></a> プロパティは <code>0%</code>, <code>30%</code>, <code>100%</code> のキーフレームでアニメーション指定されています。また、 <a href="/ja/docs/Web/CSS/left" title="left は CSS のプロパティで、位置指定要素 (positioned element) の水平位置の決定に関与します。位置指定されていない要素には効果はありません。"><code>left</code></a> プロパティは <code>0%</code>, <code>68%</code>, <code>72%</code>, <code>100%</code> のキーフレームで指定されています。</p>
+
+<h3 id="キーフレームが複数宣言された場合">キーフレームが複数宣言された場合</h3>
+
+<p>キーフレームが複数宣言されているものの、アニメーションで作用する全てのプロパティがそれぞれのキーフレームに存在するわけではない場合、これらのキーフレームで指定されたすべての値が適用されます。例えば、</p>
+
+<pre class="brush: css notranslate">@keyframes identifier {
+  0% { top: 0; }
+  50% { top: 30px; left: 20px; }
+  50% { top: 10px; }
+  100% { top: 0; }
+}
+</pre>
+
+<p>この例では、 <code>50%</code> のキーフレームで、使用される値は <code>top: 10px</code> と <code>left: 20px</code> です。</p>
+
+<p> カスケード的なキーフレームは Firefox 14 から対応しています。</p>
+
+<h3 id="!important_in_a_keyframe" name="!important_in_a_keyframe">キーフレーム内の <code>!important</code></h3>
+
+<p>キーフレーム内で <code>!important</code> が付けられた宣言は無視されます。</p>
+
+<pre class="brush: css notranslate">@keyframes important1 {
+  from { margin-top: 50px; }
+  50%  { margin-top: 150px !important; } /* 無視される */
+  to   { margin-top: 100px; }
+}
+
+@keyframes important2 {
+  from { margin-top: 50px;
+         margin-bottom: 100px; }
+  to   { margin-top: 150px !important; /* 無視される */
+         margin-bottom: 50px; }
+}
+</pre>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<h3 id="Values" name="Values">値</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/CSS/custom-ident" title="&lt;custom-ident&gt; は CSS のデータ型で、識別子として使われるユーザー定義の任意の文字列を意味します。これは大文字と小文字を区別し、曖昧さを避けるため、いくつかの値は様々なコンテキストで禁止されています。"><code>&lt;custom-ident&gt;</code></a></dt>
+ <dd>キーフレームのリストを識別する名前。これは CSS 構文規則で定義されている識別子に適合する必要があります。</dd>
+ <dt><code>from</code></dt>
+ <dd>アニメーションの始まりである <code>0%</code> を示します。</dd>
+ <dt><code>to</code></dt>
+ <dd>アニメーションの終わりである <code>100%</code> を示します。</dd>
+ <dt><a href="/ja/docs/Web/CSS/percentage" title="&lt;percentage&gt; は CSS のデータ型で、パーセント値による割合を表します。要素の親オブジェクトからの相対的な寸法を定義するためによく使われます。 width、 height, margin, padding、 font-size など、たくさんのプロパティでパーセント値を使うことができます。"><code>&lt;percentage&gt;</code></a></dt>
+ <dd>指定したキーフレームがアニメーションの中で作動する時間を示すパーセント値です。</dd>
+</dl>
+
+<h3 id="Formal_syntax" name="Formal_syntax">形式文法</h3>
+
+<pre class="syntaxbox notranslate">@keyframes <a href="#keyframes-name">&lt;keyframes-name&gt;</a> {
+  <a href="#keyframe-block-list">&lt;keyframe-block-list&gt;</a>
+}<p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframes-name">&lt;keyframes-name&gt;</span> = <a href="/ja/docs/Web/CSS/custom-ident" title="&lt;custom-ident&gt; は CSS のデータ型で、識別子として使われるユーザー定義の任意の文字列を意味します。これは大文字と小文字を区別し、曖昧さを避けるため、いくつかの値は様々なコンテキストで禁止されています。">&lt;custom-ident&gt;</a> <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。">&lt;string&gt;</a><br><span id="keyframe-block-list">&lt;keyframe-block-list&gt;</span> = <a href="#keyframe-block">&lt;keyframe-block&gt;</a><a href="/ja/docs/CSS/Value_definition_syntax#Plus_()" title="Plus: the entity may occur one or several times">+</a></code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframe-block">&lt;keyframe-block&gt;</span> = <a href="#keyframe-selector">&lt;keyframe-selector&gt;</a><a href="/ja/docs/CSS/Value_definition_syntax#Hash_mark_()" title="Hash mark: the entity is repeated one or several times, each occurence separated by a comma">#</a> {
+  &lt;declaration-list&gt;
+}</code></p><p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="keyframe-selector">&lt;keyframe-selector&gt;</span> = from <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> to <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> <a href="/ja/docs/Web/CSS/percentage" title="&lt;percentage&gt; は CSS のデータ型で、パーセント値による割合を表します。要素の親オブジェクトからの相対的な寸法を定義するためによく使われます。 width、 height, margin, padding、 font-size など、たくさんのプロパティでパーセント値を使うことができます。">&lt;percentage&gt;</a></code></p></pre>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p><a href="/ja/docs/Web/CSS/CSS_Animations/Using_CSS_animations">CSS アニメーションの利用</a> を参照してください。</p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-animations/#keyframes" hreflang="en" lang="en">CSS Animations<br><small lang="ja">@keyframes の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:css.at-rules.keyframes"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/CSS/CSS_Animations/Using_CSS_animations">CSS アニメーションの使用</a></li>
+ <li><a href="/ja/docs/Web/API/AnimationEvent"><code>AnimationEvent</code></a></li>
+</ul>

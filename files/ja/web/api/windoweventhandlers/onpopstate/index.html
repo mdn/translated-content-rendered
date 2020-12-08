@@ -1,0 +1,85 @@
+---
+title: WindowEventHandlers.onpopstate
+slug: Web/API/WindowEventHandlers/onpopstate
+tags:
+  - API
+  - DOM
+  - Event Handler
+  - HTML DOM
+  - HTML5
+  - Window
+  - WindowEventHandlers
+  - onpopstate
+  - イベント
+  - プロパティ
+translation_of: Web/API/WindowEventHandlers/onpopstate
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/WindowEventHandlers"><code>WindowEventHandlers</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Window/onafterprint"><code>onafterprint</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onbeforeprint"><code>onbeforeprint</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onbeforeunload"><code>onbeforeunload</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onhashchange"><code>onhashchange</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/WindowEventHandlers/onlanguagechange"><code>onlanguagechange</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onmessage"><code>onmessage</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onmessageerror"><code>onmessageerror</code></a></li><li><em><code>onpopstate</code></em></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onrejectionhandled"><code>onrejectionhandled</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onstorage"><code>onstorage</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onunhandledrejection"><code>onunhandledrejection</code></a></li><li><a href="/ja/docs/Web/API/WindowEventHandlers/onunload"><code>onunload</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implemented by:</summary><ol><li><a href="/ja/docs/Web/API/HTMLBodyElement"><code>HTMLBodyElement</code></a></li><li><a href="/ja/docs/Web/API/HTMLFrameSetElement"><code>HTMLFrameSetElement</code></a></li><li><a href="/ja/docs/Web/API/Window"><code>Window</code></a></li></ol></details></li></ol></section></div>
+
+<p><span class="seoSummary"><a href="/ja/docs/Web/API/WindowEventHandlers"><code>WindowEventHandlers</code></a> ミックスインの <strong><code>onpopstate</code></strong> プロパティは、ウィンドウの <code><a href="/ja/docs/Web/API/Window/popstate_event">popstate</a></code> イベントを処理するための <a href="/ja/docs/Web/API/EventHandler"><code>EventHandler</code></a> です。</span></p>
+
+<p><code>popstate</code> イベントは、同じ文書の2つの履歴項目の間で、アクティブな履歴項目が変わるたびにウィンドウに発行されます。アクティブな履歴項目が <code>history.pushState()</code> を呼び出したことで作成されたり、 <code>history.replaceState()</code> を呼び出したことで影響されたりした場合、 <code>popstate</code> イベントの <code>state</code> プロパティが履歴項目の状態オブジェクトのコピーを保持します。</p>
+
+<div class="note">
+<p><strong>メモ</strong>: <code>history.pushState()</code> 又は <code>history.replaceState()</code> を呼び出すことは、 <code>popstate</code> イベントのトリガーにはなりません。 <code>popstate</code> イベントは、戻るボタンをクリックしたり (又は JavaScript で <code>history.back()</code> を呼び出したり)、同じ文書で2つの履歴項目間を移動したりするように、ブラウザーのアクションを実行することのみがトリガーになります。</p>
+</div>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">window.onpopstate = <em>funcRef</em>;
+</pre>
+
+<ul>
+ <li><code>funcRef</code> は、ハンドラ関数です。</li>
+</ul>
+
+<h2 id="The_popstate_event" name="The_popstate_event">例</h2>
+
+<p>例えば、<code>http://example.com/example.html</code> のページで次のコードを実行すると、示されているようにアラートを生成します。</p>
+
+<pre class="brush:js notranslate">window.onpopstate = function(event) {
+  alert(&quot;location: &quot; + document.location + &quot;, state: &quot; + JSON.stringify(event.state));
+};
+
+history.pushState({page: 1}, &quot;title 1&quot;, &quot;?page=1&quot;);
+history.pushState({page: 2}, &quot;title 2&quot;, &quot;?page=2&quot;);
+history.replaceState({page: 3}, &quot;title 3&quot;, &quot;?page=3&quot;);
+history.back(); // alerts &quot;location: http://example.com/example.html?page=1, state: {&quot;page&quot;:1}&quot;
+history.back(); // alerts &quot;location: http://example.com/example.html, state: null
+history.go(2);  // alerts &quot;location: http://example.com/example.html?page=3, state: {&quot;page&quot;:3}
+</pre>
+
+<p>なお、元の履歴項目 (<code>http://example.com/example.html</code> の場合) には関連付けられる状態オブジェクトがありませんが、それでも2回目の <code>history.back()</code> の呼び出し後に項目がアクティブになったとき、 <code>popstate</code> イベントが発行されます。</p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/webappapis.html#handler-window-onpopstate" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">onpopstate の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.WindowEventHandlers.onpopstate"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/Window/history"><code>window.history</code></a></li>
+ <li><a href="/ja/docs/Web/Guide/DOM/Manipulating_the_browser_history">ブラウザーの履歴の操作</a></li>
+ <li><a href="/ja/docs/Web/Guide/DOM/Manipulating_the_browser_history/Example">AJAX ナビゲーションの例</a></li>
+</ul>

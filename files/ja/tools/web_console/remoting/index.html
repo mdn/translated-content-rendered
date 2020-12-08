@@ -1,0 +1,737 @@
+---
+title: Webコンソールリモーティング
+slug: Tools/Web_Console/remoting
+translation_of: Tools/Web_Console/remoting
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/ja/docs/Tools/Page_Inspector">ページインスペクター</a></li>
+        <li><a href="/ja/docs/Tools/Web_Console">ウェブコンソール</a></li>
+        <li><a href="/ja/docs/Tools/Debugger">JavaScript デバッガー</a></li>
+        <li><a href="/ja/docs/Tools/Network_Monitor">ネットワークモニター</a></li>
+        <li><a href="/ja/docs/Tools/Performance">パフォーマンス</a></li>
+        <li><a href="/ja/docs/Tools/Application">Application</a></li>
+        <li><a href="/ja/docs/Tools/Responsive_Design_Mode">レスポンシブデザインモード</a></li>
+        <li><a href="/ja/docs/Tools/Accessibility_inspector">Accessibility Inspector</a></li>
+        <li class="toggle">
+            <details>
+                <summary>その他のツール</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Memory">メモリー</a></li>
+                    <li><a href="/ja/docs/Tools/Storage_Inspector">ストレージインスペクター</a></li>
+                    <li><a href="/ja/docs/Tools/DOM_Property_Viewer">DOM プロパティビューアー</a></li>
+                    <li><a href="/ja/docs/Tools/Eyedropper">スポイト</a></li>
+                    <li><a href="/ja/docs/Tools/Taking_screenshots">スクリーンショット</a></li>
+                    <li><a href="/ja/docs/Tools/Style_Editor">スタイルエディター</a></li>
+                    <li><a href="/ja/docs/Tools/Rulers">Rulers</a></li>
+                    <li><a href="/ja/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+                    <li><a href="/ja/docs/Tools/View_source">View Source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>開発ツールに接続する</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/about:debugging">about:debugging</a></li>
+                    <li><a href="/ja/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Android 版 Firefox に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Working_with_iframes">iframe に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Valence">ほかのブラウザーに接続する</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>ブラウザーのデバッグ</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Browser_Console">ブラウザーコンソール</a></li>
+                    <li><a href="/ja/docs/Tools/Browser_Toolbox">ブラウザーツールボックス</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/ja/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">開発ツールの拡張</a></li>
+        <li><a href="/ja/docs/Tools/Settings">オプション</a></li>
+        <li><a href="/ja/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/ja/docs/Tools/Release_notes">リリースノート</a></li>
+    </ol>
+</section></div>
+
+<h2 id="イントロダクション">イントロダクション</h2>
+
+<p>このドキュメントでは、Webコンソールのリモート処理のしくみについて説明します。Webコンソールはユーザーインターフェイスを備えたクライアントと、タブ内で発生するすべてのもののリスナーを持つサーバーに分割されています。サーバーとクライアント間の通信には、<a href="https://wiki.mozilla.org/Remote_Debugging_Protocol">リモートデバッグプロトコル</a>を使用します。このアーキテクチャでは、WebコンソールクライアントインスタンスをB2G、Fennecまたはその他のFirefoxインスタンス上で動作するサーバーに接続できます。</p>
+
+<p>Webコンソールのアーキテクチャをよりよく理解するために、<a href="https://wiki.mozilla.org/Debugger_Architecture">デバッガのアーキテクチャ</a>について学ぶことをお勧めします。</p>
+
+<div class="note">
+<p>リモートWebコンソールは、Firefox 18で導入された機能です。このドキュメントでは、最新のプロトコルについて説明しています。</p>
+</div>
+
+<h2 id="WebConsoleActor_と_WebConsoleClient"><code>WebConsoleActor</code> と <code>WebConsoleClient</code></h2>
+
+<p><code>WebConsoleActor</code> は、<a href="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/" title="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/"><code>toolkit/devtools/webconsole</code></a> フォルダの <a href="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/dbg-webconsole-actors.js" title="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/dbg-webconsole-actors.js"><code>dbg-webconsole-actors.js</code></a> にあります。</p>
+
+<p><code>WebConsoleClient</code> は (<a href="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/" title="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/"><code>toolkit/devtools/webconsole</code></a> の) <a href="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/WebConsoleClient.jsm" title="http://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/webconsole/WebConsoleClient.jsm"><code>WebConsoleClient.jsm</code></a> にあり、Web コンソールアクターで作業するときにWeb コンソールで使用されます。</p>
+
+<p>デバッガが Web コンソールコードでどのように使用されているかを確認するには、<a href="http://mxr.mozilla.org/mozilla-central/source/browser/devtools/webconsole/webconsole.js" title="http://mxr.mozilla.org/mozilla-central/source/browser/devtools/webconsole/webconsole.js"><code>browser/devtools/webconsole/webconsole.js</code></a> を開き、<code>WebConsoleConnectionProxy</code> を検索します。</p>
+
+<p>新しい Web コンソールアクターは次のとおりです。</p>
+
+<ul>
+ <li><code>WebConsoleActor</code> は JS 評価、オートコンプリート、リスナーの開始/停止などを許可します。</li>
+ <li><code>NetworkEventActor</code> は、新しいネットワークリクエストごとに使用されます。クライアントは、レスポンス本文やリクエストヘッダーなど、詳細なネットワークイベントの詳細を要求できます。</li>
+</ul>
+
+<p><code>WebConsoleActor</code> に接続するには、次の手順を実行します。</p>
+
+<pre class="brush:js; notranslate">connectToServer() // the usual
+listTabs()
+pickTheTabYouWant()
+debuggerClient.attachConsole(tab.consoleActor, listeners, onAttachConsole)
+</pre>
+
+<p><code>listeners</code> 引数は、Web コンソールで開始するリスナーを指定する配列です。ページエラー、<code>window.console</code> API メッセージ、ネットワークアクティビティ、ファイルアクティビティなどがあります。例えば：</p>
+
+<pre class="brush:js; notranslate">[&quot;PageError&quot;, &quot;ConsoleAPI&quot;, &quot;NetworkActivity&quot;, &quot;FileActivity&quot;]</pre>
+
+<div class="note">
+<p>Webコンソールアクタはデフォルトではリスナーを起動しません。クライアントには、必要なときに各リスナーを起動するオプションがあります。この方法で、サーバーでのリソース使用率を低く抑えることができます。これは、サーバーが少ないリソースでデバイスを実行する場合に起こりうる問題です。</p>
+</div>
+
+<p><code>onAttachConsole</code> コールバックは <code>WebConsoleClient</code> オブジェクトの新しいインスタンスを受け取ります。このオブジェクトは <code>startListeners()</code>、<code>stopListeners()</code> などのプロトコルパケットを抽象化するメソッドを提供します。</p>
+
+<p>プロトコルパケットは次のようになります。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;root&quot;,
+  &quot;type&quot;: &quot;listTabs&quot;
+}
+{
+  &quot;from&quot;: &quot;root&quot;,
+  &quot;consoleActor&quot;: &quot;conn0.console9&quot;,
+  &quot;selected&quot;: 2,
+  &quot;tabs&quot;: [
+    {
+      &quot;actor&quot;: &quot;conn0.tab2&quot;,
+      &quot;consoleActor&quot;: &quot;conn0.console7&quot;,
+      &quot;title&quot;: &quot;&quot;,
+      &quot;url&quot;: &quot;https://tbpl.mozilla.org/?tree=Fx-Team&quot;
+    },
+// ...
+  ]
+}
+</pre>
+
+<p><code>consoleActor</code> は<strong>グローバルアクター</strong>としても利用可能であることに注意してください。グローバル <code>consoleActor</code> にアタッチすると、すべてのネットワークリクエスト、ページエラー、およびその他のイベント (クロムエラーやネットワークイベントなど) がすべてのタブとウィンドウから受信されます。このアクターはブラウザコンソールの実装や、リモート Firefox/B2G インスタンスのデバッグに使用されます。</p>
+
+<h3 id="startListenerslisteners_onResponse"><code>startListeners(listeners, onResponse)</code></h3>
+
+<p>新しい <code>startListeners</code> パケット：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;startListeners&quot;,
+  &quot;listeners&quot;: [
+    &quot;PageError&quot;,
+    &quot;ConsoleAPI&quot;,
+    &quot;NetworkActivity&quot;,
+    &quot;FileActivity&quot;
+  ]
+}
+</pre>
+
+<p>返答：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;startedListeners&quot;: [
+    &quot;PageError&quot;,
+    &quot;ConsoleAPI&quot;,
+    &quot;NetworkActivity&quot;,
+    &quot;FileActivity&quot;
+  ],
+  &quot;nativeConsoleAPI&quot;: true,
+  &quot;from&quot;: &quot;conn0.console9&quot;
+}
+</pre>
+
+<p>レスポンスは開始されたリスナーを示し、<code>window.console</code> オブジェクトがページ内のスクリプトによってオーバーライドされたかどうかを示す <code>nativeConsoleAPI</code> フラグを含みます。</p>
+
+<h3 id="タブナビゲーション">タブナビゲーション</h3>
+
+<p>タブナビゲーションイベントを待ち受けるには、指定したタブのタブアクターにアタッチする必要もあります。<code>tabNavigated</code> 通知はタブのアクターから来ます。</p>
+
+<div class="warning notecard">
+<p>Firefox 20 以前では、Web コンソールの実行者は<code>LocationChange</code>リスナを提供し、<code>locationChanged</code> 通知を関連付けました。これはもはや当てはまりません。Web コンソールクライアントが <code>tabNavigated</code> 通知を再利用 (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=792062" title="https://bugzilla.mozilla.org/show_bug.cgi?id=792062">bug 792062</a>) できるように変更しました。</p>
+</div>
+
+<p>ページナビゲーションが開始されると、次のパケットがタブアクターから送信されます。</p>
+
+<pre class="brush: json notranslate"><code class="brush: json">{
+  &quot;from&quot;: tabActor,
+  &quot;type&quot;: &quot;tabNavigated&quot;,
+  &quot;state&quot;: &quot;start&quot;,
+  &quot;url&quot;: newURL,
+  &quot;nativeConsoleAPI&quot;: true
+}</code>
+</pre>
+
+<p><code>nativeConsoleAPI</code> プロパティは、<code>window.console</code> オブジェクトがネイティブかどうかを、指定されたタブのトップレベルウィンドウオブジェクトに対して示します。これは、ナビゲーションが開始されると常に <code>true</code> になります。ナビゲーションが停止すると、次のパケットが送信されます。</p>
+
+<pre class="brush: json notranslate"><code>{
+  &quot;from&quot;: tabActor,
+  &quot;type&quot;: &quot;tabNavigated&quot;,
+  &quot;state&quot;: &quot;stop&quot;,
+  &quot;url&quot;: newURL,
+  &quot;title&quot;: newTitle,
+  &quot;nativeConsoleAPI&quot;: true|false
+}</code></pre>
+
+<h3 id="getCachedMessagestypes_onResponse"><code>getCachedMessages(types, onResponse)</code></h3>
+
+<p><code>webConsoleClient.getCachedMessages(types, onResponse)</code> メソッドは、次のパケットをサーバーに送信します。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;getCachedMessages&quot;,
+  &quot;messageTypes&quot;: [
+    &quot;PageError&quot;,
+    &quot;ConsoleAPI&quot;
+  ]
+}
+</pre>
+
+<p><code>getCachedMessages</code> パケットを使用すると、Web コンソールを開く前にキャッシュされたメッセージを取得できます。 ページエラーとコンソール API 呼び出しのキャッシュメッセージしか取得できません。 返信は次のようになります。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;messages&quot;: [ ... ],
+  &quot;from&quot;: &quot;conn0.console9&quot;
+}
+</pre>
+
+<p>配列内の各メッセージは、典型的なページエラーやコンソール API コールを送信するときと同じタイプです。これらについては、本書の以下のセクションで説明します。</p>
+
+<h3 id="アクター設定">アクター設定</h3>
+
+<p>Web コンソールが実行中にログオプションを設定できるように、<code>setPreferences</code>パケットを追加しました。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;setPreferences&quot;,
+  &quot;preferences&quot;: {
+    &quot;NetworkMonitor.saveRequestAndResponseBodies&quot;: false
+  }
+}
+</pre>
+
+<p>返答:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;updated&quot;: [
+    &quot;NetworkMonitor.saveRequestAndResponseBodies&quot;
+  ],
+  &quot;from&quot;: &quot;conn0.console10&quot;
+}
+</pre>
+
+<p>便宜上 <code>webConsoleClient.setPreferences(prefs, onResponse)</code>を使用できます。<code>prefs</code> 引数は <code>{ prefName: prefValue, ... }</code> のようなオブジェクトです。</p>
+
+<p>Firefox 25 では <code>getPreferences</code> リクエストパケットが追加されました：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console34&quot;,
+  &quot;type&quot;: &quot;getPreferences&quot;,
+  &quot;preferences&quot;: [
+    &quot;NetworkMonitor.saveRequestAndResponseBodies&quot;
+  ]
+}
+</pre>
+
+<p>返答パケット：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;preferences&quot;: {
+    &quot;NetworkMonitor.saveRequestAndResponseBodies&quot;: false
+  },
+  &quot;from&quot;: &quot;conn0.console34&quot;
+}
+</pre>
+
+<p><code>webConsoleClient.getPreferences(prefs, onResponse)</code> を使用することもできます。<code>prefs</code> 引数は、名前で値を取得したい設定の配列です。</p>
+
+<h3 id="プライベートブラウジング">プライベートブラウジング</h3>
+
+<p>ブラウザコンソールは、ユーザーがプライベートウィンドウを開いているときに使用できます。各ページエラー、コンソール API メッセージ、およびネットワークリクエストにはプライベートフラグが付いています。プライベートメッセージは、最後のプライベートウィンドウが閉じられるたびにクリアされます。コンソールアクタは <code>lastPrivateContextExited</code> 通知を提供します。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console19&quot;,
+  &quot;type&quot;: &quot;lastPrivateContextExited&quot;
+}
+</pre>
+
+<p>この通知はクライアントがグローバルコンソールアクターに接続されている場合にのみ送信され、タブコンソールアクターには意味をなしません。</p>
+
+<div class="note">
+<p>この通知は Firefox 24 で導入されました。</p>
+</div>
+
+<h3 id="HTTP_リクエストの送信">HTTP リクエストの送信</h3>
+
+<p>Firefox 25 から、コンソールアクタを使用して HTTP リクエストを送信することができます：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;sendHTTPRequest&quot;,
+  &quot;request&quot;: {
+    &quot;url&quot;: &quot;http://localhost&quot;,
+    &quot;method&quot;: &quot;GET&quot;,
+    &quot;headers&quot;: [
+      {
+        name: &quot;Header-name&quot;,
+        value: &quot;header value&quot;,
+      },
+      // ...
+    ],
+  },
+}
+</pre>
+
+<p>レスポンスパケットは、ネットワークイベントアクターグリップです。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;eventActor&quot;: {
+    &quot;actor&quot;: &quot;conn0.netEvent14&quot;,
+    &quot;startedDateTime&quot;: &quot;2013-08-26T19:50:03.699Z&quot;,
+    &quot;url&quot;: &quot;http://localhost&quot;,
+    &quot;method&quot;: &quot;GET&quot;
+    &quot;isXHR&quot;: true,
+    &quot;private&quot;: false
+  }
+}
+</pre>
+
+<p><code>webConsoleClient.sendHTTPRequest(request, onResponse)</code> メソッドを使用することもできます。<code>request</code> 引数は上記のリクエストパケットの <code>request</code> オブジェクトと同じです。</p>
+
+<h2 id="ページエラー">ページエラー</h2>
+
+<p>ページエラーは <a href="/ja/docs/XPCOM_Interface_Reference/nsIConsoleService" title="/en-US/docs/XPCOM_Interface_Reference/nsIConsoleService"><code>nsIConsoleService</code></a> から発生します。許可される各ページエラーは <a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIScriptError" title="/en-US/docs/XPCOM_Interface_Reference/nsIScriptError"><code>nsIScriptError</code></a> オブジェクトです。</p>
+
+<p><code>pageError</code> パケットは次のとおりです。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;pageError&quot;,
+  &quot;pageError&quot;: {
+    &quot;errorMessage&quot;: &quot;ReferenceError: foo is not defined&quot;,
+    &quot;sourceName&quot;: &quot;http://localhost/~mihai/mozilla/test.js&quot;,
+    &quot;lineText&quot;: &quot;&quot;,
+    &quot;lineNumber&quot;: 6,
+    &quot;columnNumber&quot;: 0,
+    &quot;category&quot;: &quot;content javascript&quot;,
+    &quot;timeStamp&quot;: 1347294508210,
+    &quot;error&quot;: false,
+    &quot;warning&quot;: false,
+    &quot;exception&quot;: true,
+    &quot;strict&quot;: false,
+    &quot;private&quot;: false,
+  }
+}
+</pre>
+
+<p>単純化のため、パケットは <code>nsIScriptError</code> に似ています。いくつかの不必要なプロパティを削除し、フラグの働きを変更しました。</p>
+
+<p><code>private</code> フラグは、エラーがプライベートウィンドウ/タブ (Firefox 24で追加されたもの) から来たものかどうかを示します。</p>
+
+<p>Firefox 24 以降、文字列が非常に長い場合、<code>errorMessage</code> および <code>lineText</code> プロパティは長い文字列アクターグリップになることがあります。</p>
+
+<h2 id="Console_API_メッセージ">Console API メッセージ</h2>
+
+<p><a href="/ja/docs/Web/API/console"><code>window.console</code> API</a> 呼び出しは、Gecko を通して内部メッセージを送信します。これにより、各呼び出しに必要な処理を実行できます。Web コンソールのアクターは、これらのメッセージをリモートデバッグクライアントに送信します。</p>
+
+<p><a href="https://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/debugger/server/dbg-script-actors.js" title="https://mxr.mozilla.org/mozilla-central/source/toolkit/devtools/debugger/server/dbg-script-actors.js">dbg-script-actors.js</a> の <code>ObjectActor</code> を <code>ThreadActor</code> なしで使用すると、ページスクリプトの速度低下を避けることができます。デバッガはターゲットページで JavaScript の実行を非最適化します。Web コンソールの<a href="https://searchfox.org/mozilla-central/source/devtools/docs/backend/protocol.md">オブジェクトアクタの有効期間</a>は、デバッガ内のこれらのオブジェクトの存続期間とは異なります。通常、一時停止またはスレッドごとです。 Web コンソールは <code>ObjectActors</code> の有効期間を手動で管理します。</p>
+
+<div class="warning notecard">
+<p>Firefox 23以前は、プロトコルを通じてJavaScriptオブジェクトを操作するために、別のアクタ<code>(WebConsoleObjectActor</code>)を使用しました。<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=783499" title="https://bugzilla.mozilla.org/show_bug.cgi?id=783499">bug 783499</a>では、デバッガから<code>ObjectActor</code>を再利用するためにいくつかの変更を行いました。</p>
+</div>
+
+<p>コンソール API メッセージは <a href="https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIObserverService" title="/en-US/docs/XPCOM_Interface_Reference/nsIObserverService"><code>nsIObserverService</code></a> を経由します。コンソールオブジェクトの実装は <a href="http://mxr.mozilla.org/mozilla-central/source/dom/base/ConsoleAPI.js" title="http://mxr.mozilla.org/mozilla-central/source/dom/base/ConsoleAPI.js"><code>dom/base/ConsoleAPI.js</code></a> にあります。</p>
+
+<p>サーバーで受信したコンソールメッセージごとに、次の <code>consoleAPICall</code> パケットをクライアントに送信します。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;consoleAPICall&quot;,
+  &quot;message&quot;: {
+    &quot;level&quot;: &quot;error&quot;,
+    &quot;filename&quot;: &quot;http://localhost/~mihai/mozilla/test.html&quot;,
+    &quot;lineNumber&quot;: 149,
+    &quot;functionName&quot;: &quot;&quot;,
+    &quot;timeStamp&quot;: 1347302713771,
+    &quot;private&quot;: false,
+    &quot;arguments&quot;: [
+      &quot;error omg aloha &quot;,
+      {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;className&quot;: &quot;HTMLBodyElement&quot;,
+        &quot;actor&quot;: &quot;conn0.consoleObj20&quot;
+      },
+      &quot; 960 739 3.141592653589793 %a&quot;,
+      &quot;zuzu&quot;,
+      { &quot;type&quot;: &quot;null&quot; },
+      { &quot;type&quot;: &quot;undefined&quot; }
+    ]
+  }
+}
+</pre>
+
+<p>ページエラーを送信する方法と同様に、ここでは <code>nsIObserverService</code> から受信した実際のコンソールイベントを送信します。<code>arguments</code> の配列を変更します - 引数として渡される各オブジェクトの <code>ObjectActor</code> インスタンスを作成し、最後に不要なプロパティ (ウィンドウIDなど) を削除します。長い文字列の場合、<code>LongStringActor</code> を使用します。Web コンソールは引き数を検査できます。</p>
+
+<p><code>private</code> フラグは、コンソール API 呼び出しがプライベートウィンドウ/タブ (Firefox 24 で追加されたもの) から来ているかどうかを示します。</p>
+
+<p>オブザーバーサービスから受け取ったコンソールイベントオブジェクトには小さな違いがあるように、コンソール API 呼び出しメソッドに応じて、オブジェクトの小さなバリエーションがあります。これらの相違点を確認するには、コンソール API 実装の <a href="http://mxr.mozilla.org/mozilla-central/source/dom/base/ConsoleAPI.js" title="http://mxr.mozilla.org/mozilla-central/source/dom/base/ConsoleAPI.js">dom/base/ConsoleAPI.js</a> を参照してください。</p>
+
+<h3 id="JavaScript_評価">JavaScript 評価</h3>
+
+<h4 id="evaluateJS_リクエストとレスポンスパケット"><code>evaluateJS</code> リクエストとレスポンスパケット</h4>
+
+<p>Web コンソールクライアントは <code>evaluateJS(requestId, string, onResponse)</code> メソッドを提供し、次のパケットを送信します。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;evaluateJS&quot;,
+  &quot;text&quot;: &quot;document&quot;,
+  &quot;bindObjectActor&quot;: null,
+  &quot;frameActor&quot;: null,
+  &quot;url&quot;: null,
+  &quot;selectedNodeActor&quot;: null,
+}
+</pre>
+
+<p><code>bindObjectActor</code> プロパティは、<code>Debugger.Object</code> を指すオプションの <code>ObjectActor</code> IDです。このオプションを使用すると、文字列の評価中に <code>_self</code> を指定されたオブジェクトアクターの <code>Debugger.Object</code> にバインドできます。バインディングについては <a href="/ja/docs/Tools/Debugger-API/Debugger.Object"><code>evalInGlobalWithBindings()</code></a> を参照してください。</p>
+
+<div class="note">
+<p>変数ビューはオブジェクトを更新する必要があり、表示されている<code>ObjectActor</code>の<code>Debugger.Object</code>に<code>_self</code>をバインドすることによってオブジェクトを更新する必要があります。 そのため、変数ビューは評価のために次のような文字列を送信します。</p>
+
+<pre class="brush:js; notranslate">  _self[&quot;prop&quot;] = value;
+</pre>
+</div>
+
+<p><code>frameActor</code> プロパティは、オプションの <code>FrameActor</code> IDです。FAは <a href="/ja/docs/Tools/Debugger-API/Debugger.Frame"><code>Debugger.Frame</code></a> への参照を保持します。このオプションを使用すると指定された FA のフレーム内の文字列を評価できます。</p>
+
+<p><code>url</code> プロパティはスクリプトを評価するためのオプションの URL です(Firefox 25 の新機能)。評価のためのデフォルトのソース URL は &quot;debugger eval code&quot; です。</p>
+
+<p><code>selectedNodeActor</code> プロパティはオプションの <code>NodeActor</code> ID であり、Inspector で現在選択されているノードがある場合はそのノードを示すために使用されます。この <code>NodeActor</code> は <code>$0</code> JSTerm ヘルパーによって参照できます。</p>
+
+<p>レスポンスパケット：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console9&quot;,
+  &quot;input&quot;: &quot;document&quot;,
+  &quot;result&quot;: {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;className&quot;: &quot;HTMLDocument&quot;,
+    &quot;actor&quot;: &quot;conn0.consoleObj20&quot;
+    &quot;extensible&quot;: true,
+    &quot;frozen&quot;: false,
+    &quot;sealed&quot;: false
+  },
+  &quot;timestamp&quot;: 1347306273605,
+  &quot;exception&quot;: null,
+  &quot;exceptionMessage&quot;: null,
+  &quot;helperResult&quot;: null
+}
+</pre>
+
+<ul>
+ <li><code>exception</code> は、評価中にスローされた例外の JSON-ification を保持します。</li>
+ <li><code>exceptionMessage</code> は <code>exception.toString()</code> の結果を保持します。</li>
+ <li><code>result</code> は結果の <code>ObjectActor</code> インスタンスを保持します。</li>
+ <li><code>helperResult</code> は JSTerm ヘルパーの結果、JSON のもの (コンテンツオブジェクトではありません) から来るものです。</li>
+</ul>
+
+<div class="warning notecard">
+<p>Firefox 23では、プロトコルエラーが発生したときに使用されるデフォルトプロパティとの競合を避けるために、<code>error</code>および<code>errorMessage</code>プロパティの名前をそれぞれ<code>exception</code>および<code>exceptionMessage</code>に変更しました。</p>
+</div>
+
+<h3 id="Autocomplete_など">Autocomplete など</h3>
+
+<p><code>autocomplete</code> リクエストパケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;autocomplete&quot;,
+  &quot;text&quot;: &quot;d&quot;,
+  &quot;cursor&quot;: 1
+}
+</pre>
+
+<p>レスポンスパケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console9&quot;,
+  &quot;matches&quot;: [
+    &quot;decodeURI&quot;,
+    &quot;decodeURIComponent&quot;,
+    &quot;defaultStatus&quot;,
+    &quot;devicePixelRatio&quot;,
+    &quot;disableExternalCapture&quot;,
+    &quot;dispatchEvent&quot;,
+    &quot;doMyXHR&quot;,
+    &quot;document&quot;,
+    &quot;dump&quot;
+  ],
+  &quot;matchProp&quot;: &quot;d&quot;
+}
+</pre>
+
+<p>また、レスポンスがない <code>clearMessagesCache</code> リクエストパケットもあります。これにより、コンソール API コールキャッシュがクリアされ、ページエラーキャッシュがクリアされるはずです。<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=717611">バグ 717611</a> を参照してください。</p>
+
+<h2 id="ネットワークロギング">ネットワークロギング</h2>
+
+<h3 id="networkEvent_パケット"><code>networkEvent</code> パケット</h3>
+
+<p>新しいネットワークリクエストがログに記録されるたびに <code>networkEvent</code> パケットが送信されます。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console10&quot;,
+  &quot;type&quot;: &quot;networkEvent&quot;,
+  &quot;eventActor&quot;: {
+    &quot;actor&quot;: &quot;conn0.netEvent14&quot;,
+    &quot;startedDateTime&quot;: &quot;2012-09-17T19:50:03.699Z&quot;,
+    &quot;url&quot;: &quot;http://localhost/~mihai/mozilla/test2.css&quot;,
+    &quot;method&quot;: &quot;GET&quot;
+    &quot;isXHR&quot;: false,
+    &quot;private&quot;: false
+  }
+}
+</pre>
+
+<p>このパケットは Web コンソールに新しいネットワークイベントを通知するために使用されます。リクエストごとに新しい <code>NetworkEventActor</code> インスタンスが作成されます。<code>isXHR</code> フラグはリクエストが <a href="/ja/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a> インスタンスを介して開始されたかどうかを示します。つまり、<a href="/ja/docs/XPCOM_Interface_Reference/nsIHttpChannel">nsIHttpChannel</a> の通知は <a href="/ja/docs/XPCOM_Interface_Reference/nsIXMLHttpRequest">nsIXMLHttpRequest</a> インターフェイスです。</p>
+
+<p><code>private</code> フラグは、ネットワークリクエストがプライベートウィンドウ/タブ (Firefox 24 で追加されたもの) から来たものかどうかを示します。</p>
+
+<h3 id="NetworkEventActor"><code>NetworkEventActor</code></h3>
+
+<p>新しいネットワークイベントアクターは、さらにリクエストおよびレスポンス情報を格納します。</p>
+
+<h4 id="networkEventUpdate_パケット"><code>networkEventUpdate</code> パケット</h4>
+
+<p>変更が発生したとき、新しいものが追加されたときに Web コンソール UI を最新の状態に保つ必要があります。この目的のために新しい <code>networkEventUpdate</code> パケットが送信されます。例：</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;requestHeaders&quot;,
+  &quot;headers&quot;: 10,
+  &quot;headersSize&quot;: 425
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;requestCookies&quot;,
+  &quot;cookies&quot;: 0
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;requestPostData&quot;,
+  &quot;dataSize&quot;: 1024,
+  &quot;discardRequestBody&quot;: false
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;responseStart&quot;,
+  &quot;response&quot;: {
+    &quot;httpVersion&quot;: &quot;HTTP/1.1&quot;,
+    &quot;status&quot;: &quot;304&quot;,
+    &quot;statusText&quot;: &quot;Not Modified&quot;,
+    &quot;headersSize&quot;: 194,
+    &quot;discardResponseBody&quot;: true
+  }
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;eventTimings&quot;,
+  &quot;totalTime&quot;: 1
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;responseHeaders&quot;,
+  &quot;headers&quot;: 6,
+  &quot;headersSize&quot;: 194
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;responseCookies&quot;,
+  &quot;cookies&quot;: 0
+},
+{
+  &quot;from&quot;: &quot;conn0.netEvent14&quot;,
+  &quot;type&quot;: &quot;networkEventUpdate&quot;,
+  &quot;updateType&quot;: &quot;responseContent&quot;,
+  &quot;mimeType&quot;: &quot;text/css&quot;,
+  &quot;contentSize&quot;: 0,
+  &quot;discardResponseBody&quot;: true
+}
+</pre>
+
+<p>実際のヘッダー、Cookie、および本文は送信されません。</p>
+
+<h4 id="getRequestHeaders_とその他のパケット"><code>getRequestHeaders</code> とその他のパケット</h4>
+
+<p>ネットワークイベントの詳細については、次のパケットリクエスト (およびレスポンス) を使用できます。</p>
+
+<p><code>getRequestHeaders</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getRequestHeaders&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;headers&quot;: [
+    {
+      &quot;name&quot;: &quot;Host&quot;,
+      &quot;value&quot;: &quot;localhost&quot;
+    }, ...
+  ],
+  &quot;headersSize&quot;: 350
+}
+</pre>
+
+<p><code>getRequestCookies</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getRequestCookies&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;cookies&quot;: []
+}
+</pre>
+
+<p><code>getResponseHeaders</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getResponseHeaders&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;headers&quot;: [
+    {
+      &quot;name&quot;: &quot;Date&quot;,
+      &quot;value&quot;: &quot;Mon, 17 Sep 2012 20:05:27 GMT&quot;
+    }, ...
+  ],
+  &quot;headersSize&quot;: 320
+}
+</pre>
+
+<p><code>getResponseCookies</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getResponseCookies&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;cookies&quot;: []
+}
+</pre>
+
+<div class="note">
+<p>Firefox19より提供開始：上記のパケットのすべてのヘッダーとCookieの値に対して、値が非常に長い場合は<a href="https://wiki.mozilla.org/Remote_Debugging_Protocol#Objects" title="https://wiki.mozilla.org/Remote_Debugging_Protocol#Objects"><code>LongStringActor</code> grips</a>を使用します。 これにより、ネットワーク帯域幅の使い過ぎを避けることができます。</p>
+</div>
+
+<p><code>getRequestPostData</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getRequestPostData&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;postData&quot;: { text: &quot;foobar&quot; },
+  &quot;postDataDiscarded&quot;: false
+}</pre>
+
+<p><code>getResponseContent</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getResponseContent&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;content&quot;: {
+    &quot;mimeType&quot;: &quot;text/css&quot;,
+    &quot;text&quot;: &quot;\n@import \&quot;test.css\&quot;;\n\n.foobar { color: green }\n\n&quot;
+  },
+  &quot;contentDiscarded&quot;: false
+}
+</pre>
+
+<p>リクエストとレスポンスの内容のテキスト値は、LongStringActorグリップを使用して最も一般的に送信されます。 非常に短いリクエスト/レスポンスのボディについては、生のテキストを送信します。</p>
+
+<div class="note">
+<p>Firefox19から：非テキストレスポンスタイプの場合、Base64エンコーディング（これはおそらく<code>LongStringActor</code>グリップです）でコンテンツを送信します。違いを伝えるには、<code>response.content.encoding == &quot;base64&quot;</code>かどうかを確認してください。</p>
+</div>
+
+<p><code>getEventTimings</code> パケット:</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;to&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;type&quot;: &quot;getEventTimings&quot;
+}
+{
+  &quot;from&quot;: &quot;conn0.netEvent15&quot;,
+  &quot;timings&quot;: {
+    &quot;blocked&quot;: 0,
+    &quot;dns&quot;: 0,
+    &quot;connect&quot;: 0,
+    &quot;send&quot;: 0,
+    &quot;wait&quot;: 16,
+    &quot;receive&quot;: 0
+  },
+  &quot;totalTime&quot;: 16
+}
+</pre>
+
+<h3 id="fileActivity_パケット"><code>fileActivity</code> パケット</h3>
+
+<p>ファイルのロードが監視されると、次の <code>fileActivity</code> パケットがクライアントに送信されます。</p>
+
+<pre class="brush:json; notranslate">{
+  &quot;from&quot;: &quot;conn0.console9&quot;,
+  &quot;type&quot;: &quot;fileActivity&quot;,
+  &quot;uri&quot;: &quot;file:///home/mihai/public_html/mozilla/test2.css&quot;
+}
+</pre>
+
+<h2 id="ヒストリー">ヒストリー</h2>
+
+<p>Firefoxバージョンによるプロトコルの変更：</p>
+
+<ul>
+ <li>Firefox 18: 初期バージョン。</li>
+ <li>Firefox 19: <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=787981" title="https://bugzilla.mozilla.org/show_bug.cgi?id=787981">bug 787981</a> - いくつかの場所で <code>LongStringActor</code> の使用法を追加しました。</li>
+ <li>Firefox 20: <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=792062" title="https://bugzilla.mozilla.org/show_bug.cgi?id=792062">bug 792062</a> - removed <code>locationChanged</code> packet and updated the <code>tabNavigated</code> packet for tab actors.</li>
+ <li>Firefox 23: <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=783499" title="https://bugzilla.mozilla.org/show_bug.cgi?id=783499">bug 783499</a> - removed the <code>WebConsoleObjectActor</code>. Now the Web Console uses the JavaScript debugger API and the <code>ObjectActor</code>.</li>
+ <li>Firefox 23: added the <code>bindObjectActor</code> and <code>frameActor</code> options to the <code>evaluateJS</code> request packet.</li>
+ <li>Firefox 24: new <code>private</code> flags for the console actor notifications, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=874061">bug 874061</a>. Also added the <code>lastPrivateContextExited</code> notification for the global console actor.</li>
+ <li>Firefox 24: new <code>isXHR</code> flag for the <code>networkEvent</code> notification, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=859046">bug 859046</a>.</li>
+ <li>Firefox 24: removed the <code>message</code> property from the <code>pageError</code> packet notification, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=877773">bug 877773</a>. The <code>lineText</code> and <code>errorMessage</code> properties can be long string actors now.</li>
+ <li>Firefox 25: added the <code>url</code> option to the <code>evaluateJS</code> request packet.</li>
+ <li>Firefox 25: added the <code>getPreferences</code> and <code>sendHTTPRequest</code> request packets to the console actor, <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=886067" title="Bug 886067 - Netmonitor displays request sizes as &apos;0 KB&apos; after opening Console">bug 886067</a> and <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=731311" title="Bug 731311 - Network monitor should allow to replay and edit requests">bug 731311</a>.</li>
+</ul>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>この文書の執筆時点では、この文書は <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=768096" title="https://bugzilla.mozilla.org/show_bug.cgi?id=768096">バグ 768096</a> で行った作業とそれに続く変更をまとめたものです。このドキュメントを最新の状態に保つよう努めています。これがあなたの役立つことを願っています。</p>
+
+<p>Webコンソールサーバーを変更する場合は、このドキュメントを更新してください。 ありがとうございました！</p>

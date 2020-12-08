@@ -1,0 +1,116 @@
+---
+title: PerformanceEntry.startTime
+slug: Web/API/PerformanceEntry/startTime
+tags:
+  - API
+  - Web パフォーマンス
+  - プロパティ
+  - リファレンス
+translation_of: Web/API/PerformanceEntry/startTime
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Performance_Timeline">Performance Timeline</a></strong></li><li><strong><a href="/ja/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/PerformanceEntry/duration"><code>duration</code></a></li><li><a href="/ja/docs/Web/API/PerformanceEntry/entryType"><code>entryType</code></a></li><li><a href="/ja/docs/Web/API/PerformanceEntry/name"><code>name</code></a></li><li><em><code>startTime</code></em></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/PerformanceEntry/toJSON"><code>toJSON()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Performance Timeline API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Performance"><code>Performance</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserverEntryList"><code>PerformanceObserverEntryList</code></a></li><li><a href="/ja/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a></li><li><a href="/ja/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section></div>
+
+<p><strong><code>startTime</code></strong> プロパティは、<a href="/ja/docs/Web/API/PerformanceEntry"><code>performance entry</code></a> のうち最初に記録された <a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>timestamp</code></a> を返します。</p>
+
+<div class="note notecard"><strong>註:</strong> この機能は <a href="/ja/docs/Web/API/Web_Workers_API">Web Workers</a> 内で利用可能です。</div>
+
+<p>このプロパティによって返される値は、パフォーマンスエントリの<a href="/ja/docs/Web/API/PerformanceEntry/entryType"><code>タイプ</code></a>によって異なります。</p>
+
+<ul>
+ <li>&quot;<code>frame</code>&quot; - フレームが開始されたときに<a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します</li>
+ <li>&quot;<code>mark</code>&quot; - マークが<a href="/ja/docs/Web/API/Performance/mark"><code>performance.mark()</code></a> の呼び出しによって作成された場合は、<a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します</li>
+ <li>&quot;<code>measure</code>&quot; - メジャーが　<a href="/ja/docs/Web/API/Performance/measure"><code>performance.measure()</code></a> の呼び出しによって作成された場合、<a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します</li>
+ <li>&quot;<code>navigation</code>&quot; - &quot;<code>0</code>&quot; の値を持つ<a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します</li>
+ <li>&quot;<code>resource</code>&quot; - ブラウザ<a href="/ja/docs/Web/API/PerformanceEntry/fetchStart"><code>リソースの取得</code></a>の直前に<a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します</li>
+</ul>
+
+<p>このプロパティは <span class="readOnly readOnlyInline notecard inline" title="This value may not be changed.">読取専用 </span> です。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate"><em>entry</em>.startTime;</pre>
+
+<h3 id="Return_Value" name="Return_Value">戻り値</h3>
+
+<p><a href="/ja/docs/Web/API/PerformanceEntry"><code>パフォーマンスエントリ</code></a>が作成されたときの最初のタイムスタンプを表す <a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>DOMHighResTimeStamp</code></a>。</p>
+
+<p class="note">メモ: パフォーマンスエントリが &quot;<code>resource</code>&quot; の <a href="/ja/docs/Web/API/PerformanceEntry/entryType"><code>entryType</code></a>  を持つ場合 (つまり、エントリが<a href="/ja/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a> オブジェクトである場合)、このプロパティは<a href="/ja/docs/Web/API/PerformanceEntry/fetchStart"><code>PerformanceEntry.fetchStart</code></a> <a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>タイムスタンプ</code></a>を返します。</p>
+
+<h2 id="例">例</h2>
+
+<p>次の例は、<code>startTime</code> プロパティの使用方法を示しています。</p>
+
+<pre class="brush: js notranslate">function run_PerformanceEntry() {
+  log(&quot;PerformanceEntry support ...&quot;);
+
+  if (performance.mark === undefined) {
+    log(&quot;... performance.mark Not supported&quot;);
+    return;
+  }
+
+  // Create some performance entries via the mark() method
+  performance.mark(&quot;Begin&quot;);
+  do_work(50000);
+  performance.mark(&quot;End&quot;);
+
+  // Use getEntries() to iterate through the each entry
+  var p = performance.getEntries();
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;Entry[&quot; + i + &quot;]&quot;);
+    check_PerformanceEntry(p[i]);
+  }
+}
+function check_PerformanceEntry(obj) {
+  var properties = [&quot;name&quot;, &quot;entryType&quot;, &quot;startTime&quot;, &quot;duration&quot;];
+  var methods = [&quot;toJSON&quot;];
+
+  for (var i=0; i &lt; properties.length; i++) {
+    // check each property
+    var supported = properties[i] in obj;
+    if (supported)
+      log(&quot;...&quot; + properties[i] + &quot; = &quot; + obj[properties[i]]);
+    else
+      log(&quot;...&quot; + properties[i] + &quot; = Not supported&quot;);
+  }
+  for (var i=0; i &lt; methods.length; i++) {
+    // check each method
+    var supported = typeof obj[methods[i]] == &quot;function&quot;;
+    if (supported) {
+      var js = obj[methods[i]]();
+      log(&quot;...&quot; + methods[i] + &quot;() = &quot; + JSON.stringify(js));
+    } else {
+      log(&quot;...&quot; + methods[i] + &quot; = Not supported&quot;);
+    }
+  }
+}
+</pre>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">ステータス</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/performance-timeline/#dom-performanceentry-starttime" hreflang="en" lang="en">Performance Timeline Level 2<br><small lang="ja">startTime の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/performance-timeline/#dom-performanceentry-starttime" hreflang="en" lang="en">Performance Timeline<br><small lang="ja">startTime の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザの互換性">ブラウザの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性テーブルは構造化データから生成されます。データに貢献したい場合は <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックして、プルリクエストを送ってください。</div>
+
+<div class="bc-data" id="bcd:api.PerformanceEntry.startTime"></div>
+</div>

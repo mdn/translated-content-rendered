@@ -1,0 +1,364 @@
+---
+title: イテレーターとジェネレーター
+slug: Web/JavaScript/Guide/Iterators_and_Generators
+tags:
+  - Guide
+  - Intermediate
+  - JavaScript
+  - 'l10n:priority'
+translation_of: Web/JavaScript/Guide/Iterators_and_Generators
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/ja/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/ja/docs/Web/JavaScript/Tutorials"><strong>チュートリアル:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>初級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript の基礎</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>JavaScript ガイド</summary>
+      <ol>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Introduction">入門編</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Grammar_and_Types">文法とデータ型</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">制御フローとエラー処理</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Loops_and_iteration">ループとイテレーター</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Functions">関数</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Expressions_and_Operators">式と演算子</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Numbers_and_dates">数と日付</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Text_formatting">テキスト処理</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Regular_Expressions">正規表現</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Indexed_collections">インデックス付きコレクション</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Keyed_collections">キー付きコレクション</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Working_with_Objects">オブジェクトを利用する</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">オブジェクトモデルの詳細</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Iterators_and_generators">イテレーターとジェネレーター</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Meta_programming">メタプログラミング</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>中級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/A_re-introduction_to_JavaScript">JavaScript 「再」入門</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Data_structures">JavaScript のデータ構造</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Equality_comparisons_and_sameness">等値比較と同一性</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Closures">クロージャ</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>上級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">継承とプロトタイプチェーン</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode">Strict モード</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Typed_arrays">JavaScript 型付き配列</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Memory_Management">メモリ管理</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/EventLoop">並列モデルとイベントループ</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ja/docs/Web/JavaScript/Reference">リファレンス:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>ビルトインオブジェクト</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>式と演算子</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition">加算 (+)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition_assignment">加算代入 (+=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Assignment">代入 (=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">ビット論理積 (&amp;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">ビット論理積代入 (&amp;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">ビット否定 (~)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">ビット論理和 (|)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">ビット論理和代入 (|=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">ビット排他的論理和 (^)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">ビット排他的論理和代入 (^=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Comma_Operator">カンマ演算子 (,)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">条件 (三項) 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Decrement">デクリメント (--)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">分割代入</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Division">除算 (/)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Division_assignment">除算代入 (/=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Equality">等価 (==)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation">べき乗 (**)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">べき乗代入 (**=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/function">関数式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than">大なり (&gt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">大なりイコール (&gt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Grouping">グループ化演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Increment">インクリメント (++)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Inequality">不等価 (!=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Left_shift">左シフト (&lt;&lt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">左シフト代入 (&lt;&lt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Less_than">小なり (&lt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">小なりイコール (&lt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND">論理積 (&amp;&amp;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">論理積代入 (&amp;&amp;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_NOT">論理否定 (!)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_OR">論理和 (||)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">論理和代入 (||=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">Null 合体代入 (??=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication">乗算 (*)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">乗算代入 (*=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">Null 合体 (??)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer">オブジェクト初期化子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">演算子の優先順位</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Optional_chaining">Optional chaining (?.)</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Operators/Pipeline_operator">パイプライン演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Property_Accessors">プロパティアクセサー</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder">剰余 (%)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">剰余代入 (%=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Right_shift">右シフト (&gt;&gt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">右シフト代入 (&gt;&gt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Spread_syntax">スプレッド構文</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Strict_equality">厳密等価 (===)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Strict_inequality">厳密不等価 (!==)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction">減算 (-)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">減算代入 (-=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unary_negation">単項マイナス (-)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unary_plus">単項プラス (+)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">符号なし右シフト (&gt;&gt;&gt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">符号なし右シフト代入 (&gt;&gt;&gt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/async_function">非同期関数式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/class">クラス式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/delete">delete</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/function*">function* 式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/in">in</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/new">new 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/void">void 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>文と宣言</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/async_function">async function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/block">ブロック</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/Empty">空文</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/function">関数宣言</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/var">var</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>関数</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Arrow_functions">アロー関数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Default_parameters">デフォルト引数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Method_definitions">メソッド定義</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/rest_parameters">残余引数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/arguments">arguments</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/get">ゲッター</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/set">セッター</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>クラス</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/Private_class_fields">プライベートクラスフィールド</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/Public_class_fields">パブリッククラスフィールド</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/constructor">コンストラクター</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">TypeError: X.prototype.y called on incompatible type</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>その他</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript 技術概説</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Lexical_grammar">字句文法</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Data_structures">JavaScript のデータ構造</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">プロパティの列挙可能性と所有権</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Iteration_protocols">反復処理プロトコル</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode">Strict モード</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">strict モードへの移行</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Template_literals">テンプレート文字列</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">廃止予定の機能</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/ja/docs/Web/JavaScript/Guide/Using_promises" style="float: left;" class="button">« 前のページ</a><a href="/ja/docs/Web/JavaScript/Guide/Meta_programming" class="button">次のページ  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>コレクション内の各アイテムに対する処理は非常に一般的な操作です。JavaScript では簡単な <a href="/ja/docs/Web/JavaScript/Reference/Statements/for"><code>for</code></a> ループから <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code>map()</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code>filter()</code></a> にいたるまで、コレクションに対する反復処理の複数の方法を提供します。</p>
+
+<p>イテレーターとジェネレーターは、コア言語の内部に反復処理が直接的に取り入れられており、<a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of"><code>for...of</code></a> ループの動作を簡単にカスタマイズできる仕組みをもたらします。</p>
+</div>
+
+<p>詳細についてはこちらもご覧ください:</p>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of"><code>for...of</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Statements/function*"><code>function*</code></a> と <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator">ジェネレーター</a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Operators/yield"><code>yield</code></a> と <a href="/ja/docs/Web/JavaScript/Reference/Operators/yield*"><code>yield*</code></a></li>
+</ul>
+
+<h2 id="Iterators" name="Iterators">イテレーター</h2>
+
+<p>JavaScript では、<strong>イテレーター</strong>はシーケンスおよび潜在的には終了時の戻り値を定義するオブジェクトです。</p>
+
+<p>より具体的に言うと、イテレーターは、次の 2 つのプロパティを持つオブジェクトを返す <code style="font-style: normal;">next()</code> メソッドを持つことによってイテレータープロトコルを実装するオブジェクトです。</p>
+
+<dl>
+ <dt><code><var>value</var></code></dt>
+ <dd>反復シーケンスの次の値</dd>
+ <dt><code><var>done</var></code></dt>
+ <dd>シーケンスの最後の値が既に消費されている場合に <code>true</code> となります。<code><var>done</var></code> と並んで <code><var>value</var></code> が存在する場合、それがイテレーターの戻り値となります。</dd>
+</dl>
+
+<p>イテレーターオブジェクトが作成されると、<code>next()</code> を繰り返し呼び出すことによって、明示的に反復することができます。イテレーターを反復することを、イテレーターを消費すると言います。一般的に 1 回しか実行できないためです。終了値が返された後、さらに <code>next()</code> を呼び出しても、単に <code>{done: true}</code> を返し続けます。</p>
+
+<p>Javascript で最も一般的なイテレーターは配列イテレーターで、配列の各値を順番に返します。</p>
+
+<p>すべてのイテレーターを配列として表現できるとは想像するのは容易ですが、これは真実ではありません。配列は完全に割り当てなければなりませんが、イテレーターは必要なだけで消費されるため、0 から Infinity までの整数の範囲など、無限のサイズのシーケンスを表現できます。</p>
+
+<p>ここでは、それを行うことができる例を示します。<code>start</code> (包括) から <code>end</code> (排他) までの一連の整数を定義する単純な範囲のイテレーターの作成を可能にします。最終的な戻り値は、作成したシーケンスのサイズあり、変数 <code><var>iterationCount</var></code> で追跡されます。</p>
+
+<pre class="brush: js notranslate">function makeRangeIterator(<var>start</var> = 0, <var>end</var> = Infinity, <var>step</var> = 1) {
+    let nextIndex = start;
+    let iterationCount = 0;
+
+    const rangeIterator = {
+       next: function() {
+           let result;
+           if (nextIndex &lt; end) {
+               result = { value: nextIndex, done: false }
+               nextIndex += step;
+               iterationCount++;
+               return result;
+           }
+           return { value: iterationCount, done: true }
+       }
+    };
+    return rangeIterator;
+}
+</pre>
+
+<p>このイテレーターを使えば、次のようになります:</p>
+
+<pre class="brush: js notranslate">const it = makeRangeIterator(1, 10, 2);
+
+let result = it.next();
+while (!result.done) {
+ console.log(result.value); // 1 3 5 7 9
+ result = it.next();
+}
+
+console.log(&quot;Iterated over sequence of size: &quot;, result.value); // [5 numbers returned, that took interval in between: 0 to 10]
+</pre>
+
+<div class="note">
+<p><strong>メモ:</strong> 特定のオブジェクトがイテレーターであるかどうかは考えても知ることはできません。それが必要な場合は、<a href="#Iterables">反復可能オブジェクト</a>を使用してください。</p>
+</div>
+
+<h2 id="Generators" name="Generators">ジェネレーター関数</h2>
+
+<p>カスタムイテレーターは便利なツールですが、その作成には内部状態を明示的に維持する必要があるため、慎重なプログラミングが必要です。ジェネレーター関数は強力な代替手段を提供します。実行が連続していない単一の関数を記述することによって反復アルゴリズムを定義できます。ジェネレーター関数は、<a href="/ja/docs/Web/JavaScript/Reference/Statements/function*"><code>function*</code></a> 構文を使用して記述されます。</p>
+
+<p>最初に呼び出されると、ジェネレーター関数はコードを実行せず、ジェネレーターと呼ばれるある種のイテレーターを返します。ジェネレーターの <strong>next</strong> メソッドを呼び出すことによって値が消費されると、ジェネレーター関数は <strong>yield</strong> キーワードを検出するまで実行します。</p>
+
+<p>この関数は、必要な回数だけ呼び出すことができ、毎回新しいジェネレーターを返しますが、各ジェネレーターは 1 回のみ反復することができます。</p>
+
+<p>上の例に適用してみましょう。このコードの動作は同じですが、実装は書くのも読むのもはるかに容易になります。</p>
+
+<pre class="brush: js notranslate">function* makeRangeIterator(<var>start</var> = 0, <var>end</var> = 100, <var>step</var> = 1) {
+    let iterationCount = 0;
+    for (let i = start; i &lt; end; i += step) {
+        iterationCount++;
+        yield i;
+    }
+    return iterationCount;
+}</pre>
+
+<h2 id="Iterables" name="Iterables">反復可能オブジェクト</h2>
+
+<p>オブジェクトは、<a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of"><code>for...of</code></a> 構文でループされる値など反復動作を定義する場合、<strong>反復可能オブジェクト</strong>です。<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> や <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Map"><code>Map</code></a> のような組み込み型の中にはデフォルトの反復動作を持つものがありますが、他の型 (<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a> など) は持っていません。</p>
+
+<p><strong>反復可能オブジェクト</strong>にするには、オブジェクトは <strong>@@iterator</strong> メソッドを実装する必要があります。つまり、オブジェクト (またはプロトタイプチェーン上のオブジェクトのうちの 1 つ) に <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator"><code>Symbol.iterator</code></a> キーを持つプロパティが必要です 。</p>
+
+<p>反復可能オブジェクトは 1 回だけでも 2 回以上でも反復することができます。どちらが当てはまるかは、プログラマに任されています。</p>
+
+<p>一度しか反復することができない反復可能オブジェクト (例えば、ジェネレーター) は、通常 <strong>@@iterator</strong> メソッドから <strong>this</strong> を返します。何度も繰り返し可能なものは、<strong>@@iterator</strong> の各呼び出しで新しいイテレーターを返す必要があります。</p>
+
+<pre class="brush: js notranslate">function* makeIterator() {
+    yield 1;
+    yield 2;
+}
+
+const <var>it</var> = makeIterator();
+
+for (const <var>itItem</var> of <var>it</var>) {
+    console.log(<var>itItem</var>);
+}
+
+console.log(<var>it</var>[Symbol.iterator]() === <var>it</var>) // true;
+
+// This example show us generator(iterator) is iterable object,
+// which has the @@iterator method return the <var>it</var> (itself),
+// and consequently, the <var>it</var> object can iterate only _once_.
+
+
+// If we change <var>it</var>&apos;s @@iterator method to a function/generator
+// which returns a new iterator/generator object, (<var>it</var>)
+// can iterate many times
+
+<var>it</var>[Symbol.iterator] = function* () {
+  yield 2;
+  yield 1;
+};
+</pre>
+
+<h3 id="User-defined_iterables" name="User-defined_iterables">ユーザー定義の反復可能オブジェクト</h3>
+
+<p>以下のようにして反復可能オブジェクトを自作することができます:</p>
+
+<pre class="brush: js notranslate">var myIterable = {
+    *[Symbol.iterator]() {
+        yield 1;
+        yield 2;
+        yield 3;
+    }
+}
+
+for (let value of myIterable) {
+    console.log(value);
+}
+// 1
+// 2
+// 3
+
+or
+
+[...myIterable]; // [1, 2, 3]
+</pre>
+
+<h3 id="Built-in_iterables" name="Built-in_iterables">組み込み反復可能オブジェクト</h3>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/String"><code>String</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray"><code>TypedArray</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Map"><code>Map</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Set"><code>Set</code></a> はすべて組み込み反復可能オブジェクトです。これらのオブジェクトはすべて、そのプロトタイプオブジェクトに <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator"><code>Symbol.iterator</code></a> メソッドを備えているためです。</p>
+
+<h3 id="Syntaxes_expecting_iterables" name="Syntaxes_expecting_iterables">反復可能オブジェクトが必要な構文</h3>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of"><code>for-of</code></a> ループ、<a href="/ja/docs/Web/JavaScript/Reference/Operators/yield*"><code>yield*</code></a> などの文や式は、反復可能オブジェクトを必要とします。</p>
+
+<pre class="brush: js notranslate">for (let value of [&apos;a&apos;, &apos;b&apos;, &apos;c&apos;]) {
+    console.log(value);
+}
+// &quot;a&quot;
+// &quot;b&quot;
+// &quot;c&quot;
+
+[...&apos;abc&apos;];
+// [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]
+
+function* gen() {
+  yield* [&apos;a&apos;, &apos;b&apos;, &apos;c&apos;];
+}
+
+gen().next();
+// { value: &quot;a&quot;, done: false }
+
+[a, b, c] = new Set([&apos;a&apos;, &apos;b&apos;, &apos;c&apos;]);
+a;
+// &quot;a&quot;
+
+</pre>
+
+<h2 id="Advanced_generators" name="Advanced_generators">高度なジェネレーター</h2>
+
+<p>ジェネレーターは要求に応じて yield 文により生成される値を計算しており、多くの計算が必要な一連のデータを効率的に表現したり、前出のとおり無限のシーケンスを表現したりすることを可能にします。</p>
+
+<p>ジェネレーターの内部状態を変更するのための値を <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator/next"><code>next()</code></a> メソッドで受け入れることもできます。<code>next()</code> に渡された値は <code>yield</code> が受け取ります。最初 <code>next()</code> の呼び出しに値を渡しても常に無視されることに注意してください。</p>
+
+<div class="note notecard">
+<p><strong>メモ:</strong> <code>next()</code> の<em>最初の</em>呼び出しに渡された値は常に無視されます。</p>
+</div>
+
+<p>以下のフィボナッチ数列ジェネレーターでは数列を再起動するのに <code>next(x)</code> を使っています:</p>
+
+<pre class="brush: js notranslate">function* fibonacci() {
+  let current = 0;
+  let next = 1;
+  while (true) {
+    let reset = yield current;
+    [current, next] = [next, next + current];
+    if (reset) {
+        current = 0;
+        next = 1;
+    }
+  }
+}
+
+const sequence = fibonacci();
+console.log(sequence.next().value);     // 0
+console.log(sequence.next().value);     // 1
+console.log(sequence.next().value);     // 1
+console.log(sequence.next().value);     // 2
+console.log(sequence.next().value);     // 3
+console.log(sequence.next().value);     // 5
+console.log(sequence.next().value);     // 8
+console.log(sequence.next(true).value); // 0
+console.log(sequence.next().value);     // 1
+console.log(sequence.next().value);     // 1
+console.log(sequence.next().value);     // 2</pre>
+
+<p>ジェネレーターの <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator/throw"><code>throw()</code></a> メソッドを呼び出して発生すべき例外値を渡すことで、ジェネレーターに例外を強制的に発生させることができます。これにより、まるで停止中の <code>yield</code> が <code>throw <em>value</em></code> 文に替わったかのように、ジェネレーターが停止した際の状況に応じて例外が発生します。</p>
+
+<p>例外がジェネレーター内部で捕捉されない場合は、<code>throw()</code> を通してその例外が呼び出し元へと伝播し、その後 <code>next()</code> を呼び出した結果の <code>done</code> プロパティは <code>true</code> となります。</p>
+
+<p>またジェネレーターは、与えられた値を返してジェネレーター自身の処理を終了させる <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator/return"><code>return(value)</code></a> メソッドを持っています。</p>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/ja/docs/Web/JavaScript/Guide/Using_promises" style="float: left;" class="button">« 前のページ</a><a href="/ja/docs/Web/JavaScript/Guide/Meta_programming" class="button">次のページ  »</a></p>
+</div>

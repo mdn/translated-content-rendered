@@ -1,0 +1,130 @@
+---
+title: History API
+slug: Web/API/History_API
+tags:
+  - API
+  - Advanced
+  - DOM
+  - HTML5
+  - History
+  - 履歴
+translation_of: Web/API/History_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/History_API">History API</a></strong></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/History"><code>History</code></a></li></ol></details></li></ol></section></div>
+
+<p>DOM の <a href="/ja/docs/Web/API/Window"><code>Window</code></a> オブジェクトは、ブラウザーのセッション履歴 (<a href="/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history">WebExtensions history</a> と混同しないように) へのアクセスを <a href="/ja/docs/Web/API/Window/history"><code>history</code></a> オブジェクトを介して提供しています。このオブジェクトは、ユーザーの履歴の中を前のページや後のページへ移動したり、履歴スタックの中を称さしたりするのに便利なメソッドやプロパティが提供されています。</p>
+
+<h2 id="Concepts_and_usage" name="Concepts_and_usage">概念と使用方法</h2>
+
+<p>ユーザーの履歴の中を前のページや次のページへ移動するには、 <a href="/ja/docs/Web/API/History/back"><code>back()</code></a>, <a href="/ja/docs/Web/API/History/forward"><code>forward()</code></a>, <a href="/ja/docs/Web/API/History/go"><code>go()</code></a> の各メソッドを使用します。</p>
+
+<h3 id="Moving_forward_and_backward" name="Moving_forward_and_backward">前のページや次のページへの移動</h3>
+
+<p>履歴を前に遡るには、次のようにします。</p>
+
+<pre class="brush: js notranslate">window.history.back()
+</pre>
+
+<p>これは、ちょうどユーザーがブラウザーのツールバーの<kbd><strong>前のページへ戻る</strong></kbd>ボタンをクリックしたときのような動作です。</p>
+
+<p>同様に、次のようにして (ユーザーが<kbd><strong>次のページへ進む</strong></kbd>ボタンをクリックしたときのように) 次のページへ進むこともできます。</p>
+
+<pre class="brush: js notranslate">window.history.forward()
+</pre>
+
+<h3 id="Moving_to_a_specific_point_in_history" name="Moving_to_a_specific_point_in_history">履歴内の特定の位置まで移動</h3>
+
+<p><a href="/ja/docs/Web/API/History/go"><code>go()</code></a> メソッドを使うと、セッション履歴において現在のページから相対的な位置を指定して特定のページを読み込むことができます。 (現在のページの相対位置は <code>0</code> となります。)</p>
+
+<p>ひとつ前のページへと戻る例です (<a href="/ja/docs/Web/API/History/back"><code>back()</code></a> と同様の動き)。</p>
+
+<pre class="brush: js notranslate">window.history.go(-1)
+</pre>
+
+<p>ページを進める例で、 <a href="/ja/docs/Web/API/History/forward"><code>forward()</code></a> を呼び出すのと同様です。</p>
+
+<pre class="brush: js notranslate">window.history.go(1)
+</pre>
+
+<p>同様に、 <code>2</code> を渡すことで2ページ分を進めることができます。</p>
+
+<p><code>go()</code> メソッドの他の使い方として、 <code>0</code> を渡すか、引数なしで呼び出すことで、現在のページを再読み込みすることができます。</p>
+
+<pre class="brush: js notranslate">// 以下の文は、
+// どちらもページを再読み込みする
+// 効果があります。
+window.history.go(0)
+window.history.go()
+</pre>
+
+<p><code>length</code> プロパティの値を参照することにより、履歴スタック中のページの数を知ることができます。</p>
+
+<pre class="brush: js notranslate">let numberOfEntries = window.history.length
+</pre>
+
+<h2 id="Interfaces" name="Interfaces">インターフェイス</h2>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/History"><code>History</code></a></dt>
+ <dd>ブラウザーの<em>セッション履歴</em> (すなわち、現在のページが読み込まれているタブやフレームで表示したことがあるページ群) の操作ができます。</dd>
+</dl>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>以下の例では <code>onpopstate</code> プロパティにリスナーを割り当てています。そして、 history オブジェクトのメソッドで現在のタブのブラウザー履歴の追加、置換、移動など、いくつかの操作を説明しています。</p>
+
+<pre class="brush:js line-numbers language-js notranslate">window.onpopstate = function(event) {
+  alert(`location: ${document.location}, state: ${JSON.stringify(event.state)}`)
+}
+
+history.pushState({page: 1}, &quot;title 1&quot;, &quot;?page=1&quot;)
+history.pushState({page: 2}, &quot;title 2&quot;, &quot;?page=2&quot;)
+history.replaceState({page: 3}, &quot;title 3&quot;, &quot;?page=3&quot;)
+history.back() // alerts &quot;location: http://example.com/example.html?page=1, state: {&quot;page&quot;:1}&quot;
+history.back() // alerts &quot;location: http://example.com/example.html, state: null&quot;
+history.go(2)  // alerts &quot;location: http://example.com/example.html?page=3, state: {&quot;page&quot;:3}&quot;</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/browsers.html#history" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">History の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td><a class="external" href="https://www.w3.org/TR/html52/" hreflang="en" lang="en" title="HTML5の仕様書">HTML5</a> から変更なし</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52/browsers.html#history" hreflang="en" lang="en">HTML5<br><small lang="ja">History の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.History"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<h3 id="References" name="References">リファレンス</h3>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/Window/history"><code>window.history</code></a></li>
+ <li><a href="/ja/docs/Web/API/Window/onpopstate"><code>window.onpopstate</code></a></li>
+</ul>
+
+<h3 id="Guides" name="Guides">ガイド</h3>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/History_API/Working_with_the_History_API">History API の操作</a></li>
+</ul>

@@ -1,0 +1,136 @@
+---
+title: CSS.registerProperty()
+slug: Web/API/CSS/RegisterProperty
+tags:
+  - CSS
+  - Houdini
+  - Reference
+translation_of: Web/API/CSS/RegisterProperty
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div></div>
+
+<p><strong><code>CSS.registerProperty()</code></strong> メソッドは<a href="/ja/docs/Web/CSS/--*" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>カスタムプロパティ</code></a>を登録し、プロパティ型のチェック、デフォルト値、およびそれらの値を継承するまたは継承しないプロパティを許可します。</p>
+
+<p>カスタムプロパティを登録すると、カスタムプロパティの振る舞い（許される型は何か、カスタムプロパティがその値を継承するかどうか、カスタムプロパティのデフォルト値は何か）をブラウザーに指示できます。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">CSS.registerProperty(<em>PropertyDefinition</em>);</pre>
+
+<h3 id="Parameters" name="Parameters">パラメーター</h3>
+
+<p>次のメンバーを含むことができる <code>PropertyDefinition</code> ディクショナリオブジェクトです。</p>
+
+<dl>
+ <dt><code>name</code></dt>
+ <dd>定義しているプロパティの名前を示す <code><a href="/ja/docs/Web/API/DOMString">DOMString</a></code>。</dd>
+ <dt><code>syntax</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>定義されたプロパティの期待される構文を表す <code><a href="/ja/docs/Web/API/DOMString">DOMString</a></code>。 デフォルトは <code>&quot;*&quot;</code> です。</dd>
+ <dt><code>inherits</code></dt>
+ <dd>定義されたプロパティを継承する必要があるか（<code>true</code>）、否か（<code>false</code>）を定義するブール値。 デフォルトは <code>false</code> です。</dd>
+ <dt><code>initialValue</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>定義されたプロパティの初期値を表す <code><a href="/ja/docs/Web/API/DOMString">DOMString</a></code>。</dd>
+</dl>
+
+<h3 id="Return_value" name="Return_value">戻り値</h3>
+
+<p><code>undefined</code>。</p>
+
+<dl>
+</dl>
+
+<h3 id="Exceptions" name="Exceptions">例外</h3>
+
+<dl>
+ <dt><code>InvalidModificationError</code></dt>
+ <dd>指定された <code>name</code> はすでに登録されています。</dd>
+ <dt><code>SyntaxError</code></dt>
+ <dd>指定された <code>name</code> は（<code>--foo</code> のように、2つのダッシュで始まる）有効なカスタムプロパティ名ではありません。</dd>
+ <dt><code>TypeError</code></dt>
+ <dd>必要なディクショナリメンバーの <code>name</code> または <code>inherits</code>、あるいはその両方が指定されていません。</dd>
+</dl>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>次の例では、<code>registerProperty()</code> を使用して<a href="/ja/docs/Web/CSS/--*" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>カスタムプロパティ</code></a> <code>--my-color</code> を色として登録し、デフォルト値を指定して、その値を継承しません。</p>
+
+<pre class="brush: js notranslate">window.CSS.registerProperty({
+  name: &apos;--my-color&apos;,
+  syntax: &apos;&lt;color&gt;&apos;,
+  inherits: false,
+  initialValue: &apos;#c0ffee&apos;,
+});
+</pre>
+
+<p>この例では、カスタムプロパティ <code>--my-color</code> が構文 <code>&lt;color&gt;</code> を使用して登録されています。 これで、このプロパティを使用して、ホバーまたはフォーカスでグラデーションを遷移（transition）できます。 登録されたプロパティでは遷移が機能しますが、未登録のプロパティでは機能しないことに注意してください！</p>
+
+<pre class="brush: css notranslate">.registered {
+  --my-color: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--my-color));
+  transition: --my-color 1s ease-in-out;
+}
+
+.registered:hover,
+.registered:focus {
+  --my-color: #b4d455;
+}
+
+.unregistered {
+  --unregistered: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--unregistered));
+  transition: --unregistered 1s ease-in-out;
+}
+
+.unregistered:hover,
+.unregistered:focus {
+  --unregistered: #b4d455;
+}
+button {
+  font-size: 3vw;
+}</pre>
+
+<p>これらのスタイルをいくつかのボタンに追加できます。</p>
+
+<pre class="brush: html notranslate">&lt;button class=&quot;registered&quot;&gt;Background Registered&lt;/button&gt;
+&lt;button class=&quot;unregistered&quot;&gt;Background Not Registered&lt;/button&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="320" id="frame_Examples" src="https://mdn.mozillademos.org/ja/docs/Web/API/CSS/RegisterProperty$samples/Examples?revision=1642940" width="320"></iframe></p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://drafts.css-houdini.org/css-properties-values-api-1/#the-registerproperty-function" hreflang="en" lang="en">CSS Properties and Values API Level 1<br><small lang="ja">The registerProperty() function の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CSS.registerProperty"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/CSS_Properties_and_Values_API/guide">CSS properties and values API の使用</a></li>
+ <li><a href="/ja/docs/Web/API/CSS"><code>CSS</code></a></li>
+ <li><a href="/ja/docs/Web/API/CSS/supports"><code>CSS.supports()</code></a></li>
+ <li><a href="/ja/docs/Web/API/CSS/escape"><code>CSS.escape()</code></a></li>
+ <li><a href="/ja/docs/Web/API/CSS/factory_functions"><code>CSS ファクトリー関数</code></a></li>
+</ul>
+
+<dl>
+</dl>

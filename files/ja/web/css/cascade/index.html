@@ -1,0 +1,225 @@
+---
+title: CSS カスケード入門
+slug: Web/CSS/Cascade
+tags:
+  - CSS
+  - CSS カスケードと継承
+  - Reference
+  - カスケード
+  - ガイド
+  - スタイル
+  - スタイルシート
+  - レイアウト
+translation_of: Web/CSS/Cascade
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/Reference">CSS リファレンス</a></strong></li></ol></section></div>
+
+<p><strong>カスケード</strong>は、異なるソースから来るプロパティ値を組み合わせる方法を定義するアルゴリズムです。これは<em>カスケーディング</em>スタイルシートという名前で強調されているように、 CSS の中心を占めるものです。<span class="seoSummary">この記事では、カスケードとは何か、 <a href="/ja/docs/Glossary/CSS">CSS</a> <a href="/ja/docs/Web/API/CSSStyleDeclaration">宣言</a>をカスケードする順番、そしてウェブ開発者にどのように影響するかを説明します。</span></p>
+
+<h2 id="Which_CSS_entities_participate_in_the_cascade" name="Which_CSS_entities_participate_in_the_cascade">どの CSS エンティティがカスケードに関係するか</h2>
+
+<p>CSS 宣言のみが、つまりプロパティ/値の組だけが、カスケードに加わります。つまり、宣言以外のエンティティを含む <a href="/ja/docs/Web/CSS/At-rule">@-規則</a>、例えば<em>記述子</em>を含む <a href="/ja/docs/Web/CSS/@font-face" title="CSS の @font-face @-規則は、テキストを表示するための独自フォントを指定します。フォントはリモートサーバーまたはユーザー自身のコンピューターにローカルにインストールされたフォントのどちらかから読み込むことができます。"><code>@font-face</code></a> などは、カスケードには加わりません。これらの場合、カスケードには全体としての @-規則のみがカスケードに加わります。ここで、 <code>@font-face</code> は <code><a href="/ja/docs/Web/CSS/@font-face/font-family">font-family</a></code> 記述子で識別されます。いくつかの <code>@font-face</code> 規則に同じ記述子が定義されていた場合は、全体から見て、最も適切な <code>@font-face</code> が考慮されます。</p>
+
+<p>大部分の @-規則 — <a href="/ja/docs/Web/CSS/@media" title="CSS の @media @-規則は、一つまたは複数のメディアクエリの結果に基づいて、スタイルシートの一部を適用するために使用することができます。"><code>@media</code></a>, <a href="/ja/docs/Web/CSS/@document" title="@document は CSS の @-規則で、文書の URL に基づいて、その中に含まれるスタイル規則を制約します。これは主にユーザー定義スタイルシート用に設計されていますが、独自定義スタイルシートにも使うことができます。"><code>@document</code></a>, <a href="/ja/docs/Web/CSS/@supports" title="CSS の @supports @-規則は、宣言をブラウザーが1つまたは複数の特定の CSS 機能に対応しているかによって、宣言を指定することができます。これは機能クエリと呼ばれます。規則はコードの最上位または他の条件付きグループ @-規則の中に配置することができます。"><code>@supports</code></a> の中など — に含まれる宣言はカスケードに加わりますが、 <a href="/ja/docs/Web/CSS/@keyframes" title="CSS の @keyframes @-規則は、アニメーションの流れに沿ったキーフレーム (または中間地点) のスタイルを定義することによって、一連の CSS アニメーションの中間ステップを制御します。"><code>@keyframes</code></a> に含まれる宣言は加わりません。 <code>@font-face</code> と同様に、 @-規則全体のみがカスケードアルゴリズムによって選択されます。</p>
+
+<p>最後に、 <a href="/ja/docs/Web/CSS/@import" title="CSS の @import @-規則 は、他のスタイルシートから @charset を除いたスタイル規則をインポートするために使用します。これは入れ子になるステートメントではないので、 @import は条件付き @-規則グループの中で使うことはできません。"><code>@import</code></a> および <a href="/ja/docs/Web/CSS/@charset" title="CSS の @charset at-規則 は、スタイルシートで使う文字エンコーディングを定義します。この規則はスタイルシートの最初の要素でなければならず、これより前には文字を一切記述してはいけません。入れ子の文 でないとしても、条件付きグループ規則 では使えません。複数の @charset at-規則が定義されると、最初のものだけが使われます。HTML 要素の style 属性や、HTML ページの文字セットが関係している &lt;style> 要素の中では使えません。"><code>@charset</code></a> は特定のアルゴリズムに従い、カスケードアルゴリズムには影響を与えないことに注意してください。</p>
+
+<h2 id="Origin_of_CSS_declarations" name="Origin_of_CSS_declarations">CSS 宣言のオリジン</h2>
+
+<p>CSS カスケードアルゴリズムの役割は、 CSS プロパティの正しい値を決定するために CSS 宣言を選択することです。 CSS 宣言は、 <strong><a href="#User-agent_stylesheets">ユーザーエージェントスタイルシート</a></strong>, <strong><a href="#Author_stylesheets">ページ作成者スタイルシート</a></strong>, <strong><a href="#User_stylesheets">ユーザースタイルシート</a></strong> など、さまざまなものに由来します。</p>
+
+<p>スタイルシートはこれらの異なる起源に由来しますが、それらは範囲が重複しています。これを機能させるために、カスケードアルゴリズムはそれらの相互作用を定義します。</p>
+
+<h3 id="User-agent_stylesheets" name="User-agent_stylesheets">ユーザーエージェントスタイルシート</h3>
+
+<p>ブラウザーには、任意の文書に既定のスタイルを提供する基本的なスタイルシートがあります。これらのスタイルシートには<strong>ユーザーエージェントスタイルシート</strong>という名前が付けられています。実際のスタイルシートを使用するブラウザーもあれば、コードでシミュレートするブラウザーもありますが、最終的な結果は同じです。</p>
+
+<p>一部のブラウザーでは、ユーザーがユーザーエージェントスタイルシートを変更することができます。ユーザーエージェントスタイルシートに関するいくつかの制約は HTML 仕様書によって設定されていますが、ブラウザーにはまだ多くの自由度があります。つまり、ブラウザーごとに大きな違いがあります。開発プロセスを簡素化するために、ウェブ開発者は多くの場合、 CSS リセットスタイルシートを使用して、特定のニーズに合わせて変更を開始する前に、共通のプロパティ値を既知の状態にします。</p>
+
+<h3 id="Author_stylesheets" name="Author_stylesheets">ページ作成者スタイルシート</h3>
+
+<p><strong>ページ作成者スタイルシート</strong>は、スタイルシートの最も一般的な種類です。これらは、特定のウェブページまたはサイトのデザインの一部としてスタイルを定義するスタイルシートです。ページの作成者は、1つ以上のスタイルシートを使用して文書のスタイルを定義します。スタイルシートは、ウェブサイトの外観 (テーマ) を定義します。</p>
+
+<h3 id="User_stylesheets" name="User_stylesheets">ユーザースタイルシート</h3>
+
+<p>ウェブサイトのユーザー (または読者) は、ユーザーの希望に合わせて使い勝手を調整するように設計された独自の<strong>ユーザースタイルシート</strong>を使用して、多くのブラウザーでスタイルを上書きすることを選択できます。</p>
+
+<h2 id="Cascading_order" name="Cascading_order">カスケード順</h2>
+
+<p>カスケードアルゴリズムは、文書の各要素の各プロパティに適用する値を見つける方法を決定します。</p>
+
+<ol>
+ <li>最初に、さまざまな起源からすべての規則をフィルタリングして、特定の要素に適用されるルールのみを保持します。つまり、セレクターが指定された要素と一致し、適切な <code>media</code> @-規則の一部である規則を意味します。</li>
+ <li>次に、これらのルールをその重要度、つまり、 <code>!important</code> が後に続くかどうか、およびその起源に従って並べ替えます。カスケードは上流から下流に向けて行われます。つまり、ユーザー定義のスタイルシートによる <code>!important</code> の値は、ユーザーエージェントスタイルシートによる通常の値よりも優先されます。
+  <table class="standard-table">
+   <thead>
+    <tr>
+     <th scope="col"></th>
+     <th scope="col">起源</th>
+     <th scope="col">重要性</th>
+    </tr>
+   </thead>
+   <tbody>
+    <tr>
+     <td>1</td>
+     <td>ユーザーエージェント</td>
+     <td>normal</td>
+    </tr>
+    <tr>
+     <td>2</td>
+     <td>ユーザー</td>
+     <td>normal</td>
+    </tr>
+    <tr>
+     <td>3</td>
+     <td>作成者</td>
+     <td>normal</td>
+    </tr>
+    <tr>
+     <td>4</td>
+     <td>アニメーション</td>
+     <td></td>
+    </tr>
+    <tr>
+     <td>5</td>
+     <td>ユーザーエージェント</td>
+     <td><code>!important</code></td>
+    </tr>
+    <tr>
+     <td>6</td>
+     <td>作成者</td>
+     <td><code>!important</code></td>
+    </tr>
+    <tr>
+     <td>7</td>
+     <td>ユーザー</td>
+     <td><code>!important</code></td>
+    </tr>
+    <tr>
+     <td>8</td>
+     <td>トランジション</td>
+     <td></td>
+    </tr>
+   </tbody>
+  </table>
+ </li>
+ <li>同等の場合は、どれを選択するかに値の<a href="/ja/docs/Web/CSS/Specificity">詳細度</a>が考慮されます。</li>
+</ol>
+
+<h2 id="Resetting_styles" name="Resetting_styles">スタイルの初期化</h2>
+
+<p>コンテンツのスタイルの変更が完了した後で、それ自体を既知の状態に戻す必要がある状況に陥ることがあります。アニメーションやテーマの変更などの場合に起こるかもしれません。 CSS プロパティ <a href="/ja/docs/Web/CSS/all" title="CSS の all 一括指定プロパティは、要素のすべてのプロパティを (unicode-bidi および direction を除いて) 初期化します。"><code>all</code></a> を使用すると、 CSS 内の (ほぼ) すべてのものを既知の状態に素早く戻すことができます。</p>
+
+<p><code>all</code>では、すべてのプロパティを初期 (既定) 状態、前のレベルのカスケードから継承した状態、特定の起源 (ユーザーエージェントスタイルシート、作成者スタイルシート、またはユーザースタイルシート) のいずれかに直ちに復元することを選択できます。または、プロパティの値を完全にクリアすることもできます。</p>
+
+<h2 id="CSS_animations_and_the_cascade" name="CSS_animations_and_the_cascade">CSS アニメーションとカスケード</h2>
+
+<p><a href="/ja/docs/Web/CSS/CSS_Animations">CSS アニメーション</a>は、 <a href="/ja/docs/Web/CSS/@keyframes" title="CSS の @keyframes @-規則は、アニメーションの流れに沿ったキーフレーム (または中間地点) のスタイルを定義することによって、一連の CSS アニメーションの中間ステップを制御します。"><code>@keyframes</code></a> @-規則を使用して、状態間のアニメーションを定義します。キーフレームはカスケードされません。つまり、 CSS は常に単一の <a href="/ja/docs/Web/CSS/@keyframes" title="CSS の @keyframes @-規則は、アニメーションの流れに沿ったキーフレーム (または中間地点) のスタイルを定義することによって、一連の CSS アニメーションの中間ステップを制御します。"><code>@keyframes</code></a> から値を取得し、複数の値を混合することはありません。</p>
+
+<p>複数のキーフレームが適用された場合は、最も重要な文書で定義されている最新のものを選択しますが、すべてを組み合わせることはありません。</p>
+
+<h2 id="Example" name="Example">例</h2>
+
+<p>さまざまなオリジンにまたがる CSS の複数のソースを含む例を見てみましょう。ここには、ユーザーエージェントスタイルシート、2つの作成者スタイルシート、ユーザースタイルシート、および HTML 内のインラインスタイルがあります。</p>
+
+<p><strong>ユーザーエージェント CSS:</strong></p>
+
+<pre class="brush:css;">li { margin-left: 10px }</pre>
+
+<p><strong>作成者 CSS 1:</strong></p>
+
+<pre class="brush:css;">li { margin-left: 0 } /* 初期化のため */</pre>
+
+<p><strong>作成者 CSS 2:</strong></p>
+
+<pre class="brush:css;">@media screen {
+  li { margin-left: 3px }
+}
+
+@media print {
+  li { margin-left: 1px }
+}
+</pre>
+
+<p><strong>ユーザー CSS:</strong></p>
+
+<pre class="brush:css;">.specific { margin-left: 1em }</pre>
+
+<p><strong>HTML:</strong></p>
+
+<pre class="brush:html;">&lt;ul&gt;
+  &lt;li class="specific"&gt;1&lt;sup&gt;st&lt;/sup&gt;&lt;/li&gt;
+  &lt;li&gt;2&lt;sup&gt;nd&lt;/sup&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p>この場合、 <code>li</code> および <code>.specific</code> 規則内の宣言を適用する必要があります。 <code>!important</code>として宣言されている宣言はないため、優先順位は、ユーザースタイルシートまたはユーザーエージェントスタイルシートの前の作成者スタイルシートです。</p>
+
+<p>ここでは3つの宣言が競合しています。</p>
+
+<pre class="brush:css;">margin-left: 0</pre>
+
+<pre class="brush:css;">margin-left: 3px</pre>
+
+<pre class="brush:css;">margin-left: 1px</pre>
+
+<p>最後のものは (画面上で) 無視され、最初の2つは同じセレクターを持つため、同じ詳細度があります。したがって、次に選択されるのは同じ詳細度のうちの最後のものです。</p>
+
+<pre class="brush:css;">margin-left: 3px</pre>
+
+<p>カスケードアルゴリズムは詳細度アルゴリズムの前に適用されるため、ユーザー CSS で定義された宣言はより高い詳細度を持ちますが、選択されないことに注意してください。</p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-cascade/" hreflang="en" lang="en" title="CSS Cascading and Inheritance Level 4の仕様書">CSS Cascading and Inheritance Level 4</a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>プロパティをカスケードレベルに戻すことができる <a href="/ja/docs/Web/CSS/revert" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>revert</code></a> キーワードを追加。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-cascade-3/" hreflang="en" lang="en" title="CSS Cascading and Inheritance Level 3の仕様書">CSS Cascading and Inheritance Level 3</a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>カスケードオリジンの上書を削除。 W3C 標準で使用されなかったため。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS2/cascade.html" hreflang="en" lang="en">CSS Level 2 (Revision 1)<br><small lang="ja">the cascade の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS1/#the-cascade" hreflang="en" lang="en">CSS Level 1<br><small lang="ja">the cascade の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Learn/CSS/Introduction_to_CSS/Cascade_and_inheritance">とても簡単な CSS カスケードの紹介</a></li>
+ <li>CSS の主要概念:
+ <a href="/ja/docs/Web/CSS/Syntax" title="Syntax">CSS 構文</a>、
+ <a href="/ja/docs/Web/CSS/Specificity" title="Specificity">詳細度</a>、
+ <a href="/ja/docs/Web/CSS/inheritance" title="inheritance">継承</a>、
+ <a href="/ja/docs/Web/CSS/box_model" title="Box model">ボックスモデル</a>、
+ <a href="/ja/docs/Web/CSS/Layout_mode" title="CSS layout modes">レイアウトモード</a>、
+ <a href="/ja/docs/Web/CSS/Visual_formatting_model" title="Visual formatting model">視覚フォーマットモデル</a>、
+ <a href="/ja/docs/Web/CSS/margin_collapsing" title="Margin collapsing">マージンの相殺</a>、
+ 値 (<a href="/ja/docs/Web/CSS/initial_value" title="initial value">initial</a> /
+ <a href="/ja/docs/Web/CSS/computed_value" title="computed value">computed</a> /
+ <a href="/ja/docs/Web/CSS/used_value" title="used value">used</a> /
+ <a href="/ja/docs/Web/CSS/actual_value" title="actual value">actual</a>)、
+ <a href="/ja/docs/Web/CSS/Value_definition_syntax" title="Value definition syntax">値の定義構文</a>、
+ <a href="/ja/docs/Web/CSS/Shorthand_properties" title="Shorthand properties">ショートハンドプロパティ</a>、
+ <a href="/ja/docs/Web/CSS/Replaced_element" title="Replaced element">置換要素</a></li>
+</ul>

@@ -1,0 +1,128 @@
+---
+title: handler.getOwnPropertyDescriptor()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/getOwnPropertyDescriptor
+tags:
+  - ECMAScript 2015
+  - JavaScript
+  - Method
+  - Proxy
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/getOwnPropertyDescriptor
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects">Standard built-in objects</a></strong></li><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p><strong><code>handler.getOwnPropertyDescriptor()</code></strong> は <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor"><code>Object.getOwnPropertyDescriptor()</code></a> に対するトラップです。</p>
+
+<div><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-getownpropertydescriptor.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></div>
+
+<div class="hidden">このデモのソースファイルは GitHub リポジトリに格納されています。デモプロジェクトに協力していただける場合は、 <a href="https://github.com/mdn/interactive-examples">https://github.com/mdn/interactive-examples</a> をクローンしてプルリクエストを送信してください。</div>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="brush: js notranslate">const <var>p</var> = new Proxy(<var>target</var>, {
+  getOwnPropertyDescriptor: function(<var>target</var>, <var>prop</var>) {
+  }
+});
+</pre>
+
+<h3 id="Parameters" name="Parameters">引数</h3>
+
+<p>次の引数は <code>getOwnPropertyDescriptor()</code> メソッドに渡されます。 <code>this</code> はハンドラーにバインドされます。</p>
+
+<dl>
+ <dt><code><var>target</var></code></dt>
+ <dd>ターゲットオブジェクトです。</dd>
+ <dt><code><var>prop</var></code></dt>
+ <dd>ディスクリプタを取得されるプロパティ名です。</dd>
+</dl>
+
+<h3 id="Return_value" name="Return_value">返値</h3>
+
+<p><code>getOwnPropertyDescriptor</code> メソッドはオブジェクト、または <code>undefined</code> を返さなければなりません。</p>
+
+<h2 id="Description" name="Description">解説</h2>
+
+<p><code><strong>handler.getOwnPropertyDescriptor()</strong></code> メソッドは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor"><code>Object.getOwnPropertyDescriptor()</code></a> に対するトラップです。</p>
+
+<h3 id="Interceptions" name="Interceptions">介入</h3>
+
+<p>このトラップは下記の操作に介入できます。</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor"><code>Object.getOwnPropertyDescriptor()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/getOwnPropertyDescriptor"><code>Reflect.getOwnPropertyDescriptor()</code></a></li>
+</ul>
+
+<h3 id="Invariants" name="Invariants">不変条件</h3>
+
+<p>以下の不変条件に違反している場合、プロキシは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a> を発生します。</p>
+
+<ul>
+ <li><code>getOwnPropertyDescriptor()</code> はオブジェクトか、または <code>undefined</code> を返さなければなりません。</li>
+ <li>プロパティがターゲットオブジェクトの設定不可な独自のプロパティとして存在する場合、存在しないとして報告されてはいけません。</li>
+ <li>プロパティがターゲットオブジェクトの独自のプロパティとして存在し、そのターゲットオブジェクトが拡張不可の場合、存在しないとして報告されてはいけません。</li>
+ <li>プロパティがターゲットオブジェクトの独自のプロパティとして存在せず、そのターゲットオブジェクトが拡張不可の場合、存在するとして報告されてはいけません。</li>
+ <li>プロパティがターゲットオブジェクトの独自のプロパティとして存在しないか、ターゲットオブジェクトの設定可能な独自のプロパティとして存在している場合、設定不可であるとして報告されてはいけません。</li>
+ <li><code>Object.getOwnPropertyDescriptor(<var>target</var>)</code> の結果を <code>Object.defineProperty()</code> に使用した時に、ターゲットオブジェクトに適用でき、例外をスローしません。</li>
+</ul>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="Trapping_of_getOwnPropertyDescriptor" name="Trapping_of_getOwnPropertyDescriptor">getOwnPropertyDescriptor のトラップ</h3>
+
+<p>次のコードでは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor"><code>Object.getOwnPropertyDescriptor()</code></a> をトラップします。</p>
+
+<pre class="brush: js notranslate">const p = new Proxy({ a: 20}, {
+  getOwnPropertyDescriptor: function(target, prop) {
+    console.log(&apos;called: &apos; + prop);
+    return { configurable: true, enumerable: true, value: 10 };
+  }
+});
+
+console.log(Object.getOwnPropertyDescriptor(p, &apos;a&apos;).value); // &quot;called: a&quot;
+                                                            // 10
+</pre>
+
+<p>次のコードでは不変条件に違反します。</p>
+
+<pre class="brush: js example-bad notranslate">const obj = { a: 10 };
+Object.preventExtensions(obj);
+const p = new Proxy(obj, {
+  getOwnPropertyDescriptor: function(target, prop) {
+    return undefined;
+  }
+});
+
+Object.getOwnPropertyDescriptor(p, &apos;a&apos;); // TypeError is thrown
+</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="ja">[[GetOwnProperty]] の定義</small></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.getOwnPropertyDescriptor"></div>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptor"><code>Object.getOwnPropertyDescriptor()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/getOwnPropertyDescriptor"><code>Reflect.getOwnPropertyDescriptor()</code></a></li>
+</ul>

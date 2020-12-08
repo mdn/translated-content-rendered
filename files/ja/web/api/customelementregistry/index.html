@@ -1,0 +1,101 @@
+---
+title: CustomElementRegistry
+slug: Web/API/CustomElementRegistry
+tags:
+  - API
+  - CustomElementRegistry
+  - Experimental
+  - Interface
+  - Landing
+  - Webコンポーネント
+  - custom elements
+  - レファレンス
+  - 試験的
+translation_of: Web/API/CustomElementRegistry
+---
+<section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/Web_Components/Using_custom_elements">Using custom elements</a></li><li><a href="/ja/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM の使い方</a></li><li><a href="/ja/docs/Web/Web_Components/Using_templates_and_slots">template と slot の使い方</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/ja/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/ja/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/ja/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/ja/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/ja/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/ja/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/ja/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/ja/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/ja/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/ja/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/ja/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/ja/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary"><strong><code>CustomElementRegistry</code></strong> インターフェイスはカスタムエレメントの登録と、登録された要素を紹介するためのメソッドを提供します。このインスタンスを取得するには、<a href="/ja/docs/Web/API/Window/customElements"><code>window.customElements</code></a> プロパティを使います。 </span></p>
+
+<h2 id="メソッド">メソッド</h2>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a></dt>
+ <dd>新しい<a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements">カスタムエレメント</a>を定義。</dd>
+ <dt><a href="/ja/docs/Web/API/CustomElementRegistry/get"><code>CustomElementRegistry.get()</code></a></dt>
+ <dd>指定されたカスタムエレメントへのコンストラクタか、またはカスタムエレメントが定義されていない場合は <code>undefined</code> を返す。</dd>
+ <dt><a href="/ja/docs/Web/API/CustomElementRegistry/whenDefined"><code>CustomElementRegistry.whenDefined()</code></a></dt>
+ <dd>名前を与えられたカスタムエレメントが定義されたとき、空の <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>promise</code></a>（resolves）を返す。もしそのようなカスタムエレメントが既に定義されていた場合、返された promise は即座に fulfill状態になります。</dd>
+</dl>
+
+<h2 id="例">例</h2>
+
+<p>以下のコードは我々の <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> という例 (<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">こちらのライブデモを見てください</a>) から持ってきています。メモ: クラスを生成した後カスタムエレメント定義するための <a href="/ja/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> メソッドの使用方法。</p>
+
+<pre class="brush: js notranslate">// 要素のクラスを生成
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // コンストラクタ内ではまずはじめに必ず super をコールする
+    super();
+
+    // 親要素の要素内の count というワード
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // shadow root を生成
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // テキストノードを生成し、count というワードを追加
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // shadow root に追加
+    shadow.appendChild(text);
+
+
+    // 要素のコンテンツが変化した時、count を更新
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// 新しい要素を定義
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<div class="note">
+<p>メモ: CustomElementsRegistry は <a href="/ja/docs/Web/API/Window/customElements"><code>Window.customElements</code></a> プロパティを通して利用可能です。</p>
+</div>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">ステータス</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#customelementregistry" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">CustomElementRegistry の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td>初期定義。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザ互換性">ブラウザ互換性</h2>
+
+
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry"></div>

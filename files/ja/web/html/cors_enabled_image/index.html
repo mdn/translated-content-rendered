@@ -1,0 +1,122 @@
+---
+title: 画像とキャンバスをオリジン間で利用できるようにする
+slug: Web/HTML/CORS_enabled_image
+tags:
+  - Advanced
+  - CORS
+  - Canvas
+  - HTML
+  - セキュリティ
+  - リファレンス
+  - 上級者
+translation_of: Web/HTML/CORS_enabled_image
+---
+<p><span class="seoSummary">HTML では画像に <code><a href="/ja/docs/Web/HTML/Element/img#attr-crossorigin">crossorigin</a></code> 属性を提供し、適切な <a href="/ja/docs/Glossary/CORS">CORS</a> ヘッダーと組み合わせることで、 <a href="/ja/docs/Web/HTML/Element/img" title="HTML の &lt;img> 要素は、文書に画像を埋め込みます。"><code>&lt;img&gt;</code></a> 要素で定義されている他のオリジンから読み込まれた画像を、 <a href="/ja/docs/Web/HTML/Element/canvas" title="HTML の &lt;canvas> 要素 と Canvas スクリプティング API や WebGL API を使用して、グラフィックやアニメーションを描画することができます。"><code>&lt;canvas&gt;</code></a> の中で現在のオリジンから読み込まれた画像であるかのように扱うことができます。</span></p>
+
+<p><code>crossorigin</code> 属性の使い方については <a href="/ja/docs/Web/HTML/CORS_settings_attributes">CORS 設定属性</a>をご覧ください。</p>
+
+<h2 id="Security_and_tainted_canvases" name="Security_and_tainted_canvases">セキュリティと汚染されたキャンバス</h2>
+
+<p>キャンバスのビットマップ内のピクセルは様々なソース、例えば他のホストから受け取った画像や動画などから来ることもありますが、セキュリティの問題が発生することが避けられません。</p>
+
+<p>CORS による許可なしに他のオリジンから読み込んだ何らかのデータをキャンバスに描画すると、キャンバスは<ruby><strong>汚染</strong><rp> (</rp><rt>taint</rt><rp>) </rp></ruby>されてしまいます。汚染されたキャンバスは安全とみなされなくなり、そのキャンバスから画像データを取得しようとすると、例外が発生するでしょう。</p>
+
+<p>外部コンテンツの元が HTML の <a href="/ja/docs/Web/HTML/Element/img" title="HTML の &lt;img> 要素は、文書に画像を埋め込みます。"><code>&lt;img&gt;</code></a> または SVG の <a href="/ja/docs/Web/SVG/Element/svg" title="svg 要素は、新しい座標系とビューポートを定義するコンテナです。これは SVG ドキュメントの最も外側の要素として使用されますが、SVG または HTML ドキュメントの中に SVG フラグメントを埋め込むためにも使用できます。"><code>&lt;svg&gt;</code></a> 要素であった場合、キャンバスの内容を取得しようとすることは許可されていません。</p>
+
+<p><a href="/ja/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a> または <a href="/ja/docs/Web/API/ImageBitMap"><code>ImageBitMap</code></a> のどちらかとして取得した、元が同一オリジン規則に合わない画像から取得した外部のコンテンツは、キャンバスの内容を読み取ろうとするとブロックされます。</p>
+
+<p>汚染されたキャンバスで以下の呼び出しを行うと、エラーが発生します。</p>
+
+<ul>
+ <li>キャンバスのコンテキストに対する <a href="/ja/docs/Web/API/CanvasRenderingContext2D/getImageData"><code>getImageData()</code></a> の呼び出し</li>
+ <li><a href="/ja/docs/Web/HTML/Element/canvas" title="HTML の &lt;canvas> 要素 と Canvas スクリプティング API や WebGL API を使用して、グラフィックやアニメーションを描画することができます。"><code>&lt;canvas&gt;</code></a> 要素自身に対する <a href="/ja/docs/Web/API/HTMLCanvasElement/toBlob"><code>toBlob()</code></a> の呼び出し</li>
+ <li>キャンバスに対する <a href="/ja/docs/Web/API/HTMLCanvasElement/toDataURL"><code>toDataURL()</code></a> の呼び出し</li>
+</ul>
+
+<p>キャンバスが汚染されていた場合にこれらの何れかを行うと、 <code>SecurityError</code> が発生します。これによって、外部のウェブサイトが許可なしに情報を引き出すために、画像を使用して個人的なデータを暴露することからユーザーを守ります。</p>
+
+<h2 id="Storing_an_image_from_a_foreign_origin" name="Storing_an_image_from_a_foreign_origin">異なるオリジンからの画像の保存</h2>
+
+<p>この例では、外部のオリジンから画像を受け取り、ローカルストレージに保存することを許可します。これを実装するには、コードを書くだけでなくそのウェブサイトのサーバーを構成する必要があります。</p>
+
+<h3 id="Web_server_configuration" name="Web_server_configuration">ウェブサーバーの構成</h3>
+
+<p>最初に必要なものは、画像をホスティングし、画像ファイルに対するオリジン間のアクセスを許可するために、 <a href="/ja/docs/Web/HTTP/Headers/Access-Control-Allow-Origin" title="Access-Control-Allow-Origin レスポンスヘッダーは、指定されたオリジンからのリクエストを行うコードでレスポンスが共有できるかどうかを示します。"><code>Access-Control-Allow-Origin</code></a> ヘッダーが構成されたサーバーが必要です。</p>
+
+<p><a href="https://httpd.apache.org/">Apache</a> を使用してサイトを提供してみましょう。 HTML5 Boilerplate の <a href="https://github.com/h5bp/server-configs-apache/blob/master/h5bp/cross-origin/images.conf">CORS 画像のための Apache サーバー構成ファイル</a>を考えてみましょう。</p>
+
+<pre class="brush: xml notranslate">&lt;IfModule mod_setenvif.c&gt;
+  &lt;IfModule mod_headers.c&gt;
+    &lt;FilesMatch "\.(bmp|cur|gif|ico|jpe?g|png|svgz?|webp)$"&gt;
+      SetEnvIf Origin ":" IS_CORS
+      Header set Access-Control-Allow-Origin "*" env=IS_CORS
+    &lt;/FilesMatch&gt;
+  &lt;/IfModule&gt;
+&lt;/IfModule&gt;</pre>
+
+<p>つまり、この構成はサーバーにグラフィックのファイル (拡張子が ".bmp", ".cur", ".gif", ".ico", ".jpg", ".jpeg", ".png", ".svg", ".svgz", ".webp" であるもの) を、インターネットのどこからでもオリジン間のアクセスができるようにします。</p>
+
+<h3 id="Implementing_the_save_feature" name="Implementing_the_save_feature">保存機能の実装</h3>
+
+<p>サーバーをオリジン間の画像の取得ができるように構成したので、画像がコードを実行しているところと同じドメインから提供されたものであるかのように、ユーザーが画像を<a href="/ja/docs/Web/API/Web_Storage_API">ローカルストレージ</a>に保存することができるようにするコードを書くことができます。</p>
+
+<p>鍵となるのは、 <a href="/ja/docs/Web/API/HTMLImageElement/crossOrigin"><code>crossOrigin</code></a> を画像が読み込まれる <a href="/ja/docs/Web/API/HTMLImageElement"><code>HTMLImageElement</code></a> に設定することで、 <code><a href="/ja/docs/Web/HTML/Global_attributes#attr-crossorigin">crossorigin</a></code> 属性を使用することです。これでブラウザーに画像データをダウンロードしようとするときにオリジン間のリクエストを命じます。</p>
+
+<h4 id="Starting_the_download" name="Starting_the_download">ダウンロードの開始</h4>
+
+<p>ダウンロードを始める (つまり、ユーザーが「ダウンロード」ボタンをクリックした時の) コードは次にようになります。</p>
+
+<pre class="brush: js notranslate">function startDownload() {
+  let imageURL = "https://cdn.glitch.com/4c9ebeb9-8b9a-4adc-ad0a-238d9ae00bb5%2Fmdn_logo-only_color.svg?1535749917189";
+
+  downloadedImg = new Image;
+  downloadedImg.crossOrigin = "Anonymous";
+  downloadedImg.addEventListener("load", imageReceived, false);
+  downloadedImg.src = imageURL;
+}</pre>
+
+<p>ここではハードコーディングされた URL (<code>imageURL</code>) を使用していますが、どこからでも持ってくるのは簡単でしょう。画像のダウンロードを始めるために、 <a href="/ja/docs/Web/API/HTMLImageElement/Image"><code>Image()</code></a> コンストラクターを使用することで新しい <a href="/ja/docs/Web/API/HTMLImageElement"><code>HTMLImageElement</code></a> を生成します。それから画像は <code>crossOrigin</code> 属性を <code>"Anonymous"</code> (つまり、認証のないオリジン間の画像のダウンロード) に設定することで、オリジン間のダウンロードができるように構成します。 image 要素で <code><a href="/ja/docs/Web/Reference/Events/load" title="/ja/docs/Web/Reference/Events/load">load</a></code> イベントが発火した場合、つまり画像データが受信された場合のイベントリスナーを追加します。</p>
+
+<p>最後に、画像の <a href="/ja/docs/Web/API/HTMLImageElement/src"><code>src</code></a> 属性をダウンロードする画像に設定します。これがダウンロードを始める引き金になります。</p>
+
+<h4 id="Receiving_and_saving_the_image" name="Receiving_and_saving_the_image">画像の受信と保存</h4>
+
+<p>新規の画像のダウンロードを扱うコードは、 <code>imageReceived()</code> メソッドに見られます。</p>
+
+<pre class="brush: js notranslate">function imageReceived() {
+  let canvas = document.createElement("canvas");
+  let context = canvas.getContext("2d");
+
+  canvas.width = downloadedImg.width;
+  canvas.height = downloadedImg.height;
+
+  context.drawImage(downloadedImg, 0, 0);
+  imageBox.appendChild(canvas);
+
+  try {
+    localStorage.setItem("saved-image-example", canvas.toDataURL("image/png"));
+  }
+  catch(err) {
+    console.log("Error: " + err);
+  }
+}</pre>
+
+<p><code>imageReceived()</code> は <code>HTMLImageElement</code> 上でダウンロードした画像を受け取ったことを表す <code>"load"</code> イベントを扱うために呼び出されます。このイベントは、ダウンロードしたデータがすべて利用可能になったら一度呼び出されます。新しい <a href="/ja/docs/Web/HTML/Element/canvas" title="HTML の &lt;canvas> 要素 と Canvas スクリプティング API や WebGL API を使用して、グラフィックやアニメーションを描画することができます。"><code>&lt;canvas&gt;</code></a> 要素を作成することから始まり、画像をデータ URL に変換して、キャンバスの二次元描画コンテキスト (<a href="/ja/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a>) がある変数 <code>context</code> へのアクセスを取得します。</p>
+
+<p>キャンバスの寸法は受信した画像に合うよう調整され、それから <a href="/ja/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage()</code></a> を使って画像をキャンバスに描画します。それからキャンバスが文書に挿入され、画像が見えるようになります。</p>
+
+<p>実際に画像をローカルに保存する時になりました。このためにはウェブストレージ API のローカルストレージの仕組みを使用し、 <a href="/ja/docs/Web/API/Window/localStorage"><code>localStorage</code></a> グローバル変数を通してアクセスします。キャンバスのメソッド <a href="/ja/docs/Web/API/HTMLCanvasElement/toDataURL"><code>toDataURL()</code></a> を使用して画像を data:// URL が表す PNG 画像に変換し、それから <a href="/ja/docs/Web/API/Storage/setItem"><code>setItem()</code></a> を用いてローカルストレージに保存します。</p>
+
+<p>この例は Glitch で<a href="https://cors-image-example.glitch.me/">試用</a>または<a href="https://glitch.com/edit/#!/remix/cors-image-example">リミックス</a>することができます。</p>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a class="external" href="http://blog.chromium.org/2011/07/using-cross-domain-images-in-webgl-and.html">Using Cross-domain images in WebGL and Chrome 13</a></li>
+ <li><a class="external" href="http://whatwg.org/html#attr-img-crossorigin">HTML Specification - the <code>crossorigin</code> attribute</a></li>
+ <li><a href="/ja/docs/Web/API/Web_Storage_API">Web Storage API</a></li>
+</ul>
+
+<div><section class="Quick_links" id="Quick_Links">
+<ol><li><a href="/ja/docs/Web/HTML/Applying_color">CSS を使った HTML の要素への色の適用</a></li><li><a href="/ja/docs/Web/HTML/Forms_in_HTML">Forms in HTML5</a></li><li><a href="/ja/docs/Web/HTML/HTML_Extensions">HTML Extensions</a></li><li><a href="/ja/docs/Web/HTML/Date_and_time_formats">HTML で使われる日付や時刻の形式</a></li><li><a href="/ja/docs/Web/HTML/Index">HTML ドキュメントの索引</a></li><li><a href="/ja/docs/Web/HTML/Reference">HTML リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Attributes">HTML 属性リファレンス</a><ol><li><a href="/ja/docs/Web/HTML/Attributes">HTML 属性リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Attributes/pattern">HTML attribute: pattern</a></li><li><a href="/ja/docs/Web/HTML/Attributes/step">HTML attribute: step</a></li><li><a href="/ja/docs/Web/HTML/Attributes/crossorigin">HTML crossorigin 属性</a></li><li><a href="/ja/docs/Web/HTML/Attributes/autocomplete">HTML の autocomplete 属性</a></li><li><a href="/ja/docs/Web/HTML/Attributes/max">HTML 属性: max</a></li><li><a href="/ja/docs/Web/HTML/Attributes/maxlength">HTML 属性: maxlength</a></li><li><a href="/ja/docs/Web/HTML/Attributes/min">HTML 属性: min</a></li><li><a href="/ja/docs/Web/HTML/Attributes/minlength">HTML 属性: minlength</a></li><li><a href="/ja/docs/Web/HTML/Attributes/multiple">HTML 属性: multiple</a></li><li><a href="/ja/docs/Web/HTML/Attributes/required">HTML 属性: required</a></li><li><a href="/ja/docs/Web/HTML/Attributes/size">HTML 属性: size</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Element">HTML 要素リファレンス</a><ol><li><a href="/ja/docs/Web/HTML/Element">HTML 要素リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Element/a">&lt;a&gt;: アンカー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/abbr">&lt;abbr&gt;: 略語要素</a></li><li><a href="/ja/docs/Web/HTML/Element/acronym">&lt;acronym&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/address">&lt;address&gt;: 連絡先要素</a></li><li><a href="/ja/docs/Web/HTML/Element/applet">&lt;applet&gt;: 埋め込み Java アプレット要素</a></li><li><a href="/ja/docs/Web/HTML/Element/area">&lt;area&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/article">&lt;article&gt;: 記事コンテンツ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/aside">&lt;aside&gt;: 余談要素</a></li><li><a href="/ja/docs/Web/HTML/Element/audio">&lt;audio&gt;: 埋め込み音声要素</a></li><li><a href="/ja/docs/Web/HTML/Element/b">&lt;b&gt;: 注目付け要素</a></li><li><a href="/ja/docs/Web/HTML/Element/base">&lt;base&gt;: 文書の基底 URL 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/basefont">&lt;basefont&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/bdi">&lt;bdi&gt;: 書字方向分離要素</a></li><li><a href="/ja/docs/Web/HTML/Element/bdo">&lt;bdo&gt;: 双方向文字列上書き要素</a></li><li><a href="/ja/docs/Web/HTML/Element/bgsound">&lt;bgsound&gt;: 背景音の要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/big">&lt;big&gt;: 大きめの文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/blink">&lt;blink&gt;: 点滅文字列要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/blockquote">&lt;blockquote&gt;: ブロック引用要素</a></li><li><a href="/ja/docs/Web/HTML/Element/body">&lt;body&gt;: 文書の本文要素</a></li><li><a href="/ja/docs/Web/HTML/Element/br">&lt;br&gt;: 改行要素</a></li><li><a href="/ja/docs/Web/HTML/Element/button">&lt;button&gt;: ボタン要素</a></li><li><a href="/ja/docs/Web/HTML/Element/canvas">&lt;canvas&gt;: グラフィックキャンバス要素</a></li><li><a href="/ja/docs/Web/HTML/Element/caption">&lt;caption&gt;: 表キャプション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/center">&lt;center&gt;: 文字列の中央揃え要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/cite">&lt;cite&gt;: 引用元要素</a></li><li><a href="/ja/docs/Web/HTML/Element/code">&lt;code&gt;: 行内コード要素</a></li><li><a href="/ja/docs/Web/HTML/Element/col">&lt;col&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/colgroup">&lt;colgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/command">&lt;command&gt;: HTML コマンド要素</a></li><li><a href="/ja/docs/Web/HTML/Element/content">&lt;content&gt;: シャドウ DOM のコンテンツのプレイスホルダー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/data">&lt;data&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/datalist">&lt;datalist&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/dd">&lt;dd&gt;: 詳細説明要素</a></li><li><a href="/ja/docs/Web/HTML/Element/del">&lt;del&gt;: 削除文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/details">&lt;details&gt;: 詳細折りたたみ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dfn">&lt;dfn&gt;: 定義要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dialog">&lt;dialog&gt;: ダイアログ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dir">&lt;dir&gt;: ディレクトリ要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/div">&lt;div&gt;: コンテンツ分割要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dl">&lt;dl&gt;: 説明リスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dt">&lt;dt&gt;: 説明用語要素</a></li><li><a href="/ja/docs/Web/HTML/Element/element">&lt;element&gt;: カスタム要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/em">&lt;em&gt;: 強調要素</a></li><li><a href="/ja/docs/Web/HTML/Element/embed">&lt;embed&gt;: 埋め込み外部コンテンツ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/fieldset">&lt;fieldset&gt;: フィールドセット要素</a></li><li><a href="/ja/docs/Web/HTML/Element/figcaption">&lt;figcaption&gt;: 図キャプション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/figure">&lt;figure&gt;: 任意のキャプション付きの図要素</a></li><li><a href="/ja/docs/Web/HTML/Element/font">&lt;font&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/footer">&lt;footer&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/form">&lt;form&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/frame">&lt;frame&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/frameset">&lt;frameset&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/Heading_Elements">&lt;h1&gt;–&lt;h6&gt;: HTML の見出し要素</a></li><li><a href="/ja/docs/Web/HTML/Element/head">&lt;head&gt;: 文書メタデータ (ヘッダー) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/header">&lt;header&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/hgroup">&lt;hgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/hr">&lt;hr&gt;: 主題分割 (水平線) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/html">&lt;html&gt;: HTML 文書 / ルート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/i">&lt;i&gt;: 興味深いテキスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/iframe">&lt;iframe&gt;: インラインフレーム要素</a></li><li><a href="/ja/docs/Web/HTML/Element/image">&lt;image&gt;: 廃止された画像要素</a></li><li><a href="/ja/docs/Web/HTML/Element/Img">&lt;img&gt;: 画像埋め込み要素</a></li><li><a href="/ja/docs/Web/HTML/Element/input">&lt;input&gt;: 入力欄 (フォーム入力) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ins">&lt;ins&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/isindex">&lt;isindex&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/kbd">&lt;kbd&gt;: キーボード入力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/keygen">&lt;keygen&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/label">&lt;label&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/legend">&lt;legend&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/li">&lt;li&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/link">&lt;link&gt;: 外部リソースへのリンク要素</a></li><li><a href="/ja/docs/Web/HTML/Element/listing">&lt;listing&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/main">&lt;main&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/map">&lt;map&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/mark">&lt;mark&gt;: 文字列マーク要素</a></li><li><a href="/ja/docs/Web/HTML/Element/marquee">&lt;marquee&gt;: マーキー要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/menu">&lt;menu&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/menuitem">&lt;menuitem&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/meta">&lt;meta&gt;: 文書レベルメタデータ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/meter">&lt;meter&gt;: HTML メーター要素</a></li><li><a href="/ja/docs/Web/HTML/Element/multicol">&lt;multicol&gt;: HTML 段組みレイアウト要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/nav">&lt;nav&gt;: ナビゲーションセクション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/nobr">&lt;nobr&gt;: 無改行文字列要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/noembed">&lt;noembed&gt;: 埋め込みフォールバック要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/noframes">&lt;noframes&gt;: フレームフォールバック要素</a></li><li><a href="/ja/docs/Web/HTML/Element/noscript">&lt;noscript&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/object">&lt;object&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/ol">&lt;ol&gt;: 順序付きリスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/optgroup">&lt;optgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/option">&lt;option&gt;: HTML 選択肢要素</a></li><li><a href="/ja/docs/Web/HTML/Element/output">&lt;output&gt;: 出力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/p">&lt;p&gt;: 段落要素</a></li><li><a href="/ja/docs/Web/HTML/Element/param">&lt;param&gt;: オブジェクト引数要素</a></li><li><a href="/ja/docs/Web/HTML/Element/picture">&lt;picture&gt;: 画像要素</a></li><li><a href="/ja/docs/Web/HTML/Element/plaintext">&lt;plaintext&gt;: プレーンテキスト要素 (非推奨)</a></li><li><a href="/ja/docs/Web/HTML/Element/pre">&lt;pre&gt;: 整形済みテキスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/progress">&lt;progress&gt;: 進捗表示要素</a></li><li><a href="/ja/docs/Web/HTML/Element/q">&lt;q&gt;: 行内引用要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rb">&lt;rb&gt;: ルビベース要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rp">&lt;rp&gt;: ルビのフォールバック用括弧要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rt">&lt;rt&gt;: ルビ文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rtc">&lt;rtc&gt;: ルビ文字列コンテナー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ruby">&lt;ruby&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/s">&lt;s&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/samp">&lt;samp&gt;: サンプル出力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/script">&lt;script&gt;: スクリプト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/section">&lt;section&gt;: 汎用セクション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/select">&lt;select&gt;: HTML 選択要素</a></li><li><a href="/ja/docs/Web/HTML/Element/Shadow">&lt;shadow&gt;: 廃止されたシャドウルート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/slot">&lt;slot&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/small">&lt;small&gt;: 附随コメント要素</a></li><li><a href="/ja/docs/Web/HTML/Element/source">&lt;source&gt;: メディアまたは画像のソース要素</a></li><li><a href="/ja/docs/Web/HTML/Element/spacer">&lt;spacer&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/span">&lt;span&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/strike">&lt;strike&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/strong">&lt;strong&gt;: 強い重要性要素</a></li><li><a href="/ja/docs/Web/HTML/Element/style">&lt;style&gt;: スタイル情報要素</a></li><li><a href="/ja/docs/Web/HTML/Element/sub">&lt;sub&gt;: 下付き文字要素</a></li><li><a href="/ja/docs/Web/HTML/Element/summary">&lt;summary&gt;: 概要明示要素</a></li><li><a href="/ja/docs/Web/HTML/Element/sup">&lt;sup&gt;: 上付き文字要素</a></li><li><a href="/ja/docs/Web/HTML/Element/table">&lt;table&gt;: 表要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tbody">&lt;tbody&gt;: テーブル本体要素</a></li><li><a href="/ja/docs/Web/HTML/Element/td">&lt;td&gt;: 表データセル要素</a></li><li><a href="/ja/docs/Web/HTML/Element/template">&lt;template&gt;: コンテンツテンプレート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/textarea">&lt;textarea&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/tfoot">&lt;tfoot&gt;: 表フッター要素</a></li><li><a href="/ja/docs/Web/HTML/Element/th">&lt;th&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/thead">&lt;thead&gt;: 表ヘッダー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/time">&lt;time&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/title">&lt;title&gt;: 文書題名要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tr">&lt;tr&gt;: 表の行要素</a></li><li><a href="/ja/docs/Web/HTML/Element/track">&lt;track&gt;: 埋め込みテキストトラック要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tt">&lt;tt&gt;: テレタイプテキスト要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/u">&lt;u&gt;: 非言語的注釈 (下線) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ul">&lt;ul&gt;: 順序なしリスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/var">&lt;var&gt;: 変数要素</a></li><li><a href="/ja/docs/Web/HTML/Element/video">&lt;video&gt;: 動画埋め込み要素</a></li><li><a href="/ja/docs/Web/HTML/Element/wbr">&lt;wbr&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/xmp">&lt;xmp&gt;</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Preloading_content">rel="preload" によるコンテンツの先読み</a></li><li><a href="/ja/docs/Web/HTML/Using_the_application_cache">アプリケーションキャッシュの使用</a></li><li><a href="/ja/docs/Web/HTML/Inline_elements">インライン要素</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes">グローバル属性</a><ol><li><a href="/ja/docs/Web/HTML/Global_attributes">グローバル属性</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/accesskey">accesskey</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/autocapitalize">autocapitalize</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/class">class</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/contenteditable">contenteditable</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/contextmenu">contextmenu</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/data-*">data-*</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/dir">dir</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/draggable">draggable</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/dropzone">dropzone</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/hidden">hidden</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/id">id</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/inputmode">inputmode</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/is">is</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemid">itemid</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemprop">itemprop</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemref">itemref</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemscope">itemscope</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemtype">itemtype</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/lang">lang</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/part">part</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/slot">slot</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/spellcheck">spellcheck</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/style">style</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/tabindex">tabindex</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/title">title</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/translate">translate</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/x-ms-format-detection">x-ms-format-detection</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Block-level_elements">ブロックレベル要素</a></li><li><a href="/ja/docs/Web/HTML/Microdata">マイクロデータ</a></li><li><a href="/ja/docs/Web/HTML/microformats">マイクロフォーマット</a></li><li><a href="/ja/docs/Web/HTML/Link_types">リンク種別</a></li><li><a href="/ja/docs/Web/HTML/Quirks_Mode_and_Standards_Mode">後方互換モードと標準準拠モード</a></li><li><a href="/ja/docs/Web/HTML/CORS_enabled_image">画像とキャンバスをオリジン間で利用できるようにする</a></li><li><a href="/ja/docs/Web/Guide/HTML/Tips_for_authoring_fast-loading_HTML_pages">読み込みが速い HTML ページを作成するための Tips</a></li></ol>
+</section></div>

@@ -1,0 +1,133 @@
+---
+title: handler.ownKeys()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/ownKeys
+tags:
+  - ECMAScript 2015
+  - JavaScript
+  - Method
+  - Proxy
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/ownKeys
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects">Standard built-in objects</a></strong></li><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p><strong><code>handler.ownKeys()</code></strong> メソッドは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/ownKeys"><code>Reflect.ownKeys()</code></a> に対するトラップです。</p>
+
+<div><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-ownkeys.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></div>
+
+<div class="hidden">このデモのソースファイルは GitHub リポジトリに格納されています。デモプロジェクトに協力していただける場合は、 <a href="https://github.com/mdn/interactive-examples">https://github.com/mdn/interactive-examples</a> をクローンしてプルリクエストを送信してください。</div>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">const <var>p</var> = new Proxy(<var>target</var>, {
+  ownKeys: function(<var>target</var>) {
+  }
+});
+</pre>
+
+<h3 id="Parameters" name="Parameters">引数</h3>
+
+<p>次の引数は <code>ownKeys</code> メソッドに渡されます。 <code>this</code> はハンドラーにバインドされます。</p>
+
+<dl>
+ <dt><code><var>target</var></code></dt>
+ <dd>ターゲットオブジェクトです。</dd>
+</dl>
+
+<h3 id="Return_value" name="Return_value">返値</h3>
+
+<p><code>ownKeys()</code> メソッドは列挙可能オブジェクトを返さなければなりません。</p>
+
+<h2 id="Description" name="Description">解説</h2>
+
+<p><code><strong>handler.ownKeys()</strong></code> メソッドは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/ownKeys"><code>Reflect.ownKeys()</code></a> に対するトラップです。</p>
+
+<h3 id="Interceptions" name="Interceptions">介入</h3>
+
+<p>このトラップは下記の操作に介入できます。</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames"><code>Object.getOwnPropertyNames()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertySymbols"><code>Object.getOwnPropertySymbols()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"><code>Object.keys()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/ownKeys"><code>Reflect.ownKeys()</code></a></li>
+</ul>
+
+<h3 id="Invariants" name="Invariants">不変条件</h3>
+
+<p>以下の不変条件に違反している場合、プロキシは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a> を発生します。</p>
+
+<ul>
+ <li><code>ownKeys</code>の結果はリストです。</li>
+ <li>結果リストのそれぞれの要素の型は<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/String"><code>String</code></a> または <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol"><code>Symbol</code></a>のどちらかです。</li>
+ <li>結果リストはターゲットオブジェクトのすべての非設定の独自プロパティのキーを含みます。</li>
+ <li>ターゲットオブジェクトが拡張可能でないなら、結果リストはターゲットオブジェクトのすべての独自プロパティのキーを含まなければなりません。そして、他の値を含みません。</li>
+</ul>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="Trapping_of_getOwnPropertyNames" name="Trapping_of_getOwnPropertyNames">getOwnPropertyNames のトラップ</h3>
+
+<p>次のコードでは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames"><code>Object.getOwnPropertyNames()</code></a> をトラップします。</p>
+
+<pre class="brush: js notranslate">const p = new Proxy({}, {
+  ownKeys: function(target) {
+    console.log(&apos;called&apos;);
+    return [&apos;a&apos;, &apos;b&apos;, &apos;c&apos;];
+  }
+});
+
+console.log(Object.getOwnPropertyNames(p)); // &quot;called&quot;
+                                            // [ &apos;a&apos;, &apos;b&apos;, &apos;c&apos; ]</pre>
+
+<p>次のコードでは不変条件に違反します。</p>
+
+<pre class="brush: js example-bad notranslate">const obj = {};
+Object.defineProperty(obj, &apos;a&apos;, {
+  configurable: false,
+  enumerable: true,
+  value: 10 }
+);
+
+const p = new Proxy(obj, {
+  ownKeys: function(target) {
+    return [123, 12.5, true, false, undefined, null, {}, []];
+  }
+});
+
+console.log(Object.getOwnPropertyNames(p));
+
+// TypeError: proxy [[OwnPropertyKeys]] must return an array
+// with only string and symbol elements
+</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="ja">[[OwnPropertyKeys]] の定義</small></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.ownKeys"></div>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames"><code>Object.getOwnPropertyNames()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/ownKeys"><code>Reflect.ownKeys()</code></a></li>
+</ul>

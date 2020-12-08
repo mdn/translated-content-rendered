@@ -1,0 +1,98 @@
+---
+title: Permissions.query()
+slug: Web/API/Permissions/query
+tags:
+  - API
+  - Experimental
+  - Method
+  - Permissions
+  - Reference
+translation_of: Web/API/Permissions/query
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Permissions_API">Permissions API</a></strong></li><li><strong><a href="/ja/docs/Web/API/Permissions"><code>Permissions</code></a></strong></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><em><code>query()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Permissions/revoke"><code>revoke()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Permissions API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Navigator/permissions"><code>Navigator.permissions</code></a></li><li><a href="/ja/docs/Web/API/PermissionStatus"><code>PermissionStatus</code></a></li><li><a href="/ja/docs/Web/API/WorkerNavigator/permissions"><code>WorkerNavigator.permissions</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div>
+
+<p><span class="seoSummary"><a href="/ja/docs/Web/API/Permissions"><code>Permissions</code></a> インターフェイスの <strong><code>Permissions.query()</code></strong> メソッドは、グローバルスコープに対するユーザーのパーミッションの状態を返します。</span></p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="brush: js notranslate">navigator.permissions.query(PermissionDescriptor).then(function(permissionStatus) { ... })</pre>
+
+<h3 id="Parameters" name="Parameters">パラメーター</h3>
+
+<dl>
+ <dt><code>PermissionDescriptor</code></dt>
+ <dd>名前と値のペアのカンマ区切りリストで構成される、<code>query</code> 操作のオプションを設定するオブジェクト。 利用可能なオプションは次のとおりです。
+ <ul>
+  <li><code>name</code>: パーミッションを照会したい API の名前。 有効な値は <code>&apos;accelerometer&apos;</code>、<code>&apos;accessibility-events&apos;</code>、<code>&apos;ambient-light-sensor&apos;</code>、<code>&apos;background-sync&apos;</code>、<code>&apos;camera&apos;​</code>、<code>&apos;clipboard-read&apos;</code>、<code>&apos;clipboard-write&apos;</code>、<code>&apos;geolocation&apos;</code>、<code>&apos;gyroscope&apos;</code>、<code>&apos;magnetometer&apos;</code>、<code>&apos;microphone&apos;</code>、<code>&apos;midi&apos;</code>、<code>&apos;notifications&apos;</code>、<code>&apos;payment-handler&apos;</code>、<code>&apos;persistent-storage&apos;</code>、<code>&apos;push</code>&apos; です。</li>
+  <li><code>userVisibleOnly</code>: （Push のみ。 Firefox はサポートしていません。 下記のブラウザーの互換性のセクションを参照してください）すべてのメッセージについて通知を表示するか、サイレントプッシュ通知を送信できるかを示します。 デフォルトは <code>false</code> です。</li>
+  <li><code>sysex</code>: （Midi のみ）システムエクスクルーシブメッセージが必要か受信するかどうかを示します。 デフォルトは <code>false</code> です。</li>
+ </ul>
+ </dd>
+</dl>
+
+<div class="note">
+<p><strong>注</strong>: Firefox 44 以降、<a href="/ja/docs/Web/API/Notifications_API">Notifications</a> と <a href="/ja/docs/Web/API/Push_API">Push</a> のパーミッションは統合されました。 （例えば、ユーザーによって、関連するパーミッションのダイアログにより）パーミッションが与えられた場合、<code>navigator.permissions.query()</code> は <code>notifications</code> と <code>push</code> の両方に対して <code>true</code> を返します。</p>
+</div>
+
+<div class="note">
+<p><strong>注</strong>: <code>persistent-storage</code> パーミッションは、<a href="https://storage.spec.whatwg.org/">Storage API</a> のとおりに、オリジンがそのストレージとして永続的ボックス（すなわち永続的ストレージ（<a href="https://storage.spec.whatwg.org/#persistence">persistent storage</a>））を使用することを許可します。</p>
+</div>
+
+<h3 id="Returns" name="Returns">戻り値</h3>
+
+<p><a href="/ja/docs/Web/API/PermissionStatus"><code>PermissionStatus</code></a> オブジェクトに解決される <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>。</p>
+
+<h3 id="Exceptions" name="Exceptions">例外</h3>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">例外</th>
+   <th scope="col">説明</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>TypeError</code></td>
+   <td><code>PermissionDescriptor</code> 情報の取得が何らかの理由で失敗したか、パーミッションが存在しないか現在サポートされていません（例えば、<code>midi</code>、または <code>userVisibleOnly</code> と一緒の <code>push</code> で）。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Example" name="Example">例</h2>
+
+<pre class="brush: js notranslate">navigator.permissions.query({name:&apos;geolocation&apos;}).then(function(result) {
+ if (result.state == &apos;granted&apos;) {
+   showLocalNewsWithGeolocation();
+ } else if (result.state == &apos;prompt&apos;) {
+   showButtonToEnableLocalNews();
+ }
+ // パーミッションが拒否された場合は何もしないでください。
+});</pre>
+
+<h2 id="Specification" name="Specification">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/permissions/#dom-permissions-query" hreflang="en" lang="en">Permissions<br><small lang="ja">query() の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Permissions.query"></div>
+</div>

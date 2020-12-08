@@ -1,0 +1,97 @@
+---
+title: ReadableStreamDefaultController.close()
+slug: Web/API/ReadableStreamDefaultController/close
+tags:
+  - API
+  - Method
+  - ReadableStreamDefaultController
+  - Reference
+  - Streams
+  - close
+translation_of: Web/API/ReadableStreamDefaultController/close
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Streams_API">Streams API</a></strong></li><li><strong><a href="/ja/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/ReadableStreamDefaultController/desiredSize"><code>desiredSize</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><em><code>close()</code></em></li><li><a href="/ja/docs/Web/API/ReadableStreamDefaultController/enqueue"><code>enqueue()</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamDefaultController/error"><code>error()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Streams に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Body/body"><code>Body.body</code></a></li><li><a href="/ja/docs/Web/API/ByteLengthQueuingStrategy"><code>ByteLengthQueuingStrategy</code></a></li><li><a href="/ja/docs/Web/API/CountQueuingStrategy"><code>CountQueuingStrategy</code></a></li><li><a href="/ja/docs/Web/API/ReadableByteStreamController"><code>ReadableByteStreamController</code></a></li><li><a href="/ja/docs/Web/API/ReadableStream"><code>ReadableStream</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamBYOBReader"><code>ReadableStreamBYOBReader</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamBYOBRequest"><code>ReadableStreamBYOBRequest</code></a></li><li><a href="/ja/docs/Web/API/ReadableStreamDefaultReader"><code>ReadableStreamDefaultReader</code></a></li><li><a href="/ja/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li><li><a href="/ja/docs/Web/API/WritableStream"><code>WritableStream</code></a></li><li><a href="/ja/docs/Web/API/WritableStreamDefaultController"><code>WritableStreamDefaultController</code></a></li><li><a href="/ja/docs/Web/API/WritableStreamDefaultWriter"><code>WritableStreamDefaultWriter</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary"><span class="seoSummary"><a href="/ja/docs/Web/API/ReadableStreamDefaultController"><code>ReadableStreamDefaultController</code></a> インターフェイスの <strong><code>close()</code></strong> メソッドは、関連するストリームを閉じます。</span></p>
+
+<div>
+<p>リーダーは、以前にキューに入れられたチャンクをストリームから読み取ることができますが、それらを読み取とってしまうとストリームは閉じられます。 ストリームを完全に取り除き、キューに入れられたチャンクを破棄する場合は、<a href="/ja/docs/Web/API/ReadableStream/cancel"><code>ReadableStream.cancel()</code></a> または <a href="/ja/docs/Web/API/ReadableStreamDefaultReader/cancel"><code>ReadableStreamDefaultReader.cancel()</code></a> を使用します。</p>
+</div>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate"><em>readableStreamDefaultController</em>.close();</pre>
+
+<h3 id="Parameters" name="Parameters">パラメーター</h3>
+
+<p>なし。</p>
+
+<h3 id="Return_value" name="Return_value">戻り値</h3>
+
+<p><code>undefined</code>。</p>
+
+<h3 id="Exceptions" name="Exceptions">例外</h3>
+
+<dl>
+ <dt>TypeError</dt>
+ <dd>ソースオブジェクトは <code>ReadableStreamDefaultController</code> ではありません。</dd>
+</dl>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>次の単純な例では、コンストラクターを使用してカスタムの <code>ReadableStream</code> を作成します（完全なコードについては、<a href="https://mdn.github.io/dom-examples/streams/simple-random-stream/">単純なランダムストリームの例</a>を参照）。 <code>start()</code> 関数は、1秒ごとにテキストのランダムな文字列を生成し、それをストリームのキューに入れます。 <a href="/ja/docs/Web/API/ReadableStream/cancel"><code>ReadableStream.cancel()</code></a> が何らかの理由で呼び出された場合、生成を停止するための <code>cancel()</code> 関数も提供します。</p>
+
+<p>ボタンが押されると、生成を停止し、<a href="/ja/docs/Web/API/ReadableStreamDefaultController/close"><code>ReadableStreamDefaultController.close()</code></a> を使用してストリームを閉じ、ストリームからデータを読み取る別の関数を実行します。</p>
+
+<pre class="brush: js notranslate">const stream = new ReadableStream({
+  start(controller) {
+    interval = setInterval(() =&gt; {
+      let string = randomChars();
+
+      // ストリームに文字列を追加
+      controller.enqueue(string);
+
+      // それを画面に表示
+      let listItem = document.createElement(&apos;li&apos;);
+      listItem.textContent = string;
+      list1.appendChild(listItem);
+    }, 1000);
+
+    button.addEventListener(&apos;click&apos;, function() {
+      clearInterval(interval);
+      fetchStream();
+      controller.close();
+    })
+  },
+  pull(controller) {
+    // この例では実際には pull は必要ありません
+  },
+  cancel() {
+    // リーダーがキャンセルされた場合に呼び出されるため、
+    // 文字列の生成を停止する必要があります
+    clearInterval(interval);
+  }
+});</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://streams.spec.whatwg.org/#rs-default-controller-close" hreflang="en" lang="en">Streams<br><small lang="ja">close() の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.ReadableStreamDefaultController.close"></div>

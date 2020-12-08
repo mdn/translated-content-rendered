@@ -1,0 +1,259 @@
+---
+title: attr()
+slug: Web/CSS/attr()
+tags:
+  - CSS
+  - CSS 関数
+  - Reference
+  - Web
+  - attr
+  - レイアウト
+translation_of: Web/CSS/attr()
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/Reference">CSS リファレンス</a></strong></li></ol></section></div>
+
+<div class="note notecard"><strong>メモ:</strong> <code>attr()</code> 関数はどの CSS プロパティでも使用することができますが、 <a href="/ja/docs/Web/CSS/content" title="CSS の content プロパティは、要素を生成された値で置き換えます。 content プロパティを使用して挿入されたオブジェクトは、無名の置換要素になります。"><code>content</code></a> 以外のプロパティでの対応は実験的であり、型や単位の引数の対応はまちまちです。</div>
+
+<p><strong><code>attr()</code></strong> は <a href="/ja/docs/Web/CSS">CSS</a> の関数で、選択された要素の属性の値を受け取り、スタイルシートの中で使うために使用されます。<a href="/ja/docs/Web/CSS/Pseudo-elements">擬似要素</a>で使用することもでき、その場合は擬似要素を作る元になった要素の属性値が返されます。</p>
+
+<pre class="brush: css no-line-numbers notranslate">/* Simple usage */
+attr(data-count);
+attr(title);
+
+/* 型付き */
+attr(src url);
+attr(data-count number);
+attr(data-width px);
+
+/* 代替値付き */
+attr(data-count number, 0);
+attr(src url, &quot;&quot;);
+attr(data-width px, inherit);
+attr(data-something, &quot;default&quot;);
+</pre>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<h3 id="Values" name="Values">値</h3>
+
+<dl>
+ <dt><code>attribute-name</code></dt>
+ <dd>CSS で参照する、 HTML 要素の属性名です。</dd>
+ <dt><code style="white-space: nowrap;">&lt;type-or-unit&gt;</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></dt>
+ <dd>属性値の型またはその単位を示すキーワードです。 HTML では暗黙に単位を持つ属性があります。属性に対して無効な値を <code>&lt;type-or-unit&gt;</code> で与えると、 <code>attr()</code> 式も無効になります。省略すると既定値の <code>string</code> になります。有効な値は以下の通りです。
+ <table class="standard-table">
+  <thead>
+   <tr>
+    <th scope="col">キーワード</th>
+    <th scope="col">関係する型</th>
+    <th scope="col">コメント</th>
+    <th scope="col">既定値</th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <td><code>string</code></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。"><code>&lt;string&gt;</code></a></td>
+    <td>属性値は CSS <a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。"><code>&lt;string&gt;</code></a> として扱われます。再解析はされず、特に文字は CSS エスケープで他の文字に変換されることなく、そのまま使用されます。</td>
+    <td>空文字列</td>
+   </tr>
+   <tr>
+    <td><code>color</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/color_value" title="&lt;color&gt; は CSS のデータ型で、 sRGB 色空間にある一つの色を表します。 &lt;color&gt; は アルファチャネル透過値を含むこともでき、背景とどのように合成するかを示すこともできます。"><code>&lt;color&gt;</code></a></td>
+    <td>属性値はハッシュ (3値または6値のハッシュ) またはキーワードとして解析されます。妥当な CSS の <a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。"><code>&lt;string&gt;</code></a> 値でなければなりません。<br>
+     前後の空白は除去されます。</td>
+    <td><code>currentcolor</code></td>
+   </tr>
+   <tr>
+    <td><code>url</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/url" title="CSS の &lt;url&gt; データ型は、画像やフォントなどのリソースへのポインターを記述します。 URL は background-image, cursor, list-style のような様々な CSS のプロパティで使用することができます。"><code>&lt;url&gt;</code></a></td>
+    <td>属性値は、 CSS の <code>url()</code> 関数の中で使用される文字列として解析されます。<br>
+     相対 URL は、スタイルシートからの相対ではなく、元の文書からの相対で解決されます。<br>
+     前後の空白は除去されます。</td>
+    <td>一般的なエラーの状況で存在しない文書を指す <code>about:invalid</code> の URL。</td>
+   </tr>
+   <tr>
+    <td><code>integer</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/integer" title="&lt;integer&gt; は CSS のデータ型で、 number の特殊型であり、正と負の整数を表現します。 integer は column-count, counter-increment, grid-column, grid-row, z-index など、数多くの CSS プロパティで使用することができます。"><code>&lt;integer&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/integer" title="&lt;integer&gt; は CSS のデータ型で、 number の特殊型であり、正と負の整数を表現します。 integer は column-count, counter-increment, grid-column, grid-row, z-index など、数多くの CSS プロパティで使用することができます。"><code>&lt;integer&gt;</code></a> として解析されます。妥当ではない場合、つまり整数ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0</code>、または <code>0</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>number</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a> として解析されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0</code>、または <code>0</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>length</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/length" title="CSS の &lt;length&gt; データ型は、長さの値を表します。長さは width, height, margin, padding, border-width, font-size, text-shadow など数多くの CSS プロパティで使用されています。"><code>&lt;length&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/length" title="CSS の &lt;length&gt; データ型は、長さの値を表します。長さは width, height, margin, padding, border-width, font-size, text-shadow など数多くの CSS プロパティで使用されています。"><code>&lt;length&gt;</code></a> の距離として単位を含んで (<code>12.5em</code> など) 解釈されます。妥当ではない場合、つまり長さではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     指定された値が相対的な長さの場合は、 <code>attr()</code> は絶対的な値に変換して計算します。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0</code>、または <code>0</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>em</code>, <code>ex</code>, <code>px</code>, <code>rem</code>, <code>vw</code>, <code>vh</code>, <code>vmin</code>, <code>vmax</code>, <code>mm</code>, <code>cm</code>, <code>in</code>, <code>pt</code>, or <code>pc</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/length" title="CSS の &lt;length&gt; データ型は、長さの値を表します。長さは width, height, margin, padding, border-width, font-size, text-shadow など数多くの CSS プロパティで使用されています。"><code>&lt;length&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a>、つまり単位なし (<code>12.5</code> など) で解析され、特定の単位を付けた <a href="/ja/docs/Web/CSS/length" title="CSS の &lt;length&gt; データ型は、長さの値を表します。長さは width, height, margin, padding, border-width, font-size, text-shadow など数多くの CSS プロパティで使用されています。"><code>&lt;length&gt;</code></a> として解釈されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     指定された値が相対的な長さの場合は、 <code>attr()</code> は絶対的な値に変換して計算します。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0</code>、または <code>0</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>angle</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/angle" title="CSS の &lt;angle&gt; データ型は、度、グラード、ラジアン、回転の値で表される角度の値を表します。例えば、 &lt;gradient&gt; 関数や一部の transform 関数などで使われています。"><code>&lt;angle&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/angle" title="CSS の &lt;angle&gt; データ型は、度、グラード、ラジアン、回転の値で表される角度の値を表します。例えば、 &lt;gradient&gt; 関数や一部の transform 関数などで使われています。"><code>&lt;angle&gt;</code></a> の大きさとして単位を含んで (<code>30.5deg</code> など) 解釈されます。妥当ではない場合、つまり角度ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0deg</code>、または <code>0deg</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>deg</code>, <code>grad</code>, <code>rad</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/angle" title="CSS の &lt;angle&gt; データ型は、度、グラード、ラジアン、回転の値で表される角度の値を表します。例えば、 &lt;gradient&gt; 関数や一部の transform 関数などで使われています。"><code>&lt;angle&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a>、つまり単位なし (<code>12.5</code> など) で解析され、特定の単位を付けた <a href="/ja/docs/Web/CSS/angle" title="CSS の &lt;angle&gt; データ型は、度、グラード、ラジアン、回転の値で表される角度の値を表します。例えば、 &lt;gradient&gt; 関数や一部の transform 関数などで使われています。"><code>&lt;angle&gt;</code></a> として解釈されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0deg</code>、または <code>0deg</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>time</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/time" title="&lt;time&gt; は CSS のデータ型で、時間の値を秒単位またはミリ秒単位で表現します。これは animation や transition および関連するプロパティで使用されています。"><code>&lt;time&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/time" title="&lt;time&gt; は CSS のデータ型で、時間の値を秒単位またはミリ秒単位で表現します。これは animation や transition および関連するプロパティで使用されています。"><code>&lt;time&gt;</code></a> の大きさとして単位を含んで (<code>30.5ms</code> など) 解釈されます。妥当ではない場合、つまり時間ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0s</code>、または <code>0s</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>s</code>, <code>ms</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/time" title="&lt;time&gt; は CSS のデータ型で、時間の値を秒単位またはミリ秒単位で表現します。これは animation や transition および関連するプロパティで使用されています。"><code>&lt;time&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a>、つまり単位なし (<code>12.5</code> など) で解析され、特定の単位を付けた <a href="/ja/docs/Web/CSS/time" title="&lt;time&gt; は CSS のデータ型で、時間の値を秒単位またはミリ秒単位で表現します。これは animation や transition および関連するプロパティで使用されています。"><code>&lt;time&gt;</code></a> として解釈されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0s</code>、または <code>0s</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>frequency</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/frequency" title="CSS の &lt;frequency&gt; データ型は、話し声の高さなどの周波数の値を表します。今のところ、どの CSS プロパティでも使われていません。"><code>&lt;frequency&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/frequency" title="CSS の &lt;frequency&gt; データ型は、話し声の高さなどの周波数の値を表します。今のところ、どの CSS プロパティでも使われていません。"><code>&lt;frequency&gt;</code></a> の大きさとして単位を含んで (<code>30.5ms</code> など) 解釈されます。妥当ではない場合、つまり周波数ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。</td>
+    <td><code>0Hz</code>、または <code>0Hz</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>Hz</code>, <code>kHz</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/frequency" title="CSS の &lt;frequency&gt; データ型は、話し声の高さなどの周波数の値を表します。今のところ、どの CSS プロパティでも使われていません。"><code>&lt;frequency&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a>、つまり単位なし (<code>12.5</code> など) で解析され、特定の単位を付けた <a href="/ja/docs/Web/CSS/frequency" title="CSS の &lt;frequency&gt; データ型は、話し声の高さなどの周波数の値を表します。今のところ、どの CSS プロパティでも使われていません。"><code>&lt;frequency&gt;</code></a> として解釈されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0Hz</code>、または <code>0Hz</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+   <tr>
+    <td><code>%</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></td>
+    <td style="white-space: nowrap;"><a href="/ja/docs/Web/CSS/percentage" title="&lt;percentage&gt; は CSS のデータ型で、パーセント値による割合を表します。要素の親オブジェクトからの相対的な寸法を定義するためによく使われます。 width、 height, margin, padding、 font-size など、たくさんのプロパティでパーセント値を使うことができます。"><code>&lt;percentage&gt;</code></a></td>
+    <td>属性値は CSS の <a href="/ja/docs/Web/CSS/number" title="CSS の &lt;number&gt; データ型は、整数または小数部分のある数値を表します。"><code>&lt;number&gt;</code></a>、つまり単位なし (<code>12.5</code> など) で解析され、 <a href="/ja/docs/Web/CSS/percentage" title="&lt;percentage&gt; は CSS のデータ型で、パーセント値による割合を表します。要素の親オブジェクトからの相対的な寸法を定義するためによく使われます。 width、 height, margin, padding、 font-size など、たくさんのプロパティでパーセント値を使うことができます。"><code>&lt;percentage&gt;</code></a> として解釈されます。妥当ではない場合、つまり数値ではない場合や CSS プロパティが受け入れ可能な範囲を超えていた場合は、既定値が使用されます。<br>
+     指定された値が長さの場合は、 <code>attr()</code> は絶対的な値に変換して計算します。<br>
+     前後の空白は除去されます。</td>
+    <td><code>0%</code>、または <code>0%</code> が妥当な値ではないプロパティでは、プロパティの最小値。</td>
+   </tr>
+  </tbody>
+ </table>
+ </dd>
+ <dt><code>&lt;fallback&gt;</code> <span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></dt>
+ <dd>関連する属性が見つからないか、無効値を含むときに使われる値です。設定されていない場合は、 CSS は各 <code>&lt;type-or-unit&gt;</code> で定義された既定値を使います。</dd>
+</dl>
+
+<h3 id="Formal_syntax" name="Formal_syntax">形式文法</h3>
+
+<pre class="syntaxbox notranslate">attr( &lt;attr-name&gt; <a href="#type-or-unit">&lt;type-or-unit&gt;</a><a href="/ja/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> <a href="/ja/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">[</a>, &lt;attr-fallback&gt; <a href="/ja/docs/CSS/Value_definition_syntax#Brackets" title="Brackets: enclose several entities, combinators, and multipliers to transform them as a single component">]</a><a href="/ja/docs/CSS/Value_definition_syntax#Question_mark_()" title="Question mark: the entity is optional">?</a> )<p style="font-family: Open Sans,Arial,sans-serif; margin: 10px 0 0 0;">where <br><code style="font-family: Consolas,Monaco,&quot;Andale Mono&quot;,monospace;"><span id="type-or-unit">&lt;type-or-unit&gt;</span> = string <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> color <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> url <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> integer <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> number <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> length <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> angle <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> time <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> frequency <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> cap <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ch <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> em <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ex <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ic <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> lh <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> rlh <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> rem <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vb <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vi <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vw <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vh <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vmin <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> vmax <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> mm <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> Q <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> cm <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> in <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> pt <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> pc <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> px <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> deg <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> grad <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> rad <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> turn <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> ms <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> s <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> Hz <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> kHz <a href="/ja/docs/CSS/Value_definition_syntax#Single_bar" title="Single bar: exactly one of the entities must be present">|</a> %</code></p></pre>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="content_property" name="content_property">content プロパティ</h3>
+
+<h4 id="HTML">HTML</h4>
+
+<pre class="brush: html notranslate">&lt;p data-foo=&quot;hello&quot;&gt;world&lt;/p&gt;</pre>
+
+<h4 id="CSS">CSS</h4>
+
+<pre class="brush: css highlight[2] notranslate">[data-foo]::before {
+  content: attr(data-foo) &quot; &quot;;
+}</pre>
+
+<h4 id="Result" name="Result">結果</h4>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="50" id="frame_content_property" src="https://mdn.mozillademos.org/ja/docs/Web/CSS/attr()$samples/content_property?revision=1652005" width="100%"></iframe></p>
+
+<h3 id="&lt;color&gt;_value" name="&lt;color&gt;_value">&lt;color&gt; 値</h3>
+
+<div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div>
+
+<div id="color-value">
+<h4 id="HTML_2">HTML</h4>
+
+<pre class="brush: html notranslate">&lt;div class=&quot;background&quot; data-background=&quot;lime&quot;&gt;background expected to be red if your browser does not support advanced usage of attr()&lt;/div&gt;</pre>
+
+<h4 id="CSS_2">CSS</h4>
+
+<div class="hidden">
+<pre class="brush: css notranslate">.background {
+  height: 100vh;
+}</pre>
+</div>
+
+<pre class="brush: css highlight[6] notranslate">.background {
+  background-color: red;
+}
+
+.background[data-background] {
+  background-color: attr(data-background color, red);
+}</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="50" id="frame_color-value" src="https://mdn.mozillademos.org/ja/docs/Web/CSS/attr()$samples/color-value?revision=1652005" width="100%"></iframe></p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-values-4/#attr-notation" hreflang="en" lang="en">CSS Values and Units Module Level 4<br><small lang="ja">attr() の定義</small></a></td>
+   <td><span class="spec-ED">編集者草案</span></td>
+   <td><a href="/ja/docs/Web/CSS/var()" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>var()</code></a> のように動作するように変更。 <code>attr()</code> を含むプロパティ値は解析時に有効となり、属性値の検証は計算値になるまで延期されます。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-values-3/#attr-notation" hreflang="en" lang="en">CSS Values and Units Module Level 3<br><small lang="ja">attr() の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>
+    <p>2 つのオプション引数を追加<br>
+     全プロパティで使用可能<br>
+     <a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。"><code>&lt;string&gt;</code></a> 以外の値が返せるようになった。</p>
+    これらの変更は実験的であり、ブラウザーの互換性が少なすぎると CR 段階で外される可能性がある</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/CSS2/generate.html#x18" hreflang="en" lang="en">CSS Level 2 (Revision 1)<br><small lang="ja">attr() の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td><a href="/ja/docs/Web/CSS/content" title="CSS の content プロパティは、要素を生成された値で置き換えます。 content プロパティを使用して挿入されたオブジェクトは、無名の置換要素になります。"><code>content</code></a> プロパティに限定<br>
+    常に <a href="/ja/docs/Web/CSS/string" title="&lt;string&gt; は CSS のデータ型で、一連の文字列を表します。文字列は content, font-family, quotes など、数々の CSS プロパティで使用されます。"><code>&lt;string&gt;</code></a> を返す</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:css.types.attr"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/CSS/Attribute_selectors">属性セレクター</a></li>
+ <li><a href="/ja/docs/Web/HTML/Global_attributes/data-*">HTML <code>data-*</code> 属性</a></li>
+ <li><a href="/ja/docs/Web/SVG/Attribute/data-*">SVG <code>data-*</code> 属性</a></li>
+</ul>

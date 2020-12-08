@@ -1,0 +1,249 @@
+---
+title: FileHandle API
+slug: Web/API/File_Handle_API
+tags:
+  - API
+  - Files
+  - Non Standard
+  - Reference
+  - WebAPI
+translation_of: Web/API/File_Handle_API
+---
+<div class="nonStandard nonStandardHeader notecard">
+      <p><strong><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span> 非標準</strong><br>
+      この機能は標準ではなく、標準化の予定もありません。公開されているウェブサイトには使用しないでください。ユーザーによっては使用できないことがあります。実装ごとに大きな差があることもあり、将来は振る舞いが変わるかもしれません。</p>
+      </div>
+
+<p>FileHandle API は、ファイルの作成や内容の変更など、ファイルを操作するための API です (<a href="/docs/DOM/File" title="DOM/File">File API</a> とは異なります)。この API を通じたファイル操作は、デバイス上に物理的に格納でき、部分的な編集には、競合問題を避けるためにターンベースのロック機構が使用されています。</p>
+
+<h2 id="API_概観">API 概観</h2>
+
+<p>この API は、次のインターフェースを基にしています:</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/IDBDatabase/mozCreateFileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>IDBDatabase.mozCreateFileHandle</code></a></li>
+ <li><a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a></li>
+ <li><a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a></li>
+ <li><a href="/ja/docs/Web/API/FileRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileRequest</code></a></li>
+</ul>
+
+<p>これは、File API の <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> インターフェースおよび <a href="/ja/docs/Web/API/Blob" title="Blob オブジェクトはファイルに似たオブジェクトで、immutable な生データです。データを表す blob は必ずしも JavaScript ネイティブなフォーマットではありません。File インターフェイスは Blob を基礎にしており、その機能を継承する一方で、ユーザーのシステム上のファイルをサポートするための機能を拡張しています。"><code>Blob</code></a> インターフェースとも接続しています。</p>
+
+<h2 id="基本的な操作">基本的な操作</h2>
+
+<h3 id="FileHandle_インスタンスの作成">FileHandle インスタンスの作成</h3>
+
+<p>このインテントは IndexedDB を通じてファイルを保存しているため、<a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> インスタンスを作成するのに <a href="/docs/IndexedDB/IDBFactory#open" title="IndexedDB/IDBFactory#open">IndexedDB Database</a> が必要です。</p>
+
+<div style="overflow: hidden;">
+<pre class="brush: js">var IDBReq = indexedDB.open(&quot;myFileStorageDataBase&quot;);
+
+IDBReq.onsuccess = function(){
+  var DB = this.result;
+  var buildHandle = DB.mozCreateFileHandle(&quot;test.txt&quot;, &quot;plain/text&quot;);
+
+  buildHandle.onsuccess = function(){
+    var myFileHandle = this.result;
+    console.log(&apos;handle&apos;, myFileHandle);
+  };
+};
+</pre>
+</div>
+
+<p><a href="/ja/docs/Web/API/IDBDatabase/mozCreateFileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>mozCreateFileHandle()</code></a> は、ファイル名と任意の形式の 2 個の引数を取ります。これらは説明のためのものであり、データベースには使用されません。しかし、これらの値から <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> オブジェクトの <a href="/ja/docs/Web/API/File/name" title="File オブジェクトによって表されるファイルの名前を返します。セキュリティ上の理由から、パスはこのプロパティから除外されます。"><code>name</code></a> と <a href="/ja/docs/Web/API/File/type" title="File オブジェクトによって表されるファイルのメディアタイプ (MIME) を返します。"><code>type</code></a> に継承して生成するため、<a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> オブジェクトにとって重要です。つまり、例えば空文字にすると実際に存在するファイルと一致しないため、ユニークな名前にしなくてもよいです。</p>
+
+<div class="note">
+<p><strong>補足:</strong> 上記のコードは、<a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> インスタンスを保持している間のみ存在する「一時ファイル」を作成するだけです。ページ更新やアプリ再起動に遭遇するファイルを扱いたい場合は、データベース自身など、ファイルハンドルを永続的な場所に格納する必要があります。詳しくは、後述の <a href="#File_storage">File storage</a> を参照してください。</p>
+</div>
+
+<h3 id="ファイルの読み書き操作">ファイルの読み書き操作</h3>
+
+<p>ハンドルしたファイルを読んだり書いたりするには、<a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> を取得する必要があります。<a href="/ja/docs/Web/API/FileHandle/open" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle.open()</code></a> メソッドがこの操作のためのオブジェクトを提供しており、<code>readonly</code> または <code>readwrite</code> が可能です。<code>readonly</code> の <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> に書き込みを行おうとすると失敗します。</p>
+
+<h4 id="書き込み">書き込み</h4>
+
+<p>locked ファイルには 3 通りの書込み操作があります:</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/LockedFile/write" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>write</code></a> : これは、ファイル内の <a href="/ja/docs/Web/API/LockedFile/location" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile.location</code></a> byte の位置から書き込みを開始するメソッドです。</li>
+ <li><a href="/ja/docs/Web/API/LockedFile/append" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>append</code></a> : これは、常にファイル末尾にコンテンツを追加するメソッドです。</li>
+ <li><a href="/ja/docs/Web/API/LockedFile/truncate" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>truncate</code></a> : これは、ファイルの最初の nth-first byte までを維持してそれ以降を削除するメソッドです。</li>
+</ul>
+
+<pre class="brush: js">// Get a LockedFile object from the handle
+var myFile = myFileHandle.open(&apos;readwrite&apos;);
+
+// Start a writing operation
+var writing = myFile.append(&apos;Some content&apos;);
+
+writing.onsuccess = function () {
+  console.log(&apos;Writing operation successful&apos;);
+}
+
+writing.onerror = function () {
+  console.log(&apos;Something goes wrong in the writing process: &apos; + this.error);
+}
+</pre>
+
+<h4 id="読み込み">読み込み</h4>
+
+<p>中間の <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> オブジェクトや <a href="/ja/docs/Web/API/FileReader" title="FileReader オブジェクトを使うと、ユーザーのコンピューター内にあるファイル (もしくはバッファ上の生データ) をウェブアプリケーションから非同期的に読み込むことが出来ます。読み込むファイルやデータは File ないし Blob オブジェクトとして指定します。"><code>FileReader</code></a> オブジェクトを使用せずに、<a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> オブジェクトのコンテンツを直接読み込むことが可能です。<a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> インターフェースは、<a href="/ja/docs/Web/API/LockedFile/readAsText" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>readAsText</code></a> メソッドと <a href="/ja/docs/Web/API/LockedFile/readAsArrayBuffer" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>readAsArrayBuffer</code></a> メソッドを提供しています。</p>
+
+<p>これら 2 個のメソッドは、ファイル開始位置からの読み込むサイズを <a href="/ja/docs/Web/API/LockedFile/location" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile.location</code></a> byte で指定して読み込みます。示すサイズを指定します。</p>
+
+<p>ファイル全体を読み込むには、そのサイズを知る必要があります。この情報 (および最終変更日の日付) は、<a href="/ja/docs/Web/API/LockedFile/getMetadata" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile.getMetadata()</code></a> メソッドを通して取得できます。</p>
+
+<pre class="brush: js">// Get a LockedFile object from the handle
+var myFile = myFileHandle.open(&apos;readwrite&apos;);
+
+// Retrieve the size of the file
+var getmeta = myFile.getMetadata();
+
+getmeta.onsuccess = function () {
+  var size = this.result.size;
+
+  // The reading operation will start with the byte at index 0 in the file
+  myFile.location = 0;
+
+  // Start a reading operation for the whole file content
+  var reading = myFile.readAsText(size);
+
+  reading.onsuccess = function () {
+    console.log(&apos;The content of the file is:&apos;);
+    console.log(this.result);
+  }
+
+  reading.onerror = function () {
+    console.log(&apos;Something goes wrong in the reading process: &apos; + this.error);
+  }
+}
+</pre>
+
+<h3 id="File_スナップショット">File スナップショット</h3>
+
+<p>In many cases it can be handy to get a snapshot of the file. For example, there are many APIs that expect <a href="/ja/docs/Web/API/Blob" title="Blob オブジェクトはファイルに似たオブジェクトで、immutable な生データです。データを表す blob は必ずしも JavaScript ネイティブなフォーマットではありません。File インターフェイスは Blob を基礎にしており、その機能を継承する一方で、ユーザーのシステム上のファイルをサポートするための機能を拡張しています。"><code>Blob</code></a> or <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> objects such as domxref(&quot;FileReader&quot;)}} (which can be easier to use to read the whole file) or <a href="/ja/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest (XHR) オブジェクトを使用すると、サーバーと対話することができます。ページ全体を更新する必要なしに、データを受け取ることができます。これでユーザーの作業を中断させることなく、ウェブページの一部を更新することができます。"><code>XMLHttpRequest</code></a>.</p>
+
+<p>It&apos;s possible to get a <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> object representing the current state of the file handled by the <a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> object by using the <a href="/ja/docs/Web/API/FileHandle/getFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>getFile</code></a> method. Such a <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> object is completely desynchronized from the original file, which means any change made to that object will never be reflected to the handled file as well as any change made to the handled file will never be pushed to the <a href="/ja/docs/Web/API/File" title="File インターフェイスは、ファイルについての情報を提供したり、ウェブページ内の JavaScript でその内容にアクセスできるようにしたりします。"><code>File</code></a> object.</p>
+
+<pre class="brush: js">var mySnapshot = null;
+var request = myFileHandle.getFile();
+
+request.onsuccess = function () {
+  mySnapshot = this.result;
+}
+</pre>
+
+<h3 id="進捗の管理">進捗の管理</h3>
+
+<p>All the methods from the <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> interface return a <a href="/ja/docs/Web/API/FileRequest" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileRequest</code></a> object. Such an object is basically a <a href="/ja/docs/Web/API/DOMRequest" title="DOMRequest オブジェクトは、進行中の操作を表します。操作の完了時に呼び出されるコールバックと、操作結果への参照を提供します。 進行中の操作を開始する DOM メソッドは、その操作の進行状況の監視に使用できる DOMRequest オブジェクトを返すことがあります。"><code>DOMRequest</code></a> with an extra power: it allows to monitor the progress of an operation. Sometimes writing and reading operations can be very long, therefore it is a good idea to monitor the operation to provide feedback to the user. Such monitoring can be done using the <a href="/ja/docs/Web/API/FileRequest/onprogress" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileRequest.onprogress</code></a> event handler.</p>
+
+<pre class="brush: js">var progress = document.querySelector(&apos;progress&apos;);
+var myFile   = myFileHandle.open(&apos;readonly&apos;);
+
+// Let&apos;s read a 1GB file
+var action   = myFile.readAsArrayBuffer(1000000000);
+
+action.onprogress = function (event) {
+  if (progress) {
+    progress.value = event.loaded;
+    progress.max   = event.total;
+  }
+}
+
+action.onsuccess = function () {
+  console.log(&apos;Yeah \o/ Just read a 1GB file&apos;);
+}
+
+action.onerror = function () {
+  console.log(&apos;Oups :( Unable to read a 1GB file&apos;)
+}
+</pre>
+
+<h2 id="File_ストレージ">File ストレージ</h2>
+
+<p>When a file handle is created, the associated file only exists as a &quot;temporary file&quot; as long as you hold the <a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> instance. If you want a file to survive a page refresh/app relaunch, you need to store the handle in a database (not necessarily the one used to create the <a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> object).</p>
+
+<pre class="brush: js">var IDBReq = window.indexedDB.open(&apos;myFileStorageDataBase&apos;);
+
+// If necessary, let&apos;s create a datastore for the files
+IDBReq.onupgradeneeded = function () {
+  this.result.createObjectStore(&apos;files&apos;);
+}
+
+IDBReq.onsuccess = function () {
+  var DB = this.result;
+
+  // Let&apos;s create a new file
+  var handleReq = DB.mozCreateFileHandle(&quot;test.txt&quot;, &quot;plain/text&quot;);
+
+  handleReq.onsuccess = function () {
+    var myFileHandle = this.result;
+    var store = DB.transaction([&apos;files&apos;], &apos;readwrite&apos;).objectStore(&apos;files&apos;);
+
+    // Let&apos;s store the file permanently
+    // HINT: it could be handy to use the file name as the storage key
+    var storeReq = store.add(myFileHandle, myFileHandle.name);
+
+    storeReq.onsuccess = function () {
+      console.log(&apos;The file has been successfully stored and can be retrieved anytime.&apos;)
+    }
+  }
+}
+</pre>
+
+<p>A file stored that way is physically put on the device. The database itself only stores a pointer to that file. It means that if the <a href="/ja/docs/Web/API/FileHandle" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>FileHandle</code></a> object is stored several times in several DBs or several data stores, all those objects will reference the same unique file. This is not a problem because to access the file, a <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> object is required and operations on such object are performed in <a href="http://en.wikipedia.org/wiki/Isolation_%28database_systems%29" title="http://en.wikipedia.org/wiki/Isolation_%28database_systems%29">isolation</a>, meaning that once a <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> is active, all operations of this <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a> are guaranteed to happen sequentially on the underlying file without being interleaved with operations from other <a href="/ja/docs/Web/API/LockedFile" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile</code></a>.</p>
+
+<h3 id="安全な書込み操作">安全な書込み操作</h3>
+
+<p>For performance reasons, write (and read) operations are done in memory. Periodically, the results of those operation are asynchronously flushed to the device storage area. If for some reason a problem occurs before that, you can lose the results of some operations. To avoid that problem, you can force the data to be flushed by using the <a href="/ja/docs/Web/API/LockedFile/flush" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>LockedFile.flush()</code></a> method. Once this method has been successfully called, you can be sure your change on the file will be safe.</p>
+
+<pre class="brush: js">// Get a LockedFile object from the handle
+var myFile = myFileHandle.open(&apos;readwrite&apos;);
+
+// Start a writing operation
+var writing = myFile.append(&apos;Some content&apos;);
+
+writing.onsuccess = function () {
+  console.log(&apos;Writing operation successful&apos;);
+
+  var saving = myFile.flush();
+
+  saving.onsuccess = function () {
+    console.log(&apos;The file has been successfully stored&apos;);
+  }
+}
+
+writing.onerror = function () {
+  console.log(&apos;Something goes wrong in the writing process: &apos; + this.error);
+}</pre>
+
+<h2 id="API_の互換性">API の互換性</h2>
+
+<h3 id="FileWriter_と_API_が異なるのはなぜですか？">FileWriter と API が異なるのはなぜですか？</h3>
+
+<p>The <a href="http://dev.w3.org/2009/dap/file-system/file-writer.html" title="http://dev.w3.org/2009/dap/file-system/file-writer.html">FileWriter specification</a> defines FileWriters, objects aiming at representing editable files. <a href="http://lists.w3.org/Archives/Public/public-webapps/2012JanMar/0886.html" title="http://lists.w3.org/Archives/Public/public-webapps/2012JanMar/0886.html">Discussions on public-webapps</a> led to the conclusion that the API would behave poorly in the case of different entities writing concurrently to the same file. The outcome of this discussion is the FileHandle API with its LockedFile and transaction mechanism.</p>
+
+<h3 id="Browser_Compatibility" name="Browser_Compatibility">仕様書</h3>
+
+<p>A formal specification draft is being written. As it does not fully match the current implementation, be warned that the implementation and/or the specification will be subject to changes.</p>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">実装状況</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/filesystem-api/" hreflang="en" lang="en" title="FileSystem APIの仕様書">FileSystem API</a></td>
+   <td><span class="spec-ED">編集者草案</span></td>
+   <td>Draft proposal.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h3 id="ブラウザの互換性">ブラウザの互換性</h3>
+
+<div>
+<div>Supported in Firefox 15.</div>
+</div>

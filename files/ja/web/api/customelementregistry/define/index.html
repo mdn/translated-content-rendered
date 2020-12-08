@@ -1,0 +1,229 @@
+---
+title: CustomElementRegistry.define()
+slug: Web/API/CustomElementRegistry/define
+translation_of: Web/API/CustomElementRegistry/define
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></strong></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><em><code>define()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/CustomElementRegistry/get"><code>get()</code></a> <a href="/ja/docs/Web/API/CustomElementRegistry/get$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/CustomElementRegistry/upgrade"><code>upgrade()</code></a> <a href="/ja/docs/Web/API/CustomElementRegistry/upgrade$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/CustomElementRegistry/whenDefined"><code>whenDefined()</code></a></li></ol></details></li></ol></section>
+
+<p><a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a> インターフェイスの <code><strong>define()</strong></code> メソッドは、新しいカスタムエレメントを定義します。</p>
+
+<p>作成することができるのは、次の2種類のカスタムエレメントです。</p>
+
+<ul>
+ <li><strong>自律的カスタムエレメント (Autonomous custom element)</strong>: スタンドアロンの独立したエレメントで、ビルトインの HTML 要素を継承していません。</li>
+ <li><strong>カスタムビルトインエレメント (Customized built-in element)</strong>: ビルトインの HTML 要素を継承し、拡張を加えたエレメントです。</li>
+</ul>
+
+<h2 id="構文">構文</h2>
+
+<pre class="syntaxbox notranslate">customElements.define(<em>name</em>, <em>constructor</em>, <em>options</em>);
+</pre>
+
+<h3 id="パラメータ">パラメータ</h3>
+
+<dl>
+ <dt>name</dt>
+ <dd>新しいカスタムエレメントの名前。カスタムエレメントの名前には、少なくとも1つのハイフンが含まれなければならないことに注意してください。</dd>
+ <dt>constructor</dt>
+ <dd>新しいカスタムエレメントのコンストラクタ</dd>
+ <dt>options <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>エレメントの定義の仕方を制御するオブジェクト。現在は、次の1つのオプションのみサポートされています。
+ <ul>
+  <li><code>extends</code>: 拡張するビルトイン要素の名前を示す文字列。<em>カスタムビルトインエレメント</em>を作成するのに使われる。</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="返り値">返り値</h3>
+
+<p>なし。</p>
+
+<h3 id="例外">例外</h3>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">例外</th>
+   <th scope="col">説明</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>NotSupportedError</code></td>
+   <td>The <a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a> already contains an entry with the same name or the same constructor (or is otherwise already defined), or <code>extends</code> is specified and it is a <a href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name">valid custom element name</a>, or <code>extends</code> is specified but the element it is trying to extend is an unknown element.</td>
+  </tr>
+  <tr>
+   <td><code>SyntaxError</code></td>
+   <td>The provided name is not a <a href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name">valid custom element name</a>.</td>
+  </tr>
+  <tr>
+   <td><code>TypeError</code></td>
+   <td>The referenced constructor is not a constructor.</td>
+  </tr>
+ </tbody>
+</table>
+
+<div class="note">
+<p><strong>注意</strong>: <code>NotSupportedError</code> 例外が多く発生する場合、<code>define()</code> が失敗しているように思えるかもしれませんが、多くの場合 <a href="/ja/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a> に問題があります。</p>
+</div>
+
+<h2 id="例">例</h2>
+
+<h3 id="自律的カスタムエレメント_Autonomous_custom_element">自律的カスタムエレメント (Autonomous custom element)</h3>
+
+<p>The following code is taken from our <a href="https://github.com/mdn/web-components-examples/tree/master/popup-info-box-web-component">popup-info-box-web-component</a> example (<a href="https://mdn.github.io/web-components-examples/popup-info-box-web-component/">see it live also</a>).</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class PopUpInfo extends HTMLElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create spans
+    var wrapper = document.createElement(&apos;span&apos;);
+    wrapper.setAttribute(&apos;class&apos;,&apos;wrapper&apos;);
+    var icon = document.createElement(&apos;span&apos;);
+    icon.setAttribute(&apos;class&apos;,&apos;icon&apos;);
+    icon.setAttribute(&apos;tabindex&apos;, 0);
+    var info = document.createElement(&apos;span&apos;);
+    info.setAttribute(&apos;class&apos;,&apos;info&apos;);
+
+    // Take attribute content and put it inside the info span
+    var text = this.getAttribute(&apos;text&apos;);
+    info.textContent = text;
+
+    // Insert icon
+    var imgUrl;
+    if(this.hasAttribute(&apos;img&apos;)) {
+      imgUrl = this.getAttribute(&apos;img&apos;);
+    } else {
+      imgUrl = &apos;img/default.png&apos;;
+    }
+    var img = document.createElement(&apos;img&apos;);
+    img.src = imgUrl;
+    icon.appendChild(img);
+
+    // Create some CSS to apply to the shadow dom
+    var style = document.createElement(&apos;style&apos;);
+
+    style.textContent = &apos;.wrapper {&apos; +
+                           &apos;position: relative;&apos; +
+                        &apos;}&apos; +
+
+                         &apos;.info {&apos; +
+                            &apos;font-size: 0.8rem;&apos; +
+                            &apos;width: 200px;&apos; +
+                            &apos;display: inline-block;&apos; +
+                            &apos;border: 1px solid black;&apos; +
+                            &apos;padding: 10px;&apos; +
+                            &apos;background: white;&apos; +
+                            &apos;border-radius: 10px;&apos; +
+                            &apos;opacity: 0;&apos; +
+                            &apos;transition: 0.6s all;&apos; +
+                            &apos;position: absolute;&apos; +
+                            &apos;bottom: 20px;&apos; +
+                            &apos;left: 10px;&apos; +
+                            &apos;z-index: 3;&apos; +
+                          &apos;}&apos; +
+
+                          &apos;img {&apos; +
+                            &apos;width: 1.2rem&apos; +
+                          &apos;}&apos; +
+
+                          &apos;.icon:hover + .info, .icon:focus + .info {&apos; +
+                            &apos;opacity: 1;&apos; +
+                          &apos;}&apos;;
+
+    // attach the created elements to the shadow dom
+
+    shadow.appendChild(style);
+    shadow.appendChild(wrapper);
+    wrapper.appendChild(icon);
+    wrapper.appendChild(info);
+  }
+}
+
+// Define the new element
+customElements.define(&apos;popup-info&apos;, PopUpInfo);
+</pre>
+
+<pre class="brush: html notranslate">&lt;popup-info img=&quot;img/alt.png&quot; text=&quot;Your card validation code (CVC) is an extra
+                                    security feature — it is the last 3 or 4
+                                    numbers on the back of your card.&quot;&gt;</pre>
+
+<div class="note">
+<p><strong>注意</strong>: Constructors for autonomous custom elements must extend <a href="/ja/docs/Web/API/HTMLElement"><code>HTMLElement</code></a>.</p>
+</div>
+
+<h3 id="カスタムビルトインエレメント">カスタムビルトインエレメント</h3>
+
+<p>The following code is taken from our <a href="https://github.com/mdn/web-components-examples/tree/master/word-count-web-component">word-count-web-component</a> example (<a href="https://mdn.github.io/web-components-examples/word-count-web-component/">see it live also</a>).</p>
+
+<pre class="brush: js notranslate">// Create a class for the element
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    // Always call super first in constructor
+    super();
+
+    // count words in element&apos;s parent element
+    var wcParent = this.parentNode;
+
+    function countWords(node){
+      var text = node.innerText || node.textContent
+      return text.split(/\s+/g).length;
+    }
+
+    var count = &apos;Words: &apos; + countWords(wcParent);
+
+    // Create a shadow root
+    var shadow = this.attachShadow({mode: &apos;open&apos;});
+
+    // Create text node and add word count to it
+    var text = document.createElement(&apos;span&apos;);
+    text.textContent = count;
+
+    // Append it to the shadow root
+    shadow.appendChild(text);
+
+
+    // Update count when element content changes
+    setInterval(function() {
+      var count = &apos;Words: &apos; + countWords(wcParent);
+      text.textContent = count;
+    }, 200)
+
+  }
+}
+
+// Define the new element
+customElements.define(&apos;word-count&apos;, WordCount, { extends: &apos;p&apos; });</pre>
+
+<pre class="brush: html notranslate">&lt;p is=&quot;word-count&quot;&gt;&lt;/p&gt;</pre>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#dom-customelementregistry-define" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">customElements.define() の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザ互換性">ブラウザ互換性</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.CustomElementRegistry.define"></div>
+</div>

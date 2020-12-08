@@ -1,0 +1,102 @@
+---
+title: Battery Status API
+slug: Web/API/Battery_Status_API
+tags:
+  - API
+  - Apps
+  - Battery
+  - Firefox OS
+  - Guide
+  - Mobile
+  - ガイド
+translation_of: Web/API/Battery_Status_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Battery_Status_API">Battery Status API</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/Apps/Build/gather_and_modify_data/retrieving_battery_status_information">Retrieving Battery status information</a> <a href="/ja/docs/Web/Apps/Build/gather_and_modify_data/retrieving_battery_status_information$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/BatteryManager"><code>BatteryManager</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Navigator/battery"><code>Navigator.battery</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/Navigator/getBattery"><code>Navigator.getBattery()</code></a></li></ol></details></li></ol></section><div class="deprecated deprecatedHeader notecard">
+            <p><strong>非推奨</strong><br>この機能はウェブ標準から削除されました。まだ対応しているプラウザーがあるかもしれませんが、ゆくゆくはなくなるものです。使用を避け、できれば既存のコードを更新してください。このページの下部にある<a href="#Browser_compatibility">ブラウザーの対応</a>を見て判断してください。この機能は突然動作しなくなる可能性があることに注意してください。</p>
+        </div></div>
+
+<p><strong>Battery Status API</strong> は、 <strong>Battery API</strong> と呼ばれることの方が多いのですが、システムのバッテリー充電レベルに関する情報の提供、およびバッテリーレベルや充電状態が変化したときに発生するイベントによる通知を可能にします。これは、バッテリーが消耗したときにバッテリー消費を減らすためアプリのリソース使用状況を調整したり、データを失わないためにバッテリーが切れる前に変更点を保存したりするために使用できます。</p>
+
+<p>Battery Status API は <a href="/ja/docs/Web/API/Window/navigator"><code>window.navigator</code></a> を、 battery promise を返す <a href="/ja/docs/Web/API/Navigator/getBattery"><code>navigator.getBattery()</code></a> メソッドで拡張します。 Promise は、バッテリーの状態監視を制御できる新たなイベントも提供する、<a href="/ja/docs/Web/API/BatteryManager"><code>BatteryManager</code></a> オブジェクトで解決します。</p>
+
+<h2 id="Example" name="Example">例</h2>
+
+<p>以下の例では、充電状況 (電源に接続して充電中であるか) の変化およびバッテリーレベルの変化およびタイミングを監視します。これは、 <code><a href="/ja/docs/Web/Reference/Events/chargingchange" title="/ja/docs/Web/Reference/Events/chargingchange">chargingchange</a></code>, <code><a href="/ja/docs/Web/Reference/Events/levelchange" title="/ja/docs/Web/Reference/Events/levelchange">levelchange</a></code>, <code><a href="/ja/docs/Web/Reference/Events/chargingtimechange" title="/ja/docs/Web/Reference/Events/chargingtimechange">chargingtimechange</a></code>, <code><a href="/ja/docs/Web/Reference/Events/dischargingtimechange" title="/ja/docs/Web/Reference/Events/dischargingtimechange">dischargingtimechange</a></code> の各イベントをそれぞれ待ち受けすることによって実現します。</p>
+
+<pre class="brush: js; notranslate">navigator.getBattery().then(function(battery) {
+  function updateAllBatteryInfo(){
+    updateChargeInfo();
+    updateLevelInfo();
+    updateChargingInfo();
+    updateDischargingInfo();
+  }
+  updateAllBatteryInfo();
+
+  battery.addEventListener(&apos;chargingchange&apos;, function(){
+    updateChargeInfo();
+  });
+  function updateChargeInfo(){
+    console.log(&quot;Battery charging? &quot;
+                + (battery.charging ? &quot;Yes&quot; : &quot;No&quot;));
+  }
+
+  battery.addEventListener(&apos;levelchange&apos;, function(){
+    updateLevelInfo();
+  });
+  function updateLevelInfo(){
+    console.log(&quot;Battery level: &quot;
+                + battery.level * 100 + &quot;%&quot;);
+  }
+
+  battery.addEventListener(&apos;chargingtimechange&apos;, function(){
+    updateChargingInfo();
+  });
+  function updateChargingInfo(){
+    console.log(&quot;Battery charging time: &quot;
+                 + battery.chargingTime + &quot; seconds&quot;);
+  }
+
+  battery.addEventListener(&apos;dischargingtimechange&apos;, function(){
+    updateDischargingInfo();
+  });
+  function updateDischargingInfo(){
+    console.log(&quot;Battery discharging time: &quot;
+                 + battery.dischargingTime + &quot; seconds&quot;);
+  }
+
+});
+</pre>
+
+<p><a href="http://www.w3.org/TR/battery-status/#examples">仕様書に記載されているサンプル</a>もご覧ください。</p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/battery/" hreflang="en" lang="en" title="Battery Status APIの仕様書">Battery Status API</a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.BatteryManager"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/Apps/Build/gather_and_modify_data/retrieving_battery_status_information">Retrieving battery status information - demo &amp; article</a></li>
+ <li><a href="http://hacks.mozilla.org/2012/02/using-the-battery-api-part-of-webapi/">Hacks blog post - Using the Battery API</a></li>
+</ul>

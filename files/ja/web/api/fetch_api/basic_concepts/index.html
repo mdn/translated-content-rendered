@@ -1,0 +1,78 @@
+---
+title: Fetch の基本コンセプト
+slug: Web/API/Fetch_API/Basic_concepts
+tags:
+  - API
+  - Fetch
+  - Fetch API
+  - XMLHttpRequest
+  - concept
+  - guard
+  - request
+translation_of: Web/API/Fetch_API/Basic_concepts
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Fetch_API">Fetch API</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/API/Fetch_API/Using_Fetch">Fetch の使用</a></li><li><a href="/ja/docs/Web/API/Fetch_API/Basic_concepts">Fetch の基本コンセプト</a></li><li><a href="/ja/docs/Web/API/Fetch_API/Cross-global_fetch_usage">グローバル間フェッチの使用</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/Body"><code>Body</code></a></li><li><a href="/ja/docs/Web/API/Headers"><code>Headers</code></a></li><li><a href="/ja/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/ja/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>WindowOrWorkerGlobalScope.fetch()</code></a></li></ol></details></li></ol></section><div class="draft notecard">
+    <p><strong>草案</strong><br>
+    このページは完成していません。</p>
+
+</div>
+
+<div class="summary">
+<p><a href="/ja/docs/Web/API/Fetch_API">Fetch</a> は、(ネットワークを超えて)リソースを取得するインターフェイスを提供します。 <a href="/ja/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> を使っていた人には馴染み深いでしょうが、より拡張可能で効果的な機能があります。この記事は、Fetch API の基本コンセプトのいくつかを説明します。</p>
+</div>
+
+<div class="note">
+<p>この記事は随時加筆されます。より良い説明が必要な Fetch コンセプトを見つけた場合、<a href="https://discourse.mozilla-community.org/c/mdn">MDN ディスカッションフォーラム</a> か <a href="https://wiki.mozilla.org/Matrix">Matrix</a> の <a href="https://chat.mozilla.org/#/room/#mdn:mozilla.org">MDN WebDocs</a> ルームで誰かに知らせてください。</p>
+</div>
+
+<h2 id="概要">概要</h2>
+
+<p>Fetch の核心はインターフェイスの抽象化であり、HTTP <a href="/ja/docs/Web/API/Request"><code>Request</code></a>、<a href="/ja/docs/Web/API/Response"><code>Response</code></a>、<a href="/ja/docs/Web/API/Headers"><code>Headers</code></a>、<a href="/ja/docs/Web/API/Body"><code>Body</code></a> のペイロード、そして非同期リソースリクエストの初期化のための <a href="/ja/docs/Web/API/GlobalFetch/fetch"><code>global fetch</code></a> メソッドがその対象です。HTTP の主要コンポーネントが JavaScript オブジェクトとして抽象化されているため、他の API からそれらの機能を利用しやすくなっています。</p>
+
+<p><a href="/ja/docs/Web/API/ServiceWorker_API">Service Worker</a> は Fetch を多用する API の一例です。</p>
+
+<p>Fetch はそれらのリクエストの非同期な性質をもう一歩先へ進めるものです。API は完全に <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> ベースです。</p>
+
+<h2 id="ガード">ガード</h2>
+
+<p>ガードは <a href="/ja/docs/Web/API/Headers"><code>Headers</code></a> オブジェクトの機能で、ヘッダーが使用されている場所に応じて <code>immutable</code>、<code>request</code>、<code>request-no-cors</code>、<code>response</code>、<code>none</code> の値をとります。</p>
+
+<p><a href="/ja/docs/Web/API/Headers/Headers"><code>Headers()</code></a> の <a href="/ja/docs/Glossary/Constructor">コンストラクター</a> を使用して新しい <a href="/ja/docs/Web/API/Headers"><code>Headers</code></a> オブジェクトが生成されるとき、ガードは <code>none</code> に設定されます（既定の動作）。<a href="/ja/docs/Web/API/Request"><code>Request</code></a> オブジェクトか <a href="/ja/docs/Web/API/Response"><code>Response</code></a> オブジェクトが生成された場合、関連づけられた <a href="/ja/docs/Web/API/Headers"><code>Headers</code></a> オブジェクトのガードは下記のとおり設定されます：</p>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="row">新しいオブジェクト型</th>
+   <th scope="col">コンストラクター</th>
+   <th scope="col">関連する <a href="/ja/docs/Web/API/Headers"><code>Headers</code></a> オブジェクトのガード設定</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td rowspan="2"><a href="/ja/docs/Web/API/Request"><code>Request</code></a></td>
+   <td><a href="/ja/docs/Web/API/Request/Request"><code>Request()</code></a></td>
+   <td><code>request</code></td>
+  </tr>
+  <tr>
+   <td><code>no-cors</code> の <a href="/ja/docs/Web/API/Request/mode"><code>mode</code></a> を設定した <a href="/ja/docs/Web/API/Request/Request"><code>Request()</code></a></td>
+   <td><code>request-no-cors</code></td>
+  </tr>
+  <tr>
+   <td rowspan="2"><a href="/ja/docs/Web/API/Response"><code>Response</code></a></td>
+   <td><a href="/ja/docs/Web/API/Response/Response"><code>Response()</code></a></td>
+   <td><code>response</code></td>
+  </tr>
+  <tr>
+   <td><a href="/ja/docs/Web/API/Response/error"><code>error()</code></a> メソッドか <a href="/ja/docs/Web/API/Response/redirect"><code>redirect()</code></a> メソッド</td>
+   <td><code>immutable</code></td>
+  </tr>
+ </tbody>
+</table>
+
+<p>ヘッダーのガードは、ヘッダーのコンテンツを変更する <a href="/ja/docs/Web/API/Headers/set"><code>set()</code></a> メソッドと <a href="/ja/docs/Web/API/Headers/delete"><code>delete()</code></a> メソッド、<a href="/ja/docs/Web/API/Headers/append"><code>append()</code></a> メソッドに影響します。ガードが <code>immutable</code> の <a href="/ja/docs/Web/API/Headers"><code>Headers</code></a> を修正しようとした場合、 <code>TypeError</code> をスローします。しかし、次の場合は動作します：</p>
+
+<ul>
+ <li>ガードが <code title>request</code> で、ヘッダーの <var>name</var> が <a href="/ja/docs/Glossary/Forbidden_header_name">forbidden header name</a> ではない場合。</li>
+ <li>ガードが <code title>request-no-cors</code> で、ヘッダーの <var>name</var>/<var>value</var> が <a href="/ja/docs/Glossary/Simple_header">simple header</a> の場合。</li>
+ <li>ガードが <code title>response</code> で、ヘッダーの <var>name</var> が <a href="/ja/docs/Glossary/Forbidden_response_header_name">forbidden response header name</a> ではない場合。</li>
+</ul>

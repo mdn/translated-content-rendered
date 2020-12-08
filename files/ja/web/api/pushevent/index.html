@@ -1,0 +1,103 @@
+---
+title: PushEvent
+slug: Web/API/PushEvent
+tags:
+  - API
+  - ExtendableEvent
+  - Interface
+  - Offline
+  - Push
+  - Push API
+  - Reference
+  - Service Workers
+  - Workers
+translation_of: Web/API/PushEvent
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Push_API">Push API</a></strong></li><li><strong><a href="/ja/docs/Web/API/PushEvent"><code>PushEvent</code></a></strong></li><li class="toggle"><details open><summary>コンストラクター</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/PushEvent/PushEvent"><code>PushEvent()</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/PushEvent/data"><code>data</code></a></li></ol></details></li><li class="toggle"><details open><summary>Push API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/PushManager"><code>PushManager</code></a></li><li><a href="/ja/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></li><li><a href="/ja/docs/Web/API/PushSubscription"><code>PushSubscription</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope/onpush"><code>ServiceWorkerGlobalScope.onpush</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope/onpushsubscriptionchange"><code>ServiceWorkerGlobalScope.onpushsubscriptionchange</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerRegistration/pushManager"><code>ServiceWorkerRegistration.pushManager</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div>
+
+<p><a href="/ja/docs/Web/API/Push_API">Push API</a> の <strong><code>PushEvent</code></strong> インターフェースは、受け取ったプッシュメッセージを表します。このイベントは、<a href="/ja/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a> の <a href="/ja/docs/Web/API/ServiceWorkerGlobalScope">グローバルスコープ</a>に送信されます。これは、アプリケーションサーバーから <a href="/ja/docs/Web/API/PushSubscription"><code>PushSubscription</code></a> に送信された情報を含みます。</p>
+
+<h2 id="Constructor" name="Constructor">コンストラクタ</h2>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/PushEvent/PushEvent"><code>PushEvent.PushEvent()</code></a></dt>
+ <dd>新しい <code>PushEvent</code> オブジェクトを生成します。</dd>
+</dl>
+
+<h2 id="Properties" name="Properties">プロパティ</h2>
+
+<p><em>親である <a href="/ja/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a> からプロパティを継承しています。追加プロパティ：</em></p>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/PushEvent/data"><code>PushEvent.data</code></a> <span class="readOnly readOnlyInline notecard inline" title="This value may not be changed.">読取専用 </span></dt>
+ <dd><span><a href="/ja/docs/Web/API/PushSubscription"><code>PushSubscription</code></a></span> に送信されたデータを含む <a href="/ja/docs/Web/API/PushMessageData"><code>PushMessageData</code></a> オブジェクトへの参照を返します。</dd>
+</dl>
+
+<p><strong style>メソッド</strong></p>
+
+<p><em>親である <a href="/ja/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a> からメソッドを継承しています。</em></p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>次の例は、<code>PushEvent</code> からデータを取得して、すべての service worker クライアントで表示しています。</p>
+
+<pre class="brush: js notranslate">self.addEventListener(&apos;push&apos;, function(event) {
+  if (!(self.Notification &amp;&amp; self.notification.permission === &apos;granted&apos;)) {
+   return;
+ }
+
+ var data = {};
+ if (event.data) {
+   data = event.data.json();
+ }
+ var title = data.title || &quot;Something Has Happened&quot;;
+ var message = data.message || &quot;Here&apos;s something you might want to check out.&quot;;
+ var icon = &quot;images/new-notification.png&quot;;
+
+ var notification = new self.Notification(title, {
+   body: message,
+   tag: &apos;simple-push-demo-notification&apos;,
+   icon: icon
+ });
+
+ notification.addEventListener(&apos;click&apos;, function() {
+   if (clients.openWindow) {
+     clients.openWindow(&apos;https://example.blog.com/2015/03/04/something-new.html&apos;);
+   }
+ });
+});
+</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/push-api/#the-push-event" hreflang="en" lang="en">Push API<br><small lang="ja">PushEvent の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">ブラウザー実装状況</h2>
+
+<div>
+<div class="hidden">このページの互換性テーブルは構造化データから作成されています。データに貢献したい場合、<a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックし、プルリクエストを送ってください。</div>
+
+<div class="bc-data" id="bcd:api.PushEvent"></div>
+</div>
+
+<h2 id="See_also" name="See_also">関連項目</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/Push_API">Push API</a></li>
+ <li><a href="/ja/docs/Web/API/Service_Worker_API">Service Worker API</a></li>
+</ul>

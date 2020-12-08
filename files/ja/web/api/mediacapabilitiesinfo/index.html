@@ -1,0 +1,83 @@
+---
+title: MediaCapabilitiesInfo
+slug: Web/API/MediaCapabilitiesInfo
+tags:
+  - API
+  - Audio
+  - Experimental
+  - Interface
+  - Media Capabilities API
+  - MediaCapabilitiesInfo
+  - Reference
+  - Video
+translation_of: Web/API/MediaCapabilitiesInfo
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Media_Capabilities_API">Media Capabilities API</a></strong></li><li><strong><a href="/ja/docs/Web/API/MediaCapabilitiesInfo"><code>MediaCapabilitiesInfo</code></a></strong></li><li class="toggle"><details open><summary>Media Capabilities API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/MediaCapabilities"><code>MediaCapabilities</code></a></li><li><a href="/ja/docs/Web/API/Screen"><code>Screen</code></a></li><li><a href="/ja/docs/Web/API/ScreenLuminance"><code>ScreenLuminance</code></a></li><li><a href="/ja/docs/Web/API/mediaCapabilities/decodingInfo"><code>mediaCapabilities.decodingInfo()</code></a></li><li><a href="/ja/docs/Web/API/mediaCapabilities/encodingInfo"><code>mediaCapabilities.encodingInfo()</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary"><a href="/ja/docs/Web/API/Media_Capabilities_API">Media Capabilities API</a> の <strong><code>MediaCapabilitiesInfo</code></strong> インターフェイスは、<a href="/ja/docs/Web/API/MediaCapabilities"><code>MediaCapabilities</code></a> インターフェイスの <a href="/ja/docs/Web/API/MediaCapabilities/encodingInfo"><code>MediaCapabilities.encodingInfo()</code></a> メソッドまたは <a href="/ja/docs/Web/API/MediaCapabilities/decodingInfo"><code>MediaCapabilities.decodingInfo()</code></a> メソッドによって返される promise が満たされると使用可能になり、メディアタイプがサポートされているかどうかや、そのようなメディアのエンコードまたはデコードがスムーズで電力効率が良いかどうかに関する情報を提供します。</span></p>
+
+<h2 id="Properties" name="Properties">プロパティ</h2>
+
+<p><code>MediaCapabilitiesInfo</code> インターフェイスには、次の3つの Boolean 属性が含まれています。</p>
+
+<ul>
+ <li><code>supported</code>: <a href="/ja/docs/Web/API/MediaConfiguration"><code>MediaConfiguration</code></a> で定義されたプロパティを指定すると、指定されたメディアコンテンツをエンコード（<a href="/ja/docs/Web/API/MediaEncodingConfiguration"><code>MediaEncodingConfiguration</code></a> が設定されている場合）またはデコード（<a href="/ja/docs/Web/API/MediaDecodingConfiguration"><code>MediaDecodingConfiguration</code></a> が設定されている場合）できますか？ はいの場合、<code>supported</code> は <em>true</em> になり、そうでない場合、<em>false</em> になります。</li>
+ <li><code>smooth</code>: <a href="/ja/docs/Web/API/MediaConfiguration"><code>MediaConfiguration</code></a> で定義されたプロパティを指定すると、指定されたメディアの再生は高品質になりますか？ スムーズになりますか？ <code>supported</code> が <code>true</code> で、再生がスムーズになる場合、<code>smooth</code> は <em>true</em> になり、そうでない場合、<em>false</em> になります。</li>
+ <li><code>powerEfficient</code>: <a href="/ja/docs/Web/API/MediaConfiguration"><code>MediaConfiguration</code></a> で定義されたプロパティを指定すると、指定されたメディアの再生は電力効率が良くなりますか？ <code>supported</code> が <code>true</code> で、再生の電力効率が良い場合、<code>powerEfficient</code> は <em>true</em> になり、そうでない場合、<em>false</em> になります。</li>
+</ul>
+
+<p>ブラウザーは、このデバイスの統計情報が記録されるまで、サポートしているメディア構成を <code>smooth</code> で <code>powerEfficient</code> として報告します。 サポートしているすべての音声コーデックは、電力効率が良いと報告されます。</p>
+
+<h2 id="Example" name="Example">例</h2>
+
+<pre class="brush: js notranslate">// テストする <a href="/ja/docs/Web/API/MediaConfiguration"><code>MediaConfiguration</code></a>
+const mediaConfig = {
+    type : &apos;file&apos;,
+    audio : {<code class="language-js">
+        contentType <span class="punctuation token">:</span> <span class="string token">&quot;audio/ogg&quot;</span><span class="punctuation token">,</span>
+        channels <span class="punctuation token">:</span> <span class="number token">2</span><span class="punctuation token">,</span>
+        bitrate <span class="punctuation token">:</span> <span class="number token">132700</span><span class="punctuation token">,</span>
+        samplerate <span class="punctuation token">:</span> <span class="number token">5200</span>
+     </code>},
+};
+
+// サポートとパフォーマンスを確認する
+navigator.mediaCapabilities.decodingInfo(mediaConfig).then(result =&gt; { // result にはメディア能力情報が含まれます
+    console.log(&apos;この構成は、サポート&apos; +
+        (result.supported ? &apos;され&apos; : &apos;されておらず&apos;) + 、スムーズ&apos; +   // 構成されたメディアは、ユーザーエージェントによってデコードできますか
+        (result.smooth ? &apos;であり&apos; : &apos;でなく&apos;) + &apos;、電力効率&apos; +         // スムーズですか？
+        (result.powerEfficient ? &apos;に優れています&apos; : &apos;が良くありません&apos;) + &apos;。&apos;) // 電力効率は良いですか？
+});</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/media-capabilities/#media-capabilities-info" hreflang="en" lang="en">Media Capabilities<br><small lang="ja">MediaCapabilitiesInfo の定義</small></a></td>
+   <td><span class="spec-Draft">ドラフト</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.MediaCapabilitiesInfo"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/MediaConfiguration"><code>MediaConfiguration</code></a></li>
+ <li><a href="/ja/docs/Web/API/MediaCapabilities/encodingInfo"><code>MediaCapabilities.encodingInfo()</code></a></li>
+ <li><a href="/ja/docs/Web/API/MediaCapabilities/decodingInfo"><code>MediaCapabilities.decodingInfo()</code></a></li>
+</ul>

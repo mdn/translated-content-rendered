@@ -1,0 +1,140 @@
+---
+title: handler.defineProperty()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/defineProperty
+tags:
+  - ECMAScript 2015
+  - JavaScript
+  - Method
+  - Proxy
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/defineProperty
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects">Standard built-in objects</a></strong></li><li><strong><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p><strong><code>handler.defineProperty()</code></strong> は <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a> に対するトラップです。</p>
+
+<div><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-defineproperty.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></div>
+
+<div class="hidden">このデモのソースファイルは GitHub リポジトリに格納されています。デモプロジェクトに協力していただける場合は、 <a href="https://github.com/mdn/interactive-examples">https://github.com/mdn/interactive-examples</a> をクローンしてプルリクエストを送信してください。</div>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">const <var>p</var> = new Proxy(<var>target</var>, {
+  defineProperty: function(<var>target</var>, <var>property</var>, <var>descriptor</var>) {
+  }
+});
+</pre>
+
+<h3 id="Parameters" name="Parameters">引数</h3>
+
+<p>次の引数が <code>defineProperty()</code> メソッドに渡されます。 <code>this</code> はハンドラにバインドされます。</p>
+
+<dl>
+ <dt><code><var>target</var></code></dt>
+ <dd>ターゲットオブジェクトです。</dd>
+ <dt><code><var>property</var></code></dt>
+ <dd>説明を受け取るプロパティの名前または <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol"><code>Symbol</code></a> です。</dd>
+ <dt><code><var>descriptor</var></code></dt>
+ <dd>定義や変更されるプロパティに対するディスクリプターです。</dd>
+</dl>
+
+<h3 id="Return_value" name="Return_value">返値</h3>
+
+<p><code>defineProperty()</code> メソッドはプロパティが正しく定義されたかどうかを表す <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean"><code>Boolean</code></a> を返す必要があります。</p>
+
+<h2 id="Description" name="Description">解説</h2>
+
+<p><code><strong>handler.defineProperty()</strong></code> メソッドは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a> に対するトラップです。</p>
+
+<h3 id="Interceptions" name="Interceptions">介入</h3>
+
+<p>このトラップは下記の操作に介入できます。</p>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/defineProperty"><code>Reflect.defineProperty()</code></a></li>
+</ul>
+
+<h3 id="Invariants" name="Invariants">不変条件</h3>
+
+<p>以下の不変条件に違反している場合、プロキシは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a> を発生します。</p>
+
+<ul>
+ <li>ターゲットオブジェクトが拡張不可の場合、プロパティは追加できません。</li>
+ <li>ターゲットオブジェクトの設定不可の独自のプロパティとして存在しない場合、プロパティは設定不可とみなされ、追加や変更ができません。</li>
+ <li>ターゲットオブジェクトの対応する設定可能なプロパティが存在する場合、プロパティは設定不可にすることができません。</li>
+ <li>対応するターゲットオブジェクトのプロパティが存在する場合、<code>Object.defineProperty(target, prop, descriptor)</code> は例外をスローしません。</li>
+ <li>strict モードでは、<code>defineProperty</code> ハンドラから <code>false</code> が返ってきた場合、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a> 例外をスローします。</li>
+</ul>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="Trapping_of_defineProperty" name="Trapping_of_defineProperty">defineProperty のトラップ</h3>
+
+<p>次のコードは <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a> をトラップします。</p>
+
+<pre class="brush: js notranslate">const p = new Proxy({}, {
+  defineProperty: function(target, prop, descriptor) {
+    console.log(&apos;called: &apos; + prop);
+    return true;
+  }
+});
+
+const desc = { configurable: true, enumerable: true, value: 10 };
+Object.defineProperty(p, &apos;a&apos;, desc); // &quot;called: a&quot;
+</pre>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a> または <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/defineProperty"><code>Reflect.defineProperty()</code></a> を呼び出した時、 <code>defineProperty()</code> トラップに渡されるディスクリプターには制約があります。下記のプロパティのみが使用可能で、標準ではないプロパティは無視されます。</p>
+
+<ul>
+ <li><code>enumerable</code></li>
+ <li><code>configurable</code></li>
+ <li><code>writable</code></li>
+ <li><code>value</code></li>
+ <li><code>get</code></li>
+ <li><code>set</code></li>
+</ul>
+
+<pre class="brush: js notranslate">const p = new Proxy({}, {
+  defineProperty(target, prop, descriptor) {
+    console.log(descriptor);
+    return Reflect.defineProperty(target, prop, descriptor);
+  }
+});
+
+Object.defineProperty(p, &apos;name&apos;, {
+  value: &apos;proxy&apos;,
+  type: &apos;custom&apos;
+});  // { value: &apos;proxy&apos; }
+</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-defineownproperty-p-desc" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="ja">[[DefineOwnProperty]] の定義</small></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.defineProperty"></div>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty"><code>Object.defineProperty()</code></a></li>
+ <li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect/defineProperty"><code>Reflect.defineProperty()</code></a></li>
+</ul>

@@ -1,0 +1,148 @@
+---
+title: DataTransferItemList.length
+slug: Web/API/DataTransferItemList/length
+tags:
+  - API
+  - DataTransferItemList
+  - HTML DOM
+  - HTML Drag and Drop API
+  - Property
+  - Reference
+  - length
+  - ドラッグアンドドロップ
+translation_of: Web/API/DataTransferItemList/length
+---
+<p><a href="/ja/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a> インターフェイスの <code><strong>length</strong></code> プロパティは読み取り専用で、ドラッグアイテムリストの中に現在入っているアイテムの数を返します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate"><em>length</em> = <em>DataTransferItemList</em>.length;
+</pre>
+
+<h3 id="Return_Value" name="Return_Value">返値</h3>
+
+<p>リスト中のドラッグデータアイテムの数で、もしリストが空か無効であれば 0 です。アイテムリストの <a href="/ja/docs/Web/API/DataTransfer"><code>DataTransfer</code></a> オブジェクトがドラッグデータストアに関連付けられていない場合は、ドラッグアイテムリストは無効とみなされます。</p>
+
+<h2 id="Example_Drag_and_Drop" name="Example_Drag_and_Drop">例</h2>
+
+<p>この例は <code>length</code> プロパティの使い方を示しています。</p>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<pre class="brush: js notranslate">function dragstart_handler(ev) {
+  console.log(&quot;dragStart&quot;);
+  // Add this element&apos;s id to the drag payload so the drop handler will
+  // know which element to add to its tree
+  var dataList = ev.dataTransfer.items;
+  dataList.add(ev.target.id, &quot;text/plain&quot;);
+  // Add some other items to the drag payload
+  dataList.add(&quot;&lt;p&gt;... paragraph ...&lt;/p&gt;&quot;, &quot;text/html&quot;);
+  dataList.add(&quot;http://www.example.org&quot;,&quot;text/uri-list&quot;);
+}
+
+function drop_handler(ev) {
+  console.log(&quot;Drop&quot;);
+  ev.preventDefault();
+  var data = ev.dataTransfer.items;
+  // Loop through the dropped items and log their data
+  for (var i = 0; i &lt; data.length; i++) {
+    if ((data[i].kind == &apos;string&apos;) &amp;&amp; (data[i].type.match(&apos;^text/plain&apos;))) {
+      // This item is the target node
+      data[i].getAsString(function (s){
+        ev.target.appendChild(document.getElementById(s));
+      });
+    } else if ((data[i].kind == &apos;string&apos;) &amp;&amp; (data[i].type.match(&apos;^text/html&apos;))) {
+      // Drag data item is HTML
+      data[i].getAsString(function (s){
+        console.log(&quot;... Drop: HTML = &quot; + s);
+      });
+    } else if ((data[i].kind == &apos;string&apos;) &amp;&amp; (data[i].type.match(&apos;^text/uri-list&apos;))) {
+      // Drag data item is URI
+      data[i].getAsString(function (s){
+        console.log(&quot;... Drop: URI = &quot; + s);
+      });
+    }
+  }
+}
+
+function dragover_handler(ev) {
+  console.log(&quot;dragOver&quot;);
+  ev.preventDefault();
+  // Set the dropEffect to move
+  ev.dataTransfer.dropEffect = &quot;move&quot;
+}
+
+function dragend_handler(ev) {
+  console.log(&quot;dragEnd&quot;);
+  var dataList = ev.dataTransfer.items;
+  // Clear any remaining drag data
+  dataList.clear();
+}
+
+</pre>
+
+<h3 id="HTML">HTML</h3>
+
+<pre class="brush: html notranslate">&lt;div&gt;
+  &lt;p id=&quot;source&quot; ondragstart=&quot;dragstart_handler(event);&quot; ondragend=&quot;dragend_handler(event);&quot; draggable=&quot;true&quot;&gt;
+     Select this element, drag it to the Drop Zone and then release the selection to move the element.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&quot;target&quot; ondrop=&quot;drop_handler(event);&quot; ondragover=&quot;dragover_handler(event);&quot;&gt;Drop Zone&lt;/div&gt;
+</pre>
+
+<h3 id="CSS">CSS</h3>
+
+<pre class="brush: css notranslate">div {
+  margin: 0em;
+  padding: 2em;
+}
+
+#source {
+  color: blue;
+  border: 1px solid black;
+}
+
+#target {
+  border: 1px solid black;
+}
+</pre>
+
+<h3 id="Result" name="Result">結果</h3>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_Example_Drag_and_Drop" src="https://mdn.mozillademos.org/ja/docs/Web/API/DataTransferItemList/length$samples/Example_Drag_and_Drop?revision=1479989"></iframe></p>
+
+<p><a href="https://mdn.mozillademos.org/ja/docs/Web/API/DataTransferItemList/length$samples/Example_Drag_and_Drop?revision=1479989">Drag and Drop demo link</a></p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/interaction.html#dom-datatransferitemlist-length" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">length の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html51/editing.html#dom-datatransferitemlist-length" hreflang="en" lang="en">HTML 5.1<br><small lang="ja">length の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>W3C HTML5 <span class="spec-REC">勧告</span> には含まれていない</td>
+  </tr>
+  <tr>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの対応</h2>
+
+<p class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力したいのであれば、 <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</p>
+
+<div class="bc-data" id="bcd:api.DataTransferItemList.length"></div>
+
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></strong></li><li><strong><a href="/ja/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><em><code>length</code></em></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/DataTransferItemList/add"><code>add()</code></a> <a href="/ja/docs/Web/API/DataTransferItemList/add$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/DataTransferItemList/clear"><code>clear()</code></a></li><li><a href="/ja/docs/Web/API/DataTransferItemList/DataTransferItem"><code>DataTransferItem()</code></a> <a href="/ja/docs/Web/API/DataTransferItemList/DataTransferItem$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/DataTransferItemList/remove"><code>remove()</code></a> <a href="/ja/docs/Web/API/DataTransferItemList/remove$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li><li class="toggle"><details open><summary>HTML Drag and Drop API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/DataTransfer"><code>DataTransfer</code></a></li><li><a href="/ja/docs/Web/API/DataTransferItem"><code>DataTransferItem</code></a></li><li><a href="/ja/docs/Web/API/DragEvent"><code>DragEvent</code></a></li></ol></details></li></ol></section></div>

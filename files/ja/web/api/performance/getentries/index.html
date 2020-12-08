@@ -1,0 +1,104 @@
+---
+title: performance.getEntries()
+slug: Web/API/Performance/getEntries
+tags:
+  - API
+  - Web パフォーマンス
+  - メソッド
+  - リファレンス
+translation_of: Web/API/Performance/getEntries
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Performance_Timeline">Performance Timeline</a></strong></li><li><strong><a href="/ja/docs/Web/API/Performance"><code>Performance</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/API/Performance/navigation"><code>navigation</code></a></li><li><a href="/ja/docs/Web/API/Performance/onresourcetimingbufferfull"><code>onresourcetimingbufferfull</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Performance/timeOrigin"><code>timeOrigin</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/API/Performance/timing"><code>timing</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/Performance/clearMarks"><code>clearMarks()</code></a></li><li><a href="/ja/docs/Web/API/Performance/clearMeasures"><code>clearMeasures()</code></a></li><li><a href="/ja/docs/Web/API/Performance/clearResourceTimings"><code>clearResourceTimings()</code></a></li><li><em><code>getEntries()</code></em></li><li><a href="/ja/docs/Web/API/Performance/getEntriesByName"><code>getEntriesByName()</code></a></li><li><a href="/ja/docs/Web/API/Performance/getEntriesByType"><code>getEntriesByType()</code></a></li><li><a href="/ja/docs/Web/API/Performance/mark"><code>mark()</code></a></li><li><a href="/ja/docs/Web/API/Performance/measure"><code>measure()</code></a></li><li><a href="/ja/docs/Web/API/Performance/now"><code>now()</code></a></li><li><a href="/ja/docs/Web/API/Performance/setResourceTimingBufferSize"><code>setResourceTimingBufferSize()</code></a></li><li><a href="/ja/docs/Web/API/Performance/toJSON"><code>toJSON()</code></a></li></ol></details></li><li class="toggle"><details open><summary>イベント</summary><ol><li><a href="/ja/docs/Web/API/Performance/resourcetimingbufferfull_event"><code>resourcetimingbufferfull</code></a></li></ol></details></li><li class="toggle"><details open><summary>Performance Timeline API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserverEntryList"><code>PerformanceObserverEntryList</code></a></li><li><a href="/ja/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a></li><li><a href="/ja/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section></div>
+
+<p><strong><code>getEntries()</code></strong> メソッドは、そのページのすべての <a href="/ja/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a> オブジェクトのリストを返します。リストのメンバ (エントリ) は、明示的な時点でパフォーマンスマークまたはメジャーを作成することで (たとえば <a href="/ja/docs/Web/API/Performance/mark"><code>mark()</code></a> メソッドを呼び出すことで) 作成できます。特定の種類のパフォーマンスエントリや特定の名前のパフォーマンスエントリにのみ関心がある場合は、<a href="/ja/docs/Web/API/Performance/getEntriesByType"><code>getEntriesByType()</code></a> と <a href="/ja/docs/Web/API/Performance/getEntriesByName"><code>getEntriesByName()</code></a> を参照してください。</p>
+
+<div class="note notecard"><strong>註:</strong> この機能は <a href="/ja/docs/Web/API/Web_Workers_API">Web Workers</a> 内で利用可能です。</div>
+
+<h2 id="構文">構文</h2>
+
+<p>一般的な構文:</p>
+
+<pre class="syntaxbox notranslate"><em>entries</em> = window.performance.getEntries();
+</pre>
+
+<h3 id="Return_Value" name="Return_Value">戻り値</h3>
+
+<dl>
+ <dt>entries</dt>
+ <dd><a href="/ja/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a> オブジェクトの配列。項目はエントリ &apos;<a href="/ja/docs/Web/API/PerformanceEntry/startTime"><code>startTime</code></a> に基づいて時系列に並んでいます。</dd>
+</dl>
+
+<h2 id="例">例</h2>
+
+<pre class="brush: js notranslate">function use_PerformanceEntry_methods() {
+  console.log(&quot;PerformanceEntry tests ...&quot;);
+
+  if (performance.mark === undefined) {
+    console.log(&quot;... performance.mark Not supported&quot;);
+    return;
+  }
+
+  // Create some performance entries via the mark() method
+  performance.mark(&quot;Begin&quot;);
+  do_work(50000);
+  performance.mark(&quot;End&quot;);
+  performance.mark(&quot;Begin&quot;);
+  do_work(100000);
+  performance.mark(&quot;End&quot;);
+  do_work(200000);
+  performance.mark(&quot;End&quot;);
+
+  // Use getEntries() to iterate through the each entry
+  let p = performance.getEntries();
+  for (var i=0; i &lt; p.length; i++) {
+    console.log(&quot;Entry[&quot; + i + &quot;]&quot;);
+    check_PerformanceEntry(p[i]);
+  }
+
+  // Use getEntriesByType() to get all &quot;mark&quot; entries
+  p = performance.getEntriesByType(&quot;mark&quot;);
+  for (let i=0; i &lt; p.length; i++) {
+    console.log (&quot;Mark only entry[&quot; + i + &quot;]: name = &quot; + p[i].name +
+         &quot;; startTime = &quot; + p[i].startTime +
+         &quot;; duration  = &quot; + p[i].duration);
+  }
+
+  // Use getEntriesByName() to get all &quot;mark&quot; entries named &quot;Begin&quot;
+  p = performance.getEntriesByName(&quot;Begin&quot;, &quot;mark&quot;);
+  for (let i=0; i &lt; p.length; i++) {
+    console.log (&quot;Mark and Begin entry[&quot; + i + &quot;]: name = &quot; + p[i].name +
+         &quot;; startTime = &quot; + p[i].startTime +
+         &quot;; duration  = &quot; + p[i].duration);
+  }
+}
+</pre>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">ステータス</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/performance-timeline/#dom-performance-getentries" hreflang="en" lang="en">Performance Timeline Level 2<br><small lang="ja">getEntries() の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/performance-timeline/#dom-performance-getentries" hreflang="en" lang="en">Performance Timeline<br><small lang="ja">getEntries() の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザの互換性">ブラウザの互換性</h2>
+
+<div>
+<div class="hidden">このページの互換性テーブルは構造化データから生成されます。データに貢献したい場合は <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックして、プルリクエストを送ってください。</div>
+
+<div class="bc-data" id="bcd:api.Performance.getEntries"></div>
+</div>

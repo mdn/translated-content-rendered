@@ -1,0 +1,200 @@
+---
+title: パフォーマンスタイムラインの使用
+slug: Web/API/Performance_Timeline/Using_Performance_Timeline
+tags:
+  - Web パフォーマンス
+  - ガイド
+translation_of: Web/API/Performance_Timeline/Using_Performance_Timeline
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Performance_Timeline">Performance Timeline</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/API/Performance_Timeline/Using_Performance_Timeline">パフォーマンスタイムラインの使用</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/Performance"><code>Performance</code></a></li><li><a href="/ja/docs/Web/API/PerformanceEntry"><code>PerformanceEntry</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserver"><code>PerformanceObserver</code></a></li><li><a href="/ja/docs/Web/API/PerformanceObserverEntryList"><code>PerformanceObserverEntryList</code></a></li><li><a href="/ja/docs/Web/API/PerformanceResourceTiming"><code>PerformanceResourceTiming</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Window/performance"><code>Window.performance</code></a></li></ol></details></li></ol></section></div>
+
+<p><strong><a href="https://w3c.github.io/performance-timeline/">パフォーマンスタイムライン</a></strong>標準は、アプリケーション内でクライアント側の待ち時間の測定をサポートするための <a href="/ja/docs/Web/API/Performance" title="Performanceインターフェースは、現在のページの実績に基づく情報へのアクセスを提供します。High Resolution Time APIの一部ですが、Performance Timeline API、Navigation Timing API、User Timing APIそしてResource Timing APIによって拡張されています。"><code>Performance</code></a> インターフェイスへの拡張を定義します。この規格には、特定のパフォーマンスイベントが発生したときにアプリケーションに通知することを可能にするインターフェイスも含まれています。同時に、これらのインターフェイスを使用してアプリケーションのパフォーマンスボトルネックを特定することができます。</p>
+
+<h2 id="Performance_拡張">Performance 拡張</h2>
+
+<p><strong>Performance Timeline</strong> extends the <a href="/ja/docs/Web/API/Performance" title="Performanceインターフェースは、現在のページの実績に基づく情報へのアクセスを提供します。High Resolution Time APIの一部ですが、Performance Timeline API、Navigation Timing API、User Timing APIそしてResource Timing APIによって拡張されています。"><code>Performance</code></a> object with three methods that provide different mechanisms to get a set of <a href="/ja/docs/Web/API/PerformanceEntry" title="PerformanceEntry オブジェクトは、パフォーマンスタイムラインの一部である単一のパフォーマンスメトリックをカプセル化します。パフォーマンスエントリは、アプリケーション内の明示的な時点でパフォーマンス mark または measure を作成する (たとえば、mark() メソッドを呼び出すことによって) ことで直接作成できます。パフォーマンスエントリは、(イメージなどの) リソースのロードなどの間接的な方法でも作成されます。"><code>performance records (metrics)</code></a>, depending on the specified filter criteria. The following example show the usage of these methods <a href="/ja/docs/Web/API/Performance/getEntries" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>getEntries()</code></a>, <a href="/ja/docs/Web/API/Performance/getEntriesByName" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>getEntriesByName()</code></a> and <a href="/ja/docs/Web/API/Performance/getEntriesByType" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>getEntriesByType()</code></a>.</p>
+
+<pre class="brush: js">function log(s) {
+  var o = document.getElementsByTagName(&quot;output&quot;)[0];
+  o.innerHTML += s + &quot; &lt;br&gt;&quot;;
+}
+function do_work (n) {
+  for (var i=0 ; i &lt; n; i++) {
+     var m = Math.random();
+  }
+}
+function print_perf_entry(pe) {
+  log(&quot;..name: &quot;        + pe.name      +
+      &quot;; entryType: &quot; + pe.entryType +
+      &quot;; startTime: &quot; + pe.startTime +
+      &quot;; duration: &quot;  + pe.duration);
+}
+function print_PerformanceEntries() {
+  if (performance.mark === undefined) {
+    log(&quot;... performance.mark Not supported&quot;);
+    return;
+  }
+
+  // Create some performance entries via the mark() and measure() methods
+  performance.mark(&quot;Begin&quot;);
+  do_work(50000);
+  performance.mark(&quot;End&quot;);
+  do_work(50000);
+  performance.measure(&quot;Measure1&quot;, &quot;Begin&quot;, &quot;End&quot;);
+
+  // Use getEntries() to iterate all entries
+  var p = performance.getEntries();
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;All Entry[&quot; + i + &quot;]&quot;);
+    print_perf_entry(p[i]);
+  }
+
+  // Use getEntries(name, entryType) to get specific entries
+  p = performance.getEntries({name : &quot;Measure1&quot;, entryType: &quot;measure&quot;});
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;Begin and Measure [&quot; + i + &quot;]&quot;);
+    print_perf_entry(p[i]);
+  }
+
+  // Use getEntriesByType() to get all &quot;mark&quot; entries
+  p = performance.getEntriesByType(&quot;mark&quot;);
+  for (var i=0; i &lt; p.length; i++) {
+    log (&quot;Mark only [&quot; + i + &quot;]&quot;);
+    print_perf_entry(p[i]);
+  }
+
+  // Use getEntriesByName() to get all &quot;mark&quot; entries named &quot;Begin&quot;
+  p = performance.getEntriesByName(&quot;Begin&quot;, &quot;mark&quot;);
+  for (var i=0; i &lt; p.length; i++) {
+    log (&quot;Begin and Mark [&quot; + i + &quot;]&quot;);
+    print_perf_entry(p[i]);
+  }
+}
+</pre>
+
+<h2 id="PerformanceEntry_インターフェイス">PerformanceEntry インターフェイス</h2>
+
+<p>The <code><a href="/ja/docs/Web/API/PerformanceEntry" title="PerformanceEntry オブジェクトは、パフォーマンスタイムラインの一部である単一のパフォーマンスメトリックをカプセル化します。パフォーマンスエントリは、アプリケーション内の明示的な時点でパフォーマンス mark または measure を作成する (たとえば、mark() メソッドを呼び出すことによって) ことで直接作成できます。パフォーマンスエントリは、(イメージなどの) リソースのロードなどの間接的な方法でも作成されます。"><code>PerformanceEntry</code></a></code> interface encapsulates a single <em>performance entry</em> i.e. a single performance metric. This interface has four properties and a JSON <em>serializer</em> (<a href="/ja/docs/Web/API/Performance/toJSON" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>toJSON()</code></a>. The following example shows the use of these properties.</p>
+
+<pre class="brush: js">function print_PerformanceEntry(ev) {
+  var properties = [&quot;name&quot;, &quot;entryType&quot;, &quot;startTime&quot;, &quot;duration&quot;];
+
+  // Create a few performance entries
+  performance.mark(&quot;Start&quot;);
+  do_work(50000);
+  performance.mark(&quot;Stop&quot;);
+  performance.measure(&quot;measure-1&quot;);
+
+  var p = performance.getEntries();
+  for (var i=0; i &lt; p.length; i++) {
+    log(&quot;PerfEntry[&quot; + i + &quot;]&quot;);
+    for (var j=0; j &lt; properties.length; j++) {
+      // check each property in window.performance
+      var supported = properties[j] in p[i];
+      if (supported) {
+        var pe = p[i];
+        log(&quot;... &quot; + properties[j] + &quot; = &quot; + pe[properties[j]]);
+      } else {
+        log(&quot;... &quot; + properties[j] + &quot; = Not supported&quot;);
+      }
+    }
+  }
+}
+</pre>
+
+<p>This interface also includes a <a href="/ja/docs/Web/API/PerformanceEntry/toJSON" title="toJSON() メソッドはシリアライザで、パフォーマンスエントリオブジェクトの JSON 表現を返します。"><code>toJSON()</code></a> method that returns the serialization of the <a href="/ja/docs/Web/API/PerformanceEntry" title="PerformanceEntry オブジェクトは、パフォーマンスタイムラインの一部である単一のパフォーマンスメトリックをカプセル化します。パフォーマンスエントリは、アプリケーション内の明示的な時点でパフォーマンス mark または measure を作成する (たとえば、mark() メソッドを呼び出すことによって) ことで直接作成できます。パフォーマンスエントリは、(イメージなどの) リソースのロードなどの間接的な方法でも作成されます。"><code>PerformanceEntry</code></a> object. The following examples show the use of this method.</p>
+
+<pre class="brush: js">function PerfEntry_toJSON() {
+
+  // Create a few performance entries
+  performance.mark(&quot;mark-1&quot;);
+  performance.mark(&quot;mark-2&quot;);
+  performance.measure(&quot;meas-1&quot;, &quot;mark-1&quot;, &quot;mark-2&quot;);
+
+  var peList = performance.getEntries();
+  var pe = peList[0];
+
+  if (pe.toJSON === undefined) {
+    log (&quot;PerformanceEntry.toJSON() is NOT supported&quot;);
+    return;
+  }
+
+  // Print the PerformanceEntry object
+  var json = pe.toJSON();
+  var s = JSON.stringify(json);
+  log(&quot;PerformanceEntry.toJSON = &quot; + s);
+}
+</pre>
+
+<h2 id="Performance_オブザーバー">Performance オブザーバー</h2>
+
+<p></p><div class="experimental indicator-warning notecard">
+    <p><span title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span> <strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div><p></p>
+
+<p>The <em>performance observer</em> interfaces allow an application to register an <em>observer</em> for specific performance event types, and when one of those event types is recorded, the application is <em>notified</em> of the event via the observer&apos;s callback function that was specified at the time, the observer was created. When the observer (callback) is invoked  the callback&apos;s parameters include a <em><a href="/ja/docs/Web/API/PerformanceObserverEntryList" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>performance observer entry list</code></a></em> that only contains <em>observed</em> <a href="/ja/docs/Web/API/PerformanceEntry" title="PerformanceEntry オブジェクトは、パフォーマンスタイムラインの一部である単一のパフォーマンスメトリックをカプセル化します。パフォーマンスエントリは、アプリケーション内の明示的な時点でパフォーマンス mark または measure を作成する (たとえば、mark() メソッドを呼び出すことによって) ことで直接作成できます。パフォーマンスエントリは、(イメージなどの) リソースのロードなどの間接的な方法でも作成されます。"><code>performance entries</code></a>. That is, the list only contains entries for the event types that were specified when the observer&apos;s <a href="/ja/docs/Web/API/PerformanceObserver/observe" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>observe()</code></a> method was invoked.</p>
+
+<p>The following example shows how to register two observers: the first one registers for several event types and the second observer only registers for one event type.</p>
+
+<pre class="brush: js">function PerformanceObservers() {
+  // Create observer for all performance event types
+  var observe_all = new PerformanceObserver(function(list, obs) {
+    var perfEntries;
+
+    // Print all entries
+    perfEntries = list.getEntries();
+    for (var i=0; i &lt; perfEntries.length; i++) {
+      print_perf_entry(perfEntries[i]);
+    }
+
+    // Print entries named &quot;Begin&quot; with type &quot;mark&quot;
+    perfEntries = list.getEntriesByName(&quot;Begin&quot;, &quot;mark&quot;);
+    for (var i=0; i &lt; perfEntries.length; i++) {
+      print_perf_entry(perfEntries[i]);
+    }
+
+    // Print entries with type &quot;mark&quot;
+    perfEntries = list.getEntriesByType(&quot;mark&quot;);
+    for (var i=0; i &lt; perfEntries.length; i++) {
+      print_perf_entry(perfEntries[i]);
+    }
+  });
+  // subscribe to all performance event types
+  observe_all.observe({entryTypes: [&apos;frame&apos;, &apos;mark&apos;, &apos;measure&apos;, &apos;navigation&apos;, &apos;resource&apos;, &apos;server&apos;]});
+
+  // Create observer for just the &quot;mark&quot; event type
+  var observe_mark = new PerformanceObserver(function(list, obs) {
+    var perfEntries = list.getEntries();
+    // Should only have &apos;mark&apos; entries
+    for (var i=0; i &lt; perfEntries.length; i++) {
+      print_perf_entry(perfEntries[i]);
+    }
+  });
+  // subscribe to only the &apos;mark&apos; event
+  observe_mark.observe({entryTypes: [&apos;mark&apos;]});
+}
+function print_perf_entry(pe) {
+  log(&quot;name: &quot;        + pe.name      +
+      &quot;; entryType: &quot; + pe.entryType +
+      &quot;; startTime: &quot; + pe.startTime +
+      &quot;; duration: &quot;  + pe.duration);
+}
+</pre>
+
+<p>The <a href="/ja/docs/Web/API/PerformanceObserverEntryList" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>performance observer entry list</code></a> interface has the same three <code>getEntries*()</code> methods as the <a href="/ja/docs/Web/API/Performance" title="Performanceインターフェースは、現在のページの実績に基づく情報へのアクセスを提供します。High Resolution Time APIの一部ですが、Performance Timeline API、Navigation Timing API、User Timing APIそしてResource Timing APIによって拡張されています。"><code>Performance</code></a> interface and these methods are used to retrieve <em>observed</em> performance entries within the observer callback. These methods have been used in the above stated example.</p>
+
+<h2 id="仕様">仕様</h2>
+
+<p>The interfaces described in this document are defined in the <strong>Performance Timeline</strong> standard which has two levels:</p>
+
+<ul>
+ <li><a href="https://w3c.github.io/performance-timeline/">Performance Timeline Level 2</a>; Editors Draft; Work In Progress. This version introduces <em>performance observers</em> (and the <a href="/ja/docs/Web/API/PerformanceObserver" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>PerformanceObserver</code></a> and <a href="/ja/docs/Web/API/PerformanceObserverEntryList" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>PerformanceObserverEntryList</code></a> interfaces).</li>
+ <li><a href="http://www.w3.org/TR/performance-timeline/">Performance Timeline</a>; W3C Recommendation 12 December 2013</li>
+</ul>
+
+<h2 id="あわせて参照">あわせて参照</h2>
+
+<ul>
+ <li><a href="/Web/API/Performance_Timeline">Performance Timeline (Overview)</a></li>
+ <li><a href="http://siusin.github.io/perf-timing-primer/">A Primer for Web Performance Timing APIs</a></li>
+</ul>

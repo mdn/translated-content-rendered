@@ -1,0 +1,101 @@
+---
+title: XRInputSource.handedness
+slug: Web/API/XRInputSource/handedness
+tags:
+  - API
+  - AR
+  - Controller
+  - Handedness
+  - Input
+  - Property
+  - Read-only
+  - Reference
+  - VR
+  - WebXR
+  - WebXR API
+  - WebXR Device API
+  - XR
+  - XRInputSource
+  - hand
+  - left
+  - right
+translation_of: Web/API/XRInputSource/handedness
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/XRInputSource"><code>XRInputSource</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/XRInputSource/gripSpace"><code>gripSpace</code></a></li><li><em><code>handedness</code></em></li><li><a href="/ja/docs/Web/API/XRInputSource/profiles"><code>profiles</code></a> <a href="/ja/docs/Web/API/XRInputSource/profiles$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/XRInputSource/targetRayMode"><code>targetRayMode</code></a> <a href="/ja/docs/Web/API/XRInputSource/targetRayMode$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/XRInputSource/targetRaySpace"><code>targetRaySpace</code></a> <a href="/ja/docs/Web/API/XRInputSource/targetRaySpace$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li></ol></section><div class="secureContexts notecard"><p><strong>安全なコンテキスト用</strong><br>この機能は一部またはすべての<a href="#Browser_compatibility">対応しているブラウザー</a>において、<a href="/ja/docs/Web/Security/Secure_Contexts">安全なコンテキスト</a> (HTTPS) でのみ利用できます。</p></div>
+
+<p><a href="/ja/docs/Web/API/XRInputSource"><code>XRInputSource</code></a> の <strong><code>handedness</code></strong> 読み取り専用プロパティは、WebXR 入力ソースがユーザーのどの手に関連付けられているか、またはまったく関連付けられていないかを示します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">let <em>hand</em> = <em>xrInputSource</em>.handedness;</pre>
+
+<h3 id="Value" name="Value">値</h3>
+
+<p>入力コントローラーがユーザーの片方の手にあるかどうか、もしそうならどちらの手にあるかを示す <a href="/ja/docs/Web/API/DOMString"><code>DOMString</code></a>。 <a href="/ja/docs/Web/API/XRHandedness"><code>XRHandedness</code></a> 列挙型に由来する値は、次のいずれかです。</p>
+
+<dl>
+ <dt><code>none</code></dt>
+ <dd>入力コントローラーは、ユーザーのいずれの手にも関連付けられていません。</dd>
+ <dt><code>left</code></dt>
+ <dd>入力コントローラーは、ユーザーの左手に握られているか、着用されているか、取り付けられています。</dd>
+ <dt><code>right</code></dt>
+ <dd>入力コントローラーは、ユーザーの右手に握られているか、着用されているか、取り付けられています。</dd>
+</dl>
+
+<h2 id="Usage_notes" name="Usage_notes">使用上の注意</h2>
+
+<p>入力ソースがユーザーの手に関連付けられたデバイスでない場合（握られているか、取り付けられているか、着用されているかに関係なく）、<code>handedness</code> の値は <code>none</code> です。 これは、例えば、ヘッドセットに組み込まれたコントロールや、頭や体に取り付けられた入力デバイスなど、ハンドヘルドではない入力ソースを示している場合があります。</p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p><code>handedness</code> の重要な使用方法の1つは、コントローラーがどちらの手にあるかを判別して、仮想空間でその手（またはその手が制御しているデバイス）の表現を描画できるようにすることです。</p>
+
+<pre class="brush: js notranslate">function updateInputSources(session, frame, refSpace) {
+  for (let source of session.inputSources) {
+    if (source.gripSpace) {
+      let gripPose = frame.getPose(source.gripSpace, refSpace);
+
+      if (gripPose) {
+        myRenderHandObject(gripPose, inputSource.handedness);
+      }
+    }
+  }
+}
+</pre>
+
+<p>この関数は、すべてのアニメーションフレーム（または必要な滑らかさの程度とパフォーマンスの制約に応じて定期的に）で呼ばれ、入力ソースのリストをスキャンして、<code>null</code> ではない <a href="/ja/docs/Web/API/XRInputSource/gripSpace"><code>gripSpace</code></a> を持つものを探します。 <code>gripSpace</code> が存在する場合、それは入力ソースが何らかのハンドヘルドデバイスであることを意味するため、可能であれば視覚的にレンダリングする必要があります。</p>
+
+<p><code>gripSpace</code> が <code>null</code> 以外の場合、この関数は、現在の参照空間に変換された <code>gripSpace</code> のポーズを取得します。 それが有効であると仮定すると、<code>myRenderHandObject()</code> と呼ばれる関数が、グリップのポーズと <code>handedness</code> の値を使用して呼び出されます。 これらの値が手元にあれば（しゃれは意図していません）、<code>myRenderHandObject()</code> は、正しい手のために配置および形成された適切なモデルを描画できます。</p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://immersive-web.github.io/webxr/#dom-xrinputsource-handedness" hreflang="en" lang="en">WebXR Device API<br><small lang="ja">XRInputSource.handedness の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<div class="bc-data" id="bcd:api.XRInputSource.handedness"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/WebXR_Device_API">WebXR Device API</a></li>
+ <li><a href="/ja/docs/Web/API/WebXR_Device_API/Inputs">入力と入力ソース</a></li>
+ <li><a href="/ja/docs/Web/WebXR%20Device%20API/Gamepads">WebXR アプリケーションでのゲームパッドの使用</a></li>
+</ul>

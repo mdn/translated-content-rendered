@@ -1,0 +1,404 @@
+---
+title: 継承とプロトタイプチェーン
+slug: Web/JavaScript/Inheritance_and_the_prototype_chain
+tags:
+  - Inheritance
+  - JavaScript
+  - OOP
+translation_of: Web/JavaScript/Inheritance_and_the_prototype_chain
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/ja/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/ja/docs/Web/JavaScript/Tutorials"><strong>チュートリアル:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>初級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript の基礎</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>JavaScript ガイド</summary>
+      <ol>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Introduction">入門編</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Grammar_and_Types">文法とデータ型</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">制御フローとエラー処理</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Loops_and_iteration">ループとイテレーター</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Functions">関数</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Expressions_and_Operators">式と演算子</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Numbers_and_dates">数と日付</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Text_formatting">テキスト処理</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Regular_Expressions">正規表現</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Indexed_collections">インデックス付きコレクション</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Keyed_collections">キー付きコレクション</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Working_with_Objects">オブジェクトを利用する</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">オブジェクトモデルの詳細</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Iterators_and_generators">イテレーターとジェネレーター</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Meta_programming">メタプログラミング</a></li>
+          <li><a href="/ja/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>中級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/A_re-introduction_to_JavaScript">JavaScript 「再」入門</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Data_structures">JavaScript のデータ構造</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Equality_comparisons_and_sameness">等値比較と同一性</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Closures">クロージャ</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>上級編</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">継承とプロトタイプチェーン</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode">Strict モード</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Typed_arrays">JavaScript 型付き配列</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Memory_Management">メモリ管理</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/EventLoop">並列モデルとイベントループ</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ja/docs/Web/JavaScript/Reference">リファレンス:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>ビルトインオブジェクト</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt()</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>式と演算子</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition">Addition (+)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition_assignment">Addition assignment (+=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Addition_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Assignment">Assignment (=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">ビット毎 AND (&amp;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">Bitwise AND assignment (&amp;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">Bitwise NOT (~)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">ビット毎 OR (|)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">ビット毎 OR 代入 (|=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">ビット毎 XOR (^)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">Bitwise XOR assignment (^=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Comma_Operator">カンマ演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">条件 (三項) 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Decrement">Decrement (--)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Decrement$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">分割代入</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Division$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Division_assignment">除算代入 (/=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Equality">等価 (==)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/function">関数式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than">Greater than (&gt;)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">Greater than or equal (&gt;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Grouping">グループ化演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Increment">Increment (++)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Increment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Inequality$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Left_shift">Left shift (&lt;&lt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Less_than$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">小なりイコール (&lt;=)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND">論理積 (&amp;&amp;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_NOT">論理否定 (!)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_OR">論理和 (||)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">Logical nullish assignment (??=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication">Multiplication (*)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">Null合体演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer">オブジェクト初期化子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">演算子の優先順位</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Optional_chaining">Optional chaining</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Operators/Pipeline_operator">パイプライン演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Property_Accessors">プロパティアクセサー</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder">Remainder (%)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Remainder_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Right_shift">右シフト (&gt;&gt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Spread_syntax">スプレッド構文</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Strict_equality">厳密等価 (===)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Strict_inequality">厳密不等価 (!==)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unary_negation">単項マイナス (-)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Unary_plus$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a> <a href="/ja/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/async_function">非同期関数式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/class">クラス式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/delete">delete</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/function*">function* 式</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/in">in</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/new">new 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/void">void 演算子</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/yield">yield</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>文と宣言</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/async_function">async function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/block">ブロック</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/class">class</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/continue">continue</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/Empty">空文</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for">for</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/function">関数宣言</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/var">var</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Statements/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/JavaScript/Reference/Statements/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>関数</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Arrow_functions">アロー関数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Default_parameters">デフォルト引数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/Method_definitions">メソッド定義</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/rest_parameters">残余引数</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/arguments">arguments</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/get">ゲッター</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Functions/set">セッター</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>クラス</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/Private_class_fields">Private class fields</a> <a href="/ja/docs/Web/JavaScript/Reference/Classes/Private_class_fields$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/Public_class_fields">Public class fields</a> <a href="/ja/docs/Web/JavaScript/Reference/Classes/Public_class_fields$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/constructor">constructor</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">X.prototype.y called on incompatible type</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/ja/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>その他</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript 技術概説</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Lexical_grammar">字句文法</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Data_structures">JavaScript のデータ構造</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">プロパティの列挙可能性と所有権</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Iteration_protocols">反復処理プロトコル</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode">Strict モード</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">strict モードへの移行</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Template_literals">テンプレート文字列</a></li>
+        <li><a href="/ja/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">廃止予定の機能</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>JavaScript は動的で、 <code>class</code> の実装それ自体を提供しないことから、 Java や C++ のようなクラスベースの言語を経験した開発者にとって、やや紛らわしいものです（<code>class</code> キーワードは ES6 で導入されましたが、シンタックスシュガーであり、JavaScript は引き続きプロトタイプベースです）。</p>
+
+<p>JavaScript には1つだけ、継承が発生する要素があります。オブジェクトです。どのオブジェクトも<strong>プロトタイプ</strong>と呼ばれる、他のオブジェクトへの内部的な繋がりを持っています。そのプロトタイプオブジェクトも自身のプロトタイプを持っており、あるオブジェクトのプロトタイプが <code>null</code> に到達するまでそれが続きます。 <code>null</code> は、定義によれば、プロトタイプを持たず、<strong>プロトタイプチェーン</strong>の最終リンクとなります。</p>
+
+<p>これはしばしば、JavaScript の1つの弱点と見なされますが、プロトタイプの継承モデルは、実際にはクラスのモデルよりも強力です。例えば、プロトタイプのモデルの上にクラスのモデルを構築することは、実にささいなことです。</p>
+
+<h2 id="Inheritance_with_the_prototype_chain" name="Inheritance_with_the_prototype_chain">プロトタイプチェーンと継承</h2>
+
+<h3 id="Inheriting_properties" name="Inheriting_properties">プロパティの継承</h3>
+
+<p>JavaScript のオブジェクトはプロパティ（<strong>自身のプロパティ</strong>を指す）の動的な「かばん」であり、プロトタイプオブジェクトへの繋がりを持っています。あるオブジェクトのプロパティにアクセスを試みるとき、そのオブジェクトのみならず、そのオブジェクトのプロトタイプ、プロトタイプのプロトタイプ…と、一致する名前のプロパティが見つかるか、プロトタイプチェーンの終端に到達するまで、そのプロパティが捜索されます。</p>
+
+<div class="note">
+<p>ECMAScript 標準に基づき、<code>someObject.[[Prototype]]</code> という記法は、 <code>someObject</code> のプロトタイプを示します。これは JavaScript の <code>__proto__</code> プロパティ（現在は非推奨）と同等です。その関数のすべてのインスタンスの <code>[[Prototype]]</code> を代わりに指定する関数の <code><em>func</em>.prototype</code> プロパティと混同するべきではありません。ECMAScript 6 から、<code>[[Prototype]]</code> は、 <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf"><code>Object.getPrototypeOf()</code></a> と <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a> のアクセサを使ってアクセスされます。</p>
+</div>
+
+<p>では、プロパティにアクセスを試みたときに、何が起こるのかを見てみましょう。</p>
+
+<pre class="brush: js notranslate">// o というオブジェクトがあり、自身のプロパティとして a と b を持っています。
+// {a: 1, b: 2}
+// o.[[Prototype]] は b と c プロパティを持っています。
+// {b: 3, c: 4}
+// 最後に、o.[[Prototype]].[[Prototype]] は null です。
+// これがプロトタイプチェーンの終端としての null であり、
+// 定義によると、 null は [[Prototype]] を持っていません。
+// つまり、プロトタイプチェーン全体は次のようになります。
+// {a:1, b:2} ---&gt; {b:3, c:4} ---&gt; null
+
+console.log(o.a); // 1
+// o には、自身のプロパティとして &apos;a&apos; があるでしょうか？はい、その値は1です。
+
+console.log(o.b); // 2
+// o には、自身のプロパティとして &apos;b&apos; があるでしょうか？はい、その値は2です。
+// o のプロトタイプにも &apos;b&apos; プロパティがありますが、アクセスされません。
+// これを「property shadowing」と呼びます。
+
+console.log(o.c); // 4
+// o には、自身のプロパティとして &apos;c&apos; があるでしょうか？いいえ、そのプロトタイプを確認します。
+// o.[[Prototype]] には、自身のプロパティとして &apos;c&apos; があるでしょうか？はい、その値は4です。
+
+console.log(o.d); // undefined
+// o には、自身のプロパティとして &apos;d&apos; があるでしょうか？いいえ、そのプロトタイプを確認します。
+// o.[[Prototype]] には、自身のプロパティとして &apos;d&apos; があるでしょうか？いいえ、そのプロトタイプを確認します。
+// o.[[Prototype]].[[Prototype]] は null であるため探索を中止し、
+// プロパティが見つからなかったため undefined を返します。
+</pre>
+
+<p>あるオブジェクトにプロパティをセットすると、自身のプロパティが作られます。この取得と設定の動作の規則の唯一の例外は、 <a href="/ja/docs/JavaScript/Guide/Working_with_Objects#Defining_getters_and_setters" title="JavaScript/Guide/Working_with_Objects#Defining_getters_and_setters">getter または setter</a> とのプロパティの継承が起こるときです。</p>
+
+<h3 id="Inheriting_.22methods.22" name="Inheriting_.22methods.22">「メソッド」の継承</h3>
+
+<p>JavaScript には、クラスベースの言語が定義する形式の「メソッド」はありません。 JavaScript ではどの関数も、オブジェクトのプロパティという形で追加することができます。継承された関数は、上で見せたような property shadowing （このケースではメソッドのオーバーライドの形）を含めた、他のどのプロパティとも同じようにはたらきます。</p>
+
+<p>継承された関数が実行されるときの <a href="/ja/docs/JavaScript/Reference/Operators/this" title="JavaScript/Reference/Operators/this">this</a> の値は、その関数を自身のプロパティとして持つプロトタイプオブジェクトではなく、継承したオブジェクトを指します。</p>
+
+<pre class="brush: js notranslate">var o = {
+  a: 2,
+  m: function(b){
+    return this.a + 1;
+  }
+};
+
+console.log(o.m()); // 3
+// この場合に o.m が呼び出されたとき、 &apos;this&apos; は o を指します。
+
+var p = Object.create(o);
+// p は o から継承するオブジェクトです。
+
+p.a = 4; // p に &apos;a&apos; という自身のプロパティを作ります。
+console.log(p.m()); // 5
+// p.m が呼び出されるとき、 &apos;this&apos; は p　を指します。
+// p が o の m を継承するとき、&apos;this.a&apos; は、
+// p 自身の &apos;a&apos; プロパティとして p.a を意味します。
+</pre>
+
+<h2 id="Different_ways_to_create_objects_and_the_resulting_prototype_chain" name="Different_ways_to_create_objects_and_the_resulting_prototype_chain">オブジェクトの色々な作成方法と、発生するプロトタイプチェーン</h2>
+
+<h3 id="Objects_created_with_syntax_constructs" name="Objects_created_with_syntax_constructs">構文構造によるオブジェクト生成</h3>
+
+<pre class="brush: js notranslate">var o = {a: 1};
+
+// 新たに生成されたオブジェクト o は、その [[Prototype]] として Object.prototype を持ちます。
+// o は自身に &apos;hasOwnProperty&apos; という名のプロパティを持っていません。
+// hasOwnProperty は Object.prototype 自身のプロパティです。
+// Object.prototype のプロトタイプは null です。
+// o ---&gt; Object.prototype ---&gt; null
+
+var a = [&quot;yo&quot;, &quot;whadup&quot;, &quot;?&quot;];
+
+// 配列は Array.prototype（indexOf、forEach などのようなメソッドを持っている）から継承します。
+// プロトタイプチェーンは以下のようになります。
+// a ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null
+
+function f() {
+  return 2;
+}
+
+// 関数は Function.prototype（call、bind などのようなメソッドを持つ）から継承します。
+// f ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</pre>
+
+<h3 id="With_a_constructor" name="With_a_constructor">コンストラクタ関数を用いる方法</h3>
+
+<p>JavaScript における「コンストラクタ」は、<a href="/ja/docs/JavaScript/Reference/Operators/new" title="JavaScript/Reference/Operators/new">new 演算子</a>を使って呼び出される関数です。</p>
+
+<pre class="brush: js notranslate">function Graph() {
+  this.vertexes = [];
+  this.edges = [];
+}
+
+Graph.prototype = {
+  addVertex: function(v){
+    this.vertexes.push(v);
+  }
+};
+
+var g = new Graph();
+// g は &apos;vertexes&apos; と &apos;edges&apos; の自身のプロパティを持つオブジェクトです。
+// g.[[Prototype]] は new Graph() が実行される時点の Graph.prototype の値です。
+</pre>
+
+<p>他の関数と区別しやすくする目的で、コンストラクタ関数の関数名の最初の一文字を大文字にしておく慣例があります。</p>
+
+<h3 id="With_Object.create" name="With_Object.create">Object.create メソッドを用いる方法</h3>
+
+<p>ECMAScript 5 は <a href="/ja/docs/JavaScript/Reference/Global_Objects/Object/create" title="JavaScript/Reference/Global_Objects/Object/create">Object.create</a> という新しいメソッドを導入しました。このメソッドを呼び出すと、新しいオブジェクトが生成されます。関数の最初の引数が、このオブジェクトのプロトタイプになります。</p>
+
+<pre class="brush: js notranslate">var a = {a: 1};
+// a ---&gt; Object.prototype ---&gt; null
+
+var b = Object.create(a);
+// b ---&gt; a ---&gt; Object.prototype ---&gt; null
+console.log(b.a); // 1 (継承された)
+
+var c = Object.create(b);
+// c ---&gt; b ---&gt; a ---&gt; Object.prototype ---&gt; null
+
+var d = Object.create(null);
+// d ---&gt; null
+console.log(d.hasOwnProperty);
+// undefined、なぜなら d は Object.prototype から継承していないからです。
+</pre>
+
+<h3 id="class_キーワードを用いる方法"><code>class</code> キーワードを用いる方法</h3>
+
+<p>ECMAScript 6 はクラスを実装する新たなキーワードのセットを導入しました。これらの要素はクラスベースの言語の開発者にはよく知られたもののようですが、同じではありません。JavaScript は引き続き、プロトタイプベースの言語です。新たなキーワードは <a href="/ja/docs/Web/JavaScript/Reference/Statements/class"><code>class</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Classes/constructor"><code>constructor</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Classes/static"><code>static</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Classes/extends"><code>extends</code></a>、<a href="/ja/docs/Web/JavaScript/Reference/Operators/super"><code>super</code></a> です。</p>
+
+<pre class="brush: js notranslate">&quot;use strict&quot;;
+
+class Polygon {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+
+class Square extends Polygon {
+  constructor(sideLength) {
+    super(sideLength, sideLength);
+  }
+  get area() {
+    return this.height * this.width;
+  }
+  set sideLength(newLength) {
+    this.height = newLength;
+    this.width = newLength;
+  }
+}
+
+var square = new Square(2);</pre>
+
+<h3 id="性能"><code>性能</code></h3>
+
+<p>プロトタイプチェーンの上層にあるプロパティの検索時間は、性能に悪影響を及ぼす可能性があり、性能が重要であるコードにおいて、意義深いものになるかもしれません。加えて、存在しないプロパティへのアクセスは、常にプロトタイプチェーン全体を通過します。</p>
+
+<p>また、オブジェクトのプロパティを順に処理する際、プロトタイプチェーンにある<strong>すべての</strong>列挙可能なプロパティが列挙されます。</p>
+
+<p>あるプロパティがプロトタイプチェーンのどこかではなく、オブジェクト自身に定義されたものであるかどうかを調べるには、すべてのオブジェクトが <code>Object.prototype</code> から継承している <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty">hasOwnProperty</a> メソッドを使う必要があります。</p>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty">hasOwnProperty</a> は JavaScript において唯一、プロトタイプチェーンを通らずにプロパティを扱うものです。</p>
+
+<p>注: プロパティが <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a> かどうかを調べるだけでは不十分です。そのプロパティが存在するが、偶然、値に undefined がセットされているだけという可能性も大いにあります。</p>
+
+<h3 id="悪い例_ネイティブのプロトタイプの拡張">悪い例: ネイティブのプロトタイプの拡張</h3>
+
+<p>しばしば見られる設計ミスの1つが、<code>Object.prototype</code> あるいは他のビルトインプロトタイプの拡張です。</p>
+
+<p>このテクニックは、モンキーパッチと呼ばれ、<em>カプセル化</em>を破壊します。Prototype.js のような人気のあるフレームワークに使用されるとしても、<em>非標準の</em>機能性の追加によってビルトインの型を散らかす正当な理由は未だありません。</p>
+
+<p>ビルトインプロトタイプを拡張する<strong>唯一の</strong>正当な理由は、例えば <code>Array.forEach</code> など、新しい JavaScript エンジンの機能を移植する場合のみです。</p>
+
+<h2 id="例">例</h2>
+
+<p>B は A から継承します。</p>
+
+<pre class="brush: js notranslate">function A(a){
+  this.varA = a;
+}
+
+// 上の A 関数の定義で示すように、A.prototype.varA は常に、
+// this.varA によって隠されるのに、 varA を prototype に含む目的は何か？
+A.prototype = {
+  varA : null,
+      // 我々は何もせず、プロトタイプから varA を叩き落とすべきではないのでしょうか？
+      // 恐らく、最適化として隠れたクラスにスペースを割り当てることを意図したものです。
+      // https://developers.google.com/speed/articles/optimizing-javascript#Initializing
+      // もし varA がどのインスタンスでも独自に初期化されなかったとしても、インスタンスの変数は妥当となるでしょう。
+  doSomething : function(){
+    // ...
+  }
+};
+
+function B(a, b){
+  A.call(this, a);
+  this.varB = b;
+}
+B.prototype = Object.create(A.prototype, {
+  varB : {
+    value: null,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  },
+  doSomething : {
+    value: function(){ // オーバーライド
+      A.prototype.doSomething.apply(this, arguments); // call super
+      // ...
+    },
+    enumerable: true,
+    configurable: true,
+    writable: true
+  }
+});
+B.prototype.constructor = B;
+
+var b = new B();
+b.doSomething();</pre>
+
+<p>次の点は重要です。</p>
+
+<ul>
+ <li>.prototype に型が定義されています。</li>
+ <li>継承に Object.create() を使ってください。</li>
+</ul>
+
+<h2 id="プロトタイプと_Object.getPrototypeOf">プロトタイプと <code>Object.getPrototypeOf</code></h2>
+
+<p>JavaScript はすべてが動的で、すべてが実行時であり、一切クラスを持たないことから、 Java や C++から来た開発者にとっていささか紛らわしいものです。すべてはインスタンス（オブジェクト）です。私たちが「クラス」を装っているのは、関数オブジェクトです。</p>
+
+<p>恐らく、<code>function A</code> が <code>prototype</code> という特別なプロパティを持っていることに、既に気付いているでしょう。この特別なプロパティは JavaScript の <code>new</code> 演算子と連携しています。プロトタイプオブジェクトへの参照は、新たなインスタンスの内部 <code>[[Prototype]]</code> プロパティへとコピーされます。例えば、<code>var a1 = new A()</code> とするとき（オブジェクトがメモリ内に生成された後、かつ <code>this</code> が定義されて関数 <code>A()</code> が実行される前） 、JavaScript は <code>a1.[[Prototype]] = A.prototype</code> をセットします。そうしてインスタンスのプロパティにアクセスするとき、 JavaScript は最初にそのオブジェクトに直接、それらが存在するかどうかを調べ、もし存在しなければ、 <code>[[Prototype]]</code> を見ます。これは <code>prototype</code> に定義したすべての要素がすべてのインスタンスで効果的に共有されていることを意味しており、もし望むのであれば、後で prototype の一部を変更して、すべての存在するインスタンスにその変更を及ぼすことができます。</p>
+
+<p>もし上の例で、 <code>var a1 = new A(); var a2 = new A();</code> とすると、 <code>a1.doSomething</code> は実際には、<code>Object.getPrototypeOf(a1).doSomething</code> （定義した  <code>A.prototype.doSomething</code> と同じ）を参照します。つまり、 <code>Object.getPrototypeOf(a1).doSomething == Object.getPrototypeOf(a2).doSomething == A.prototype.doSomething</code> です。</p>
+
+<p>要するに、 <code>prototype</code> は型のためのもので、<code>Object.getPrototypeOf()</code> はインスタンスのためのものと同じです。</p>
+
+<p><code>[[Prototype]]</code> は再帰的に見えます。つまり、<code>a1.doSomething</code>、<code>Object.getPrototypeOf(a1).doSomething</code>、<code>Object.getPrototypeOf(Object.getPrototypeOf(a1)).doSomething </code>…と、それが見つかるか <code>Object.getPrototypeOf</code> が null を返すまで続きます。</p>
+
+<p>そう、</p>
+
+<pre class="brush: js notranslate">var o = new Foo();</pre>
+
+<p>これを呼び出したとき、 JavaScript は、</p>
+
+<pre class="brush: js notranslate">var o = new Object();
+o.[[Prototype]] = Foo.prototype;
+Foo.call(o);</pre>
+
+<p>実際にはこれ（あるいはこのような何か）を行っており、</p>
+
+<pre class="brush: js notranslate">o.someProp;</pre>
+
+<p>後にこうすると、 <code>o</code> が <code>someProp</code> プロパティを持っているかどうかを調べ、もし持っていなければ <code>Object.getPrototypeOf(o).someProp</code> を、そこにも存在しなければ <code>Object.getPrototypeOf(Object.getPrototypeOf(o)).someProp</code> を…と調べていきます。</p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>使用する複雑なコードを書く前に、プロトタイプの継承モデルを理解することは<strong>必要不可欠</strong>です。また、起こり得る性能の問題を回避するために、コードの中のプロトタイプチェーンの長さに気づき、それを解消してください。さらに、ネイティブプロトタイプは、新たな JavaScript の機能の互換性のためでない限り、<strong>決して</strong>拡張されるべきでは<strong>ありません</strong>。　</p>

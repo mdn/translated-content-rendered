@@ -1,0 +1,59 @@
+---
+title: JavaScript/XSLT バインディング
+slug: Web/XSLT/XSLT_JS_interface_in_Gecko/JavaScript_XSLT_Bindings
+tags:
+  - DOM
+  - JavaScript
+  - XML
+  - XSLT
+translation_of: Web/XSLT/XSLT_JS_interface_in_Gecko/JavaScript_XSLT_Bindings
+---
+<h2 id="JavaScript.2FXSLT_Bindings" name="JavaScript.2FXSLT_Bindings">JavaScript/XSLT バインディング</h2>
+
+<p>JavaScriptは <a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param> パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> オブジェクトを通してXSLT変換を実行できます。インスタンス化されると、<a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param> パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> には変換で使用される XSLT スタイルシートを引数として取る<a href="/ja/docs/Web/API/XSLTProcessor/importStylesheet" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.importStylesheet()</code></a> メソッドがあります。スタイルシートは XML 文書として渡す必要があります。つまり<a href="/ja/docs/Web/API/XSLTProcessor/importStylesheet" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.importStylesheet()</code></a> を呼び出す前に .xslファイルをページでロードする必要があります。これは <a href="/ja/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest (XHR) オブジェクトを使用すると、サーバーと対話することができます。ページ全体を更新する必要なしに、データを受け取ることができます。これでユーザーの作業を中断させることなく、ウェブページの一部を更新することができます。"><code>XMLHttpRequest</code></a> または <a href="/ja/docs/Web/API/XMLDocument/load" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XMLDocument.load()</code></a> で行うことができます。</p>
+
+<p><small><strong>Figure 1 : <a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param> パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> のインスタンス化</strong></small></p>
+
+<pre class="brush: js">  var xsltProcessor = new XSLTProcessor();
+
+  // Load the xsl file using synchronous (third param is set to false) XMLHttpRequest
+  var myXMLHTTPRequest = new XMLHttpRequest();
+  myXMLHTTPRequest.open("GET", "example.xsl", false);
+  myXMLHTTPRequest.send(null);
+
+  var xslRef = myXMLHTTPRequest.responseXML;
+
+  // Finally import the .xsl
+  xsltProcessor.importStylesheet(xslRef);
+</pre>
+
+<p>実際の変換では、<a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param> パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> には XML ドキュメントが必要です。このドキュメントは、最終的な結果を得るためにインポートされたXSLファイルと一緒に使用されます。XML ドキュメントは、図1に示すようにロードされた別個のXMLファイルでも、既存のページの一部でもかまいません。ページの DOM の一部を処理するには、最初にメモリー内に XML 文書を作成する必要があります。処理対象の DOM が id の <code>example</code>を持つ要素に含まれていると仮定すると、その DOM はメモリ内 XML ドキュメントの <a href="/ja/docs/Web/API/Document/importNode" title="Document オブジェクトの importNode() メソッドは、後で現在の文書に挿入するために、他の文書から Node または DocumentFragment の複製を作成します。"><code>Document.importNode()</code></a> メソッドを使用して "複製"できます。<a href="/ja/docs/Web/API/Document/importNode" title="Document オブジェクトの importNode() メソッドは、後で現在の文書に挿入するために、他の文書から Node または DocumentFragment の複製を作成します。"><code>Document.importNode()</code></a> は、ドキュメント間（この場合はHTMLドキュメントからXMLドキュメントへ）のDOMフラグメントを転送することを可能にします。最初のパラメータはクローンを作成する DOM ノードを参照します。2番目のパラメータを "true" にすることですべての子孫も同様にクローンします (深いクローン)。複製された DOM は図2に示すように、<a href="/ja/docs/Web/API/Node/appendChild" title="Node.appendChild() メソッドは、特定の親ノードの子ノードリストの末尾にノードを追加します。追加しようとしたノードが既に存在していたら、それは現在の親ノードから除かれ、新しい親ノードに追加されます（他のノードに追加する前にそのノードを親ノードから削除する必要はありません）。"><code>Node.appendChild()</code></a> を使用して簡単にXMLドキュメントに挿入できます。</p>
+
+<p><small><strong>Figure 2 : ドキュメントの DOM の一部に基づいて XML ドキュメントを作成する</strong></small></p>
+
+<pre class="brush: js">  // create a new XML document in memory
+  var xmlRef = document.implementation.createDocument("", "", null);
+
+  // we want to move a part of the DOM from an HTML document to an XML document.
+  // importNode is used to clone the nodes we want to process via XSLT - true makes it do a deep clone
+  var myNode = document.getElementById("example");
+  var clonedNode = xmlRef.importNode(myNode, true);
+
+  // add the cloned DOM into the XML document
+  xmlRef.appendChild(clonedNode);
+</pre>
+
+<p>スタイルシートをインポートしたら、<a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param> パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> は実際の変換に2つのメソッド、つまり<a href="/ja/docs/Web/API/XSLTProcessor/transformToDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToDocument()</code></a> と<a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> を実行する必要があります。<a href="/ja/docs/Web/API/XSLTProcessor/transformToDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToDocument()</code></a> は完全な XML ドキュメントを返しますが、<a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> は既存のドキュメントに簡単に追加できるドキュメントフラグメントを返します。どちらも、変換される最初のパラメーターとして XML 文書を取り込みます。 <a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> は第2のパラメータ、すなわち生成されたフラグメントを所有するドキュメントオブジェクトを必要とします。生成されたフラグメントが現在の HTML ドキュメントに挿入される場合はドキュメントを渡すだけで十分です。</p>
+
+<p><small><strong>Figure 2.1 : 文字列 'XML Soup' からの XML 文書の作成</strong></small></p>
+
+<p>IE <code>loadXML</code> メソッドを使用して XML を含む文字列をロードすることができますが、Mozilla で同じことをするためにいくつかの微調整とチューニングを行う必要があります。これは DomParser によって処理されるため、DomParser.no を使用してドキュメントを作成する必要があります。</p>
+
+<pre class="brush: js">var parser = new DOMParser();
+var doc = parser.parseFromString(aStr, "text/xml");
+</pre>
+
+<p><small><strong>Figure 3 : 変換の実行</strong></small></p>
+
+<pre class="brush: js">  var fragment = xsltProcessor.transformToFragment(xmlRef, document);
+</pre>

@@ -1,0 +1,95 @@
+---
+title: MediaStream Image Capture API
+slug: Web/API/MediaStream_Image_Capture_API
+translation_of: Web/API/MediaStream_Image_Capture_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/MediaStream_Image_Capture_API">MediaStream Image Capture API</a></strong></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/ImageCapture"><code>ImageCapture</code></a></li><li><a href="/ja/docs/Web/API/PhotoCapabilities"><code>PhotoCapabilities</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div>
+
+<p class="summary"><strong>MediaStream Image Capture API</strong> は、写真デバイスから画像やビデオをキャプチャするためのAPIです。データをキャプチャするだけでなく、画像サイズ、赤目軽減、フラッシュの有無、現在の設定などのデバイス機能に関する情報を取得することもできます。逆に、API では、デバイスが許可する制限内で機能を設定できます。</p>
+
+<h2 id="MediaStream_image_capture_の概念と使用方法">MediaStream image capture の概念と使用方法</h2>
+
+<p>画像またはビデオストリームを検索するプロセスは、以下のように行われます。サンプルコードは、<a href="https://googlechrome.github.io/samples/image-capture/">Chrome の Image Capture の例</a>を基にしています。</p>
+
+<p>First, get a reference to a device by calling <a href="/ja/docs/Web/API/MediaDevices/getUserMedia"><code>MediaDevices.getUserMedia()</code></a>. The example below simply says give me whatever video device is available, though the <code>getUserMedia()</code> method allows more specific capabilities to be requested. This method returns a <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> that resolves with a <a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a> object.</p>
+
+<pre class="brush: js notranslate">navigator.mediaDevices.getUserMedia({ video: true })
+  .then(mediaStream =&gt; {
+    // Do something with the stream.
+  })
+</pre>
+
+<p id="sect1">Next, isolate the visual part of the media stream. Do this by calling <a href="/ja/docs/Web/API/MediaStream/getVideoTracks"><code>MediaStream.getVideoTracks()</code></a>. This returns an array of <a href="/ja/docs/Web/API/MediaStreamTrack"><code>MediaStreamTrack</code></a> objects. The code below assumes that the first item in the <code>MediaStreamTrack</code> array is the one to use. You can use the properties of the <code>MediaStreamTrack</code> objects to select the one you need.</p>
+
+<pre class="brush: js notranslate">const track = mediaStream.getVideoTracks()[0];</pre>
+
+<p>At this point, you might want to configure the device capabilities before capturing an image. You can do this by calling <a href="/ja/docs/Web/API/MediaStreamTrack/applyConstraints"><code>applyConstraints()</code></a> on the track object before doing anything else.</p>
+
+<pre class="brush: js notranslate">let zoom = document.querySelector(&apos;#zoom&apos;);
+const capabilities = track.getCapabilities();
+// Check whether zoom is supported or not.
+if(!capabilities.zoom) {
+  return;
+}
+track.applyConstraints({ advanced : [{ zoom: zoom.value }] });
+</pre>
+
+<p>Finally, pass the <code>MediaStreamTrack</code> object to the <a href="/ja/docs/Web/API/ImageCapture/ImageCapture"><code>ImageCapture()</code></a> constructor. Though a <code>MediaStream</code> holds several types of tracks and provides multiple methods for retrieving them, the ImageCapture constructor will throw a <a href="/ja/docs/Web/API/DOMException"><code>DOMException</code></a> of type <code>NotSupportedError</code> if <a href="/ja/docs/Web/API/MediaStreamTrack/kind"><code>MediaStreamTrack.kind</code></a> is not <code>&quot;video&quot;</code>.</p>
+
+<pre class="brush: js notranslate">let imageCapture = new ImageCapture(track);
+</pre>
+
+<h2 id="インターフェイス">インターフェイス</h2>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/ImageCapture"><code>ImageCapture</code></a></dt>
+ <dd>有効な <a href="/ja/docs/Web/API/MediaStreamTrack"><code>MediaStreamTrack</code></a> を通じて参照される写真デバイスから画像をキャプチャするためのインタフェース。</dd>
+ <dt><a href="/ja/docs/Web/API/PhotoCapabilities"><code>PhotoCapabilities</code></a></dt>
+ <dd>接続されている写真デバイスに利用可能な設定オプションを提供します。 <a href="/ja/docs/Web/API/ImageCapture/getPhotoCapabilities"><code>ImageCapture.getPhotoCapabilities()</code></a> を呼び出して <code>PhotoCapabilities</code> オブジェクトを取得します。</dd>
+</dl>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/mediacapture-main/#mediadevices" hreflang="en" lang="en">Media Capture and Streams<br><small lang="ja">MediaDevices の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<h3 id="ImageCapture"><code>ImageCapture</code></h3>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.ImageCapture"></div>
+
+<h3 id="PhotoCapabilities"><code>PhotoCapabilities</code></h3>
+
+<div>
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.PhotoCapabilities"></div>
+</div>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a></li>
+ <li><a href="/ja/docs/Web/API/MediaStreamTrack"><code>MediaStreamTrack</code></a></li>
+</ul>

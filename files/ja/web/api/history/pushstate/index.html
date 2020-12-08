@@ -1,0 +1,101 @@
+---
+title: History.pushState()
+slug: Web/API/History/pushState
+tags:
+  - API
+  - HTML DOM
+  - History
+  - History API
+  - Location
+  - Method
+  - Reference
+  - Session
+  - URL
+  - Web
+  - pushState
+translation_of: Web/API/History/pushState
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/History_API">History API</a></strong></li><li><strong><a href="/ja/docs/Web/API/History"><code>History</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/History/length"><code>length</code></a> <a href="/ja/docs/Web/API/History/length$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/History/scrollRestoration"><code>scrollRestoration</code></a> <a href="/ja/docs/Web/API/History/scrollRestoration$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/History/state"><code>state</code></a> <a href="/ja/docs/Web/API/History/state$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/History/back"><code>back()</code></a></li><li><a href="/ja/docs/Web/API/History/forward"><code>forward()</code></a> <a href="/ja/docs/Web/API/History/forward$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/History/go"><code>go()</code></a></li><li><em><code>pushState()</code></em></li><li><a href="/ja/docs/Web/API/History/replaceState"><code>replaceState()</code></a></li></ol></details></li></ol></section></div>
+
+<p><a href="/ja/docs/Web/HTML">HTML</a> 文書では、<strong><code>history.pushState()</code></strong> メソッドはブラウザーのセッション履歴スタックに状態を追加します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">history.pushState(<var>state</var>, <var>title</var>[, <var>url</var>])</pre>
+
+<h3 id="Parameters" name="Parameters">パラメーター</h3>
+
+<dl>
+ <dt><code>state</code></dt>
+ <dd><code>state</code> (状態)オブジェクトは、<code>pushState()</code> によって作られる新規履歴エントリに関連した JavaScript オブジェクトです。ユーザーが新規の <code>state</code> にナビゲートしたときはいつも、<code><a href="/ja/docs/Web/Reference/Events/popstate" title="/ja/docs/Web/Reference/Events/popstate">popstate</a></code> イベントが発火し、イベントの <code>state</code> プロパティは、履歴エントリの <code>state</code> オブジェクトのコピーを含みます。</dd>
+ <dd><code>state</code> オブジェクトはシリアライズ可能なあらゆものとなりえます。Firefox では状態オブジェクトをユーザーのディスクに保存してブラウザーを再起動した後にも復帰できるため、<code>state</code> オブジェクトのシリアライズ表現を最大 640k 文字という上限を課しています。これを超える大きさの状態オブジェクトを <code>pushState()</code> に渡した場合、このメソッドは例外を投げます。これ以上のスペースが必要な場合、<a href="/ja/docs/Web/API/Window/sessionStorage"><code>sessionStorage</code></a> や <a href="/ja/docs/Web/API/Window/localStorage"><code>localStorage</code></a>の使用が推奨されます。</dd>
+ <dt><code>title</code></dt>
+ <dd><a href="https://github.com/whatwg/html/issues/2174">たいていのブラウザーはこのパラメーターを無視しますが、</a>将来使うかもしれません。ここに空文字を渡すと、将来メソッドが変更されても安全でしょう。あるいは、これから移動する状態の短いタイトルを渡すこともできます。タイトルが変わりうる場合は、<a href="/ja/docs/Web/API/Document/title"><code>document.title</code></a> を使用できます。</dd>
+ <dt><code>url</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>履歴エントリーの URL は、このパラメーターで与えられます。ブラウザーは <code>pushState()</code> を呼び出した後もこの URL を読み込もうとせずに、例えばユーザーがブラウザーを再起動した後など、後で URL を読み込む場合もあるのにご注意ください。新 URL は絶対パスとは限りません。つまり相対パスの場合、現在の URL から相対的に解決されます。新URL は現在の URL と同一 <a href="/ja/docs/Glossary/Origin">オリジン</a> でなければならず、そうでない場合、<code>pushState()</code> は例外をスローします。このパラメーターが指定されない場合、ドキュメントの現在の URL がセットされます。</dd>
+</dl>
+
+<h2 id="Description" name="Description">説明</h2>
+
+<p>ある意味で、<code>pushState()</code> の呼び出しは <code>window.location = &quot;#foo&quot;</code>と似ていて、両方とも現在の文書に関連した別の履歴エントリを作成、アクティベートします。しかし <code>pushState()</code> にはいくつかの利点があります:</p>
+
+<ul>
+ <li>新しい URL は現在の URL と同一オリジンのいかなる URL にできます。これに対して、<a href="/ja/docs/Web/API/Window/location"><code>window.location</code></a> をセットするのは、ハッシュを変更した時のみ同一ドキュメントのままになります。</li>
+ <li>URL を変えたくないときは変更しなくても良いです。これに対して、g <code>window.location = &quot;#foo&quot;;</code> をセットするのは現在のハッシュが <code>#foo</code> でない場合のみ新規の履歴エントリを作成します。</li>
+ <li>履歴エントリに任意のデータを関連づけることができます。ハッシュベースのアプローチでは、関連するデータすべてを短い文字列にエンコードする必要があります。</li>
+</ul>
+
+<p><code>pushState()</code> は <code><a href="/ja/docs/Web/Reference/Events/hashchange" title="/ja/docs/Web/Reference/Events/hashchange">hashchange</a></code> イベントを発火せず、それは新URL がハッシュだけ旧URL と異なる場合でもそうなることに気をつけてください。</p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>これはブラウザー履歴エントリに <em>state</em>, <em>title</em>, <em>url</em> をセットしたものを作成します。</p>
+
+<h3 id="JavaScript" name="JavaScript">JavaScript</h3>
+
+<pre class="brush: js notranslate">const state = { &apos;page_id&apos;: 1, &apos;user_id&apos;: 5 }
+const title = &apos;&apos;
+const url = &apos;hello-world.html&apos;
+
+history.pushState(state, title, url)</pre>
+
+<h3 id="Change_a_query_parameter" name="Change_a_query_parameter">クエリパラメーターの変更</h3>
+
+<pre class="brush: js notranslate">const url = new URL(window.location);
+url.searchParams.set(&apos;foo&apos;, &apos;bar&apos;);
+window.history.pushState({}, &apos;&apos;, url);</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">策定状況</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/history.html#dom-history-pushstate" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">History.pushState() の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td>No change from <a class="external" href="https://www.w3.org/TR/html52/" hreflang="en" lang="en" title="HTML5の仕様書">HTML5</a>.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52/history.html#dom-history-pushstate" hreflang="en" lang="en">HTML5<br><small lang="ja">History.pushState() の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザー実装状況</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.History.pushState"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/History_API/Working_with_the_History_API">Working with the History API</a></li>
+ <li><a href="https://wiki.developer.mozilla.org/ja/docs/Web/API/Window/popstate_event">Window: popstate event</a></li>
+</ul>

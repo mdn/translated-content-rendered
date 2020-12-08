@@ -1,0 +1,78 @@
+---
+title: ExtendableMessageEvent.ports
+slug: Web/API/ExtendableMessageEvent/ports
+tags:
+  - API
+  - ExtendableMessageEvent
+  - Property
+  - Reference
+  - Service Workers
+  - ports
+translation_of: Web/API/ExtendableMessageEvent/ports
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Service_Worker_API">Service Worker API</a></strong></li><li><strong><a href="/ja/docs/Web/API/ExtendableMessageEvent"><code>ExtendableMessageEvent</code></a></strong></li><li class="toggle"><details open><summary>コンストラクター</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/ExtendableMessageEvent/ExtendableMessageEvent"><code>ExtendableMessageEvent()</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/ExtendableMessageEvent/data"><code>data</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/ExtendableMessageEvent/lastEventId"><code>lastEventId</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/ExtendableMessageEvent/origin"><code>origin</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><em><code>ports</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/ExtendableMessageEvent/source"><code>source</code></a></li></ol></details></li><li class="toggle"><details open><summary>Service Workers API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Cache"><code>Cache</code></a></li><li><a href="/ja/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li><li><a href="/ja/docs/Web/API/Client"><code>Client</code></a></li><li><a href="/ja/docs/Web/API/Clients"><code>Clients</code></a></li><li><a href="/ja/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li><li><a href="/ja/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li><li><a href="/ja/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li><li><a href="/ja/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li><li><a href="/ja/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li><li><a href="/ja/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li><li><a href="/ja/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li><li><a href="/ja/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li><li><a href="/ja/docs/Web/API/SyncManager"><code>SyncManager</code></a></li><li><a href="/ja/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li><li><a href="/ja/docs/Web/API/WindowClient"><code>WindowClient</code></a></li></ol></details></li></ol></section>
+
+<p><a href="/ja/docs/Web/API/ExtendableMessageEvent"><code>ExtendableMessageEvent</code></a> インターフェイスの <strong><code>ports</code></strong> 読み取り専用プロパティは、関連するメッセージチャンネル（メッセージが送信されるチャンネル）のポートを表す <a href="/ja/docs/Web/API/MessagePort"><code>MessagePort</code></a> オブジェクトを含む配列を返します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">var <em>myPorts</em> = <em>extendableMessageEvent</em>.ports;</pre>
+
+<h3 id="Value" name="Value">値</h3>
+
+<p><a href="/ja/docs/Web/API/MessagePort"><code>MessagePort</code></a> オブジェクトの配列。</p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<p>次のコードをサービスワーカー内で使用して、<a href="/ja/docs/Web/API/PushMessageData"><code>PushMessageData</code></a> を介して受信したデータを<a href="/ja/docs/Web/API/Channel_Messaging_API">チャンネルメッセージ</a>を介してメインコンテキストに送信することにより、プッシュメッセージに応答する場合、<code>onmessage</code> のイベントオブジェクトは <code>ExtendableMessageEvent</code> になります。</p>
+
+<pre class="brush: js notranslate">var port;
+
+self.addEventListener(&apos;push&apos;, function(e) {
+  var obj = e.data.json();
+
+  if(obj.action === &apos;subscribe&apos; || obj.action === &apos;unsubscribe&apos;) {
+    port.postMessage(obj);
+  } else if(obj.action === &apos;init&apos; || obj.action === &apos;chatMsg&apos;) {
+    port.postMessage(obj);
+  }
+});
+
+self.onmessage = function(e) {
+  port = e.ports[0];
+}
+</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/#dom-extendablemessageevent-ports" hreflang="en" lang="en">Service Workers<br><small lang="ja">ExtendableMessageEvent.ports の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.ExtendableMessageEvent.ports"></div>
+</div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/Service_Worker_API/Using_Service_Workers">Service worker の使用</a></li>
+ <li><a class="external external-icon" href="https://github.com/mdn/sw-test">サービスワーカーの基本的なコード例</a>（英語）</li>
+ <li><a class="external external-icon" href="https://jakearchibald.github.io/isserviceworkerready/">ServiceWorker の準備はできていますか？</a>（英語）</li>
+ <li><a href="/ja/docs/Web/API/Channel_Messaging_API">Channel Messaging</a></li>
+</ul>

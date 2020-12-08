@@ -1,0 +1,108 @@
+---
+title: Body.arrayBuffer()
+slug: Web/API/Body/arrayBuffer
+tags:
+  - API
+  - ArrayBuffer
+  - BODY
+  - Experimental
+  - Fetch
+  - Method
+  - Reference
+translation_of: Web/API/Body/arrayBuffer
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Body"><code>Body</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/body"><code>body</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/bodyUsed"><code>bodyUsed</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><em><code>arrayBuffer()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/blob"><code>blob()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/formData"><code>formData()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/json"><code>json()</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/Body/text"><code>text()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implemented by:</summary><ol><li><a href="/ja/docs/Web/API/Request"><code>Request</code></a></li><li><a href="/ja/docs/Web/API/Response"><code>Response</code></a></li></ol></details></li></ol></section></div>
+
+<p><a href="/ja/docs/Web/API/Body"><code>Body</code></a> ミックスインの <strong><code>arrayBuffer()</code></strong> メソッドは、<a href="/ja/docs/Web/API/Response"><code>Response</code></a> ストリームを取得して、完全に読み取ります。 <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a> で解決される promise を返します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate"><em>response</em>.arrayBuffer().then(function(<em>buffer</em>) {
+  // buffer を使用した何らかの処理
+});</pre>
+
+<h3 id="Parameters" name="Parameters">パラメーター</h3>
+
+<p>なし。</p>
+
+<h3 id="Return_value" name="Return_value">戻り値</h3>
+
+<p><a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a> で解決される promise。</p>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="Playing_music" name="Playing_music">音楽の演奏</h3>
+
+<p><a href="http://mdn.github.io/fetch-examples/fetch-array-buffer/">fetch array buffer のライブ</a>では、Play ボタンを配置して、押下されると <code>getData()</code> 関数が実行されるようになっています。 再生する前に音声ファイル全体をダウンロードすることに注意してください。 ダウンロード中に演奏を開始したい（つまりストリーム再生したい）なら、次のように <a href="/ja/docs/Web/API/HTMLAudioElement"><code>HTMLAudioElement</code></a> を使いましょう。</p>
+
+<pre class="brush: js notranslate">new Audio(&quot;music.ogg&quot;).play();
+</pre>
+
+<p><code>getData()</code> 関数内では、<a href="/ja/docs/Web/API/Request/Request"><code>Request()</code></a> コンストラクターを使用して新しいリクエストを作成し、それを使用して OGG 音声トラックをフェッチします。 また、<a href="/ja/docs/Web/API/AudioContext/createBufferSource"><code>AudioContext.createBufferSource</code></a> を使用して、音声バッファーソースを作成します。 フェッチが成功したら、<code>arrayBuffer()</code> を使用してレスポンスから <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a> を読み取り、<a href="/ja/docs/Web/API/AudioContext/decodeAudioData"><code>AudioContext.decodeAudioData</code></a> を使用して音声データをデコードし、デコードされたデータを音声バッファーソースのバッファー（<code>source.buffer</code>）として設定し、それから <a href="/ja/docs/Web/API/AudioContext/destination"><code>AudioContext.destination</code></a> にソースを接続します。</p>
+
+<p><code>getData()</code> の実行が完了すると、<code>start(0)</code> で音声ソースの再生を開始し、それから再生中に再度再生ボタンをクリックできないようにするために（これはしばしばエラーの原因になります）ボタンを無効化しています。</p>
+
+<pre class="brush: js notranslate">function getData() {
+  source = audioCtx.createBufferSource();
+
+  var myRequest = new Request(&apos;viper.ogg&apos;);
+
+  fetch(myRequest).then(function(response) {
+    return response.arrayBuffer();
+  }).then(function(buffer) {
+    audioCtx.decodeAudioData(buffer, function(decodedData) {
+      source.buffer = decodedData;
+      source.connect(audioCtx.destination);
+    });
+  });
+};
+
+// wire up buttons to stop and play audio
+
+play.onclick = function() {
+  getData();
+  source.start(0);
+  play.setAttribute(&apos;disabled&apos;, &apos;disabled&apos;);
+}</pre>
+
+<h3 id="Reading_files" name="Reading_files">ファイルを読む</h3>
+
+<p><a href="/ja/docs/Web/API/Response/Response"><code>Response()</code></a> コンストラクターは、<a href="/ja/docs/Web/API/File"><code>File</code></a> と <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a> を受け入れるため、<a href="/ja/docs/Web/API/File"><code>File</code></a> を他の形式に読み込むために使用できます。</p>
+
+<pre class="brush: js notranslate">function readFile(file) {
+  return new Response(file).arrayBuffer();
+}
+</pre>
+
+<pre class="brush: html notranslate">&lt;input type=&quot;file&quot; onchange=&quot;readFile(this.files[0])&quot;&gt;</pre>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-body-arraybuffer" hreflang="en" lang="en">Fetch<br><small lang="ja">arrayBuffer() の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Body.arrayBuffer"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/ServiceWorker_API">ServiceWorker API</a></li>
+ <li><a href="/ja/docs/Web/HTTP/CORS">HTTP アクセス制御（CORS）</a></li>
+ <li><a href="/ja/docs/Web/HTTP">HTTP</a></li>
+</ul>

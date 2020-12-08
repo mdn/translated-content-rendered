@@ -1,0 +1,132 @@
+---
+title: Monster example
+slug: Tools/Memory/Monster_example
+translation_of: Tools/Memory/Monster_example
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/ja/docs/Tools/Page_Inspector">ページインスペクター</a></li>
+        <li><a href="/ja/docs/Tools/Web_Console">ウェブコンソール</a></li>
+        <li><a href="/ja/docs/Tools/Debugger">JavaScript デバッガー</a></li>
+        <li><a href="/ja/docs/Tools/Network_Monitor">ネットワークモニター</a></li>
+        <li><a href="/ja/docs/Tools/Performance">パフォーマンス</a></li>
+        <li><a href="/ja/docs/Tools/Application">Application</a></li>
+        <li><a href="/ja/docs/Tools/Responsive_Design_Mode">レスポンシブデザインモード</a></li>
+        <li><a href="/ja/docs/Tools/Accessibility_inspector">Accessibility Inspector</a></li>
+        <li class="toggle">
+            <details>
+                <summary>その他のツール</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Memory">メモリー</a></li>
+                    <li><a href="/ja/docs/Tools/Storage_Inspector">ストレージインスペクター</a></li>
+                    <li><a href="/ja/docs/Tools/DOM_Property_Viewer">DOM プロパティビューアー</a></li>
+                    <li><a href="/ja/docs/Tools/Eyedropper">スポイト</a></li>
+                    <li><a href="/ja/docs/Tools/Taking_screenshots">スクリーンショット</a></li>
+                    <li><a href="/ja/docs/Tools/Style_Editor">スタイルエディター</a></li>
+                    <li><a href="/ja/docs/Tools/Rulers">Rulers</a></li>
+                    <li><a href="/ja/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+                    <li><a href="/ja/docs/Tools/View_source">View Source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>開発ツールに接続する</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/about:debugging">about:debugging</a></li>
+                    <li><a href="/ja/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Android 版 Firefox に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Working_with_iframes">iframe に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Valence">ほかのブラウザーに接続する</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>ブラウザーのデバッグ</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Browser_Console">ブラウザーコンソール</a></li>
+                    <li><a href="/ja/docs/Tools/Browser_Toolbox">ブラウザーツールボックス</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/ja/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">開発ツールの拡張</a></li>
+        <li><a href="/ja/docs/Tools/Settings">オプション</a></li>
+        <li><a href="/ja/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/ja/docs/Tools/Release_notes">リリースノート</a></li>
+    </ol>
+</section></div><p>この記事では、メモリツールの機能を示すために使用するシンプルなページについて説明します。</p>
+
+<p>これは <a class="external external-icon" href="https://mdn.github.io/performance-scenarios/js-allocs/alloc.html">https://mdn.github.io/performance-scenarios/js-allocs/alloc.html</a> で試すことができます。コードは以下のとおりです:</p>
+
+<pre class="brush: js notranslate">var MONSTER_COUNT = 5000;
+var MIN_NAME_LENGTH = 2;
+var MAX_NAME_LENGTH = 48;
+
+function Monster() {
+
+  function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+  function randomName() {
+    var chars = "abcdefghijklmnopqrstuvwxyz";
+    var nameLength = randomInt(MIN_NAME_LENGTH, MAX_NAME_LENGTH);
+    var name = "";
+    for (var j = 0; j &amp;lt; nameLength; j++) {
+      name += chars[randomInt(0, chars.length-1)];
+    }
+    return name;
+  }
+
+  this.name = randomName();
+  this.eyeCount = randomInt(0, 25);
+  this.tentacleCount = randomInt(0, 250);
+}
+
+function makeMonsters() {
+  var monsters = {
+    "friendly": [],
+    "fierce": [],
+    "undecided": []
+  };
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.friendly.push(new Monster());
+  }
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.fierce.push(new Monster());
+  }
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.undecided.push(new Monster());
+  }
+
+  console.log(monsters);
+}
+
+var makeMonstersButton = document.getElementById("make-monsters");
+makeMonstersButton.addEventListener("click", makeMonsters);</pre>
+
+<p>このページにはボタンがあります。このボタンを押すと、コードがモンスターを生成します。詳細は以下のとおりです:</p>
+
+<ul>
+ <li>コードが 3 つのプロパティを持つオブジェクトを生成します。それぞれのプロパティは配列です:
+  <ul>
+   <li>どう猛なモンスター</li>
+   <li>友好的なモンスター</li>
+   <li>タイプがわかっていないモンスター</li>
+  </ul>
+ </li>
+ <li>コードはそれぞれの配列に、ランダムに初期化したモンスター 5000 体を生成および追加します。それぞれのモンスターは以下の属性を持ちます:
+  <ul>
+   <li>モンスターの名前を示す文字列</li>
+   <li>モンスターの目の数を表す数値</li>
+   <li>モンスターの触手の数を表す数値</li>
+  </ul>
+ </li>
+</ul>
+
+<p>従って、JavaScript のヒープ上に割り当てられるメモリの構造は、3 つの配列を持つオブジェクトになります。それぞれの配列は 5000 個のオブジェクト (モンスター) を持ち、そのオブジェクトが文字列と 2 つの数値を持ちます:</p>
+
+<p><a name="allocation-graph"><img alt="" src="https://mdn.mozillademos.org/files/12369/monsters.svg" style="display: block; height: 521px; margin-left: auto; margin-right: auto; width: 500px;"></a></p>

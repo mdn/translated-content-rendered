@@ -1,0 +1,172 @@
+---
+title: DOM onevent ハンドラー
+slug: Web/Guide/Events/Event_handlers
+tags:
+  - Beginner
+  - DOM
+  - DOM Beginner
+  - NeedsBeginnerUpdate
+  - NeedsUpdate
+translation_of: Web/Guide/Events/Event_handlers
+---
+<p><span class="seoSummary">ウェブプラットフォームでは、<a href="/ja/docs/Web/Events">DOM イベント</a>の通知を受け取るための方法をいくつか提供しています。よく使われる方法は2つあり、 <a href="/ja/docs/Web/API/EventTarget/addEventListener"><code>addEventListener()</code></a> と、特定の <code>on<em>event</em></code> ハンドラーです。</span>このページでは、後者がどのように機能するのかについて注目します。</p>
+
+<h2 id="Registering_onevent_handlers" name="Registering_onevent_handlers">onevent ハンドラーの登録</h2>
+
+<p><strong><code>on<em>event</em></code></strong> ハンドラーは特定の DOM 要素のプロパティで、その要素がイベントに対してどのように反応するかを管理します。要素には、対話的なもの (リンク、ボタン、画像、フォームなど) と対話的ではないもの (基本の <code>&lt;body&gt;</code> 要素など) があります。イベントとは、以下のようなアクションのことです。</p>
+
+<ul>
+ <li>クリックされた</li>
+ <li>キーの押下が検出された</li>
+ <li>フォーカスを受け取った</li>
+</ul>
+
+<p><code>on<em>event</em></code> ハンドラーは通常、<code>on<em>click</em></code>, <code>on<em>keypress</em></code>, <code>on<em>focus</em></code> など、反応するイベントに従って名前が付けられています。</p>
+
+<p><code>on<em>&lt;…&gt;</em></code> イベントハンドラーを指定することで、指定されたオブジェクトの特定のイベント (<code><a href="/ja/docs/Web/Reference/Events/click" title="/ja/docs/Web/Reference/Events/click">click</a></code> など) に対してさまざまな方法で指定することができます。</p>
+
+<ul>
+ <li>要素に <code>on<em>&lt;eventtype&gt;</em></code> という名前の HTML <a href="/ja/docs/Glossary/Attribute">属性</a>を追加する方法。<br>
+  <code>&lt;button <strong>onclick=&quot;handleClick()&quot;</strong>&gt;</code>,</li>
+ <li>または、JavaScript から対応する <a href="/ja/docs/Glossary/property/JavaScript">property</a> を設定する方法。<br>
+  <code>document.querySelector(&quot;button&quot;)<strong>.onclick = function(event) { … }</strong></code>.</li>
+</ul>
+
+<p><code>on<em>event</em></code> イベントハンドラープロパティは、1 つのイベントハンドラーを割り当てることができる一種のプレースホルダーとして機能します。与えられたオブジェクト上の同じイベントに対して複数のハンドラーをインストールできるようにするには、その addEventListener() メソッドを呼び出して、オブジェクト上の与えられたイベントに対するハンドラーのリストを管理することができます。ハンドラーは、その <a href="/ja/docs/Web/API/EventTarget/removeEventListener"><code>removeEventListener()</code></a> 関数を呼び出すことで、オブジェクトから削除することができます。</p>
+
+<p>要素に適用されるイベントが発生すると、そのイベントハンドラーが次々と呼び出され、イベントを処理できるようになります。自分で呼び出す必要はありませんが、多くの場合、イベントの発生を簡単にシミュレートするために呼び出すことができます。例えば、ボタンオブジェクト <code>myButton</code> を指定した場合、 <code>myButton.onclick(myEventObject)</code> を実行することでイベントハンドラーを直接呼び出すことができます。イベントハンドラーがイベントオブジェクトからデータにアクセスしない場合は、 <code>onclick()</code> を呼び出すときにイベントを省略することができます。</p>
+
+<p>これは、イベントハンドラーのいずれかがイベントオブジェクト自身に対して <a href="/ja/docs/Web/API/Event/stopPropagation"><code>stopPropagation()</code></a> を呼び出すことでイベントの処理を明示的に停止しない限り、すべてのハンドラーが呼び出されるまで続きます。</p>
+
+<h3 id="Non-element_objects" name="Non-element_objects">要素以外のオブジェクト</h3>
+
+<p>イベントハンドラーはまた、 <a href="/ja/docs/Web/API/Window"><code>window</code></a>, <a href="/ja/docs/Web/API/Document"><code>document</code></a>, <a href="/ja/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> などを含む、イベントを生成する多くの要素以外のオブジェクトのプロパティを使用して設定することもできます。例えば、 <code>progress</code> イベントが <code>XMLHttpRequest</code> のインスタンスで発生した場合は次のようになります。</p>
+
+<pre class="brush: js notranslate">const xhr = new XMLHttpRequest();
+xhr.onprogress = function() { … };</pre>
+
+<h2 id="HTML_onevent_attributes" name="HTML_onevent_attributes">HTML の onevent 属性</h2>
+
+<p>HTML 要素には <code>on<em>event</em></code> という名前の属性があり、これを利用して HTML コード内に直接イベントのハンドラーを登録することができます。要素が HTML から構築されると、その <code>on<em>event</em></code> 属性の値がその要素を表す DOM オブジェクトにコピーされるので、JavaScript を使って属性の値にアクセスすると、HTML で設定された値が得られます。</p>
+
+
+
+<p>HTML の属性値への更なる変更は <a href="/ja/docs/Web/API/Element/setAttribute"><code>setAttribute</code></a> メソッドで行うことができます。 JavaScript プロパティを変更しても効果あありません。</p>
+
+<h3 id="HTML">HTML</h3>
+
+<p>このような HTML 文書があったとします。</p>
+
+<pre class="brush: html notranslate">&lt;p&gt;Demonstrating quirks of &lt;code&gt;on&lt;em&gt;event&lt;/em&gt;&lt;/code&gt; HTML attributes on
+   &lt;a onclick=&quot;log(&apos;Click!&apos;)&quot;&gt;these three words&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;div&gt;&lt;/div&gt;</pre>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<p>この JavaScript は、 HTML 属性の値が JavaScript オブジェクトのプロパティの変更によって影響を受けないことを示しています。</p>
+
+<pre class="brush: js notranslate">let logElement = document.querySelector(&apos;div&apos;);
+let el = document.querySelector(&quot;a&quot;);
+
+function log(msg) { logElement.innerHTML += `${msg}&lt;br&gt;` };
+function anchorOnClick(event) { log(&quot;Changed onclick handler&quot;) };
+
+// Original Handler
+log(`Element&apos;s onclick as a JavaScript property: &lt;code&gt; ${el.onclick.toString()} &lt;/code&gt;`);
+
+//Changing handler using .onclick
+log(&apos;&lt;br&gt;Changing onclick handler using &lt;strong&gt; onclick property &lt;/strong&gt; &apos;);
+
+el.onclick = anchorOnClick;
+
+log(`Changed the property to: &lt;code&gt; ${el.onclick.toString()} &lt;/code&gt;`);
+log(`But the HTML attribute is unchanged: &lt;code&gt; ${el.getAttribute(&quot;onclick&quot;)} &lt;/code&gt;&lt;br&gt;`);
+
+//Changing handler using .setAttribute
+log(&apos;&lt;hr/&gt;&lt;br&gt; Changing onclick handler using &lt;strong&gt; setAttribute method &lt;/strong&gt; &apos;);
+el.setAttribute(&quot;onclick&quot;, &apos;anchorOnClick(event)&apos;);
+
+log(`Changed the property to: &lt;code&gt; ${el.onclick.toString()} &lt;/code&gt;`);
+log(`Now even the HTML attribute has changed: &lt;code&gt; ${el.getAttribute(&quot;onclick&quot;)} &lt;/code&gt;&lt;br&gt;`);</pre>
+
+<h3 id="Result" name="Result">結果</h3>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_HTML_onevent_attributes" src="https://mdn.mozillademos.org/ja/docs/Web/Guide/Events/Event_handlers$samples/HTML_onevent_attributes?revision=1642212"></iframe></p>
+
+<p>歴史的な理由から、<a href="/ja/docs/Web/HTML/Element/body" title="HTML の &lt;body&gt; 要素は、 HTML 文書のコンテンツを示す要素です。 &lt;body&gt; 要素は文書中に一つだけ配置できます。"><code>&lt;body&gt;</code></a> および <a href="/ja/docs/Web/HTML/Element/frameset" title="HTML の &lt;frameset&gt; 要素は、 &lt;frame&gt; 要素を包含するために使用する HTML 要素です。"><code>&lt;frameset&gt;</code></a> 要素の一部の属性/プロパティは、実際にはその親 <a href="/ja/docs/Web/API/Window"><code>Window</code></a> オブジェクトにイベントハンドラーを設定します。(HTML 仕様はこれらを <a href="/ja/docs/Web/API/GlobalEventHandlers/onblur"><code>onblur</code></a>, <a href="/ja/docs/Web/API/GlobalEventHandlers/onerror"><code>onerror</code></a>, <a href="/ja/docs/Web/API/GlobalEventHandlers/onfocus"><code>onfocus</code></a>, <a href="/ja/docs/Web/API/GlobalEventHandlers/onload"><code>onload</code></a>, <a href="/ja/docs/Web/API/GlobalEventHandlers/onscroll"><code>onscroll</code></a> と命名しています。)</p>
+
+<h3 id="Event_handlers_parameters_this_binding_and_the_return_value" name="Event_handlers_parameters_this_binding_and_the_return_value">イベントハンドラーの引数、this の結びつけ、および返値</h3>
+
+<p>イベントハンドラーが <strong>HTML 属性</strong>として指定されている場合、指定されたコードは<strong>次の引数</strong>を持つ関数にラップされます。</p>
+
+<ul>
+ <li><code>event</code> - {domxref(&quot;GlobalEventHandlers.onerror&quot;, &quot;onerror&quot;)}} を除くすべてのイベントハンドラー。</li>
+ <li><code>event</code>, <code>source</code>, <code>lineno</code>, <code>colno</code>, <code>error</code> - <a href="/ja/docs/Web/API/GlobalEventHandlers/onerror"><code>onerror</code></a> のイベントハンドラー。なお、 <code>event</code> 引数には、実際にはエラーメッセージが文字列として含まれています。</li>
+</ul>
+
+<p>イベントハンドラーが呼び出されると、ハンドラー内の <code>this</code> キーワードは、ハンドラーが登録されている DOM 要素に設定されます。詳しくは、<a href="/ja/docs/Web/JavaScript/Reference/Operators/this#In_an_inline_event_handler"><code>this</code> キーワードのドキュメント</a>を参照してください。</p>
+
+<p>ハンドラーからの返値は、イベントが取り消されるかどうかを決定します。返値値の具体的な処理はイベントの種類によって異なります。詳細については、<a href="https://html.spec.whatwg.org/multipage/webappapis.html#the-event-handler-processing-algorithm">HTML 仕様の「イベントハンドラー処理アルゴリズム」</a>を参照してください。</p>
+
+<h3 id="When_the_event_handler_is_invoked" name="When_the_event_handler_is_invoked">イベントハンドラーが呼び出されたとき</h3>
+
+<div class="note notecard">
+<p>作成中 (非捕獲リスナー)</p>
+</div>
+
+<h3 id="Terminology" name="Terminology">用語集</h3>
+
+<p><strong>イベントハンドラー</strong>という用語は、次のように使用されます。</p>
+
+<ul>
+ <li>イベントの通知を受けるように登録されている関数またはオブジェクト</li>
+ <li>または、より具体的には、<code>&lt;button onclick=&quot;alert(this)&quot;&gt;</code> や <code>window.onload = function() { … }</code>など、HTML の <code>on…</code> 属性または Web API のプロパティを介してイベントリスナーを登録するメカニズム。</li>
+</ul>
+
+<p>イベントを待ち受けするためのさまざまな方法を議論するときは、</p>
+
+<ul>
+ <li><strong>イベントリスナー</strong>は、<a href="/ja/docs/Web/API/EventTarget/addEventListener"><code>EventTarget.addEventListener()</code></a> によって登録された関数またはオブジェクトを参照します。</li>
+ <li>一方、<strong>イベントハンドラー</strong>は <code>on...</code> 属性またはプロパティを介して登録された関数を指します。</li>
+</ul>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-attributes" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">event handlers の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52/webappapis.html#event-handler-attributes" hreflang="en" lang="en">HTML5<br><small lang="ja">event handlers の定義</small></a></td>
+   <td><span class="spec-REC">勧告</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">ブラウザーの互換性</h2>
+
+<h4 id="イベントハンドラープロパティが存在することの検出">イベントハンドラープロパティが存在することの検出</h4>
+
+<p>JavaScript の <a href="/ja/docs/Web/JavaScript/Reference/Operators/in"><code>in</code></a> 演算子でイベントハンドラープロパティの存在を検出することができます。例えば、以下のようになります。</p>
+
+<pre class="brush: js notranslate">if (&quot;onsomenewfeature&quot; in window) {
+  /* do something amazing */
+}
+</pre>
+
+<h4 id="Event_handlers_and_prototypes" name="Event_handlers_and_prototypes">イベントハンドラーとプロトタイプ</h4>
+
+<p>DOM プロトタイプオブジェクトには、IDL で定義された属性の値を設定したり、アクセスしたりすることはできません。つまり、例えば <code>Window.prototype.onload</code> を変更することはできません。以前は、 Gecko では イベントハンドラー (<code>onload</code> など) が IDL 属性として実装されていなかったので可能だったのですが、現在はできなくなりました。これにより互換性が向上します。</p>

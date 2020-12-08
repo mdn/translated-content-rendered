@@ -1,0 +1,62 @@
+---
+title: クリッピングとマスキング
+slug: Web/SVG/Tutorial/Clipping_and_masking
+tags:
+  - SVG
+  - 'SVG:Tutorial'
+translation_of: Web/SVG/Tutorial/Clipping_and_masking
+---
+<div>
+  <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ja/docs/SVG/Tutorial/Basic_Transformations" class="button">« 前のページ</a><a href="/ja/docs/SVG/Tutorial/Other_content_in_SVG" class="button">次のページ  »</a></p>
+</div></div>
+<p>苦労して作成したオブジェクトの一部を消去することは、一見矛盾しているように見えます。ところが SVG で半円を作成しようとすると、以下のプロパティを使うことにすぐ気がつくでしょう。</p>
+<p><strong>クリッピング</strong>はある要素のうち、他の場所で定義された一部分を取り除くことを指します。この場合は半透明効果をかけることはできず、完全に表示するか全く表示しないかの扱いになります。</p>
+<p><strong>マスキング</strong>は半透明効果やマスクの濃淡値を考慮することで、ソフトエッジ効果をかけることができます。</p>
+<h2 id="Creating_clips" name="Creating_clips">クリップの作成</h2>
+<p><code>circle</code> 要素をもとにして、先に述べた半円を作成しましょう:</p>
+<pre class="brush:xml">&lt;clipPath id=&quot;cut-off-bottom&quot;&gt;
+  &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;100&quot; /&gt;
+&lt;/clipPath&gt;
+
+&lt;circle cx=&quot;100&quot; cy=&quot;100&quot; r=&quot;100&quot; clip-path=&quot;url(#cut-off-bottom)&quot; /&gt;
+</pre>
+<p>(100,100) を中心にした半径 100 の円を描画します。<code>clip-path</code> 属性は、<code>rect</code> 要素を 1 つ含む <code><a href="/ja/docs/Web/SVG/Element/clipPath" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>&lt;clipPath&gt;</code></a></code> 要素を参照しています。この長方形は、キャンバスの上半分に黒色で描画されるものです。なお補足として、<code>clipPath</code> 要素はたいてい <code>defs</code> セクションに置かれます。</p>
+<p>ところが、<code>rect</code> 要素は描画されません。描画されない代わりにそのピクセルデータは、円の中で最終的にレンダリングするピクセルを決定することに用いられます。長方形は円の上半分だけを覆っているため、円の下半分は消滅します。</p>
+<p><img src="/@api/deki/files/4933/=clipdemo.png" alt="clipdemo.png" class="default"></p>
+<p>これで、path 要素の円弧を扱う必要なしに半円を作りました。クリッピング用に <code>clipPath</code> の内部にあるすべてのパスが、そのストロークやトランスフォームと併せて調査および評価されます。そして適用先のオブジェクトのうち、<code>clipPath</code> の内容物で決められた透過領域にかかる部分は描画されません。色や不透明度などは、図形の一部を完全に消滅させない限り効果がありません。</p>
+<h2 id="Masking" name="Masking">マスキング</h2>
+<p>マスキングの効果は、グラデーションと共に適用するともっとも印象的です。要素をフェードアウトしたい場合は、マスクを用いることですぐにその効果を得ることができます。</p>
+<pre class="brush:xml">&lt;svg version=&quot;1.1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;white&quot; stop-opacity=&quot;0&quot; /&gt;
+      &lt;stop offset=&quot;1&quot; stop-color=&quot;white&quot; stop-opacity=&quot;1&quot; /&gt;
+    &lt;/linearGradient&gt;
+    &lt;mask id=&quot;Mask&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;200&quot; fill=&quot;url(#Gradient)&quot;  /&gt;
+    &lt;/mask&gt;
+  &lt;/defs&gt;
+
+  &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;200&quot; fill=&quot;green&quot; /&gt;
+  &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;200&quot; fill=&quot;red&quot; mask=&quot;url(#Mask)&quot; /&gt;
+&lt;/svg&gt;
+</pre>
+<p>下層のレイヤーに緑色で塗りつぶした <code>rect</code> 、上層に赤色で塗りつぶした <code>rect</code> があります。また後者には、<code>mask</code> 要素を指し示す <code>mask</code> 属性があります。mask 要素の内容物は <code>rect</code> 要素が 1 つあり、これは透明から白色へのグラデーションで塗りつぶしています。この結果、赤色の長方形のピクセルは mask の内容物のアルファ値 (透明度) を継承して、最終的に緑色から赤色へのグラデーションができます:</p>
+<p><img src="/@api/deki/files/4945/=maskdemo.png" alt="maskdemo.png" class="default"></p>
+<h2 id="Transparency_with_opacity" name="Transparency_with_opacity"><code>opacity</code> による透明度</h2>
+<p>要素全体の透明度を設定することができます。それには <code>opacity</code> 属性を用います:</p>
+<pre>&lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;100&quot; height=&quot;100&quot; opacity=&quot;.5&quot; /&gt;
+</pre>
+<p>上記の長方形は、半透明で描画します。fill および stroke について分けられた 2 つの属性 <code>fill-opacity</code> と <code>stroke-opacity</code> があり、それぞれのプロパティの不透明度を分けて制御します。なお、ストロークは塗りつぶしの上層に描画することに注意してください。このために塗りつぶしもある要素でストロークの不透明度を設定した場合は、ストロークの半分で塗りつぶしが透けて見え、また同時に残り半分で背景が透けて見えます:</p>
+<pre class="brush:xml">&lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;200&quot; height=&quot;200&quot; fill=&quot;blue&quot; /&gt;
+&lt;circle cx=&quot;100&quot; cy=&quot;100&quot; r=&quot;50&quot; stroke=&quot;yellow&quot; stroke-width=&quot;40&quot; stroke-opacity=&quot;.5&quot; fill=&quot;red&quot; /&gt;
+</pre>
+<p><img src="/@api/deki/files/4942/=opacitydemo.png" alt="opacitydemo.png" class="internal default"></p>
+<p>この例では、青い背景の上に赤い円があります。黄色のストロークに 50% の不透明度を設定しており、事実上 2 色のストロークになります。</p>
+<h2 id="Using_well-known_CSS_techniques" name="Using_well-known_CSS_techniques">周知の CSS 技術の利用</h2>
+<p>Web 開発者が持つツールの中でもっとも強力なもののひとつが、<code>display: none</code> です。それゆえ、CSS2 で定義された <code>visibility</code> や <code>clip</code> と併せて、この CSS プロパティも SVG に取り込むことが決定した点に若干の驚きがあります。過去に設定した <code>display: none</code> を元に戻すためには、すべての SVG 要素の初期値が <code>inline</code> であると知っておくことが重要です。</p>
+<div>
+  <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ja/docs/SVG/Tutorial/Basic_Transformations" class="button">« 前のページ</a><a href="/ja/docs/SVG/Tutorial/Other_content_in_SVG" class="button">次のページ  »</a></p>
+</div></div>

@@ -1,0 +1,218 @@
+---
+title: Web Components
+slug: Web/Web_Components
+tags:
+  - Landing
+  - NeedsTranslation
+  - TopicStub
+  - Web Components
+translation_of: Web/Web_Components
+---
+<section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/Web_Components/Using_custom_elements">Using custom elements</a></li><li><a href="/ja/docs/Web/Web_Components/Using_shadow_DOM">shadow DOM の使い方</a></li><li><a href="/ja/docs/Web/Web_Components/Using_templates_and_slots">template と slot の使い方</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/ja/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/ja/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/ja/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/ja/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/ja/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/ja/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/ja/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/ja/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/ja/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/ja/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/ja/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/ja/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section>
+
+<div class="summary">
+<p>Web Components は、再利用可能なカスタム要素を作成し、ウェブアプリの中で利用するための、一連のテクノロジーです。コードの他の部分から独立した、カプセル化された機能を使って実現します。 </p>
+</div>
+
+<h2 id="概念と使用法">概念と使用法</h2>
+
+
+
+<p>開発者ならご存知でしょうが、可能な限りコードを再利用することは良い考えです。しかしこれは、以前から、カスタムのマークアップ構造にとって、それほど簡単なことではありませんでした。複雑な HTML (と一連のスタイルやスクリプト) を考えてみて下さい。ときに、カスタム UI の制御をレンダリングするために、コードを書かなければなりません。それに、注意していないと、それらの制御をどう使い回すかで、ページが複雑なものになってしまいます。</p>
+
+<p>Web Components は、上記の問題の解決を目指しています。 Web Components は、3 つの主要な技術からなり、それらを組み合わせて、多目的なカスタム要素を作成します。カプセル化された機能を使うことで、コードの重複を恐れることなく、どこでも再利用することができます。</p>
+
+<ul>
+ <li><strong>カスタム要素:</strong> カスタム要素とその動作を定義するための、一連の JavaScript API です。以降、ユーザーインターフェースの中で好きなだけ使用することができます。</li>
+ <li><strong>Shadow DOM:</strong> カプセル化された &quot;Shadow&quot; DOM ツリーを要素に紐付け、関連する機能を制御するための、一連の JavaScript API です。 Shadow DOM ツリーは、メインドキュメントの DOM とは別にレンダリングされます。こうして、要素の機能を公開せずに済み、ドキュメントの他の部分との重複を恐れることなく、スクリプト化やスタイル化できます。</li>
+ <li><strong>HTML テンプレート:</strong> <a href="/ja/docs/Web/HTML/Element/template" title="HTML のコンテンツテンプレート (&lt;template&gt;) 要素 は、すなわちページの読み込み時にすぐには描画されないものの、後で JavaScript を使用してインスタンスを生成できる HTML を保持するメカニズムです。"><code>&lt;template&gt;</code></a> と <a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a> 要素によって、レンダリングされたページ内に表示されないマークアップのテンプレートを書くことができます。カスタム要素の構造体の基礎として、それらを何度も再利用できます。</li>
+</ul>
+
+<p>Web Component を実装する基本的な流れは、以下に挙げてある通りです。</p>
+
+<ol>
+ <li>Web Component の機能を明示したクラスもしくは関数を作成します。クラスを使用するなら、ECMAScript 2015 のクラスの文法に従って下さい。 (詳細は<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">クラス</a>を参照して下さい。)</li>
+ <li>新しく作成したカスタム要素を登録します。<a href="/ja/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> メソッドに、要素の名前、機能が明示されているクラスもしくは関数、またオプションでどの要素を継承するかを渡して下さい。</li>
+ <li>必要なら、<a href="/ja/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a> メソッドを使って、Shadow DOM をカスタム要素に紐付けます。通常の DOM メソッドを使って、子要素やイベントリスナーなどをShadow DOM に追加して下さい。</li>
+ <li>必要なら、<a href="/ja/docs/Web/HTML/Element/template" title="HTML のコンテンツテンプレート (&lt;template&gt;) 要素 は、すなわちページの読み込み時にすぐには描画されないものの、後で JavaScript を使用してインスタンスを生成できる HTML を保持するメカニズムです。"><code>&lt;template&gt;</code></a> と <a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a> を使って、HTML テンプレートを定義します。通常の DOM メソッドを再度使って、テンプレートをクローンし、Shadow DOM に紐付けてください。</li>
+ <li>ページ内のお好きな場所で、通常の HTML 要素のように、カスタム要素を使って下さい。</li>
+</ol>
+
+<h2 id="チュートリアル">チュートリアル</h2>
+
+<dl>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements">カスタム要素を使ってみよう</a></dt>
+ <dd>単純な Web Component を作成するために、カスタム要素の機能の使い方を紹介したガイドラインです。それ以外にも、ライフサイクルコールバックやその他の高度な機能の中を覗いていきます。</dd>
+ <dt><a href="https://developer.mozilla.org/ja/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM を使ってみよう</a></dt>
+ <dd>Shadow DOM の基礎を眺めるガイドラインです。 Shadow DOM を要素にどう紐付けるか、Shadow DOM ツリーにどう追加するか、どうスタイルするかなどを紹介しています。</dd>
+ <dt><a href="https://developer.mozilla.org/ja/docs/Web/Web_Components/Using_templates_and_slots">テンプレートとスロットを使ってみよう</a></dt>
+ <dd><a href="/ja/docs/Web/HTML/Element/template" title="HTML のコンテンツテンプレート (&lt;template&gt;) 要素 は、すなわちページの読み込み時にすぐには描画されないものの、後で JavaScript を使用してインスタンスを生成できる HTML を保持するメカニズムです。"><code>&lt;template&gt;</code></a> と <a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a> 要素を使って、再利用可能な HTML 構造体の定義と使用方法を紹介したガイドラインです。 </dd>
+</dl>
+
+<h2 id="リファレンス">リファレンス</h2>
+
+<h3 id="カスタム要素">カスタム要素</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></dt>
+ <dd>カスタム要素に関わる機能が含まれています。中でも注目すべきは、 <a href="/ja/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a> メソッドで、新しいカスタム要素を登録するために用います。それにより、カスタム要素をドキュメント内で使用できるようになります。</dd>
+ <dt><a href="/ja/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></dt>
+ <dd><code>CustomElementRegistry</code> オブジェクトへの参照を返します。</dd>
+ <dt><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#Using_the_lifecycle_callbacks">Life cycle callbacks</a></dt>
+ <dd>カスタム要素のクラス定義の中で定義された特別なコールバック関数で、挙動に影響を与えます。
+ <ul>
+  <li><code>connectedCallback</code>: カスタム要素がドキュメントの DOM に初めて接続したときに呼び出されます。</li>
+  <li><code>disconnectedCallback</code>: カスタム要素がドキュメントの DOM から切断されたときに呼び出されます。</li>
+  <li><code>adoptedCallback</code>: カスタム要素が新しいドキュメントに移動したときに呼び出されます。</li>
+  <li><code>attributeChangedCallback</code>: カスタム要素の属性のひとつが追加、削除、もしくは変更されたときに呼び出されます。</li>
+ </ul>
+ </dd>
+ <dd>
+ <ul>
+ </ul>
+ </dd>
+</dl>
+
+<dl>
+ <dt>カスタムビルトイン要素を作成するための拡張機能</dt>
+ <dd>
+ <ul>
+  <li><code><a href="/ja/docs/Web/HTML/Global_attributes#attr-is">is</a></code> グローバル HTML 属性: 標準の HTML 要素が、カスタムビルトイン要素のように振る舞うべきかを指定できます。</li>
+  <li><a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a> メソッドの &quot;is&quot; オプション: カスタムビルトイン要素のように振る舞う標準の HTML 要素のインスタンスを作成できます。</li>
+ </ul>
+ </dd>
+ <dt>CSS の擬似クラス</dt>
+ <dd>カスタム要素に関連する擬似クラス:
+ <ul>
+  <li><a href="/ja/docs/Web/CSS/:defined" title="CSS の :defined 疑似クラスは、定義されているすべての要素を表します。これにはブラウザーに組み込まれたすべての標準要素と、 (CustomElementRegistry.define() メソッドを使用して) 定義に成功したカスタム要素が含まれます。"><code>:defined</code></a>: ビルトイン要素と <code>CustomElementRegistry.define()</code> で定義されるカスタム要素を含む、あらゆる定義済みの要素にマッチします。</li>
+  <li><a href="/ja/docs/Web/CSS/:host" title="CSS の :host 疑似クラスは、その CSS を含むシャドウ DOM のシャドウホストを選択します。言い換えれば、シャドウ DOM の中からカスタム要素を選択できるようにします。"><code>:host</code></a>: 使われている CSS を含む、<a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> のシャドーホストを選択します。</li>
+  <li><a href="/ja/docs/Web/CSS/:host()" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>:host()</code></a>: 使われている CSS を含む、<a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> のシャドーホストを選択します。 (Shadow DOM の内側からカスタム要素を選択することができます。) ただし、関数のパラメータとして渡されるセレクタがシャドーホストに一致している場合に限ります。</li>
+  <li><a href="/ja/docs/Web/CSS/:host-context()" title=":host-context() は CSS の擬似クラス関数で、内部で使用される CSS を含むシャドウ DOM のシャドウホストを選択します (そのため、シャドウ DOM の中のカスタム要素を選択することができます)。 — しかし、関数の引数として与えられたセレクターがシャドウホストの祖先に一致した場合のみです。"><code>:host-context()</code></a>: 使われている CSS を含む、<a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> のシャドーホストを選択します。 (Shadow DOM の内側からカスタム要素を選択することができます。) ただし、関数のパラメータとして渡されるセレクタが DOM 階層内のシャドーホストの先祖要素に一致している場合に限ります。</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Shadow_DOM">Shadow DOM</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></dt>
+ <dd>Represents the root node of a shadow DOM subtree.</dd>
+ <dt><a href="/ja/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></dt>
+ <dd>A mixin defining features that are available across document and shadow roots.</dd>
+ <dt><a href="/ja/docs/Web/API/Element"><code>Element</code></a> extensions</dt>
+ <dd>Extensions to the <code>Element</code> interface related to shadow DOM:
+ <ul>
+  <li>The <a href="/ja/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a> method attaches a shadow DOM tree to the specified element.</li>
+  <li>The <a href="/ja/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a> property returns the shadow root attached to the specified element, or <code>null</code> if there is no shadow root attached.</li>
+ </ul>
+ </dd>
+ <dt>Relevant <a href="/ja/docs/Web/API/Node"><code>Node</code></a> additions</dt>
+ <dd>Additions to the <code>Node</code> interface relevant to shadow DOM:
+ <ul>
+  <li>The <a href="/ja/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a> method returns the context object&apos;s root, which optionally includes the shadow root if it is available.</li>
+  <li>The <a href="/ja/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a> property returns a boolean indicating whether or not the Node is connected (directly or indirectly) to the context object, e.g. the <a href="/ja/docs/Web/API/Document"><code>Document</code></a> object in the case of the normal DOM, or the <a href="/ja/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a> in the case of a shadow DOM.</li>
+ </ul>
+ </dd>
+ <dt><a href="/ja/docs/Web/API/Event"><code>Event</code></a> extensions</dt>
+ <dd>Extensions to the <code>Event</code> interface related to shadow DOM:
+ <ul>
+  <li><a href="/ja/docs/Web/API/Event/composed"><code>Event.composed</code></a>: Returns a <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Boolean"><code>Boolean</code></a> which indicates whether the event will propagate across the shadow DOM boundary into the standard DOM (<code>true</code>), or not  (<code>false</code>).</li>
+  <li><a href="/ja/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a>: Returns the event’s path (objects on which listeners will be invoked). This does not include nodes in shadow trees if the shadow root was created with <a href="/ja/docs/Web/API/ShadowRoot/mode"><code>ShadowRoot.mode</code></a> closed.</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="HTML_templates">HTML templates</h3>
+
+<dl>
+ <dt><a href="/ja/docs/Web/HTML/Element/template" title="HTML のコンテンツテンプレート (&lt;template&gt;) 要素 は、すなわちページの読み込み時にすぐには描画されないものの、後で JavaScript を使用してインスタンスを生成できる HTML を保持するメカニズムです。"><code>&lt;template&gt;</code></a></dt>
+ <dd>Contains an HTML fragment that is not rendered when a containing document is initially loaded, but can be displayed at runtime using JavaScript, mainly used as the basis of custom element structures. The associated DOM interface is <a href="/ja/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a>.</dd>
+ <dt><a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a></dt>
+ <dd>A placeholder inside a web component that you can fill with your own markup, which lets you create separate DOM trees and present them together. The associated DOM interface is <a href="/ja/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a>.</dd>
+ <dt>The <code><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/slot">slot</a></code> global HTML attribute</dt>
+ <dd>Assigns a slot in a shadow DOM shadow tree to an element.</dd>
+ <dt><a href="/ja/docs/Web/API/Slotable"><code>Slotable</code></a></dt>
+ <dd>A mixin implemented by both <a href="/ja/docs/Web/API/Element"><code>Element</code></a> and <a href="/ja/docs/Web/API/Text"><code>Text</code></a> nodes, defining features that allow them to become the contents of an <a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a> element. The mixin defines one attribute, <a href="/ja/docs/Web/API/Slotable/assignedSlot"><code>Slotable.assignedSlot</code></a>, which returns a reference to the slot the node is inserted in.</dd>
+</dl>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/Element"><code>Element</code></a> extensions</dt>
+ <dd>Extensions to the <code>Element</code> interface related to slots:
+ <ul>
+  <li><a href="/ja/docs/Web/API/Element/slot"><code>Element.slot</code></a>: Returns the name of the shadow DOM slot attached to the element.</li>
+ </ul>
+ </dd>
+ <dt>CSS pseudo-elements</dt>
+ <dd>Pseudo-elements relating specifically to slots:
+ <ul>
+  <li><a href="/ja/docs/Web/CSS/::slotted" title="::slotted() は CSS の 疑似要素で、 HTML テンプレート内にあるスロットに配置された任意の要素を表します (詳しくはテンプレートとスロットの利用をご覧ください)。"><code>::slotted</code></a>: Matches any content that is inserted into a slot.</li>
+ </ul>
+ </dd>
+ <dt>The <code><a href="/ja/docs/Web/Reference/Events/slotchange" title="/ja/docs/Web/Reference/Events/slotchange">slotchange</a></code> event</dt>
+ <dd>Fired on an <a href="/ja/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a> instance (<a href="/ja/docs/Web/HTML/Element/slot" title="HTML の &lt;slot&gt; 要素 — ウェブコンポーネント技術の一部 — は、ウェブコンポーネント内で別な DOM ツリーを構築し、いっしょに表示することができる独自のマークアップを入れることができるプレイスホルダーです。"><code>&lt;slot&gt;</code></a> element) when the node(s) contained in that slot change.</dd>
+</dl>
+
+<h2 id="例">例</h2>
+
+<p><a href="https://github.com/mdn/web-components-examples">web-components-examples</a> の GitHub レポジトリに、いくつかの例を用意してあります。時間とともに、より多くの例が追加されることでしょう。</p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">ステータス</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/scripting.html#the-template-element" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">&lt;template&gt; element の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td><a href="/ja/docs/Web/HTML/Element/template" title="HTML のコンテンツテンプレート (&lt;template&gt;) 要素 は、すなわちページの読み込み時にすぐには描画されないものの、後で JavaScript を使用してインスタンスを生成できる HTML を保持するメカニズムです。"><code>&lt;template&gt;</code></a> の定義です。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">custom elements の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements">HTML Custom Elements</a> の定義です。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://dom.spec.whatwg.org/#shadow-trees" hreflang="en" lang="en">DOM<br><small lang="ja">shadow trees の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> の定義です。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/imports/" hreflang="en" lang="en" title="HTML Importsの仕様書">HTML Imports</a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/HTML_Imports">HTML Imports</a> の最初の定義です。</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/shadow/" hreflang="en" lang="en" title="Shadow DOMの仕様書">Shadow DOM</a></td>
+   <td><span class="spec-Obsolete">廃止された</span></td>
+   <td><a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM">Shadow DOM</a> の最初の定義です。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザのサポート">ブラウザのサポート</h2>
+
+
+
+<p>一般に、</p>
+
+<ul>
+ <li>Web Components は、Firefox (バージョン 63、現在のところ <a href="https://www.mozilla.org/en-GB/firefox/developer/">開発者エディション</a>)、Chrome そして Opera でサポートされています。 </li>
+ <li>Safari では、いくつかの Web Components の機能がサポートされていますが、上記のブラウザほどではありません。</li>
+ <li>Edge では、現在実装中です。</li>
+</ul>
+
+<p>特定の機能のブラウザでの実装状況は、上記のページを調べるようにして下さい。</p>
+
+
+
+<h2 id="参考">参考</h2>
+
+<ul>
+ <li><a href="https://www.webcomponents.org/">webcomponents.org</a> — site featuring web components examples, tutorials, and other information.</li>
+ <li><a href="https://www.polymer-project.org/">Polymer</a> — Google&apos;s web components framework — a set of polyfills, enhancements, and examples. Currently the easiest way to use web components cross-browser.</li>
+ <li><a href="https://github.com/slimjs/slim.js">Slim.js</a> — Open source web components library — a high-performant library for rapid and easy component authoring; extensible and pluggable and cross-framework compatible. </li>
+</ul>

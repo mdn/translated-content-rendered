@@ -1,0 +1,127 @@
+---
+title: Online and offline events
+slug: Web/API/NavigatorOnLine/Online_and_offline_events
+translation_of: Web/API/NavigatorOnLine/Online_and_offline_events
+---
+<div><div class="warning notecard">
+    <p><strong>警告:</strong> <strong>この記事の内容は古くなっている可能性があります。</strong> </p>
+</div></div>
+<div></div>
+<p><a href="ja/Firefox_3_for_developers">Firefox 3</a> は <a href="http://www.whatwg.org/specs/web-apps/current-work/" class="external">WHATWG Web Applications 1.0 仕様</a>に従い <a href="http://www.whatwg.org/specs/web-apps/current-work/#offline" class="external">Online/Offline イベント</a>を実装します。</p>
+<h3 id=".E6.A6.82.E8.A6.B3" name=".E6.A6.82.E8.A6.B3">概観</h3>
+<p>オフラインに対応する良い Web アプリケーションを構築するためには、アプリケーションが実際にいつオフラインなのか知る必要があります。ついでに言えば、アプリケーションが &apos;オンライン&apos; の状態に再び戻ったのがいつかを知る必要もあります。効果的に、その要件は次のように分解されます。</p>
+<ol>
+  <li>ユーザがいつオンラインに戻るか知らなければなりません。そうすることでサーバと再び同期を取ることができます。</li>
+  <li>ユーザがいつオフラインになるのかを知らなければなりません。そうすることでサーバへの要求を後で用いるようキューに貯めることができます。</li>
+</ol>
+<p>オンライン／オフラインイベントがこのプロセスを一般化することを手助けします。</p>
+<p>あなたの Web アプリケーションは、オフラインリソースのキャッシュで確実に管理されるドキュメントを確立する必要があります。これを行うための方法を <a href="ja/Offline_resources_in_Firefox">Firefox のオフラインリソース</a>の記事で学んでください。</p>
+<h3 id="API" name="API">API</h3>
+<h4 id="navigator.onLine" name="navigator.onLine"><code>navigator.onLine</code></h4>
+<p><code><a href="ja/DOM/window.navigator.onLine">navigator.onLine</a></code> は <code>true</code>/<code>false</code> の値を保持するプロパティで、<code>true</code> はオンラインを、<code>false</code> はオフラインを意味します。このプロパティはユーザが対応するメニューアイテム (ファイル→オフライン作業) を選択することによりオフラインモードに移行する度に更新されます。</p>
+<p>加えて、このプロパティはブラウザがネットワークに接続することがそれ以降不可能になった時にもその度に更新される必要があります。次の仕様に従います。</p>
+<blockquote>
+  <code>navigator.onLine</code> 属性はユーザがリンクを押した時やスクリプトが外部のページを要求したときに、ユーザエージェントがネットワークに連絡できない場合（またはそのような試みが失敗した場合）に必ず false を返す必要があります。</blockquote>
+<p>Firefox 2 はこのプロパティをブラウザのオフラインモードが切り替わる度に更新していました。また Windows と Linux においてネットワークへの接続が失われたとき、復活したときにも更新していました。</p>
+<p>このプロパティは Firefox と Internet Explorer の古いバージョンにも存在しました。(仕様はこれらの先の実装を基にしました。) 従って今すぐこのプロパティを使い始めることができます。ネットワーク状態の自動判断は Firefox 2 にて実装されました。</p>
+<h4 id=".22online.22_.E3.81.8A.E3.82.88.E3.81.B3_.22offline.22_.E3.82.A4.E3.83.99.E3.83.B3.E3.83.88" name=".22online.22_.E3.81.8A.E3.82.88.E3.81.B3_.22offline.22_.E3.82.A4.E3.83.99.E3.83.B3.E3.83.88">&quot;<code>online</code>&quot; および &quot;<code>offline</code>&quot; イベント</h4>
+<p><a href="ja/Firefox_3">Firefox 3</a>の 2 つの新しいイベントを紹介します。&quot;<code>online</code>&quot; と &quot;<code>offline</code>&quot; です。これらの 2 つのイベントは各ページの <code>&lt;body&gt;</code> にてブラウザがオンラインとオフラインのモードを切り替えるたびに発生します。加えてこのイベントは <code>document.body</code> から <code>document</code> へと浮上し、<code>window</code> までたどり着きます。これらのイベントはキャンセルできません (ユーザのオンラインモードやオフラインモードへの移行を防ぐことはできません)。</p>
+<p>これらのイベントに対するリスナを登録することもいくつかの馴染みのある方法にて可能です。</p>
+<ul>
+  <li><code>window</code>, <code>document</code>, <code>document.body</code> 上にて <code><a href="ja/DOM/element.addEventListener">addEventListener</a></code> を利用します。</li>
+  <li><code>document</code> または <code>document.body</code> の <code>.ononline</code> または <code>.onoffline</code> プロパティを JavaScript の <code>Function</code> オブジェクトに設定します。(<b>注意：</b><code>window.ononline</code> または <code>window.onoffline</code> を利用することは互換性が原因で動作しません)</li>
+  <li>HTML マークアップにて <code>&lt;body&gt;</code> タグの <code>ononline=&quot;...&quot;</code> または <code>onoffline=&quot;...&quot;</code> 属性を指定します。</li>
+</ul>
+<h3 id=".E5.AE.9F.E8.A1.8C.E4.BE.8B" name=".E5.AE.9F.E8.A1.8C.E4.BE.8B">実行例</h3>
+<p><a href="https://bugzilla.mozilla.org/attachment.cgi?id=220609" class="link-https">簡単なテストケース</a>を実行してこれらのイベントの動作を確認することができます。 <span class="comment">XXX When mochitests for this are created, point to those instead and update this example -nickolay</span></p>
+<pre class="eval"> &lt;!doctype html&gt;
+ &lt;html&gt;
+ &lt;head&gt;
+   &lt;script&gt;
+     function updateOnlineStatus(msg) {
+       var status = document.getElementById(&quot;status&quot;);
+       var condition = navigator.onLine ? &quot;ONLINE&quot; : &quot;OFFLINE&quot;;
+       status.setAttribute(&quot;class&quot;, condition);
+       var state = document.getElementById(&quot;state&quot;);
+       state.innerHTML = condition;
+       var log = document.getElementById(&quot;log&quot;);
+       log.appendChild(document.createTextNode(&quot;Event: &quot; + msg + &quot;; status=&quot; + condition + &quot;\n&quot;));
+     }
+     function loaded() {
+       updateOnlineStatus(&quot;load&quot;);
+       document.body.addEventListener(&quot;offline&quot;, function () {
+         updateOnlineStatus(&quot;offline&quot;)
+       }, false);
+       document.body.addEventListener(&quot;online&quot;, function () {
+         updateOnlineStatus(&quot;online&quot;)
+       }, false);
+     }
+   &lt;/script&gt;
+   &lt;style&gt;...&lt;/style&gt;
+ &lt;/head&gt;
+ &lt;body onload=&quot;loaded()&quot;&gt;
+   &lt;div id=&quot;status&quot;&gt;&lt;p id=&quot;state&quot;&gt;&lt;/p&gt;&lt;/div&gt;
+   &lt;div id=&quot;log&quot;&gt;&lt;/div&gt;
+ &lt;/body&gt;
+ &lt;/html&gt;
+</pre>
+<h3 id=".E5.8F.82.E8.80.83" name=".E5.8F.82.E8.80.83">参考</h3>
+<ul>
+  <li><a href="http://www.whatwg.org/specs/web-apps/current-work/#offline" class="external">WHATWG Web Applications 1.0 仕様の &apos;Online/Offline イベント&apos; セクション</a></li>
+  <li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=336359" class="link-https">Firefox に実装された online/offline イベントのバグ追跡</a>および<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=336682" class="link-https">関連バグ</a></li>
+  <li><a href="https://bugzilla.mozilla.org/attachment.cgi?id=220609" class="link-https">簡単なテストケース</a></li>
+  <li><a href="http://ejohn.org/blog/offline-events/" class="external">Online/Offline イベントの解説</a></li>
+</ul>
+<div>
+  <div class="horizFlexboxContainer">
+  <div class="smallTextMultiColumnBoxHeading">HTML5 関連文書</div>
+  <div class="smallTextMultiColumnBoxList">
+<table class="html5ArticleToc">
+	<tbody>
+		<tr>
+			<td style="width: 150px; border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);"><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#HTML" title="HTML5 Documentation">HTML</a></td>
+			<td style="border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);">
+				<ul>
+					<li><a href="/ja/docs/Using_HTML5_audio_and_video" title="Firefox でマルチメディアコンテンツを扱う">Audio/Video</a></li>
+					<li><a href="/ja/docs/HTML/Canvas" title="Canvas">Canvas</a></li>
+					<li><a href="/ja/docs/WebGL" title="WebGL">WebGL</a></li>
+					<li><a href="/ja/docs/SVG" title="SVG">SVG</a></li>
+					<li><a href="/ja/docs/MathML" title="MathML">MathML</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#WebForms" title="HTML5 Thematic Classification #WebForms">WebForms</a></li>
+					<li><a href="/ja/docs/HTML/Using_the_application_cache" title="Using Application Cache">AppCache</a></li>
+					<li><a href="/ja/docs/Using_microformats" title="Using microformats">Microformats</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#Semantic_tags" title="HTML5 Thematic Classification - セマンティックなタグ">SemanticTags</a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 150px; border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);"><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#JavaScript" title="HTML5 Thematic Classification #JavaScript">JavaScript</a></td>
+			<td style="border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);">
+				<ul>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#Client-Side_Storage" title="HTML5 Thematic Classification #Client-Side Storage">Storage</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#IndexedDB" title="HTML5 Thematic Classification #IndexedDB">IndexedDB</a></li>
+					<li><a href="/ja/docs/WebSockets" title="WebSockets">WebSockets</a></li>
+					<li><a href="/ja/docs/DOM/Using_web_workers" title="Using web workers">WebWorkers</a></li>
+					<li><a href="/ja/docs/Online_and_offline_events" title="Online and offline events">Events</a></li>
+					<li><a href="/ja/docs/DragDrop/Drag_and_Drop" title="ドラッグ＆ドロップ">Drag/Drop</a></li>
+					<li><a href="/ja/docs/Web-based_protocol_handlers" title="Web-based protocol handlers">ProtocolHandler</a></li>
+					<li><a href="/ja/docs/Using_geolocation" title="Geolocation の利用">Geolocation</a></li>
+					<li><a href="/ja/docs/Focus_management_in_HTML" title="Focus management in HTML">Focus</a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none;"><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#CSS" title="HTML5 Thematic Classification #CSS">CSS</a></td>
+			<td style="border: none;">
+				<ul>
+					<li><a href="/ja/docs/Mozilla_CSS_support_chart" title="Mozilla CSS サポートチャート">NewSelectors</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#Typography" title="HTML5 Thematic Classification - タイポグラフィ">Typography</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#Visual" title="HTML5 Thematic Classification - ビジュアル">Visual</a></li>
+					<li><a href="/ja/docs/HTML/HTML5/HTML5_Thematic_Classification#Effects" title="HTML5 Thematic Classification - 動的なエフェクト">Effects</a></li>
+				</ul>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</div></div>

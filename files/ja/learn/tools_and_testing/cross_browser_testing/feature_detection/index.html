@@ -1,0 +1,784 @@
+---
+title: 機能検出の実装
+slug: Learn/Tools_and_testing/Cross_browser_testing/Feature_detection
+tags:
+  - Article
+  - Beginner
+  - CSS
+  - CodingScripting
+  - JavaScript
+  - Learn
+  - Modernizr
+  - Testing
+  - Tools
+  - cross browser
+  - feature detection
+  - 機能検出
+translation_of: Learn/Tools_and_testing/Cross_browser_testing/Feature_detection
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/Getting_started_with_the_web"><strong>完全な初心者はこちらから!</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>ウェブ入門</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web">ウェブ入門</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/Installing_basic_software">基本的なソフトウェアのインストール</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">ウェブサイトをどんな外見にするか</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/Dealing_with_files">ファイルの扱い</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/HTML_basics">HTML の基本</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/CSS_basics">CSS の基本</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript の基本</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/Publishing_your_website">ウェブサイトの公開</a></li>
+            <li><a href="/ja/docs/Learn/Getting_started_with_the_web/How_the_Web_works">How the Web works</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/HTML"><strong>HTML — Structuring the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>HTML概論</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML">HTML概論</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Getting started with HTML</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">head って何？HTML のメタデータ</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">HTML テキストの基礎</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">ハイパーリンクを作ってみる</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Advanced text formatting</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Document and website structure</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Debugging HTML</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Assessment: Marking up a letter</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Assessment: Structuring a page of content</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Multimedia and embedding</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding">Multimedia and embedding overview</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Images in HTML</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Video and audio content</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">From object to iframe — other embedding technologies</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Adding vector graphics to the Web</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Responsive images</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Assessment: Mozilla splash page</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/ja/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/CSS"><strong>CSS — Styling the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/ja/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/ja/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/ja/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/ja/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/ja/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Styling text</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text">Styling text overview</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text/Fundamentals">Fundamental text and font styling</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text/Styling_lists">Styling lists</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text/Styling_links">Styling links</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text/Web_fonts">Web fonts</a></li>
+            <li><a href="/ja/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Assessment: Typesetting a community school homepage</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS layout</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout">CSS layout overview</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Introduction">Introduction</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Grids">Grids</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Floats">Floats</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Positioning">Positioning</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/ja/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/JavaScript"><strong>JavaScript — 動的クライアントサイドスクリプト</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript の第一歩</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps">JavaScript の第一歩</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/What_is_JavaScript">JavaScriptって何？</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/A_first_splash">JavaScriptへの最初のダイブ</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/What_went_wrong">何が間違っている? JavaScript のトラブルシューティング</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Variables">必要な情報を保存する — 変数</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Math">JavaScriptでの数学入門 — 数値と演算子について</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Strings">テキストを扱う — JavaScript での文字列</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Useful_string_methods">便利な文字列メソッド</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Arrays">配列</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/First_steps/Silly_story_generator">バカ話ジェネレーター</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript building blocks</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks overview</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/conditionals">Making decisions in your code — Conditionals</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Looping_code">Looping code</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Functions">Functions — Reusable blocks of code</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Build your own function</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Return_values">Function return values</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Events">Introduction to events</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Building_blocks/Image_gallery">Assessment: Image gallery</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Introducing JavaScript objects</summary>
+          <ol>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects">Introducing JavaScript objects overview</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Basics">Object basics</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Object-oriented_JS">Object-oriented JavaScript for beginners</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Object_prototypes">Object prototypes</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Inheritance">Inheritance in JavaScript</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/JSON">Working with JSON data</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Object_building_practice">Object building practice</a></li>
+            <li><a href="/ja/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Assessment: Adding features to our bouncing balls demo</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ja/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/ja/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/ja/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/ja/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/ja/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ja/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/ja/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/ja/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/ja/docs/Learn/Tools_and_testing"><strong>Tools and testing</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Cross browser testing</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing">Cross browser testing overview</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+          <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/Server-side"><strong>Server-side website programming</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>First steps</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Server-side/First_steps">First steps overview</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/First_steps/Introduction">Introduction to the server-side</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-Server overview</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/First_steps/Web_frameworks">Server-side web frameworks</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/First_steps/Website_security">Website security</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Django web framework (Python)</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Server-side/Django">Django web framework (Python) overview</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Introduction">Introduction</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/development_environment">Setting up a development environment</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Tutorial_local_library_website">Tutorial: The Local Library website</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/skeleton_website">Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Models">Tutorial Part 3: Using models</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Admin_site">Tutorial Part 4: Django admin site</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Home_page">Tutorial Part 5: Creating our home page</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Generic_views">Tutorial Part 6: Generic list and detail views</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Sessions">Tutorial Part 7: Sessions framework</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Authentication">Tutorial Part 8: User authentication and permissions</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Forms">Tutorial Part 9: Working with forms</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Testing">Tutorial Part 10: Testing a Django web application</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/Deployment">Tutorial Part 11: Deploying Django to production</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/web_application_security">Web application security</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Django/django_assessment_blog">Assessment: DIY mini blog</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/ja/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Further resources</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Common questions</summary>
+        <ol>
+          <li><a href="/ja/docs/Learn/HTML/Howto">HTML questions</a></li>
+          <li><a href="/ja/docs/Learn/CSS/Howto">CSS questions</a></li>
+          <li><a href="/ja/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/ja/docs/Learn/Common_questions#How_the_Web_works">How the Web works</a></li>
+          <li><a href="/ja/docs/Learn/Common_questions#Tools_and_setup">Tools and setup</a></li>
+          <li><a href="/ja/docs/Learn/Common_questions#Design_and_accessibility">Design and accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/ja/docs/Learn/How_to_contribute">How to contribute</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility" class="button"><i class="icon-arrow-left"></i><span class="label"> 前のページ </span></a><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing" class="button"><i class="icon-arrow-up"></i> Overview: Cross browser testing</a><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing" class="button"><span class="label"> 次のページ  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">機能検出は、あるブラウザーがあるコードのブロックに対応しているかどうかを調べ、対応しているか (またはしていないか) に応じて異なるコードを実行することで、ブラウザーが常に動作し、ブラウザーによってクラッシュやエラーが発生しないようにします。この記事では、独自の単純な機能検出の書き方、実装をスピードアップするためのライブラリの使い方、 <code>@supports</code> などの機能検出のためのネイティブ機能について詳しく説明します。</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">前提条件:</th>
+   <td>主要な <a href="/ja/docs/Learn/HTML">HTML</a>、<a href="/ja/docs/Learn/CSS">CSS</a>、および <a href="/ja/docs/Learn/JavaScript">JavaScript</a> 言語に精通していること。<a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">クロスブラウザテストの原則</a>の高水準のアイデア。</td>
+  </tr>
+  <tr>
+   <th scope="row">目標:</th>
+   <td>機能検出の概念について理解し、CSS と JavaScript で適切な解決方法を実装できるようにする。</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="The_concept_of_feature_detection" name="The_concept_of_feature_detection">機能検出の概念</h2>
+
+<p>機能検出の根底にあるアイデアは、プログラムを実行中のブラウザーがある特定の機能に対応しているかを確かめ、その結果に応じて異なるコードを実行するということで、対応ブラウザーと非対応ブラウザーのいずれでも許容できる挙動となるようにすることです。もしこの対策をしなければ、その特定の機能に対応していないブラウザーではあなたのサイトが正常に表示されなかったり、エラーを起こしてユーザーの体験を悪化させるでしょう。</p>
+
+<p>それでは、私たちが <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript#Feature_detection">Handling common JavaScript problems</a> で触れた例を振り返ってみましょう。<a href="/ja/docs/Web/API/Geolocation/Using_geolocation">Geolocation API</a> (ブラウザーを実行している端末の位置情報を返します)は、 <a href="/ja/docs/Web/API/Navigator">Navigator</a> オブジェクトに含まれる <code>geolocation</code> プロパティを主なエントリーポイントとして持っています。そこで、以下のようにしてブラウザーが位置情報機能に対応しているかどうかを検出できます。</p>
+
+<pre class="language-js notranslate">if (&quot;geolocation&quot; in navigator) {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    // Google Maps API を用いて現在位置をマップ上に表示します
+  });
+} else {
+  // 位置情報がなくてもマップを表示できるようにします
+}</pre>
+
+<p>しかし、機能検出のためのコードを毎回自分で書くよりも、確立された既存の機能検出ライブラリを使うほうが良いでしょう。この用途では Modernizr が一般に利用されています。Modernizr には後ほど触れます。</p>
+
+<p>次に進む前にもう1つお伝えさせてください。機能検出と<strong>ブラウザー検出</strong>(サイトにアクセスしているブラウザーの種類の検出)を混同しないでください。これはいかなる場合にも避けられるべき悪しき風習です。詳しくは <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript#Using_bad_browser_sniffing_code">Using bad browser sniffing code</a> を参照してください。</p>
+
+<h2 id="Writing_your_own_feature_detection_tests">Writing your own feature detection tests</h2>
+
+<p>In this section, we&apos;ll look at implementing your own feature detection tests, in both CSS and JavaScript.</p>
+
+<h3 id="CSS">CSS</h3>
+
+<p>You can write tests for CSS features by testing for the existence of <em><a href="/ja/docs/Web/API/HTMLElement/style">element.style.property</a></em> (e.g. <code>paragraph.style.transform</code>) in JavaScript.</p>
+
+<p>A classic example might be to test for <a href="/ja/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a> support in a browser; for browsers that support the newest Flexbox spec, we could use a flexible and robust flex layout. For browsers that don&apos;t, we could use a floated layout that works OK, although it is slightly more brittle and hacky, and not as cool-looking.</p>
+
+<p>Let&apos;s implement something that demonstrates this, although we&apos;ll keep it simple for now.</p>
+
+<ol>
+ <li>Start by making local copies of our <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/css-feature-detect.html">css-feature-detect.html</a></code>, <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/flex-layout.css">flex-layout.css</a></code>, <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/float-layout.css">float-layout-css</a></code>, and <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/basic-styling.css">basic-styling.css</a></code> files. Save them in a new directory.</li>
+ <li>We will add the HTML5 Shiv to our example too so that the HTML5 semantic elements will style properly in older versions of IE. Download the latest version (see <a href="https://github.com/aFarkas/html5shiv#manual-installation">Manual installation</a>), unzip the ZIP file, copy the <code>html5shiv-printshiv.min.js</code> and <code>html5shiv.min.js</code> files into your example directory, and link to one of the files by putting the following under your <a href="/ja/docs/Web/HTML/Element/title" title="HTML 題名要素 (&lt;title&gt;) は、ブラウザーのタイトルバーやページのタブに表示される文書の題名を定義します。"><code>&lt;title&gt;</code></a> element:
+  <pre class="notranslate">&lt;script src=&quot;html5shiv.min.js&quot;&gt;&lt;/script&gt;</pre>
+ </li>
+ <li>Have a look at your example CSS files — you&apos;ll see that <code>basic-styling.css</code> handles all the styling that we want to give to every browser, whereas the other two CSS files contain the CSS we want to selectively apply to browser depending on their support levels. You can look at the different effects these two files they have by manually changing the CSS file referred to by the second <a href="/ja/docs/Web/HTML/Element/link" title="HTML 外部リソースへのリンク要素 (&lt;link&gt;) は、現在の文書と外部のリソースとの関係を指定します。この要素はスタイルシートへのリンクに最もよく使用されますが、サイトのアイコン (&quot;favicon&quot; スタイルのアイコンと、モバイル端末のホーム画面やアプリのアイコンの両方) の確立や、その他のことにも使用されます。"><code>&lt;link&gt;</code></a> element, but let&apos;s instead implement some JavaScript to automatically swap them as needed.</li>
+ <li>First, remove the contents of the second <code>&lt;link&gt;</code> element&apos;s <code>href</code> attribute. We will fill this in dynamically later on.</li>
+ <li>Next, add a <code>&lt;script&gt;&lt;/script&gt;</code> element at the bottom of your body (just before the closing <code>&lt;/body&gt;</code> tag).</li>
+ <li>Give it the following contents:
+  <pre class="brush: js notranslate">const conditional = document.querySelector(&apos;.conditional&apos;);
+const testElem = document.createElement(&apos;div&apos;);
+if (testElem.style.flex !== undefined &amp;&amp; testElem.style.flexFlow !== undefined) {
+  conditional.setAttribute(&apos;href&apos;, &apos;flex-layout.css&apos;);
+} else {
+  conditional.setAttribute(&apos;href&apos;, &apos;float-layout.css&apos;);
+}</pre>
+ </li>
+</ol>
+
+<p>Here we are grabbing a reference to the second <code>&lt;link&gt;</code> element, and creating a <code>&lt;div&gt;</code> element as part of our test. In our conditional statement, we test that the <a href="/ja/docs/Web/CSS/flex" title="CSS の flex プロパティは、フレックスアイテムをフレックスコンテナーの領域に収めるために、どのように伸長・収縮させるかを指定します。"><code>flex</code></a> and <a href="/ja/docs/Web/CSS/flex-flow" title="CSS の flex-flow プロパティは、 flex-direction プロパティと flex-wrap プロパティの一括指定プロパティです。"><code>flex-flow</code></a> properties exist in the browser. Note how the JavaScript representations of those properties that are stored inside the <a href="/ja/docs/Web/API/HTMLElement/style"><code>HTMLElement.style</code></a> object use lower camel case, not hyphens, to separate the words.</p>
+
+<div class="note">
+<p><strong>Note</strong>: If you have trouble getting this to work, you can compare it to our <a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/css-feature-detect-finished.html">css-feature-detect-finished.html</a> code (see also the <a href="http://mdn.github.io/learning-area/tools-testing/cross-browser-testing/feature-detection/css-feature-detect-finished.html">live version</a>).</p>
+</div>
+
+<p>When you save everything and try out your example, you should see the flexbox layout applied to the page if the browser supports modern flexbox, and the float layout if not.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Often such an approach is overkill for a minor feature detection problem — you can often get away with using multiple vendor prefixes and fallback properties, as described in <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS#CSS_fallback_behaviour">CSS fallback behavior</a> and <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS#Handling_CSS_prefixes">Handling CSS prefixes</a>.</p>
+</div>
+
+<h4 id="supports">@supports</h4>
+
+<p>In recent times, CSS has had its own native feature detection mechanism introduced — the <a href="/ja/docs/Web/CSS/@supports" title="CSS の @supports @-規則は、宣言をブラウザーが1つまたは複数の特定の CSS 機能に対応しているかによって、宣言を指定することができます。これは機能クエリと呼ばれます。規則はコードの最上位または他の条件付きグループ @-規則の中に配置することができます。"><code>@supports</code></a> at-rule. This works in a similar manner to <a href="/ja/docs/Web/CSS/Media_Queries">media queries</a> (see also <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS#Responsive_design_problems">Responsive design problems</a>) — except that instead of selectively applying CSS depending on a media feature like a resolution, screen width or aspect ratio, it selectively applies CSS depending on whether a CSS feature is supported.</p>
+
+<p>For example, we could rewrite our previous example to use <code>@supports</code> — see <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/supports-feature-detect.html">supports-feature-detect.html</a></code> and <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/supports-styling.css">supports-styling.css</a></code>. If you look at the latter, you&apos;ll see a couple of <code>@supports</code> blocks, for example:</p>
+
+<pre class="brush: css notranslate">@supports (flex-flow: row) and (flex: 1) {
+
+  main {
+    display: flex;
+  }
+
+  main div {
+    padding-right: 4%;
+    flex: 1;
+  }
+
+  main div:last-child {
+    padding-right: 0;
+  }
+
+}</pre>
+
+<p>This at-rule block applies the CSS rule within only if the current browser supports both the <code>flex-flow: row</code> and <code>flex: 1</code> declarations. For each condition to work, you need to include a complete declaration (not just a property name) and NOT include the semi-colon on the end.</p>
+
+<p><code>@supports</code> also has <code>OR</code> and <code>NOT</code> logic available — the other block applies the float layout if the flexbox properties are not available:</p>
+
+<pre class="brush: css notranslate">@supports not (flex-flow: row) and (flex: 1) {
+
+  /* rules in here */
+
+}</pre>
+
+<p>This may look a lot more convenient than the previous example — we can do all of our feature detection in CSS, no JavaScript required, and we can handle all the logic in a single CSS file, cutting down on HTTP requests. the problem here is browser support — <code>@supports</code> is not supported at all in IE, and only supported in very recent versions of Safari/iOS WebKit (9+/9.2+), whereas the JavaScript version should work in much older browsers (probably back to IE8 or 9, although older versions of IE will have additional problems, such as not supporting <a href="/ja/docs/Web/API/Document/querySelector"><code>Document.querySelector</code></a>, and having a messed up box model).</p>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<p>We already saw an example of a JavaScript feature detection test earlier on. Generally, such tests are done via one of the following common patterns:</p>
+
+<table class="standard-table">
+ <caption>Summary of JavaScript feature detection techniques</caption>
+ <thead>
+  <tr>
+   <th scope="col">Feature detection type</th>
+   <th scope="col">Explanation</th>
+   <th scope="col">Example</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><em>If member in object</em></td>
+   <td>Check whether a certain method or property (typically an entry point into using the API or other feature you are detecting for) exists in its parent Object.</td>
+   <td>
+    <p><code>if(&quot;geolocation&quot; in navigator) { ... }</code></p>
+   </td>
+  </tr>
+  <tr>
+   <td><em>Property on element</em></td>
+   <td>Create an element in memory using <a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a> and then check if a property exists on it. The example shown is a way of detecting <a href="/ja/docs/Web/API/Canvas_API">HTML5 Canvas</a> support.</td>
+   <td><code>function supports_canvas() {<br>
+    return !!document.createElement(&apos;canvas&apos;).getContext;<br>
+    }<br>
+    <br>
+    if(supports_canvas()) { ... }</code></td>
+  </tr>
+  <tr>
+   <td><em>Method on element return value</em></td>
+   <td>Create an element in memory using <a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a> and then check if a method exists on it. If it does, check what value it returns.</td>
+   <td>See <a href="http://diveinto.html5doctor.com/detect.html#video-formats">Dive Into HTML5 Video Formats detection</a> test.</td>
+  </tr>
+  <tr>
+   <td><em>Property on element retains value</em></td>
+   <td>Create an element in memory using <a href="/ja/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a>, set a property to a certain value, then check to see if the value is retained.</td>
+   <td>See <a href="http://diveinto.html5doctor.com/detect.html#input-types">Dive into HTML5 <code>&lt;input&gt;</code> types detection</a> test.</td>
+  </tr>
+ </tbody>
+</table>
+
+<div class="note">
+<p><strong>Note</strong>: The double <code>NOT</code> in the above example (<code>!!</code>) is a way to force a return value to become a &quot;proper&quot; boolean value, rather than a <a href="/ja/docs/Glossary/Truthy">Truthy</a>/<a href="/ja/docs/Glossary/Falsy">Falsy</a> value that may skew the results.</p>
+</div>
+
+<p>The <a href="http://diveinto.html5doctor.com/detect.html">Dive into HTML5 Detecting HTML5 Features</a> page has a lot more useful feature detection tests besides the ones listed above, and you can generally find a feature detection test for most things by searching for &quot;detect support for YOUR-FEATURE-HERE&quot; in your favorite search engine. Bear in mind though that some features, however, are known to be undetectable — see Modernizr&apos;s list of <a href="https://github.com/Modernizr/Modernizr/wiki/Undetectables">Undetectables</a>.</p>
+
+<h4 id="matchMedia">matchMedia</h4>
+
+<p>We also wanted to mention the <a href="/ja/docs/Web/API/Window/matchMedia"><code>Window.matchMedia</code></a> JavaScript feature at this point too. This is a property that allows you to run media query tests inside JavaScript. It looks like this:</p>
+
+<pre class="brush: js notranslate">if (window.matchMedia(&quot;(max-width: 480px)&quot;).matches) {
+  // run JavaScript in here.
+}</pre>
+
+<p>As an example, our <a href="https://github.com/chrisdavidmills/snapshot">Snapshot</a> demo makes use of it to selectively apply the Brick JavaScript library and use it to handle the UI layout, but only for the small screen layout (480px wide or less). We first use the <code>media</code> attribute to only apply the Brick CSS to the page if the page width is 480px or less:</p>
+
+<pre class="brush: css notranslate">&lt;link href=&quot;dist/brick.css&quot; type=&quot;text/css&quot; rel=&quot;stylesheet&quot; media=&quot;all and (max-width: 480px)&quot;&gt;</pre>
+
+<p>We then use <code>matchMedia()</code> in the JavaScript several times, to only run Brick navigation functions if we are on the small screen layout (in wider screen layouts, everything can be seen at once, so we don&apos;t need to navigate between different views).</p>
+
+<pre class="brush: js notranslate">if (window.matchMedia(&quot;(max-width: 480px)&quot;).matches) {
+  deck.shuffleTo(1);
+}</pre>
+
+<h2 id="Using_Modernizr_to_implement_feature_detection">Using Modernizr to implement feature detection</h2>
+
+<p>It is possible to implement your own feature detection tests using techniques like the ones detailed above. You might as well use a dedicated feature detection library however, as it makes things much easier. The mother of all feature detection libraries is <a href="https://modernizr.com/">Modernizr</a>, and it can detect just about everything you&apos;ll ever need. Let&apos;s look at how to use it now.</p>
+
+<p>When you are experimenting with Modernizr you might as well use the development build, which includes every possible feature detection test. Download this now by:</p>
+
+<ol>
+ <li>Clicking on the <a href="https://modernizr.com/download?do_not_use_in_production">Development build</a> link.</li>
+ <li>Clicking the big pink <em>Build</em> button on the page that comes up.</li>
+ <li>Clicking the top <em>Download</em> link in the dialog box that appears.</li>
+</ol>
+
+<p>Save it somewhere sensible, like the directory you&apos;ve been creating your other examples for in this article.</p>
+
+<p>When you are using Modernizr in production, you can go to the <a href="https://modernizr.com/download">Download page</a> you&apos;ve already visited and click the plus buttons for only the features you need feature detects for. Then when you click the <em>Build</em> button, you&apos;ll download a custom build containing only those feature detects, making for a much smaller file size.</p>
+
+<h3 id="CSS_2">CSS</h3>
+
+<p>Let&apos;s have a look at how Modernizr works in terms of selectively applying CSS.</p>
+
+<ol>
+ <li>First, make a copy of <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/supports-feature-detect.html">supports-feature-detect.html</a></code> and <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/supports-styling.css">supports-styling.css</a></code>. Save them as <code>modernizr-css.html</code> and <code>modernizr-css.css</code>.</li>
+ <li>Update your <a href="/ja/docs/Web/HTML/Element/link" title="HTML 外部リソースへのリンク要素 (&lt;link&gt;) は、現在の文書と外部のリソースとの関係を指定します。この要素はスタイルシートへのリンクに最もよく使用されますが、サイトのアイコン (&quot;favicon&quot; スタイルのアイコンと、モバイル端末のホーム画面やアプリのアイコンの両方) の確立や、その他のことにも使用されます。"><code>&lt;link&gt;</code></a> element in your HTML so it points to the correct CSS file (you should also update your <a href="/ja/docs/Web/HTML/Element/title" title="HTML 題名要素 (&lt;title&gt;) は、ブラウザーのタイトルバーやページのタブに表示される文書の題名を定義します。"><code>&lt;title&gt;</code></a> element to something more suitable!):
+  <pre class="brush: html notranslate">&lt;link href=&quot;modernizr-css.css&quot; rel=&quot;stylesheet&quot;&gt;</pre>
+ </li>
+ <li>Above this <code>&lt;link&gt;</code> element, add a <a href="/ja/docs/Web/HTML/Element/script" title="HTML の &lt;script&gt; 要素は、実行できるコードやデータを埋め込むために使用します。ふつうは JavaScript のコードの埋め込みや参照に使用されます。"><code>&lt;script&gt;</code></a> element to apply the Modernizr library to the page, as shown below. This needs to be applied to the page before any CSS (or JavaScript) that might make use of it.
+  <pre class="brush: html notranslate">&lt;script src=&quot;modernizr-custom.js&quot;&gt;&lt;/script&gt;</pre>
+ </li>
+ <li>Now edit your opening <code>&lt;html&gt;</code> tag, so that it looks like this:
+  <pre class="brush: html notranslate">&lt;html class=&quot;no-js&quot;&gt;</pre>
+ </li>
+</ol>
+
+<p>At this point, try loading your page, and you&apos;ll get an idea of how Modernizr works for CSS features. If you look at the DOM inspector of your browser&apos;s developer tools, you&apos;ll see that Modernizr has updated your <code>&lt;html&gt;</code> <code>class</code> value like so:</p>
+
+<pre class="notranslate">&lt;html class=&quot;js no-htmlimports sizes flash transferables applicationcache blobconstructor
+blob-constructor cookies cors ...AND LOADS MORE VALUES!&gt;</pre>
+
+<p>It now contains a large number of classes that indicate the support status of different technology features. As an example, if the browser didn&apos;t support flexbox at all, <code>&lt;html&gt;</code> would be given a class name of <code>no-flexbox</code>. If it did support modern flexbox, it would get a class name of <code>flexbox</code>. If you search through the class list, you&apos;ll also see others relating to flexbox, like:</p>
+
+<ul>
+ <li><code>flexboxlegacy</code> for the old flexbox spec (2009).</li>
+ <li><code>flexboxtweener</code> for 2011 in between syntax supported by IE10.</li>
+ <li><code>flexwrap</code> for the <a href="/ja/docs/Web/CSS/flex-wrap" title="CSS の flex-wrap プロパティは、フレックスアイテムを単一行に押し込むか、あるいは複数行に折り返してもよいかを指定します。折り返しを許可する場合は、行を積み重ねる方向の制御も可能です。"><code>flex-wrap</code></a> property, which isn&apos;t present in some implementations.</li>
+</ul>
+
+<div class="note">
+<p><strong>Note</strong>: You can find a list of what all the class names mean — see <a href="https://modernizr.com/docs#features">Features detected by Modernizr</a>.</p>
+</div>
+
+<p>Moving on, let&apos;s update our CSS to use Modernizr rather than <code>@supports</code>. Go into <code>modernizr-css.css</code>, and replace the two <code>@supports</code> blocks with the following:</p>
+
+<pre class="brush: css notranslate">/* Properties for browsers with modern flexbox */
+
+.flexbox main {
+  display: flex;
+}
+
+.flexbox main div {
+  padding-right: 4%;
+  flex: 1;
+}
+
+.flexbox main div:last-child {
+  padding-right: 0;
+}
+
+/* Fallbacks for browsers that don&apos;t support modern flexbox */
+
+.no-flexbox main div {
+  width: 22%;
+  float: left;
+  padding-right: 4%;
+}
+
+.no-flexbox main div:last-child {
+  padding-right: 0;
+}
+
+.no-flexbox footer {
+  clear: left;
+}</pre>
+
+<p>So how does this work? Because all those class names have been put on the <code>&lt;html&gt;</code> element, you can target browsers that do or don&apos;t support a feature using specific descendant selectors. So here we&apos;re applying the top set of rules only to browsers that do support flexbox, and the bottom set of rules only to browsers that don&apos;t (<code>no-flexbox</code>).</p>
+
+<div class="note">
+<p><strong>Note</strong>: Bear in mind that all of Modernizr&apos;s HTML and JavaScript feature tests are also reported in these class names, so you can quite happily apply CSS selectively based on whether the browser supports HTML or JavaScript features, if needed.</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: If you have trouble getting this to work, check your code against our <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/modernizr-css.html">modernizr-css.html</a></code> and <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/modernizr-css.css">modernizr-css.css</a></code> files (see this running live also).</p>
+</div>
+
+<h3 id="JavaScript_2">JavaScript</h3>
+
+<p>Modernizr is also equally well-prepared for implementing JavaScript feature detects too. It does this by making the global <code>Modernizr</code> object available to the page it is applied to, which contains results of the feature detects as <code>true</code>/<code>false</code> properties.</p>
+
+<p>For example, load up our <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/modernizr-css.html">modernizr-css.html</a></code> example in your browser, then try going to your JavaScript console and typing in <code>Modernizr.</code> followed by some of those class names (they are the same here too). For example:</p>
+
+<pre class="notranslate">Modernizr.flexbox
+Modernizr.websqldatabase
+Modernizr.xhr2
+Modernizr.fetch</pre>
+
+<p>The console will return <code>true</code>/<code>false</code> values to indicate whether your browser supports those features or not.</p>
+
+<p>Let&apos;s look at an example to show how you&apos;d use those properties.</p>
+
+<ol>
+ <li>First of all, make a local copy of the <code><a href="https://github.com/mdn/learning-area/blob/master/tools-testing/cross-browser-testing/feature-detection/modernizr-js.html">modernizr-js.html</a></code> example file.</li>
+ <li>Attach the Modernizr library to the HTML using a <code>&lt;script&gt;</code> element, as we have done in previous demos. Put it above the existing <code>&lt;script&gt;</code> element, which is attaching the Google Maps API to the page.</li>
+ <li>Next, fill in the <code>YOUR-API-KEY</code> placeholder text in the second <code>&lt;script&gt;</code> element (as it is now) with a valid Google Maps API key. To get a key, sign in to a Google account, go to the <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Get a Key/Authentication</a> page, then click the blue <em>Get a Key</em> button and follow the instructions.</li>
+ <li>Finally, add another <code>&lt;script&gt;</code> element at the bottom of the HTML body (just before the <code>&lt;/body&gt;</code> tag), and put the following script inside the tags:
+  <pre class="brush: js notranslate">if (Modernizr.geolocation) {
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+
+    let latlng = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+    let myOptions = {
+      zoom: 8,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.TERRAIN,
+      disableDefaultUI: true
+    }
+    let map = new google.maps.Map(document.getElementById(&quot;map_canvas&quot;), myOptions);
+  });
+
+} else {
+  const para = document.createElement(&apos;p&apos;);
+  para.textContent = &apos;Argh, no geolocation!&apos;;
+  document.body.appendChild(para);
+}</pre>
+ </li>
+</ol>
+
+<p>Try your example out! Here we use the <code>Modernizr.geolocation</code> test to check whether geolocation is supported by the current browser. If it is, we run some code that gets your device&apos;s current location, and plots it on a Google Map.</p>
+
+<h2 id="Summary">Summary</h2>
+
+<p>This article covered feature detection in a reasonable amount of detail, going through the main concepts and showing you how to both implement your own feature detection tests and use the Modernizr library to implement tests more easily.</p>
+
+<p>Next up, we&apos;ll start looking at automated testing.</p>
+
+<div class="prevnext">
+  <a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility" class="button"><i class="icon-arrow-left"></i><span class="label"> 前のページ </span></a><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing" class="button"><i class="icon-arrow-up"></i> Overview: Cross browser testing</a><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing" class="button"><span class="label"> 次のページ  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<h2 id="In_this_module">In this module</h2>
+
+<ul>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+ <li><a href="/ja/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+</ul>

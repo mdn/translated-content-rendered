@@ -1,0 +1,130 @@
+---
+title: Web Periodic Background Synchronization API
+slug: Web/API/Web_Periodic_Background_Synchronization_API
+translation_of: Web/API/Web_Periodic_Background_Synchronization_API
+---
+<div class="secureContexts notecard"><p><strong>安全なコンテキスト用</strong><br>この機能は一部またはすべての<a href="#Browser_compatibility">対応しているブラウザー</a>において、<a href="/ja/docs/Web/Security/Secure_Contexts">安全なコンテキスト</a> (HTTPS) でのみ利用できます。</p></div>
+
+<div><div class="draft notecard">
+    <p><strong>草案</strong><br>
+    このページは完成していません。</p>
+
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Web_Periodic_Background_Synchronization_API">Web Periodic Background Synchronization API</a></strong></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li><li><a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/ServiceWorkerRegistration/periodicSync"><code>ServiceWorkerRegistration.periodicSync</code></a></li><li><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope/onperiodicsync"><code>ServiceWorkerGlobalScope.onperiodicsync</code></a></li></ol></details></li><li class="toggle"><details open><summary>イベント</summary><ol><li><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope/periodicsync_event"><code>ServiceWorkerGlobalScope</code>: <code>periodicsync</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">Web Periodic Background Synchonization APIは、 <a href="/ja/docs/Web/API/Service_Worker_API"><code>service worker</code></a> 上で定期的にネットワーク通信ができる状況で走るタスクを登録する機能を提供します。それらのタスクを周期的なバックグラウンド同期リクエスト (periodic background sync requests) と呼びます。</p>
+
+<h2 id="Web_Periodic_Background_Synchronization_の概念と用法">Web Periodic Background Synchronization の概念と用法</h2>
+
+<p>Periodic Background Sync API により、ウェブアプリケーションが定期的にサービスワーカーにアップデートを行うよう知らせることができます。利用法としては、デバイスがWiFiに接続している間に最新のコンテンツを取得したり、アプリケーションをバックグラウンドでアップデートしたりすることが挙げられます。</p>
+
+<p>APIが呼び出された際には最小の時間間隔がセットされますが、サービスワーカーがそのイベントを受け取るタイミングに影響を与える様々な要素をユーザーエージェントは考慮します。その要素には、例えばウェブサイトのエンゲージメントや特定のネットワークへの接続などがあります。</p>
+
+<p><a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a> インターフェースは <a href="/ja/docs/Web/API/ServiceWorkerRegistration/periodicSync"><code>ServiceWorkerRegistration.periodicSync</code></a> によって提供されます。一意のタグが sync イベントの &apos;name&apos; として設定され、これは <a href="/ja/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a> スクリプト内で取得することができます。イベントを受け取った際には、キャッシュのアップデートや新たなリソースの取得といった任意の利用可能な機能を実行することができます</p>
+
+<p>このAPIはサービスワーカーに依存しているため、このAPIも安全なコンテクスト (secure context) でしか利用できません。</p>
+
+<div class="note">
+<p>At the time of writing, the Web Periodic Background Synchronization API is only available through an installed <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">Progressive Web App</a></p>
+</div>
+
+<h2 id="Web_Periodic_Background_Synchronization_Interfaces">Web Periodic Background Synchronization Interfaces</h2>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></dt>
+ <dd>Registers tasks to be run in a service worker at periodic intervals with network connectivity. These tasks are referred to as periodic background sync requests.</dd>
+ <dt><a href="/ja/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></dt>
+ <dd>Represents a synchronization event, sent to the <a href="/ja/docs/Web/API/ServiceWorkerGlobalScope"><code>global scope</code></a> of a <a href="/ja/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a>. It provides a way to run tasks in the service worker with network connectivity.</dd>
+</dl>
+
+<h2 id="Service_Worker_Additions">Service Worker Additions</h2>
+
+<p>The following additions to the <a href="/ja/docs/Web/API/Service_Worker_API"><code>Service Worker API</code></a> are specified in the Periodic Background Sync specification to provide an entry point for using Periodic Background Sync.</p>
+
+<dl>
+ <dt><a href="/ja/docs/Web/API/ServiceWorkerRegistration/periodicSync"><code>ServiceWorkerRegistration.periodicSync</code></a> <span class="readOnly readOnlyInline notecard inline" title="This value may not be changed.">読取専用 </span></dt>
+ <dd>Returns a reference to the <a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a> interface for registering tasks to run at specific intervals.</dd>
+ <dt><a href="/ja/docs/Web/API/ServiceWorkerGlobalScope/onperiodicsync"><code>ServiceWorkerGlobalScope.onperiodicsync</code></a></dt>
+ <dd>An event handler fired whenever a <code><a href="/ja/docs/Web/Reference/Events/periodicsync" title="/ja/docs/Web/Reference/Events/periodicsync">periodicsync</a></code> event occurs. This happens at timed intervals, that are specified when registering a <a href="/ja/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a>.</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>The following examples show how to use the interface.</p>
+
+<h3 id="Requesting_a_Periodic_Background_Sync">Requesting a Periodic Background Sync</h3>
+
+<p>The following asynchronous function registers a periodic background sync at a minimum interval of one day from a browsing context:</p>
+
+<pre class="brush: js notranslate">async function registerPeriodicNewsCheck() {
+  const registration = await navigator.serviceWorker.ready;
+  try {
+    await registration.periodicSync.register(&apos;fetch-news&apos;, {
+      minInterval: 24 * 60 * 60 * 1000,
+    });
+  } catch {
+    console.log(&apos;Periodic Sync could not be registered!&apos;);
+  }
+}
+</pre>
+
+<h3 id="Verifying_a_Background_Periodic_Sync_by_Tag">Verifying a Background Periodic Sync by Tag</h3>
+
+<p>This code checks to see if a Periodic Background Sync task with a given tag is registered.</p>
+
+<pre class="brush: js notranslate">navigator.serviceWorker.ready.then(registration =&gt; {
+  registration.periodicSync.getTags().then(tags =&gt; {
+    if (tags.includes(&apos;get-latest-news&apos;))
+      skipDownloadingLatestNewsOnPageLoad();
+  });
+});
+</pre>
+
+<h3 id="Removing_a_Periodic_Background_Sync_Task">Removing a Periodic Background Sync Task</h3>
+
+<p>The following code removes a Periodic Background Sync task to stop articles syncing in the background.</p>
+
+<pre class="brush: js notranslate">navigator.serviceWorker.ready.then(registration =&gt; {
+  registration.periodicSync.unregister(&apos;get-latest-news&apos;);
+});
+</pre>
+
+<h3 id="Listening_for_a_Periodic_Background_Sync_within_a_Service_Worker">Listening for a Periodic Background Sync within a Service Worker</h3>
+
+<p>The following example shows how to respond to a periodic sync event in the service worker.</p>
+
+<pre class="brush: js notranslate">self.addEventListener(&apos;periodicsync&apos;, event =&gt; {
+  if (event.tag == &apos;get-latest-news&apos;) {
+    event.waitUntil(fetchAndCacheLatestNews());
+  }
+});
+</pre>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://wicg.github.io/periodic-background-sync/" hreflang="en" lang="en" title="Web Periodic Background Synchronizationの仕様書">Web Periodic Background Synchronization</a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.PeriodicSyncManager"></div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="https://web.dev/periodic-background-sync/">An article on using Periodic Background Sync</a></li>
+ <li><a href="https://webplatformapis.com/periodic_sync/periodicSync_improved.html">A Periodic Background Sync demo app</a></li>
+</ul>

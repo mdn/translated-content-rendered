@@ -1,0 +1,889 @@
+---
+title: DevTools API
+slug: Tools/DevToolsAPI
+translation_of: Tools/DevToolsAPI
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/ja/docs/Tools/Page_Inspector">ページインスペクター</a></li>
+        <li><a href="/ja/docs/Tools/Web_Console">ウェブコンソール</a></li>
+        <li><a href="/ja/docs/Tools/Debugger">JavaScript デバッガー</a></li>
+        <li><a href="/ja/docs/Tools/Network_Monitor">ネットワークモニター</a></li>
+        <li><a href="/ja/docs/Tools/Performance">パフォーマンス</a></li>
+        <li><a href="/ja/docs/Tools/Application">Application</a></li>
+        <li><a href="/ja/docs/Tools/Responsive_Design_Mode">レスポンシブデザインモード</a></li>
+        <li><a href="/ja/docs/Tools/Accessibility_inspector">Accessibility Inspector</a></li>
+        <li class="toggle">
+            <details>
+                <summary>その他のツール</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Memory">メモリー</a></li>
+                    <li><a href="/ja/docs/Tools/Storage_Inspector">ストレージインスペクター</a></li>
+                    <li><a href="/ja/docs/Tools/DOM_Property_Viewer">DOM プロパティビューアー</a></li>
+                    <li><a href="/ja/docs/Tools/Eyedropper">スポイト</a></li>
+                    <li><a href="/ja/docs/Tools/Taking_screenshots">スクリーンショット</a></li>
+                    <li><a href="/ja/docs/Tools/Style_Editor">スタイルエディター</a></li>
+                    <li><a href="/ja/docs/Tools/Rulers">Rulers</a></li>
+                    <li><a href="/ja/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+                    <li><a href="/ja/docs/Tools/View_source">View Source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>開発ツールに接続する</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/about:debugging">about:debugging</a></li>
+                    <li><a href="/ja/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Android 版 Firefox に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Working_with_iframes">iframe に接続する</a></li>
+                    <li><a href="/ja/docs/Tools/Valence">ほかのブラウザーに接続する</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>ブラウザーのデバッグ</summary>
+                <ol>
+                    <li><a href="/ja/docs/Tools/Browser_Console">ブラウザーコンソール</a></li>
+                    <li><a href="/ja/docs/Tools/Browser_Toolbox">ブラウザーツールボックス</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/ja/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">開発ツールの拡張</a></li>
+        <li><a href="/ja/docs/Tools/Settings">オプション</a></li>
+        <li><a href="/ja/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/ja/docs/Tools/Release_notes">リリースノート</a></li>
+    </ol>
+</section></div>
+
+<div class="obsolete obsoleteHeader notecard"><p><strong>廃止</strong><br>この機能は廃止されました。まだいくつかのブラウザーで動作するかもしれませんが、いつ削除されてもおかしくないので、使わないようにしましょう。</p></div>
+
+<div class="warning notecard">
+    <p><strong>警告:</strong> DevTools APIはまだWIPです。 矛盾がある場合は、Firefox Developer Toolsチームにお知らせください。</p>
+</div>
+
+<p>この API は現在進行中ですが、現在使用可能なページインスペクタとデバッガの使用可能な部分があります。</p>
+
+<h2 id="イントロダクション">イントロダクション</h2>
+
+<p><span class="seoSummary">DevTools API は、Firefox の開発者ツールを登録してアクセスする方法を提供します。</span></p>
+
+<p>In terms of User Interface, each registered tool lives in its own tab (we call one tab a <strong>panel</strong>). These tabs are located in a box we call a <strong>Toolbox</strong>. A toolbox can be <em>hosted</em> within a browser tab (at the bottom or on the side), or in its own window (we say that the toolbox is <em>undocked</em>). A Toolbox (and all the tools it contains) is linked to a <strong>Target</strong>, which is the object the tools are debugging. A target is usually a web page (a tab), but can be other things (a chrome window, a remote tab,…).</p>
+
+<p>In terms of code, each tool has to provide a <strong>ToolDefinition</strong> object. A definition is a JS light object that exposes different information about the tool (like its name and its icon), and a <em>build</em> method that will be used later-on to start an instance of this tool. The <strong> gDevTools</strong> global object provides methods to register a tool definition and to access tool instances. An instance of a tool is called a <strong>ToolPanel</strong>. The ToolPanel is built only when the tool is selected (not when the toolbox is opened). There is no way to &quot;close/destroy&quot; a ToolPanel. The only way to close a toolPanel is to close its containing toolbox. All these objects implement the <strong>EventEmitter</strong> interface.</p>
+
+<h2 id="API">API</h2>
+
+<h3 id="gDevTools">gDevTools</h3>
+
+<p>The <code>gDevTools</code> API can be used to register new tools, themes and handle toolboxes for different tabs and windows. To use the <code>gDevTools</code> API from an add-on, it can be imported with following snippet</p>
+
+<pre class="brush: js notranslate"><code>const { gDevTools } = require(&quot;resource:///modules/devtools/gDevTools.jsm&quot;);</code></pre>
+
+<h4 id="メソッド">メソッド</h4>
+
+<dl>
+ <dt>
+ <h5 id="registerTooltoolDefinition"><code>registerTool(toolDefinition)</code></h5>
+ </dt>
+ <dd>Registers a new tool and adds a tab to each existing toolbox.</dd>
+ <dd><strong>Parameters:</strong><br>
+ <em><code>toolDefinition {ToolDefinition}</code></em> - An object that contains information about the tool. See <a href="#ToolDefinition">ToolDefinition</a> for details.</dd>
+ <dt>
+ <h5 id="unregisterTooltool"><code>unregisterTool(tool)</code></h5>
+ </dt>
+ <dd>Unregisters the given tool and removes it from all toolboxes.</dd>
+ <dd><strong>Parameters:</strong><br>
+ <em><code>tool {ToolDefinition|String}</code></em> - The tool definition object or the id of the tool to unregister.</dd>
+ <dt>
+ <h5 id="registerThemethemeDefinition"><code>registerTheme(themeDefinition)</code></h5>
+ </dt>
+ <dd>Registers a new theme.</dd>
+ <dd><strong>Parameters:</strong><br>
+ <em><code>themeDefinition {ThemeDefinition}</code></em> - An object that contains information about the theme.</dd>
+ <dt>
+ <h5 id="unregisterThemetheme"><code>unregisterTheme(theme)</code></h5>
+ </dt>
+ <dd>Unregisters the given theme.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <em><code>theme {ThemeDefinition|String}</code></em> - The theme definition object or the theme identifier.</dd>
+ <dt>
+ <h5 id="showToolboxtarget_toolId_hostType_hostOptions"><code>showToolbox(target [, toolId [, hostType [, hostOptions]]])</code></h5>
+ </dt>
+ <dd>Opens a toolbox for given target either by creating a new one or activating an existing one.</dd>
+ <dd><strong>Parameters:</strong><br>
+ <em><code>target {Target}</code></em> - The target the toolbox will debug.<br>
+ <em><code>toolId {String}</code></em> - The tool that should be activated. If unspecified the previously active tool is shown.<br>
+ <em><code>hostType {String}</code></em> - The position the toolbox will be placed. One of <code>bottom</code>, <code>side</code>, <code>window</code>, <code>custom</code>. See <a href="#HostType">HostType</a> for details.<br>
+ <em><code>hostOptions {Object}</code></em> - An options object passed to the selected host. See <a href="#HostType">HostType</a> for details.</dd>
+ <dd><strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#Toolbox">Toolbox</a> instance once it has been initialized and the selected tool is loaded.</dd>
+ <dt>
+ <h5 id="getToolboxtarget"><code>getToolbox(target)</code></h5>
+ </dt>
+ <dd>Fetch the <a href="#Toolbox">Toolbox</a> object for the given target.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <em><code>target {Target}</code></em> - The target the toolbox is debugging.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ <a href="#Toolbox">Toolbox</a> object or undefined if there&apos;s no toolbox for the given target..</dd>
+ <dt>
+ <h5 id="closeToolboxtarget"><code>closeToolbox(target)</code></h5>
+ </dt>
+ <dd>Closes the toolbox for given target.</dd>
+ <dd><strong>Parameters:</strong><br>
+ <em><code>target {Target}</code></em> - The target of the toolbox that should be closed.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled once the toolbox has been destroyed.</dd>
+ <dt>
+ <h5 id="getDefaultTools"><code>getDefaultTools()</code></h5>
+ </dt>
+ <dd>Returns an <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> of <a href="#ToolDefinition">ToolDefinition</a> objects for the built-in tools.</dd>
+ <dt>
+ <h5 id="getAdditionalTools"><code>getAdditionalTools()</code></h5>
+ </dt>
+ <dd>Returns an <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> of <a href="#ToolDefinition">ToolDefinition</a> objects for tools added by addons.</dd>
+ <dt>
+ <h5 id="getToolDefinitiontoolId"><code>getToolDefinition(toolId)</code></h5>
+ </dt>
+ <dd>Fetch the <a href="#ToolDefinition">ToolDefinition</a> object for a tool if it exists and is enabled.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String}</em></code> - The ID of the tool.</dd>
+ <dd><strong>Return value:</strong><br>
+ A <a href="#ToolDefinition">ToolDefinition</a> if a tool with the given ID exists and is enabled, null otherwise.</dd>
+ <dt>
+ <h5 id="getToolDefinitionMap"><code>getToolDefinitionMap()</code></h5>
+ </dt>
+ <dd>Returns a toolId → <a href="#ToolDefinition">ToolDefinition</a> map for tools that are enabled.</dd>
+ <dt>
+ <h5 id="getToolDefinitionArray"><code>getToolDefinitionArray()</code></h5>
+ </dt>
+ <dd>Returns an <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> of <a href="#ToolDefinition">ToolDefinition</a> objects for enabled tools sorted by the order they appear in the toolbox.</dd>
+ <dt>
+ <h5 id="getThemeDefinitionthemeId"><code>getThemeDefinition(themeId)</code></h5>
+ </dt>
+ <dd>Fetch the <code>ThemeDefinition</code> object for the theme with the given id.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>themeId {String}</em></code> - The ID of the theme.</dd>
+ <dd><strong>Return value:</strong><br>
+ A <code>ThemeDefinition</code> object if the theme exists, null otherwise.</dd>
+ <dt>
+ <h5 id="getThemeDefinitionMap"><code>getThemeDefinitionMap()</code></h5>
+ </dt>
+ <dd>Returns a toolId → <code>ThemeDefinition</code> map for available themes.</dd>
+ <dt>
+ <h5 id="getThemeDefinitionArray"><code>getThemeDefinitionArray()</code></h5>
+ </dt>
+ <dd>Returns an <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> of <code>ThemeDefinition</code> objects for avialble themes.</dd>
+</dl>
+
+<h4 id="Events">Events</h4>
+
+<p>Following events are emitted by the <code>gDevTools</code> object via the <a href="#EventEmitter">EventEmitter</a> interface.</p>
+
+<dl>
+ <dt>
+ <h5 id="tool-registeredtoolId"><code>tool-registered</code><code>(toolId)</code></h5>
+ </dt>
+ <dd>A new tool has been registered.</dd>
+ <dt>
+ <h5 id="tool-unregisteredtool"><code>tool-unregistered(tool)</code></h5>
+ </dt>
+ <dd>A tool has been unregistered. The parameter is a <a href="#ToolDefinition">ToolDefinition</a> object.</dd>
+ <dt>
+ <h5 id="theme-registeredthemeId"><code>theme-registered(themeId)</code></h5>
+ </dt>
+ <dd>A new theme has been registered.</dd>
+ <dt>
+ <h5 id="theme-unregisteredtheme"><code>theme-unregistered(theme)</code></h5>
+ </dt>
+ <dd>A theme has been unregistered. The parameter is a <code>ThemeDefinition</code> object.</dd>
+ <dt>
+ <h5 id="toolbox-readytoolbox"><code>toolbox-ready(toolbox)</code></h5>
+ </dt>
+ <dd>A new toolbox has been created and is ready to use. The parameter is a <a href="#Toolbox">Toolbox</a> object instance.</dd>
+ <dt>
+ <h5 id="toolbox-destroytarget"><code>toolbox-destroy(target)</code></h5>
+ </dt>
+ <dd>The toolbox for the specified target is about to be destroyed.</dd>
+ <dt>
+ <h5 id="toolbox-destoyedtarget"><code>toolbox-destoyed(target)</code></h5>
+ </dt>
+ <dd>The toolbox for the specified target has been destroyed.</dd>
+ <dt>
+ <h5 id="toolId-inittoolbox_iframe"><code>{toolId}-init(toolbox, iframe)</code></h5>
+ </dt>
+ <dd>A tool with the given ID has began to load in the given toolbox to the given frame.</dd>
+ <dt>
+ <h5 id="toolId-buildtoolbox_panel"><code>{toolId}-build(toolbox, panel)</code></h5>
+ </dt>
+ <dd>A tool with the given ID has began to initialize in the given toolbox. The panel is the object returned by the <code>ToolDefinition.build()</code> method.</dd>
+ <dt>
+ <h5 id="toolId-readytoolbox_panel"><code>{toolId}-ready(toolbox, panel)</code></h5>
+ </dt>
+ <dd>A tool with the given ID has finished its initialization and is ready to be used. The panel is the object returned by the <code>ToolDefinition.build()</code> method.</dd>
+ <dt>
+ <h5 id="toolId-destroytoolbox_panel"><code>{toolId}-destroy(toolbox, panel)</code></h5>
+ </dt>
+ <dd>A tool with the given ID is about to be destroyed. The panel is the object returned by the <code>ToolDefinition.build()</code> method.</dd>
+</dl>
+
+<h3 id="Toolbox">Toolbox</h3>
+
+<p>A Toolbox is a frame for the <a href="#ToolPanel">ToolPanels</a> that is debugging a specific target.</p>
+
+<h4 id="プロパティ">プロパティ</h4>
+
+<dl>
+ <dt>
+ <h5 id="target"><code>target</code></h5>
+ </dt>
+ <dd><strong>Target</strong>. The Target this toolbox is debugging.</dd>
+ <dt>
+ <h5 id="hostType"><code>hostType</code></h5>
+ </dt>
+ <dd><strong>Toolbox.HostType</strong>. The type of the host this Toolbox is docked to. The value is one of the <code>Toolbox.HostType</code> constants.</dd>
+ <dt>
+ <h5 id="zoomValue"><code>zoomValue</code></h5>
+ </dt>
+ <dd>The current zoom level of the Toolbox.</dd>
+</dl>
+
+<h4 id="Constants">Constants</h4>
+
+<p>The Toolbox constructor contains following constant properties.</p>
+
+<dl>
+ <dt>
+ <h5 id="Toolbox.HostType.BOTTOM"><code>Toolbox.HostType.BOTTOM</code></h5>
+ </dt>
+ <dd>Host type for the default toolbox host at the bottom of the browser window.</dd>
+ <dt>
+ <h5 id="Toolbox.HostType.SIDE"><code>Toolbox.HostType.SIDE</code></h5>
+ </dt>
+ <dd>Host type for the host at the side of the browser window.</dd>
+ <dt>
+ <h5 id="Toolbox.HostType.WINDOW"><code>Toolbox.HostType.WINDOW</code></h5>
+ </dt>
+ <dd>Host type for the separate Toolbox window.</dd>
+ <dt>
+ <h5 id="Toolbox.HostType.CUSTOM"><code>Toolbox.HostType.CUSTOM</code></h5>
+ </dt>
+ <dd>Host type for a custom frame host.</dd>
+</dl>
+
+<h4 id="メソッド_2">メソッド</h4>
+
+<dl>
+ <dt>
+ <h5 id="getCurrentPanel"><code>getCurrentPanel()</code></h5>
+ </dt>
+ <dd>Get the currently active <a href="#ToolPanel">ToolPanel</a>.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ The <a href="#ToolPanel">ToolPanel</a> object that was returned from <a href="#build(window_toolbox)">ToolPanel.build()</a>.</dd>
+ <dt>
+ <h5 id="getPaneltoolId"><code>getPanel(toolId)</code></h5>
+ </dt>
+ <dd>Get the <a href="#ToolPanel">ToolPanel</a> for given tool.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool identifier.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ The <a href="#ToolPanel">ToolPanel</a> object if the tool with the given <code>toolId</code> is active, otherwise <code>undefined</code>.</dd>
+ <dt>
+ <h5 id="getPanelWhenReadytoolId"><code>getPanelWhenReady(toolId)</code></h5>
+ </dt>
+ <dd>Similar to <code>getPanel()</code> but waits for the tool to load first. If the tool is not already loaded or currently loading the returned <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> won&apos;t be fulfilled until something triggers the tool to load.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool identifier.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#ToolPanel">ToolPanel</a> object once the tool has finished loading.</dd>
+ <dt>
+ <h5 id="getToolPanels"><code>getToolPanels()</code></h5>
+ </dt>
+ <dd>Returns a <code>toolId → <a href="#ToolPanel">ToolPanel</a></code> <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Map"><code>Map</code></a> for currently loaded tools.</dd>
+ <dt>
+ <h5 id="getNotificationBox"><code>getNotificationBox()</code></h5>
+ </dt>
+ <dd>Returns a <code><a href="/ja/docs/Mozilla/Tech/XUL/notificationbox">&lt;xul:notificationbox&gt;</a></code> element for the Toolbox that can be used to display notifications to the user.</dd>
+ <dt>
+ <h5 id="loadTooltoolId"><code>loadTool(toolId)</code></h5>
+ </dt>
+ <dd>Loads the tool with the given <code>toolId</code> in the background but does not activate it.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool identifier.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#ToolPanel">ToolPanel</a> object of the loaded panel once the tool has loaded.<br>
+  </dd>
+ <dt>
+ <h5 id="selectTooltoolId"><code>selectTool(toolId)</code></h5>
+ </dt>
+ <dd>Selects the tool with the given <code>toolId</code>.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool identifier.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#ToolPanel">ToolPanel</a> object of the selected panel once the tool has loaded and activated.</dd>
+ <dt>
+ <h5 id="selectNextTool"><code>selectNextTool()</code></h5>
+ </dt>
+ <dd>Selects the next tool in the <code>Toolbox</code>.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#ToolPanel">ToolPanel</a> object of the selected panel.</dd>
+ <dt>
+ <h5 id="selectPreviousTool"><code>selectPreviousTool()</code></h5>
+ </dt>
+ <dd>Selects the previous tool in the <code>Toolbox</code>.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the <a href="#ToolPanel">ToolPanel</a> object of the selected panel.</dd>
+ <dt>
+ <h5 id="highlightTooltoolId"><code>highlightTool(toolId)</code></h5>
+ </dt>
+ <dd>Highlights the tab for the given tool.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool to highlight.</dd>
+ <dt>
+ <h5 id="unhighlightTooltoolId"><code>unhighlightTool(toolId)</code></h5>
+ </dt>
+ <dd>Unhighlights the tab for the given tool.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>toolId {String} - </em></code>The tool to unhighlight.</dd>
+ <dt>
+ <h5 id="openSplitConsole"><code>openSplitConsole()</code></h5>
+ </dt>
+ <dd>Opens the split Console to the bottom of the toolbox.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled once the Console has loaded.</dd>
+ <dt>
+ <h5 id="closeSplitConsole"><code>closeSplitConsole()</code></h5>
+ </dt>
+ <dd>Closes the split console.</dd>
+ <dt>
+ <h5 id="toggleSplitConsole"><code>toggleSplitConsole()</code></h5>
+ </dt>
+ <dd>Toggles the state of the split console.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled once the operation has finished.</dd>
+ <dt>
+ <h5 id="switchHosthostType"><code>switchHost(hostType)</code></h5>
+ </dt>
+ <dd>Switches the location of the toolbox<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>hostType {Toolbox.HostType} - </em></code>The type of the new host.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled once the new host is ready.<br>
+  </dd>
+ <dt>
+ <h5 id="reloadTargetforce"><code>reloadTarget(force)</code></h5>
+ </dt>
+ <dd>Reloads the current target of the toolbox.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <em><code>force {Boolean} -</code></em> If true the target is shift-reloaded i.e. the cache is bypassed during the reload.</dd>
+ <dt>
+ <h5 id="zoomIn"><code>zoomIn()</code></h5>
+ </dt>
+ <dd>Increases the zoom level of the <code>Toolbox</code> document.</dd>
+ <dt>
+ <h5 id="zoomOut"><code>zoomOut()</code></h5>
+ </dt>
+ <dd>Decreases the zoom level of the <code>Toolbox</code> document.</dd>
+ <dt>
+ <h5 id="zoomReset"><code>zoomReset()</code></h5>
+ </dt>
+ <dd>Resets the zoom level of the <code>Toolbox</code> document.</dd>
+ <dt>
+ <h5 id="setZoomvalue"><code>setZoom(value)</code></h5>
+ </dt>
+ <dd>Set the zoom level to an arbitrary value.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>value {Number} - </em></code>The zoom level such as <code>1.2</code>.</dd>
+ <dt>
+ <h5 id="destroy"><code>destroy()</code></h5>
+ </dt>
+ <dd>Closes the toolbox.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is resolved once the <code>Toolbox</code> is destroyed.</dd>
+</dl>
+
+<h4 id="Events_2">Events</h4>
+
+<p>The Toolbox object emits following events via the <a href="#EventEmitter">EventEmitter</a> interface.</p>
+
+<dl>
+ <dt>
+ <h5 id="host-changed"><code>host-changed</code></h5>
+ </dt>
+ <dd>The Host for this Toolbox has changed.</dd>
+ <dt>
+ <h5 id="ready"><code>ready</code></h5>
+ </dt>
+ <dd>The <code>Toolbox</code> is ready to use.</dd>
+ <dt>
+ <h5 id="selecttoolId"><code>select(toolId)</code></h5>
+ </dt>
+ <dd>A tool has been selected. This event is emitted before the corresponding <code>{toolId}-selected</code> event.</dd>
+ <dt>
+ <h5 id="toolId-initframe"><code>{toolId}-init(frame)</code></h5>
+ </dt>
+ <dd>A tool is about to be loaded. The frame is the <a href="/ja/docs/Web/HTML/Element/iframe" title="HTML のインラインフレーム要素 (&lt;iframe&gt;) は、入れ子になった閲覧コンテキストを表現し、現在の HTML ページに他のページを埋め込むことができます。"><code>&lt;iframe&gt;</code></a> element that has been created for the tool.</dd>
+ <dt>
+ <h5 id="toolId-buildpanel"><code>{toolId}-build(panel)</code></h5>
+ </dt>
+ <dd>The frame for a tool has loaded and the <a href="#build(window_toolbox)">ToolPanel.build()</a> method has been called but the asynchronous initialization has not started. The parameter is a <a href="#ToolPanel">ToolPanel</a> object.</dd>
+ <dt>
+ <h5 id="toolId-readypanel"><code>{toolId}-ready(panel)</code></h5>
+ </dt>
+ <dd>The asynchronous initialization for a tool has completed and it is ready to be used. The parameter is a <a href="#ToolPanel">ToolPanel</a> object.</dd>
+ <dt>
+ <h5 id="toolId-selectedpanel"><code>{toolId}-selected(panel)</code></h5>
+ </dt>
+ <dd>A tool has been selected. The parameter is a <a href="#ToolPanel">ToolPanel</a> object.</dd>
+ <dt>
+ <h5 id="toolId-destroypanel"><code>{toolId}-destroy(panel)</code></h5>
+ </dt>
+ <dd>A tool is about to be destroyed. The parameter is a <a href="#ToolPanel">ToolPanel</a> object.</dd>
+ <dt>
+ <h5 id="destroy_2"><code>destroy</code></h5>
+ </dt>
+ <dd>The <code>Toolbox</code> is about to be destroyed.</dd>
+ <dt>
+ <h5 id="destroyed"><code>destroyed</code></h5>
+ </dt>
+ <dd>The <code>Toolbox</code> has been destroyed.</dd>
+</dl>
+
+<h3 id="ToolDefinition">ToolDefinition</h3>
+
+<p>A <code>ToolDefinition</code> object contains all the required information for a tool to be shown in the toolbox.</p>
+
+<h4 id="Methods">Methods</h4>
+
+<dl>
+ <dt>
+ <h5 id="isTargetSupportedtarget"><code>isTargetSupported(target)</code></h5>
+ </dt>
+ <dd>A method that is called during toolbox construction to check if the tool supports debugging the given target.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>target {Target} - </em></code>The target to check.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A boolean indicating if the tool supports the given target.</dd>
+ <dt>
+ <h5 id="buildwindow_toolbox"><code>build(window, toolbox)</code></h5>
+ </dt>
+ <dd>A method that builds the <a href="#ToolPanel">ToolPanel</a> for this tool.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <em><code>window {Window} - </code></em>The <a href="/ja/docs/Web/API/Window"><code>Window</code></a> object for frame the tool is being built into.<br>
+ <em><code>toolbox {Toolbox} - </code></em>The <a href="#Toolbox">Toolbox</a> the tool is being built for.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="#ToolPanel">ToolPanel</a> for the tool.</dd>
+ <dt>
+ <h5 id="onKeypanel_toolbox"><code>onKey(panel, toolbox)</code></h5>
+ </dt>
+ <dd><strong>Optional.</strong> A method that is called when the keyboard shortcut for the tool is activated while the tool is the active tool.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <code><em>panel {ToolPanel} - </em></code>The <a href="#ToolPanel">ToolPanel</a> for the tool.<br>
+ <em><code>toolbox {Toolbox} - </code></em>The toolbox for the shortcut was triggered for.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ Undefined.</dd>
+</dl>
+
+<h4 id="Properties">Properties</h4>
+
+<p>The ToolDefinition object can contain following properties. Most of them are optional and can be used to customize the presense of the tool in the Browser and the Toolbox.</p>
+
+<dl>
+ <dt>
+ <h5 id="id"><code>id</code></h5>
+ </dt>
+ <dd><strong>String, required.</strong> An unique identifier for the tool. It must be a valid id for an HTML <a href="/ja/docs/Web/API/Element"><code>Element</code></a>.</dd>
+ <dt>
+ <h5 id="url"><code>url</code></h5>
+ </dt>
+ <dd><strong>String, required.</strong> An URL of the panel document.</dd>
+ <dt>
+ <h5 id="label"><code>label</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> The tool&apos;s name. If undefined the <code>icon</code> should be specified.</dd>
+ <dt>
+ <h5 id="tooltip"><code>tooltip</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> The tooltip for the tool&apos;s tab.</dd>
+ <dt>
+ <h5 id="panelLabel"><code>panelLabel</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> An accessibility label for the panel.</dd>
+ <dt>
+ <h5 id="ordinal"><code>ordinal</code></h5>
+ </dt>
+ <dd><strong>Integer, optional.</strong> The position of the tool&apos;s tab within the toolbox. <strong>Default: </strong>99</dd>
+ <dt>
+ <h5 id="visibilityswitch"><code>visibilityswitch</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> A preference name that controls the visiblity of the tool. <strong>Default: </strong><code>devtools.{id}.enabled</code></dd>
+ <dt>
+ <h5 id="icon"><code>icon</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> An URL for the icon to show in the toolbox tab. If undefined the label should be defined.</dd>
+ <dt>
+ <h5 id="highlightedicon"><code>highlightedicon</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> An URL for an icon that is to be used when the tool is highlighted (see e.g. paused, inactive debugger). <strong>Default:</strong> <code>{icon}</code></dd>
+ <dt>
+ <h5 id="iconOnly"><code>iconOnly</code></h5>
+ </dt>
+ <dd><strong>Boolean, optional.</strong> If true, the label won&apos;t be shown in the tool&apos;s tab. <strong>Default:</strong> false</dd>
+ <dt>
+ <h5 id="invertIconForLightTheme"><code>invertIconForLightTheme</code></h5>
+ </dt>
+ <dd><strong>Boolean, optional.</strong> If true the colors of the icon will be inverted for the light theme. <strong>Default:</strong> false</dd>
+ <dt>
+ <h5 id="key"><code>key</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> The key used for keyboard shortcut. Either <code id="a-key"><a href="https://developer.mozilla.org/ja/docs/Mozilla/Tech/XUL/Attribute/key">key</a></code> or <code id="a-keycode"><a href="https://developer.mozilla.org/ja/docs/Mozilla/Tech/XUL/Attribute/keycode">keycode</a></code> value.</dd>
+ <dt>
+ <h5 id="modifiers"><code>modifiers</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> <code id="a-modifiers"><a href="https://developer.mozilla.org/ja/docs/Mozilla/Tech/XUL/Attribute/modifiers">Modifiers</a></code> for the keyboard shortcut.</dd>
+ <dt>
+ <h5 id="preventClosingOnKey"><code>preventClosingOnKey</code></h5>
+ </dt>
+ <dd><strong>Boolean, optional.</strong> If true the tool won&apos;t close if its keybinding is pressed while it is active. <strong>Default:</strong> false</dd>
+ <dt>
+ <h5 id="inMenu"><code>inMenu</code></h5>
+ </dt>
+ <dd><strong>Boolean, optional.</strong> If true the tool will be shown in the Developer Menu. <strong>Default:</strong> false</dd>
+ <dt>
+ <h5 id="menuLabel"><code>menuLabel</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> A label for the Developer Menu item. <strong>Default:</strong> <code>{label}</code></dd>
+ <dt>
+ <h5 id="accesskey"><code>accesskey</code></h5>
+ </dt>
+ <dd><strong>String, optional.</strong> <code id="a-accesskey"><a href="https://developer.mozilla.org/ja/docs/Mozilla/Tech/XUL/Attribute/accesskey">accesskey</a></code> for the Developer Menu <code><a href="/ja/docs/Mozilla/Tech/XUL/menuitem">&lt;xul:menuitem&gt;</a></code>.</dd>
+</dl>
+
+<h4 id="Example">Example</h4>
+
+<p>Here&apos;s a minimal definition for a tool.</p>
+
+<pre class="brush: js notranslate"><code>let def = {
+  id: &quot;my-tool&quot;,
+  label: &quot;My Tool&quot;,
+  icon: &quot;chrome://browser/skin/devtools/tool-webconsole.svg&quot;,
+  url: &quot;about:blank&quot;,
+  isTargetSupported: target =&gt; true,
+  build: (window, toolbox) =&gt; new MyToolPanel(window, toolbox)
+};</code>
+
+// Register it.
+gDevTools.registerTool(def);
+</pre>
+
+<h3 id="TargetType">TargetType</h3>
+
+<p>FIXME:</p>
+
+<h3 id="HostType">HostType</h3>
+
+<p>FIXME</p>
+
+<h3 id="ToolPanel">ToolPanel</h3>
+
+<p>The ToolPanel is an interface the toolbox uses to manage the panel of a tool. The object that <code>ToolDefinition.build()</code> returns should implement the methods described below.</p>
+
+<h4 id="Methods_2">Methods</h4>
+
+<dl>
+ <dt>
+ <h5 id="open"><code>open()</code></h5>
+ </dt>
+ <dd><strong>Optional</strong>. A method that can be used to perform asynchronous initialization. If the method returns a <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a>, many operations (e.g. <a href="#showToolbox(target_toolId_hostType_hostOptions)">gDevTools.showToolbox()</a> or <code>toolbox.selectTool()</code>) and events (e.g. <a href="#toolbox-ready(toolbox)">toolbox-ready</a>) are delayed until the promise has been fulfilled.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ The method should return a <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is resolved with the <code>ToolPanel</code> object once it&apos;s ready to be used.</dd>
+ <dt>
+ <h5 id="destroy_3"><code>destroy()</code></h5>
+ </dt>
+ <dd>
+ <p>A method that is called when the toolbox is closed or the tool is unregistered. If the tool needs to perform asynchronous operations during destruction the method should return a <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is resolved once the process is complete.</p>
+
+ <p><strong>Return value:</strong><br>
+  A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> if the function performs asynchronous operations, otherwise <code>undefined</code>.</p>
+ </dd>
+</dl>
+
+<h4 id="Example_2">Example</h4>
+
+<p>Here&apos;s a basic template for a ToolPanel implementation.</p>
+
+<pre class="brush: js notranslate"><code>// In the ToolDefintion object, do
+//   build: (window, target) =&gt; new MyPanel(window, target),
+
+function MyPanel(window, target) {
+  // The window object that has loaded the URL defined in the ToolDefinition
+  this.window = window;
+  // The Target this toolbox is debugging.
+  this.target = target;
+
+  // Do synchronous initialization here.
+  window.document.body.addEventListener(&quot;click&quot;, this.handleClick);
+}
+
+MyPanel.prototype = {
+  open: function() {
+    // Any asynchronous operations should be done here.
+    return this.doSomethingAsynchronous()
+      .then(() =&gt; this);
+  },
+
+  destroy: function() {
+    // Synchronous destruction.
+    this.window.document.body.removeEventListener(&quot;click&quot;, this.handleClick);
+
+    // Async destruction.
+    return this.destroySomethingAsynchronosly()
+      .then(() =&gt; console.log(&quot;destroyed&quot;));
+  },
+
+  handleClick: function(event) {
+    console.log(&quot;Clicked&quot;, event.originalTarget);
+  },
+};</code>
+</pre>
+
+<h3 id="EventEmitter">EventEmitter</h3>
+
+<p><code>EventEmitter</code> is an interface many Developer Tool classes and objects implement and use to notify others about changes in their internal state.</p>
+
+<p>When an event is emitted on the <code>EventEmitter</code>, the listeners will be called with the event name as the first argument and the extra arguments are spread as the remaining parameters.</p>
+
+<div class="note">
+<p>Note: Some components use Add-on SDK event module instead of the DevTools EventEmitter. Unfortunately, their API&apos;s are a bit different and it&apos;s not always evident which one a certain component is using. The main differences between the two modules are that the first parameter for Add-on SDK events is the first payload argument instead of the event name and the <code>once</code> method does not return a Promise. The work for unifying the event paradigms is ongoing in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=952653">バグ 952653</a>.</p>
+</div>
+
+<h4 id="Methods_3">Methods</h4>
+
+<p>The following methods are available on objects that have been decorated with the <code>EventEmitter</code> interface.</p>
+
+<dl>
+ <dt>
+ <h5 id="emiteventName_...extraArguments"><code>emit(eventName, ...extraArguments)</code></h5>
+ </dt>
+ <dd>Emits an event with the given name to this object.<br>
+ <br>
+ <strong>Parameters:</strong><br>
+ <em><code>eventName {String} - </code></em>The name of the event.<br>
+ <code><em>extraArguments {</em>...<em>Any} - </em></code>Extra arguments that are passed to the listeners.</dd>
+ <dt>
+ <h5 id="oneventName_listener"><code>on(eventName, listener)</code></h5>
+ </dt>
+ <dd>Adds a listener for the given event.</dd>
+ <dt>
+ <h5 id="offeventName_listener"><code>off(eventName, listener)</code></h5>
+ </dt>
+ <dd>Removes the previously added listener from the event.</dd>
+ <dt>
+ <h5 id="onceeventName_listener"><code>once(eventName, listener)</code></h5>
+ </dt>
+ <dd>Adds a listener for the event that is removed after it has been emitted once.<br>
+ <br>
+ <strong>Return value:</strong><br>
+ A <a href="/ja/docs/Web/API/Promise"><code>Promise</code></a> that is fulfilled with the first extra argument for the event when then event is emitted. If the event contains multiple payload arguments, the rest are discarded and can only be received by providing the listener function to this method.</dd>
+</dl>
+
+<h4 id="Examples">Examples</h4>
+
+<p>Here&apos;s a few examples using the <a href="#gDevTools">gDevTools</a> object.</p>
+
+<pre class="brush: js notranslate"><code>let onInit = (eventName, toolbox, netmonitor) =&gt; console.log(&quot;Netmonitor initialized!&quot;);
+
+// Attach a listener.
+gDevTools.on(&quot;netmonitor-init&quot;, onInit);
+
+// Remove a listener.
+gDevTools.off(&quot;netmonitor-init&quot;, onInit);
+
+// Attach a one time listener.
+gDevTools.once(&quot;netmonitor-init&quot;, (eventName, toolbox, netmonitor) =&gt; {
+  console.log(&quot;Network Monitor initialized once!&quot;, toolbox, netmonitor);
+});
+
+// Use the Promise returned by the once method.
+gDevTools.once(&quot;netmonitor-init&quot;).then(toolbox =&gt; {
+  // Note that the second argument is not available here.
+  console.log(&quot;Network Monitor initialized to toolbox&quot;, toolbox);
+});</code>
+</pre>
+
+<h3 id="ToolSidebar">ToolSidebar</h3>
+
+<p>To build a sidebar in your tool, first, add a xul:tabbox where you want the sidebar to live:</p>
+
+<pre class="line notranslate"><code class="brush: html">    <span class="nt">&lt;splitter</span> <span class="na">class=</span><span class="s">&quot;devtools-side-splitter&quot;</span><span class="nt">/&gt;</span></code>
+<code>    <span class="nt">&lt;tabbox</span> <span class="na">id=</span><span class="s">&quot;mytool-sidebar&quot;</span> <span class="na">class=</span><span class="s">&quot;devtools-sidebar-tabs&quot;</span> <span class="na">hidden=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span></code>
+<code>      <span class="nt">&lt;tabs/&gt;</span></code>
+<code>      <span class="nt">&lt;tabpanels</span> <span class="na">flex=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span></code>
+<code>    <span class="nt">&lt;/tabbox&gt;</span></code></pre>
+
+<div class="line"> </div>
+
+<div class="line">A sidebar is composed of tabs. Each tab will hold an iframe. For example, in the Inspector, there are 3 tabs (Computed View, Rule View, Layout View). The user can select the tab he wants to see.</div>
+
+<div class="line"> </div>
+
+<div class="line">If the availability of the tabs depends on some tool-related conditions, we might want to not let the user select a tab. This API provides methods to hide the tabstripe. For example, in the Web Console, there are 2 views (Network View and Object View). These views are only available in certain conditions controlled by the WebConsole code. So it&apos;s up the WebConsole the hide and show the sidebar, and select the correct tab.</div>
+
+<div class="line"> </div>
+
+<div class="line">If the loaded document exposes a <code>window.setPanel(ToolPanel)</code> function, the sidebar will call it once the document is loaded.</div>
+
+<div class="line"> </div>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th>Method</th>
+   <th>Description</th>
+  </tr>
+  <tr>
+   <td><code>new ToolSidebar(xul:tabbox, ToolPanel, uid, showTabstripe=true)</code></td>
+   <td>ToolSidebar constructor</td>
+  </tr>
+  <tr>
+   <td><code>void addTab(tabId, url, selected=false)</code></td>
+   <td>Add a tab in the sidebar</td>
+  </tr>
+  <tr>
+   <td><code>void select(tabId)</code></td>
+   <td>Select a tab</td>
+  </tr>
+  <tr>
+   <td><code>void hide()</code></td>
+   <td>Hide the sidebar</td>
+  </tr>
+  <tr>
+   <td><code>void show()</code></td>
+   <td>Show the sidebar</td>
+  </tr>
+  <tr>
+   <td><code>void toggle()</code></td>
+   <td>Toggle the sidebar</td>
+  </tr>
+  <tr>
+   <td><code>void getWindowForTab(tabId)</code></td>
+   <td>Get the iframe containing the tab content</td>
+  </tr>
+  <tr>
+   <td><code>tabId getCurrentTabID()</code></td>
+   <td>Return the id of tabId of the current tab</td>
+  </tr>
+  <tr>
+   <td><code>tabbox getTab(tabId)</code></td>
+   <td>Return a tab given its id</td>
+  </tr>
+  <tr>
+   <td><code>destroy()</code></td>
+   <td>Destroy the ToolSidebar object</td>
+  </tr>
+  <tr>
+   <th>Events</th>
+   <th>Description</th>
+  </tr>
+  <tr>
+   <td><code>new-tab-registered</code></td>
+   <td>A new tab has been added</td>
+  </tr>
+  <tr>
+   <td><code>{tabId}-ready</code></td>
+   <td>Tab is loaded and can be used</td>
+  </tr>
+  <tr>
+   <td><code>{tabId}-selected</code></td>
+   <td>Tab has been selected and is visible</td>
+  </tr>
+  <tr>
+   <td><code>{tabId}-unselected</code></td>
+   <td>Tab has been unselected and is not visible</td>
+  </tr>
+  <tr>
+   <td><code>show</code></td>
+   <td>The sidebar has been opened.</td>
+  </tr>
+  <tr>
+   <td><code>hide</code></td>
+   <td>The sidebar has been closed.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Examples_2">Examples</h2>
+
+<p>Register a tool</p>
+
+<pre class="brush: js notranslate">gDevTools.registerTool({
+  // FIXME: missing key related properties.
+  id: &quot;inspector&quot;,
+  icon: &quot;chrome://browser/skin/devtools/inspector-icon.png&quot;,
+  url: &quot;chrome://browser/content/devtools/inspector/inspector.xul&quot;,
+  get label() {
+    let strings = Services.strings.createBundle(&quot;chrome://browser/locale/devtools/inspector.properties&quot;);
+    return strings.GetStringFromName(&quot;inspector.label&quot;);
+  },
+
+  isTargetSupported: function(target) {
+    return !target.isRemote;
+  },
+
+  build: function(iframeWindow, toolbox, node) {
+    return new InspectorPanel(iframeWindow, toolbox, node);
+  }
+});
+</pre>
+
+<p>Open a tool, or select it if the toolbox is already open:</p>
+
+<pre class="brush: js notranslate">let target = TargetFactory.forTab(gBrowser.selectedTab);
+let toolbox = gDevTools.openToolbox(target, null, &quot;inspector&quot;);
+
+toolbox.once(&quot;inspector-ready&quot;, function(event, panel) {
+  let inspector = toolbox.getToolPanels().get(&quot;inspector&quot;);
+  inspector.selection.setNode(target, &quot;browser-context-menu&quot;);
+});
+</pre>
+
+<p>Add a sidebar to an existing tool:</p>
+
+<pre class="brush: js notranslate">let sidebar = new ToolSidebar(xulTabbox, toolPanel, &quot;toolId&quot;);
+sidebar.addTab(&quot;tab1&quot;, &quot;chrome://browser/content/.../tab1.xhtml&quot;, true);
+sidebar.addTab(&quot;tab2&quot;, &quot;chrome://browser/content/.../tab2.xhtml&quot;, false);
+sidebar.show();
+</pre>

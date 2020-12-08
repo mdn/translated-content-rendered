@@ -1,0 +1,724 @@
+---
+title: WebGL 拡張機能を使用する
+slug: Web/API/WebGL_API/Using_Extensions
+tags:
+  - Advanced
+  - WebGL
+translation_of: Web/API/WebGL_API/Using_Extensions
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/ja/docs/Web/API/WebGL_API"><strong>WebGL API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>WebGL tutorial</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL">Getting started with WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context">Adding 2D content to a WebGL context</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Using_shaders_to_apply_color_in_WebGL">Using shaders to apply color in WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Animating_objects_with_WebGL">Animating objects with WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Creating_3D_objects_using_WebGL">Creating 3D objects using WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL">Using textures in WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL">Lighting in WebGL</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL">Animating textures in WebGL</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples and articles</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Matrix_math_for_the_web">Matrix math for the web</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/WebGL_model_view_projection">WebGL model view projection</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/WebGL_best_practices">WebGL best practices</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Using_Extensions">Using WebGL extensions</a></li>
+        <li><a href="/ja/docs/Web/API/WebGL_API/Basic_2D_animation_example">A basic 2D WebGL animation example</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/WebGLRenderingContext"><code>WebGLRenderingContext</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGL2RenderingContext"><code>WebGL2RenderingContext</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLActiveInfo"><code>WebGLActiveInfo</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLBuffer"><code>WebGLBuffer</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLContextEvent"><code>WebGLContextEvent</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLFramebuffer"><code>WebGLFramebuffer</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLQuery"><code>WebGLQuery</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLRenderbuffer"><code>WebGLRenderbuffer</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLSampler"><code>WebGLSampler</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLShader"><code>WebGLShader</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLShaderPrecisionFormat"><code>WebGLShaderPrecisionFormat</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLSync"><code>WebGLSync</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLTexture"><code>WebGLTexture</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLTransformFeedback"><code>WebGLTransformFeedback</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLUniformLocation"><code>WebGLUniformLocation</code></a></li>
+        <li><a href="/ja/docs/Web/API/WebGLVertexArrayObject"><code>WebGLVertexArrayObject</code></a></li>
+      </ol>
+    </details>
+  </li>
+
+  <li><strong><a href="/ja/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/ja/docs/tag/WebGL">Pages tagged &quot;WebGL&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/ja/docs/MDN/Doc_status/API/WebGL">WebGL doc status</a></li>
+        <li><a href="/ja/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>WebGL は姉妹 API (OpenGL や OpenGL ES) と同様に、拡張機能をサポートします。拡張機能の完全な一覧は <a href="http://www.khronos.org/registry/webgl/extensions/" title="http://www.khronos.org/registry/webgl/extensions/">khronos webgl extension registry</a> で確認できます。</p>
+
+<div class="note"><strong>注記:</strong> 他の GL API とは異なり、WebGL の拡張機能は明示的に要求した場合に限り使用できます。</div>
+
+<h2 id="Canonical_extension_names_vendor_prefixes_and_preferences" name="Canonical_extension_names_vendor_prefixes_and_preferences">Canonical 拡張機能名とベンダー接頭辞と設定</h2>
+
+<p>拡張機能は公式に認められる前に、ブラウザベンダーがサポートする場合があります (ただし、草案段階にあるときに限ります)。このとき、拡張機能名にベンダー接頭辞 (<code>MOZ_</code> や <code>WEBKIT_</code> など) を付加するか、ブラウザの設定を切り替えた場合に限り使用できるようにする可能性があります。</p>
+
+<p>最先端の拡張機能を使用したい場合、および公認されたときにも動作し続けるようにしたい (もちろん、その拡張機能が互換性を失うように変更されていないものとします) 場合は、ベンダー拡張機能名だけでなく canonical 拡張機能名も問い合わせます。例えば以下のようにします:</p>
+
+<pre class="brush:js">var ext = (
+  gl.getExtension(&apos;OES_vertex_array_object&apos;) ||
+  gl.getExtension(&apos;MOZ_OES_vertex_array_object&apos;) ||
+  gl.getExtension(&apos;WEBKIT_OES_vertex_array_object&apos;)
+);
+</pre>
+
+<p>ベンダー接頭辞は次第に採用されなくなっており、ほとんどのブラウザは実験的な拡張機能をベンダー接頭辞ではなく機能フラグで制御するように実装しています。</p>
+
+<p>機能フラグは以下のようなものです:</p>
+
+<ul>
+ <li>Firefox では <code>webgl.enable-draft-extensions</code></li>
+ <li>Chromium ベースのブラウザ (Chrome、Opera) では <code>chrome://flags/#enable-webgl-draft-extensions</code></li>
+</ul>
+
+<h2 id="Querying_available_extensions" name="Querying_available_extensions">使用可能な拡張機能を問い合わせる</h2>
+
+<p>WebGL コンテキストは、使用できる拡張機能を問い合わせる機能をサポートしています。</p>
+
+<pre class="brush:js">var available_extensions = gl.getSupportedExtensions();</pre>
+
+<p><a href="/ja/docs/Web/API/WebGLRenderingContext/getSupportedExtensions" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WebGLRenderingContext.getSupportedExtensions()</code></a> メソッドは、サポートする拡張機能を収めた文字列配列を返します。</p>
+
+<h2 id="Extension_list" name="Extension_list">拡張機能一覧</h2>
+
+<p>現行の拡張機能の一覧:</p>
+
+<p></p><div class="index">
+<ul>
+ <li><a href="/ja/docs/Web/API/ANGLE_instanced_arrays" title="ANGLE_instanced_arrays この拡張機能はWebGL APIの一部です。 同じ頂点データ、プリミティブカウント、およびタイプを共有する場合は、同じオブジェクトまたは同様のオブジェクトのグループを複数回描画できます。"><code>ANGLE_instanced_arrays</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_blend_minmax" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_blend_minmax</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_color_buffer_float" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_color_buffer_float</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_color_buffer_half_float" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_color_buffer_half_float</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_disjoint_timer_query" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_disjoint_timer_query</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_frag_depth" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_frag_depth</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_sRGB" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_sRGB</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_shader_texture_lod" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_shader_texture_lod</code></a></li>
+ <li><a href="/ja/docs/Web/API/EXT_texture_filter_anisotropic" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EXT_texture_filter_anisotropic</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_element_index_uint" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_element_index_uint</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_standard_derivatives" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_standard_derivatives</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_texture_float" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_texture_float</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_texture_float_linear" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_texture_float_linear</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_texture_half_float" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_texture_half_float</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_texture_half_float_linear" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_texture_half_float_linear</code></a></li>
+ <li><a href="/ja/docs/Web/API/OES_vertex_array_object" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>OES_vertex_array_object</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_color_buffer_float" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_color_buffer_float</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_astc" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_astc</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_atc" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_atc</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_etc" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_etc</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_etc1" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_etc1</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_pvrtc" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_pvrtc</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_s3tc" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_s3tc</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_compressed_texture_s3tc_srgb" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_compressed_texture_s3tc_srgb</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_debug_renderer_info" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_debug_renderer_info</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_debug_shaders" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_debug_shaders</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_depth_texture" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_depth_texture</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_draw_buffers" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_draw_buffers</code></a></li>
+ <li><a href="/ja/docs/Web/API/WEBGL_lose_context" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WEBGL_lose_context</code></a></li>
+</ul>
+</div><p></p>
+
+<h2 id="Enabling_an_extension" name="Enabling_an_extension">拡張機能を有効化する</h2>
+
+<p>拡張機能を使用する前に、<a href="/ja/docs/Web/API/WebGLRenderingContext/getExtension" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WebGLRenderingContext.getExtension()</code></a> を使用して機能を有効化しなければなりません。例えば:</p>
+
+<pre class="brush:js">var float_texture_ext = gl.getExtension(&apos;OES_texture_float&apos;);</pre>
+
+<p>拡張機能をサポートしていない場合の戻り値は <code>null</code>、サポートしている場合の戻り値は拡張機能オブジェクトです。</p>
+
+<h2 id="Extension_objects" name="Extension_objects">拡張機能オブジェクト</h2>
+
+<p>WebGL のコア仕様で使用できないシンボルや関数を拡張機能で定義している場合は、<code>gl.getExtension()</code> の呼び出しによって返される拡張機能オブジェクトでそれらを使用できます。</p>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザ実装状況</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">現在、互換性データを可読形式の JSON フォーマットに置き換えているところです。</a></strong>
+            この互換性一覧は古い形式を使っており、これに含まれるデータの置き換えが済んでいません。
+            <strong><a href="/ja/docs/MDN/Contribute/Structures/Compatibility_tables">手助けしていただける場合は、こちらから！</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>デスクトップ</a></li>
+        <li><a>モバイル</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>機能</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>基本サポート</td>
+   <td>9</td>
+   <td><a href="/en-US/Firefox/Releases/4" title="Released on 2011-03-22.">4.0</a> (2.0)</td>
+   <td>11</td>
+   <td>12</td>
+   <td>5.1</td>
+  </tr>
+  <tr>
+   <td><code>ANGLE_instanced_arrays</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/33" title="Released on 2014-10-14.">33.0</a> (33.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_blend_minmax</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/33" title="Released on 2014-10-14.">33.0</a> (33.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_color_buffer_half_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_disjoint_timer_query</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/41" title="Released on 2015-09-22.">41.0</a> (41.0) [1]</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_frag_depth</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_sRGB</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/28" title="Released on 2014-03-18.">28.0</a> (28.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_shader_texture_lod</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/34" title="Released on 2014-12-01.">34.0</a> (34.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_texture_filter_anisotropic</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/17" title="Released on 2012-11-20.">17.0</a> (17.0) [2]</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_element_index_uint</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/24" title="Released on 2013-09-17.">24.0</a> (24.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_standard_derivatives</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/10" title="Released on 2012-01-31.">10.0</a> (10.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/6" title="Released on 2011-08-16.">6.0</a> (6.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_float_linear</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/24" title="Released on 2013-09-17.">24.0</a> (24.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_half_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/29" title="Released on 2014-04-29.">29.0</a> (29.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_half_float_linear</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_vertex_array_object</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/25" title="Released on 2013-10-29.">25.0</a> (25.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_color_buffer_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_atc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/18" title="Released on 2013-01-08.">18.0</a> (18.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_etc1</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_pvrtc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/18" title="Released on 2013-01-08.">18.0</a> (18.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_s3tc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/15" title="Released on 2012-08-28.">15.0</a> (15.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_debug_renderer_info</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/19" title="Released on 2013-02-19.">19.0</a> (19.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_debug_shaders</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/30" title="Released on 2014-06-10.">30.0</a> (30.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_depth_texture</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/17" title="Released on 2012-11-20.">17.0</a> (17.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_draw_buffers</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/28" title="Released on 2014-03-18.">28.0</a> (28.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_lose_context</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/19" title="Released on 2013-02-19.">19.0</a> (19.0)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>機能</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>基本サポート</td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td>25</td>
+   <td>4.0 (2.0)</td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td>12</td>
+   <td>8.0</td>
+  </tr>
+  <tr>
+   <td><code>ANGLE_instanced_arrays</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_blend_minmax</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_color_buffer_half_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_disjoint_timer_query</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_frag_depth</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_sRGB</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_shader_texture_lod</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>EXT_texture_filter_anisotropic</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_element_index_uint</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_standard_derivatives</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_float_linear</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_half_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_texture_half_float_linear</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>OES_vertex_array_object</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_color_buffer_float</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_atc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_etc1</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_pvrtc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_compressed_texture_s3tc</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_debug_renderer_info</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_debug_shaders</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_depth_texture</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_draw_buffers</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>WEBGL_lose_context</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] about:config で設定項目 <code>webgl.enable-draft-extensions</code> を切り替えなければなりません。</p>
+
+<p>[2] これより前のバージョンでは接頭辞付きの <code>MOZ_EXT_texture_filter_anisotropic</code> になっています。</p>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/WebGLRenderingContext/getSupportedExtensions" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WebGLRenderingContext.getSupportedExtensions()</code></a></li>
+ <li><a href="/ja/docs/Web/API/WebGLRenderingContext/getExtension" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>WebGLRenderingContext.getExtension()</code></a></li>
+ <li><a href="http://webglreport.com" class="external external-icon">webglreport.com</a></li>
+ <li><a href="http://webglstats.com">webglstats.com</a></li>
+</ul>
+
+<p>--- 以降の内容は個別のページに移動する ---</p>
+
+<h2 id="EXT_texture_filter_anisotropic" name="EXT_texture_filter_anisotropic">EXT_texture_filter_anisotropic</h2>
+
+<p>異方性フィルタリングは、テクスチャを貼り付けた物体を斜めの角度から見る場合の、ミップマップテクスチャの品質を向上させます。ミップマップしか使用しないと、外見が全体的にグレーへ寄る傾向があります。</p>
+
+<p>この<a href="http://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic/" title="http://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic/">拡張機能</a>では 2 つのシンボルを定義しています:</p>
+
+<ul>
+ <li><code>extension_object.MAX_TEXTURE_MAX_ANISOTROPY_EXT</code>: これは <code>gl.getParameter()</code> の呼び出し用の pname パラメータであり、使用できる最大の異方性を返します。</li>
+ <li><code>extension_object.TEXTURE_MAX_ANISOTROPY_EXT</code>: これは <code>gl.texParameter()</code> や <code>gl.getTexParameter{f,i}()</code> の呼び出し用の pname パラメータであり、テクスチャに対して希望する異方性を設定します。</li>
+</ul>
+
+<h3 id="Example" name="Example">例</h3>
+
+<pre class="brush:js">var texture = gl.createTexture();
+gl.bindTexture(gl.TEXTURE_2D, texture);
+var ext = (
+  gl.getExtension(&apos;EXT_texture_filter_anisotropic&apos;) ||
+  gl.getExtension(&apos;MOZ_EXT_texture_filter_anisotropic&apos;) ||
+  gl.getExtension(&apos;WEBKIT_EXT_texture_filter_anisotropic&apos;)
+);
+if (ext){
+  var max = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+  gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, max);
+}
+</pre>
+
+<h2 id="WEBGL_compressed_texture_s3tc" name="WEBGL_compressed_texture_s3tc">WEBGL_compressed_texture_s3tc</h2>
+
+<p>圧縮テクスチャは、GPU がテクスチャを保存するために必要なメモリ量を削減します。より高解像のテクスチャを使用する、あるいは同じ解像度でより多くのテクスチャを使用することができます。</p>
+
+<p>この<a href="http://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/" title="http://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/">拡張機能</a>では 4 種類のテクスチャタイプを新たに定義します:</p>
+
+<ul>
+ <li><code>extension_object.COMPRESSED_RGB_S3TC_DXT1_EXT</code></li>
+ <li><code>extension_object.COMPRESSED_RGBA_S3TC_DXT1_EXT</code></li>
+ <li><code>extension_object.COMPRESSED_RGBA_S3TC_DXT3_EXT</code></li>
+ <li><code>extension_object.COMPRESSED_RGBA_S3TC_DXT5_EXT</code></li>
+</ul>
+
+<p>圧縮テクスチャのフォーマットは、2 つの関数で使用できます: compressedTexImage2D および compressedTexSubImage2D</p>
+
+<h3 id="Example_2" name="Example_2">例</h3>
+
+<pre class="brush:js">var ext = (
+  gl.getExtension(&quot;WEBGL_compressed_texture_s3tc&quot;) ||
+  gl.getExtension(&quot;MOZ_WEBGL_compressed_texture_s3tc&quot;) ||
+  gl.getExtension(&quot;WEBKIT_WEBGL_compressed_texture_s3tc&quot;)
+);
+var texture = gl.createTexture();
+gl.bindTexture(gl.TEXTURE_2D, texture);
+gl.compressedTexImage2D(gl.TEXTURE_2D, 0, ext.COMPRESSED_RGBA_S3TC_DXT5_EXT, 512, 512, 0, textureData);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+</pre>

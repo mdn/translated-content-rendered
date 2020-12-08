@@ -1,0 +1,347 @@
+---
+title: ゲームパッド API の使用
+slug: Web/Guide/API/Gamepad
+tags:
+  - API
+  - Advanced
+  - Gamepad API
+  - Games
+  - Guide
+translation_of: Web/API/Gamepad_API/Using_the_Gamepad_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Gamepad_API">Gamepad API</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/Guide/API/Gamepad">ゲームパッド API の使用</a></li><li><a href="/ja/docs/Games/Techniques/Controls_Gamepad_API">Gamepad APIを使用したコントロールの実装</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a></li><li><a href="/ja/docs/Web/API/GamepadButton"><code>GamepadButton</code></a></li><li><a href="/ja/docs/Web/API/GamepadEvent"><code>GamepadEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/Window/ongamepadconnected"><code>Window.ongamepadconnected</code></a></li><li><a href="/ja/docs/Web/API/Window/ongamepaddisconnected"><code>Window.ongamepaddisconnected</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/Navigator/getGamepads"><code>Navigator.getGamepads()</code></a></li></ol></details></li><li class="toggle"><details open><summary>イベント</summary><ol><li><a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>Window</code>: <code>gamepadconnected</code></a></li><li><a href="/ja/docs/Web/API/Window/gamepaddisconnected_event"><code>Window</code>: <code>gamepaddisconnected</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary">HTML5 はリッチでインタラクティブなゲームを開発するために必要なコンポーネントを多く搭載しています。 <code>&lt;canvas&gt;</code> や WebGL、 <code>&lt;audio&gt;</code> に <code>&lt;video&gt;</code> などの技術は、今までネイティブコードを書く必要のあった機能をサポートできるほどに成長しました。ゲームパッド API は開発者とデザイナーにゲームパッドやコントローラーへのアクセスを提供するものです。</span></p>
+
+<p><a href="/ja/docs/Web/API/Gamepad_API">ゲームパッドAPI</a> は <a href="/ja/docs/Web/API/Window"><code>Window</code></a> オブジェクトにゲームパッドとコントローラー (以下、ゲームパッド) の状態を読み取る新しいイベントをいくつか追加します。さらに、 <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> というゲームパッドの接続状態が得られるオブジェクトと <a href="/ja/docs/Web/API/Navigator/getGamepads"><code>navigator.getGamepads</code></a> というゲームパッドの一覧を取得できるメソッドが追加されます。</p>
+
+<h2 id="conntecting" name="conntecting">ゲームパッドの接続</h2>
+
+<p>新しいゲームパッドが接続された時、アクティブなページは <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> イベントを受け取ります。ページ読み込み時にゲームパッドがすでに接続されている場合、ゲームパッドのボタンを押すなどの操作をした時に <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> イベントがアクティブなページに対して発生します。</p>
+
+<div class="geckoVersionNote notecard">
+<p>Firefox では、ページが見える状態でかつユーザーによるゲームパッドの操作を受け付けたときにのみ、ゲームパッドが利用可能になります。これによって、ユーザーを特定する Fingerprinting に利用されることを防止しています。一度一つのコントローラーが操作されれば、他のコントローラーも自動で接続され利用可能になります。</p>
+</div>
+
+<p>以下のようにして <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> を使用します:</p>
+
+<pre class="brush: js; notranslate">window.addEventListener(&quot;gamepadconnected&quot;, function(e) {
+  console.log(&quot;Gamepad connected at index %d: %s. %d buttons, %d axes.&quot;,
+    e.gamepad.index, e.gamepad.id,
+    e.gamepad.buttons.length, e.gamepad.axes.length);
+});
+</pre>
+
+<p>ゲームパッドはそれぞれ固有の ID を <code>gamepad</code> プロパティの中に持っています。</p>
+
+<h2 id="disconnecting" name="disconnecting">ゲームパッドの切断</h2>
+
+<p>ゲームパッドが切断されると、ゲームパッドが以前に受信したデータ(例: <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> )があると、2番目のイベント(例: <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> )がフォーカスされたウィンドウにディスパッチします:</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;gamepaddisconnected&quot;, function(e) {
+  console.log(&quot;Gamepad disconnected from index %d: %s&quot;,
+    e.gamepad.index, e.gamepad.id);
+});</pre>
+
+<p>ゲームパッドの <a href="/ja/docs/Web/API/Gamepad/index"><code>index</code></a> というプロパティは同じタイプの複数のコントローラーが使用されている場合であっても、システムに接続されたデバイスごとにユニークになります。 <code>Index</code> プロパティもまた <a href="/ja/docs/Web/API/Navigator/getGamepads"><code>Navigator.getGamepads()</code></a> として戻される <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a> の index として機能します。</p>
+
+<pre class="brush: js notranslate">var gamepads = {};
+
+function gamepadHandler(event, connecting) {
+  var gamepad = event.gamepad;
+  // Note:
+  // gamepad === navigator.getGamepads()[gamepad.index]
+
+  if (connecting) {
+    gamepads[gamepad.index] = gamepad;
+  } else {
+    delete gamepads[gamepad.index];
+  }
+}
+
+window.addEventListener(&quot;gamepadconnected&quot;, function(e) { gamepadHandler(e, true); }, false);
+window.addEventListener(&quot;gamepaddisconnected&quot;, function(e) { gamepadHandler(e, false); }, false);
+</pre>
+
+<p>この前の例ではイベントが完了した後に <code>gamepad</code> プロパティがどのように保持できるかを示しています - 後でデバイスの状態照会のために使用する技術となります。</p>
+
+<h2 id="querying" name="querying">Gamepad オブジェクトの問い合わせ</h2>
+
+<p>ご覧のように、上述の <strong>gamepad</strong> イベントは <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクトを返すイベントオブジェクト、上の <code>gamepad</code> のプロパティが含まれています。複数のゲームパッド(すなわち、そのID ) を一度に接続される可能性があるため、イベントを発生させたのはどのゲームパッドを決定するためにこれらを使用することができます。それへの参照を保持し、それがボタンや軸のいずれかの時点で押されているかを知るために照会するなど、<a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクトから様々なことを行うことができます。そうすることで、多くの場合、今回と次回のイベント発生とゲームパッドの状態を知っておく必要があり、ゲームやその他のインタラクティブな Web ページであることが望ましいです。</p>
+
+<p>このようなチェックを実行すると、開発者はゲームパッドやゲームパッドの状態に基づいて、現在のフレームのための意思決定を行うために必要なアニメーションループ (例 : <a href="/ja/docs/Web/API/Window/requestAnimationFrame"><code>requestAnimationFrame</code></a>) と一緒に <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクトを使用して関与する傾向があります。</p>
+
+<p><a href="/ja/docs/Web/API/Navigator/getGamepads"><code>Navigator.getGamepads()</code></a> メソッドは現在 Web ページから見える <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクト (ゲームパッドが繋がっていない時は毎回 null が返される ) のような、すべてのデバイスを配列として戻します。これは、同じ情報を得るために使用することができます。例えば、 以下に示すように上記の最初のコード例を書き換えます。</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;gamepadconnected&quot;, function(e) {
+  var gp = navigator.getGamepads()[e.gamepad.index];
+  console.log(&quot;Gamepad connected at index %d: %s. %d buttons, %d axes.&quot;,
+    gp.index, gp.id,
+    gp.buttons.length, gp.axes.length);
+});</pre>
+
+<p><a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクトの機能は以下の通りです。</p>
+
+<ul>
+ <li><code>id</code>: コントローラーに関する情報を含んだ文字列です。これは厳密には指定されていなく、Firefox では、コントローラーのUSBベンダと製品IDを含んでいる2つの4桁16進数字列、およびドライバーから提供されるようなコントローラーの名前といった3つの情報が、ダッシュ (<code>-</code>) により分離され含まれています。この情報はユーザーへの有益なフィードバックを表示するとともに、デバイスのコントロールのマッピングを見つけることができるようにします。</li>
+ <li><code>index</code>: 現在システムに接続されているゲームパッドごとに固有の整数。この値は複数のコントローラーを区別するために使用できます。デバイスを切断してから新しいデバイスを接続すると、以前のインデックスが再利用されることに注意してください。</li>
+ <li><code>mapping</code>: ブラウザがデバイス上のコントロールを既知のレイアウトに再マップしたかどうかを示す文字列。現在、サポートされている既知のレイアウト - <a href="https://dvcs.w3.org/hg/gamepad/raw-file/default/gamepad.html#remapping">標準のゲームパッド</a>は1つしかありません。ブラウザがデバイス上のコントロールをそのレイアウトにマッピングできる場合、 <code>mapping</code> プロパティは文字列 <code>standard</code> に設定されます。</li>
+ <li><code>connected</code>:ゲームパッドがシステムに接続されているかどうかを示すブール値。もし接続されている場合は <code>True</code>。接続されていない場合は <code>False</code> が設定されます。</li>
+ <li><code>buttons</code>: デバイス上に存在するボタンを表す <a href="/ja/docs/Web/API/GamepadButton"><code>GamepadButton</code></a> オブジェクトの配列。各 <a href="/ja/docs/Web/API/GamepadButton"><code>GamepadButton</code></a> には、<code>pressed</code> プロパティと <code>value</code> のプロパティがあります。
+  <ul>
+   <li><code>pressed</code> プロパティは、ボタンが現在押されている (<code>true</code>) か押されていない (<code>false</code>) かを示すブール値です。&gt;</li>
+   <li><code>value</code> プロパティは、現代の多くのゲームパッドのトリガなど、アナログボタンの表示を有効にするために使用される浮動小数点値です。値は 0.0..1.0 の範囲に正規化され、 0.0 は押されていないボタンを表し、 1.0 は完全に押されたボタンを表します。</li>
+  </ul>
+ </li>
+ <li><code>axes</code>: デバイス上に軸があるコントロールを表す配列 (例：アナログサムスティック)。 配列の各エントリは-1.0〜1.0の範囲の浮動小数点値で、最小値 (-1.0) から最大値 (1.0) までの軸の位置を表します。</li>
+ <li><code>timestamp</code>: このゲームパッドのデータが最後に更新された時刻を表す <a href="/ja/docs/Web/API/DOMHighResTimeStamp"><code>DOMHighResTimeStamp</code></a> を返します。この値により、開発者は <code>axes</code> と <code>button</code> のデータがハードウェアから更新されたかどうかを判断できます。 値は、 <a href="/ja/docs/Web/API/PerformanceTiming"><code>PerformanceTiming</code></a> インターフェースの <code>navigationStart</code> 属性との相対値でなければなりません。 値は単調に増加します。つまり、更新の順序を決定するために比較することができます。新しい値は常に古い値よりも大きいか等しいためです。このプロパティは現在 Firefox ではサポートされていません。</li>
+</ul>
+
+<div class="note">
+<p><strong>注</strong>: Gamepadオブジェクトは、セキュリティ上の理由から <a href="/ja/docs/Web/API/Window"><code>Window</code></a> オブジェクトではなく <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> イベントで使用できます。一度リファレンスを取得すると、そのプロパティでゲームパッドの現在の状態に関する情報を照会できます。 このオブジェクトは、ゲームパッドの状態が変わるたびに更新されます。</p>
+</div>
+
+<h3 id="Using_button_information" name="Using_button_information">ボタン情報の使用</h3>
+
+<p>1つのゲームパッドの接続情報を表示する簡単な例を見てみましょう (後続のゲームパッド接続を無視します)。ゲームパッドの右側にある4つのゲームパッドボタンを使用してボールを画面の周りに移動できます。<a href="http://chrisdavidmills.github.io/gamepad-buttons/">デモをライブで見ることができ</a>ことができ、Githubで<a href="https://github.com/chrisdavidmills/gamepad-buttons/tree/master">ソースコードを見つけることができます</a>。</p>
+
+<p>まず、いくつかの変数を宣言します: 接続情報が書き込まれる <code>gamepadInfo</code> のパラグラフ、移動する <code>ball</code>、<code>requestAnimation Frame</code> の ID として機能する <code>start</code> 変数、ボールを移動するための位置変更子として機能する a および b 変数、および短縮形変数 これは、　<a href="/ja/docs/Web/API/Window/requestAnimationFrame"><code>requestAnimationFrame()</code></a> および <a href="/ja/docs/Web/API/Window/cancelAnimationFrame"><code>cancelAnimationFrame()</code></a> クロスブラウザフォークで使用されます。</p>
+
+<pre class="brush: js notranslate">var gamepadInfo = document.getElementById(&quot;gamepad-info&quot;);
+var ball = document.getElementById(&quot;ball&quot;);
+var start;
+var a = 0;
+var b = 0;
+</pre>
+
+<p>次に <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> イベントを使用して、接続されているゲームパッドを確認します。接続されると <a href="/ja/docs/Web/API/Navigator/getGamepads"><code>Navigator.getGamepads()</code></a><code>[0]</code> を使用してゲームパッドを取得し、ゲームパッドに関する情報をゲームパッドの情報 <code>div</code> に出力し、全体のボールの動きが始まる <code>gameLoop()</code> 関数が呼び出されます。</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;gamepadconnected&quot;, function(e) {
+  var gp = navigator.getGamepads()[e.gamepad.index];
+  gamepadInfo.innerHTML = &quot;Gamepad connected at index &quot; + gp.index + &quot;: &quot; + gp.id + &quot;. It has &quot; + gp.buttons.length + &quot; buttons and &quot; + gp.axes.length + &quot; axes.&quot;;
+
+  gameLoop();
+});</pre>
+
+<p>これで <a href="/ja/docs/Web/API/Window/gamepaddisconnected_event"><code>gamepaddisconnected</code></a> イベントを使用して、ゲームパッドが再び切断されたかどうかを確認します。 もしそうならば、 <a href="/ja/docs/Web/API/Window/requestAnimationFrame"><code>requestAnimationFrame()</code></a> ループ (下記参照) を停止し、ゲームパッドの情報を元の状態に戻します。</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;gamepaddisconnected&quot;, function(e) {
+  gamepadInfo.innerHTML = &quot;Waiting for gamepad.&quot;;
+
+  cancelRequestAnimationFrame(start);
+});</pre>
+
+<p>Chrome では異なる挙動になります。変数にゲームパッドの最新の状態を常に保存するのではなく、スナップショットを保存するだけなので、 Chrome で同じことを行うにはポーリングしてから <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクトをコードで使用する必要があり、それは利用可能です。私たちはこれを <a href="/ja/docs/Web/API/Window/setInterval"><code>Window.setInterval()</code></a> オブジェクトが利用可能になると、ゲームパッド情報が出力され、ゲームループが開始され、 <a href="/ja/docs/Web/API/Window/clearInterval"><code>Window.clearInterval()</code></a> を使用して間隔がクリアされます。 Chrome <a href="/ja/docs/Web/API/Navigator/getGamepads"><code>Navigator.getGamepads()</code></a> の古いバージョンでは、 Webkit 接頭辞を使用して実装されています。下位互換性のために、接頭辞付きのバージョンと関数の標準バージョンの両方を検出して処理しようとします。</p>
+
+<pre class="brush: js notranslate">var interval;
+
+if (!(&apos;ongamepadconnected&apos; in window)) {
+  // No gamepad events available, poll instead.
+  interval = setInterval(pollGamepads, 500);
+}
+
+function pollGamepads() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+  for (var i = 0; i &lt; gamepads.length; i++) {
+    var gp = gamepads[i];
+    if (gp) {
+      gamepadInfo.innerHTML = &quot;Gamepad connected at index &quot; + gp.index + &quot;: &quot; + gp.id +
+        &quot;. It has &quot; + gp.buttons.length + &quot; buttons and &quot; + gp.axes.length + &quot; axes.&quot;;
+      gameLoop();
+      clearInterval(interval);
+    }
+  }
+}</pre>
+
+<p>今度はメインのゲームループです。ループが実行されるたびに、4つのボタンの1つが押されているかどうかがチェックされます。そうすると、<code>a</code> と <code>b</code> の移動変数の値を適切に更新し、 <a href="/ja/docs/Web/CSS/left" title="left は CSS のプロパティで、位置指定要素 (positioned element) の水平位置の決定に関与します。位置指定されていない要素には効果はありません。"><code>left</code></a> と <a href="/ja/docs/Web/CSS/top" title="top は CSS のプロパティで、位置指定要素 (positioned elements) の垂直位置の決定に関与します。位置指定されていない要素には効果はありません。"><code>top</code></a> のプロパティを更新し、その値を <code>a</code> および <code>b</code> とする。これはボールを画面の周りに動かす効果があります。 現在のバージョンの Chrome (この記事の執筆時点ではバージョン34) では、ボタンの値は <a href="/ja/docs/Web/API/GamepadButton"><code>GamepadButton</code></a> オブジェクトではなく、 double 値の配列として保存されます。</p>
+
+<p>この作業がすべて完了したら、 <code>requestAnimationFrame()</code> を使用して <code>gameLoop()</code> を再び実行して次のアニメーションフレームを要求します。</p>
+
+<pre class="brush: js notranslate">function buttonPressed(b) {
+  if (typeof(b) == &quot;object&quot;) {
+    return b.pressed;
+  }
+  return b == 1.0;
+}
+
+function gameLoop() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+  if (!gamepads) {
+    return;
+  }
+
+  var gp = gamepads[0];
+  if (buttonPressed(gp.buttons[0])) {
+    b--;
+  } else if (buttonPressed(gp.buttons[2])) {
+    b++;
+  }
+  if (buttonPressed(gp.buttons[1])) {
+    a++;
+  } else if (buttonPressed(gp.buttons[3])) {
+    a--;
+  }
+
+  ball.style.left = a * 2 + &quot;px&quot;;
+  ball.style.top = b * 2 + &quot;px&quot;;
+
+  start = requestAnimationFrame(gameLoop);
+}</pre>
+
+<h2 id="Complete_example_Displaying_gamepad_state" name="Complete_example_Displaying_gamepad_state">完全な例: ゲームパッドの状態を表示する</h2>
+
+<p>この例では、 <a href="/ja/docs/Web/API/Gamepad"><code>Gamepad</code></a> オブジェクト、 <a href="/ja/docs/Web/API/Window/gamepadconnected_event"><code>gamepadconnected</code></a> イベント、 <a href="/ja/docs/Web/API/Window/gamepaddisconnected_event"><code>gamepaddisconnected</code></a> イベントを使用してシステムに接続されているすべてのゲームパッドの状態を表示します。<a href="http://luser.github.io/gamepadtest/">デモを見て</a>、Githubの<a href="https://github.com/luser/gamepadtest">完全なソースコード</a>を見ることができます。</p>
+
+<pre class="brush: js notranslate">var haveEvents = &apos;ongamepadconnected&apos; in window;
+var controllers = {};
+
+function connecthandler(e) {
+  addgamepad(e.gamepad);
+}
+
+function addgamepad(gamepad) {
+  controllers[gamepad.index] = gamepad;
+
+  var d = document.createElement(&quot;div&quot;);
+  d.setAttribute(&quot;id&quot;, &quot;controller&quot; + gamepad.index);
+
+  var t = document.createElement(&quot;h1&quot;);
+  t.appendChild(document.createTextNode(&quot;gamepad: &quot; + gamepad.id));
+  d.appendChild(t);
+
+  var b = document.createElement(&quot;div&quot;);
+  b.className = &quot;buttons&quot;;
+  for (var i = 0; i &lt; gamepad.buttons.length; i++) {
+    var e = document.createElement(&quot;span&quot;);
+    e.className = &quot;button&quot;;
+    //e.id = &quot;b&quot; + i;
+    e.innerHTML = i;
+    b.appendChild(e);
+  }
+
+  d.appendChild(b);
+
+  var a = document.createElement(&quot;div&quot;);
+  a.className = &quot;axes&quot;;
+
+  for (var i = 0; i &lt; gamepad.axes.length; i++) {
+    var p = document.createElement(&quot;progress&quot;);
+    p.className = &quot;axis&quot;;
+    //p.id = &quot;a&quot; + i;
+    p.setAttribute(&quot;max&quot;, &quot;2&quot;);
+    p.setAttribute(&quot;value&quot;, &quot;1&quot;);
+    p.innerHTML = i;
+    a.appendChild(p);
+  }
+
+  d.appendChild(a);
+
+  // See https://github.com/luser/gamepadtest/blob/master/index.html
+  var start = document.getElementById(&quot;start&quot;);
+  if (start) {
+    start.style.display = &quot;none&quot;;
+  }
+
+  document.body.appendChild(d);
+  requestAnimationFrame(updateStatus);
+}
+
+function disconnecthandler(e) {
+  removegamepad(e.gamepad);
+}
+
+function removegamepad(gamepad) {
+  var d = document.getElementById(&quot;controller&quot; + gamepad.index);
+  document.body.removeChild(d);
+  delete controllers[gamepad.index];
+}
+
+function updateStatus() {
+  if (!haveEvents) {
+    scangamepads();
+  }
+
+  var i = 0;
+  var j;
+
+  for (j in controllers) {
+    var controller = controllers[j];
+    var d = document.getElementById(&quot;controller&quot; + j);
+    var buttons = d.getElementsByClassName(&quot;button&quot;);
+
+    for (i = 0; i &lt; controller.buttons.length; i++) {
+      var b = buttons[i];
+      var val = controller.buttons[i];
+      var pressed = val == 1.0;
+      if (typeof(val) == &quot;object&quot;) {
+        pressed = val.pressed;
+        val = val.value;
+      }
+
+      var pct = Math.round(val * 100) + &quot;%&quot;;
+      b.style.backgroundSize = pct + &quot; &quot; + pct;
+
+      if (pressed) {
+        b.className = &quot;button pressed&quot;;
+      } else {
+        b.className = &quot;button&quot;;
+      }
+    }
+
+    var axes = d.getElementsByClassName(&quot;axis&quot;);
+    for (i = 0; i &lt; controller.axes.length; i++) {
+      var a = axes[i];
+      a.innerHTML = i + &quot;: &quot; + controller.axes[i].toFixed(4);
+      a.setAttribute(&quot;value&quot;, controller.axes[i] + 1);
+    }
+  }
+
+  requestAnimationFrame(updateStatus);
+}
+
+function scangamepads() {
+  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  for (var i = 0; i &lt; gamepads.length; i++) {
+    if (gamepads[i]) {
+      if (gamepads[i].index in controllers) {
+        controllers[gamepads[i].index] = gamepads[i];
+      } else {
+        addgamepad(gamepads[i]);
+      }
+    }
+  }
+}
+
+window.addEventListener(&quot;gamepadconnected&quot;, connecthandler);
+window.addEventListener(&quot;gamepaddisconnected&quot;, disconnecthandler);
+
+if (!haveEvents) {
+ setInterval(scangamepads, 500);
+}</pre>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/gamepad/#gamepad-interface" hreflang="en" lang="en">Gamepad<br><small lang="ja">Gamepad の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初回定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+</div>
+
+<div class="bc-data" id="bcd:api.Gamepad"></div>

@@ -1,0 +1,50 @@
+---
+title: Idempotent (べき等)
+slug: Glossary/Idempotent
+tags:
+  - Glossary
+  - HTTP
+  - WebMechanics
+translation_of: Glossary/Idempotent
+---
+<p>ある HTTP メソッドが<strong>べき等</strong>であるとは、サーバーが同じ状況にあるとき、特定のリクエストに対して何回でも続けて同じ効果が起こることをいいます。 このことは、べき等なメソッドでは副作用が生じるはずではないと言うこともできます ( 記録などを除く ) 。 適切に実装された <a href="/ja/docs/Web/HTTP/Methods/GET" title="HTTP の GET メソッドは、特定のリソースの表現をリクエストします。 GET を使用したリクエストはデータを受け取るだけです。"><code>GET</code></a> メソッド、<a href="/ja/docs/Web/HTTP/Methods/HEAD" title="HTTP の HEAD メソッドは、指定されたリソースを HTTP GET メソッドでリクエストした時に返されるヘッダーをリクエストします。そのようなリクエストによって、例えば大きなリソースをダウンロードするかどうかを事前に決定して、帯域幅を節約したりすることができます。"><code>HEAD</code></a> メソッド 、<a href="/ja/docs/Web/HTTP/Methods/PUT" title="HTTP の PUT リクエストメソッドは、新しいリソースを作成するか、指定したリソースの表現をリクエストのペイロードで置き換えます。"><code>PUT</code></a> メソッド、 <a href="/ja/docs/Web/HTTP/Methods/DELETE" title="HTTP の DELETE リクエストメソッド は特定のリソースを削除します。"><code>DELETE</code></a> メソッドは<strong>べき等</strong>ですが、 <a href="/ja/docs/Web/HTTP/Methods/POST" title="HTTP の POST メソッドは、サーバーにデータを送信します。リクエストの本文のタイプは Content-Type ヘッダーで示されます。"><code>POST</code></a> メソッドはそうではありません。 <a href="/ja/docs/Glossary/safe">安全な</a>メソッドはすべてべき等です。</p>
+
+<p>べき等であるためには、サーバーにおける裏側の実際の状態だけが考慮されるので、返される状態コードはリクエストごとに異なる場合があります。 例えば、最初に <a href="/ja/docs/Web/HTTP/Methods/DELETE" title="HTTP の DELETE リクエストメソッド は特定のリソースを削除します。"><code>DELETE</code></a> メソッドが呼び出された場合は、おそらく <a href="/ja/docs/Web/HTTP/Status/200" title="HTTP 200 OK はリクエストが成功した場合に返すレスポンスコード。200のレスポンスはデフォルトでキャッシュしてよい。"><code>200</code></a> を返しますが、それ以降は <a href="/ja/docs/Web/HTTP/Status/404" title="HTTP 404 Not Found は、サーバーがリクエストされたリソースを見つけることができない時のクライアントエラーのレスポンスコードです。 404 ページにつながるリンクは、壊れたリンクまたは死んだリンクと呼ばれ、リンク腐敗の影響を受ける可能性があります。"><code>404</code></a> を返すでしょう。 RESTful な API の設計において、<em>最後の入力操作を削除する</em>機能を <code>DELETE</code> メソッドを使って実装すべきでないとされるのも、<a href="/ja/docs/Web/HTTP/Methods/DELETE" title="HTTP の DELETE リクエストメソッド は特定のリソースを削除します。"><code>DELETE</code></a> メソッドがべき等であることを示唆しています。</p>
+
+<p>なお、メソッドがべき等であっても、サーバーやアプリケーションによってべき等性の破壊が生じることがあります。</p>
+
+<p>例えば、 <code>GET /pageX HTTP/1.1</code> はべき等です。 連続して何度か呼び出しても、クライアントは同じ結果を得ます。</p>
+
+<pre class="notranslate">GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+GET /pageX HTTP/1.1
+</pre>
+
+<p><code>POST /add_row HTTP/1.1</code> はべき等ではありません。 何度か呼び出すと、その回数だけ列に追加されていきます。</p>
+
+<pre class="notranslate">POST /add_row HTTP/1.1
+POST /add_row HTTP/1.1   -&gt; 2行目に追加
+POST /add_row HTTP/1.1   -&gt; 3行目に追加
+</pre>
+
+<p><code>DELETE /idX/delete HTTP/1.1</code> はべき等ですが、状態コードは数回のリクエストの間に変化することがあります。</p>
+
+<pre class="notranslate">DELETE /idX/delete HTTP/1.1   -&gt; idX が存在する場合は 200 を返却
+DELETE /idX/delete HTTP/1.1   -&gt; ちょうど削除されたので 404 を返却
+DELETE /idX/delete HTTP/1.1   -&gt; 404 を返却</pre>
+
+<h2 id="詳細情報">詳細情報</h2>
+
+<h3 id="一般知識">一般知識</h3>
+
+<ul>
+ <li>HTTP 規格における<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">べき等</a>の定義</li>
+</ul>
+
+<h3 id="技術情報">技術情報</h3>
+
+<ul>
+ <li>べき等なメソッド: <a href="/ja/docs/Web/HTTP/Methods/GET" title="HTTP の GET メソッドは、特定のリソースの表現をリクエストします。 GET を使用したリクエストはデータを受け取るだけです。"><code>GET</code></a>, <a href="/ja/docs/Web/HTTP/Methods/HEAD" title="HTTP の HEAD メソッドは、指定されたリソースを HTTP GET メソッドでリクエストした時に返されるヘッダーをリクエストします。そのようなリクエストによって、例えば大きなリソースをダウンロードするかどうかを事前に決定して、帯域幅を節約したりすることができます。"><code>HEAD</code></a>, <a href="/ja/docs/Web/HTTP/Methods/PUT" title="HTTP の PUT リクエストメソッドは、新しいリソースを作成するか、指定したリソースの表現をリクエストのペイロードで置き換えます。"><code>PUT</code></a>, <a href="/ja/docs/Web/HTTP/Methods/DELETE" title="HTTP の DELETE リクエストメソッド は特定のリソースを削除します。"><code>DELETE</code></a>, <a href="/ja/docs/Web/HTTP/Methods/OPTIONS" title="HTTP の OPTIONSメソッドは、対象リソースの通信オプションを記述するために使用します。クライアントは OPTIONS メソッドの URL を指定するか、サーバー全体を参照するアスタリスク（*）を指定することができます。"><code>OPTIONS</code></a>, <a href="/ja/docs/Web/HTTP/Methods/TRACE" title="HTTP の TRACE メソッドは、対象リソースまでのパスに沿ってメッセージのループバックテストを行い、便利なデバッグの仕組みを提供します。"><code>TRACE</code></a></li>
+ <li>べき等でないメソッド: <a href="/ja/docs/Web/HTTP/Methods/POST" title="HTTP の POST メソッドは、サーバーにデータを送信します。リクエストの本文のタイプは Content-Type ヘッダーで示されます。"><code>POST</code></a>,<a href="/ja/docs/Web/HTTP/Methods/PATCH" title="HTTP の PATCH リクエストメソッドは、リソースへの部分的な変更を適用します。"><code>PATCH</code></a>, <a href="/ja/docs/Web/HTTP/Methods/CONNECT" title="HTTP の CONNECT メソッドは、リクエストしたリソースを用い、双方向のコミュニケーションを開始します。これはトンネリングを開始するときに使用されます。"><code>CONNECT</code></a></li>
+</ul>

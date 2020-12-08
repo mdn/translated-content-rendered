@@ -1,0 +1,121 @@
+---
+title: MediaStream.onaddtrack
+slug: Web/API/MediaStream/onaddtrack
+translation_of: Web/API/MediaStream/onaddtrack
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/MediaStream/active"><code>active</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/ja/docs/Web/API/MediaStream/ended"><code>ended</code></a> <a style="opacity: 0.5;" href="/ja/docs/Web/API/MediaStream/ended$translate">[翻訳する]</a></s></li><li><a href="/ja/docs/Web/API/MediaStream/id"><code>id</code></a></li><li><em><code>onaddtrack</code></em></li><li><a href="/ja/docs/Web/API/MediaStream/onremovetrack"><code>onremovetrack</code></a> <a style="opacity: 0.5;" href="/ja/docs/Web/API/MediaStream/onremovetrack$translate">[翻訳する]</a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/MediaStream/addTrack"><code>addTrack()</code></a></li><li><a href="/ja/docs/Web/API/MediaStream/clone"><code>clone()</code></a></li><li><span class="sidebar-icon"><span title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/MediaStream/getAudioTracks"><code>getAudioTracks()</code></a> <a style="opacity: 0.5;" href="/ja/docs/Web/API/MediaStream/getAudioTracks$translate">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/MediaStream/getTrackById"><code>getTrackById()</code></a></li><li><span class="sidebar-icon"><span title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/MediaStream/getTracks"><code>getTracks()</code></a> <a style="opacity: 0.5;" href="/ja/docs/Web/API/MediaStream/getTracks$translate">[翻訳する]</a></li><li><a href="/ja/docs/Web/API/MediaStream/getVideoTracks"><code>getVideoTracks()</code></a></li></ol></details></li><li class="toggle"><details open><summary>継承</summary><ol><li><a href="/ja/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li></ol></section><p></p>
+
+<p><span class="seoSummary"><strong><code>MediaStream.onaddtrack</code></strong> プロパティは、<a href="/ja/docs/Web/API/EventHandler" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>EventHandler</code></a>であり、<a href="/ja/docs/Web/API/MediaStream" title="MediaStream インターフェイスはメディアコンテンツを表現します。stream は音声やビデオトラックのようないくつかのトラックから構成されます。"><code>MediaStream</code></a>インスタンスで<code><a href="/ja/docs/Web/Reference/Events/addtrack" title="/ja/docs/Web/Reference/Events/addtrack">addtrack</a></code>イベントが発生した時に呼び出される関数です。このイベントは、メディアストリームへ新しいトラックが追加された時に発生します。</span>このイベントはブラウザがストリームへ新しいトラックを追加した時に発生します。たとえば、<a href="/ja/docs/Web/API/RTCPeerConnection" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>RTCPeerConnection</code></a>が再交渉された時や、<a href="/ja/docs/Web/API/HTMLMediaElement/captureStream" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>HTMLMediaElement.captureStream()</code></a>を用いてキャプチャーが開始されたストリームが、新しいトラックを取得した時です。</p>
+
+<p>JavaScriptのコードによって明示的にストリームへトラックを追加した場合(<a href="/ja/docs/Web/API/MediaStream/addTrack" title="MediaStream.addTrack()メソッドはストリームへ新しいトラックを追加するメソッドです。パラメータとして渡されるこのトラックの型はMediaStreamTrackです。"><code>addTrack()</code></a>の呼び出しによるもの)は、<code>addtrack</code>イベントは発生しません。</p>
+
+<h2 id="文法">文法</h2>
+
+<pre class="syntaxbox"><em>MediaStream</em>.onaddtrack = <em>eventHandler</em>;
+</pre>
+
+<h3 id="値">値</h3>
+
+<p>どのトラックで<code><a href="/ja/docs/Web/Reference/Events/addtrack" title="/ja/docs/Web/Reference/Events/addtrack">addtrack</a></code>イベントが発生したのかを表現するための<a href="/ja/docs/Web/API/MediaStreamTrackEvent" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>MediaStreamTrackEvent</code></a>オブジェクトを引数として受け取る関数を設定してください。追加されたトラックは、イベントの<a href="/ja/docs/Web/API/MediaStreamTrackEvent/track" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>track</code></a>プロパティで表されます。</p>
+
+<h2 id="例">例</h2>
+
+<p>この例では、新しいトラックがストリームへ追加された時に、トラックのリストへ新しいアイテムを追加しています。新しいアイテムには、トラックの<code>kind</code>(<code>&quot;audio&quot;<font face="Open Sans, arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">または</span></font></code><code>&quot;video&quot;</code>)と<code>label</code>が表示されます。</p>
+
+<pre class="brush: js">stream.onaddtrack = function(event) {
+  let trackList = document.getElementById(&quot;tracks&quot;);
+  let label = document.createElement(&quot;li&quot;);
+
+  label.innerHTML = event.track.kind + &quot;: &quot; + event.track.label;
+  trackList.appendChild(label);
+};
+</pre>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状況</th>
+   <th scope="col">コメント</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a lang="en" href="https://w3c.github.io/mediacapture-main/#event-mediastream-addtrack" class="external" hreflang="en">Media Capture and Streams<br><small lang="ja">MediaStream.onaddtrack の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td>初版</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザ互換性">ブラウザ互換性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">現在、互換性データを可読形式の JSON フォーマットに置き換えているところです。</a></strong>
+            この互換性一覧は古い形式を使っており、これに含まれるデータの置き換えが済んでいません。
+            <strong><a href="/ja/docs/MDN/Contribute/Structures/Compatibility_tables">手助けしていただける場合は、こちらから！</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>デスクトップ</a></li>
+        <li><a>モバイル</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td><a href="/en-US/Firefox/Releases/50" title="Released on 2016-11-08.">50</a> (50)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>50.0 (50)</td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="関連項目">関連項目</h2>
+
+<ul>
+ <li><code><a href="/ja/docs/Web/Reference/Events/addtrack" title="/ja/docs/Web/Reference/Events/addtrack">addtrack</a></code>イベントおよび、その型である<a href="/ja/docs/Web/API/MediaStreamTrackEvent" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>MediaStreamTrackEvent</code></a></li>
+</ul>

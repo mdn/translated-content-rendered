@@ -1,0 +1,123 @@
+---
+title: A basic ray-caster
+slug: Web/API/Canvas_API/A_basic_ray-caster
+tags:
+  - Advanced
+  - Canvas
+  - Example
+  - Graphics
+  - HTML
+  - Web
+translation_of: Web/API/Canvas_API/A_basic_ray-caster
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/ja/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/ja/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/ja/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/ja/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/ja/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span> <a href="/ja/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ja/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/ja/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/ja/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/ja/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<div class="summary">
+<p>この記事では実世界で ray-casting を使用した 3D描画に役立つ<a href="/ja/docs/Web/HTML/Element/canvas" title="HTML の &lt;canvas&gt; 要素 と Canvas スクリプティング API や WebGL API を使用して、グラフィックやアニメーションを描画することができます。"><code>&lt;canvas&gt;</code></a>の要素の使用例を提供します。</p>
+</div>
+
+<p><iframe class="live-sample-frame" frameborder="0" height="300" src="https://mdn.github.io/canvas-raycaster/index.html" width="900"></iframe></p>
+
+<p><strong><a href="http://mdn.github.io/canvas-raycaster/">Open in new window</a></strong></p>
+
+<h2 id="Why.3F" name="Why.3F">動機付け</h2>
+
+<p>この気のきいた <code>&lt;canvas&gt;</code> 要素に<a href="https://html.spec.whatwg.org/#dynamic">ついての記事</a>を読んでいたら Firefox でそろそろサポートされるだけでなく、最新の Safari でサポート<strong>済み</strong>なののを知ったので、簡単なサンプルを試す必要に駆られました。</p>
+
+<p>MDN で見つけた canvas に関する<a href="/ja/docs/Web/API/Canvas_API">概要</a>と<a href="/ja/docs/Web/Guide/HTML/Canvas_tutorial">チュートリアル</a>はとても素晴らしです、しかし誰もアニメーションについては書いてくれませんでした。なので私がほんの前に動かした基本的な raycaster を移植した方が良いだろうと思うに至りました。ぜひ JavaScript 制御のピクセルバッファーの底力を確認してください。</p>
+
+<h2 id="How.3F" name="How.3F">基本動作</h2>
+
+<p>基本的なアイディアは <a href="/ja/docs/Web/API/Window/setInterval" title="WindowOrWorkerGlobalScope ミックスインの setInterval() メソッドは、一定の遅延間隔を置いて関数やコードスニペットを繰り返し呼び出します。これは、インターバルを一意に識別する interval ID を返します。よって clearInterval() を呼び出して、後でインターバルを削除できます。このメソッドは Window および Worker インターフェイスで提供します。"><code>setInterval()</code></a>  を使って任意の遅延時間で欲しいフレームレートに一致させるということです。毎フレームでの更新関数は現在のビューを canvas に再描画します。もちろん私はもっと簡単なサンプルをで始めることもできました。私はこの canvas <a href="/ja/docs/Web/Guide/HTML/Canvas_tutorial/Basic_animations">チュートリアルで出来る</a>のは分かっていたので、この方法で可能だということを示したかったのです。</p>
+
+<p>全てのフレームで raycaster はユーザーがキーを押したかどうか見ていて、ユーザーが操作しないときに無駄な計算が発生しない様にします。操作が発生した場合 canvas をクリアしたのちに空と地面が描画されカメラの向きや位置が更新され、ray が投射されます。ray が壁と交差するとき垂直の銀色の壁が描画されます。壁との距離が遠くなると色がだんだん暗くなっていきます。カメラと壁との距離に応じて銀色の高さも調節され、水平線の中央に描画されます。</p>
+
+<p>私が書いたコードは <em>André LaMotheTricks of the Game Programming Gurus book (<small>ISBN: 0672305070</small>) </em>の raycaster の項と オンラインで見つけた <a href="http://www.shinelife.co.uk/java-maze/">Java の raycater</a> とを融合させ、意味のわかるようにリネームしたいという私の強い欲望を通過して、なお全て動作させる必要があった。</p>
+
+<h2 id="Results" name="Results">詳細</h2>
+
+<p>Safari 2.0.1 での動作はとても良いです。銀の 8 ピクセル幅のブロックネスでは Apple mini 上で 320 x 240 ピクセル 24fps で動作しました。FireFox 1.5 Beta 1 はそれよりも速く、320 x 240 ピクセル 24fps で 4 ピクセル幅で動作しました。確かに新しい ID ソフトウェアの仲間では無くとも、とても丁寧に実行をする様に考えられていてメモリー割り当てやビデオモードやアセンブラの内部ルーチンのコーディングを気にして書く必要がありませんでした。このコードは、事前計算した値の配列を見るなど、とても効率的に動く様に調整されていていますが、私は特に最適化の施しをしていません。このため、まだ速く動作するように書き直せるでしょう。</p>
+
+<p>また、ゲームエンジンとして動作するにはいくつかするべき事を残しています。例えば 「壁のテクスチャーが無い」「スプライトが無い」「扉が無い」「別の階に移動するワープ」といった類です。十分な時間を私に頂けるなら全部実装できると思いますけどね。この canvas API は画像のピクセルコピーをサポートしていて、テクスチャーは容易だと思います。将来的に他の記事で、たぶん他の人が対応してくれる為にも残しておこうと思います。=)</p>
+
+<h2 id="The_RayCaster" name="The_RayCaster">ray-caster について</h2>
+
+<p>とても良い人が手作業でファイルをコピーしてくれたので、<a href="https://mdn.github.io/canvas-raycaster/">この場所</a>で試せるのでぜひ見てください。そして誰でもハックできる様にコードをそれぞれ小分けしておいてあります。（下部参照）</p>
+
+<p>Safari 1.3+ か Firefox 1.5+ かその他の <code>&lt;canvas&gt;</code> 要素をサポートするブラウザーで動きます。楽しんで！</p>
+
+<p><br>
+ <small><a href="https://github.com/mdn/canvas-raycaster/blob/master/input.js">input.js</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/Level.js">Level.js</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/Player.js">Player.js</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/index.html">RayCaster.html</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/RayCaster.js">RayCaster.js</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/trace.css">trace.css</a> | <a href="https://github.com/mdn/canvas-raycaster/blob/master/trace.js">trace.js</a> </small></p>
+
+<h2 id="See_also" name="See_also">参考</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial">Canvas tutorial</a></li>
+</ul>

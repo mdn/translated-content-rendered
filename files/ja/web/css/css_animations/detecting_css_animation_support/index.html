@@ -1,0 +1,99 @@
+---
+title: CSS アニメーション対応の検出
+slug: Web/CSS/CSS_Animations/Detecting_CSS_animation_support
+tags:
+  - Advanced
+  - CSS
+  - CSS アニメーション
+  - Guide
+  - JavaScript
+  - Junk
+  - Reference
+translation_of: Web/CSS/CSS_Animations/Detecting_CSS_animation_support
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/Reference">CSS リファレンス</a></strong></li><li><strong><a href="/ja/docs/Web/CSS/CSS_Animations">CSS Animations</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/CSS/CSS_Animations/Tips">CSS Animations tips and tricks</a> <a style="opacity: 0.5;" href="/ja/docs/Web/CSS/CSS_Animations/Tips$translate">[翻訳する]</a></li><li><em>CSS アニメーション対応の検出</em></li><li><a href="/ja/docs/Web/CSS/CSS_Animations/Using_CSS_animations">CSS アニメーションの使用</a></li></ol></details></li><li class="toggle"><details open><summary>@規則</summary><ol><li><a href="/ja/docs/Web/CSS/@keyframes"><code>@keyframes</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a></li><li><a href="/ja/docs/Web/CSS/timing-function"><code>&lt;timing-function&gt;</code></a> <a style="opacity: 0.5;" href="/ja/docs/Web/CSS/timing-function$translate">[翻訳する]</a></li><li><a href="/ja/docs/Web/CSS/animation"><code>animation</code></a></li><li><a href="/ja/docs/Web/CSS/animation-delay"><code>animation-delay</code></a></li><li><a href="/ja/docs/Web/CSS/animation-direction"><code>animation-direction</code></a></li><li><a href="/ja/docs/Web/CSS/animation-duration"><code>animation-duration</code></a></li><li><a href="/ja/docs/Web/CSS/animation-fill-mode"><code>animation-fill-mode</code></a></li><li><a href="/ja/docs/Web/CSS/animation-iteration-count"><code>animation-iteration-count</code></a></li><li><a href="/ja/docs/Web/CSS/animation-name"><code>animation-name</code></a></li><li><a href="/ja/docs/Web/CSS/animation-play-state"><code>animation-play-state</code></a></li><li><a href="/ja/docs/Web/CSS/animation-timing-function"><code>animation-timing-function</code></a></li></ol></details></li></ol></section></div>
+
+<p>CSS アニメーションでは CSS だけを使用してコンテンツの創造的なアニメーションを行うことができます。しかし、この機能が利用できないことがよくあり、この場合には同様の効果を JavaScript コードで実現したいと思うかもしれません。この記事では、<a href="http://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/" class="external">このブログ投稿</a> (Chris Heilmann 著) に基づいて、これを行うためのテクニックを紹介します。</p>
+
+<h2 id="CSS_アニメーションへの対応の検査">CSS アニメーションへの対応の検査</h2>
+
+<p>このコードは、 CSS アニメーション対応があるかどうかをチェックします。</p>
+
+<pre class="brush: js">var animation = false,
+    animationstring = &apos;animation&apos;,
+    keyframeprefix = &apos;&apos;,
+    domPrefixes = &apos;Webkit Moz O ms Khtml&apos;.split(&apos; &apos;),
+    pfx  = &apos;&apos;,
+    elem = document.createElement(&apos;div&apos;);
+
+if( elem.style.animationName !== undefined ) { animation = true; }
+
+if( animation === false ) {
+  for( var i = 0; i &lt; domPrefixes.length; i++ ) {
+    if( elem.style[ domPrefixes[i] + &apos;AnimationName&apos; ] !== undefined ) {
+      pfx = domPrefixes[ i ];
+      animationstring = pfx + &apos;Animation&apos;;
+      keyframeprefix = &apos;-&apos; + pfx.toLowerCase() + &apos;-&apos;;
+      animation = true;
+      break;
+    }
+  }
+}
+</pre>
+
+<p>最初にいくつかの変数を定義します。アニメーションに対応していないと仮定して、 <code>animation</code> に <code>false</code> を設定します。 <code>animationstring</code> を後で設定するプロパティである <code>animation</code> に設定します。ループ用にブラウザーの接頭辞の配列を生成して、 <code>pfx</code> を空文字列に設定します。</p>
+
+<p>それから、 CSS の <a href="/ja/docs/Web/CSS/animation-name" title="CSS の animation-name プロパティは、要素に適用される1つまたは複数のアニメーションを設定します。それぞれの名前はアニメーションシーケンスのプロパティ値を定義する @keyframes @-規則を設定します。"><code>animation-name</code></a> プロパティが変数 <code>elem</code> で指定された要素のスタイルコレクションに設定されていることを確認します。これは、ブラウザーが CSS アニメーションを接頭辞なしで対応していることを意味するので、その際は何もしません。</p>
+
+<p>ブラウザーが接頭辞なしのアニメーションに対応していなければ、 <code>animation</code> はまだ <code>false</code> ですが、主要なブラウザー全てがこのプロパティに接頭辞を付けているので、可能性のある接頭辞をすべて試して、名前が <code>AnimationName</code> に変化するかを調べます。</p>
+
+<p>このコードの実行が終了したとき、値が <code>false</code> であれば CSS アニメーション対応が有効ではなく、そうでなければ <code>true</code> となります。 <code>true</code> であった場合、 animation プロパティの名前とキーフレームの接頭辞は正しいものになります。よって、新しい Firefox を使用している場合は、プロパティは <code>MozAnimation</code> となってキーフレームの接頭辞は <code>-moz-</code> となり、 Chrome ではそれぞれ <code>WebkitAnimation</code> および <code>-webkit-</code> になります。なお、ブラウザーではキャメルケースとハイフンを簡単に切り替えることはできません。</p>
+
+<h2 id="Animating_using_the_correct_syntax_for_different_browsers" name="Animating_using_the_correct_syntax_for_different_browsers">様々なブラウザーで正しい構文を使用したアニメーション</h2>
+
+<p>CSS アニメーションに対応しているかどうか分かったところで、アニメーションを行うことができます。</p>
+
+<pre class="brush: js">if( animation === false ) {
+
+  // JavaScript によるアニメーションの代替
+
+} else {
+  elem.style[ animationstring ] = &apos;rotate 1s linear infinite&apos;;
+
+  var keyframes = &apos;@&apos; + keyframeprefix + &apos;keyframes rotate { &apos;+
+                    &apos;from {&apos; + keyframeprefix + &apos;transform:rotate( 0deg ) }&apos;+
+                    &apos;to {&apos; + keyframeprefix + &apos;transform:rotate( 360deg ) }&apos;+
+                  &apos;}&apos;;
+
+  if( document.styleSheets &amp;&amp; document.styleSheets.length ) {
+
+      document.styleSheets[0].insertRule( keyframes, 0 );
+
+  } else {
+
+    var s = document.createElement( &apos;style&apos; );
+    s.innerHTML = keyframes;
+    document.getElementsByTagName( &apos;head&apos; )[ 0 ].appendChild( s );
+
+  }
+
+}
+</pre>
+
+<p>このコードは <code>animation</code> の値を見ます。もし <code>false</code> ならば、アニメーションを実行するために JavaScript の代替コードを使う必要があることが分かります。そうでなければ、求められる CSS アニメーション効果を生成するために JavaScript を使用することができます。</p>
+
+<p>animation プロパティの設定は簡単です。単にスタイルコレクションの値を更新するだけです。しかし、 keyframe の追加は、従来の CSS の構文を使用して定義されていないため、より困難です (より柔軟性がありますが、スクリプトの定義がより難しくなります)。</p>
+
+<p>JavaScript を用いて keyframe を定義するには、それを CSS 文字列に書き出す必要があります。行うことは、 <code>keyframes</code> 変数を設定し、構築されるそれぞれの属性に接頭辞を付けることです。この変数は、いったん構築されれば、一連のアニメーションシーケンスで必要なすべてのキーフレームの完全な記述を含んでいます。</p>
+
+<p>次の仕事は、ページの CSS に実際にキーフレームを追加することです。最初に行うことは、文書に既にスタイルシートがあるかどうかを確認することです。もしあれば、単にそのスタイルシートにキーフレームの記述を挿入するだけです。これは13-15行目で行っています。</p>
+
+<p>スタイルシートがないのであれば、新しい <a href="/ja/docs/Web/HTML/Element/style" title="HTML の &lt;style&gt; 要素は、文書あるいは文書の一部分のスタイル情報を含みます。"><code>&lt;style&gt;</code></a> 要素を生成し、その内容をキーフレームの値のセットとします。それから新しい <a href="/ja/docs/Web/HTML/Element/style" title="HTML の &lt;style&gt; 要素は、文書あるいは文書の一部分のスタイル情報を含みます。"><code>&lt;style&gt;</code></a> 要素を文書の <a href="/ja/docs/Web/HTML/Element/head" title="HTML の &lt;head&gt; 要素は、文書に関する全般的な情報（メタデータ）を内包する要素です。文書のタイトルや、スクリプトおよびスタイルシートへのリンクを内包できます。"><code>&lt;head&gt;</code></a> に追加し、それによって新しいスタイルシートが文書に追加されます。/p&gt;</p>
+
+<p><a href="https://jsfiddle.net/codepo8/ATS2S/8/embedded/result">JSFiddle で見る</a></p>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/CSS/CSS_Animations/Using_CSS_animations">CSS アニメーション</a></li>
+</ul>

@@ -1,0 +1,128 @@
+---
+title: CSS properties and values API の使用
+slug: Web/API/CSS_Properties_and_Values_API/guide
+tags:
+  - API
+  - CSS
+  - CSS Properties and Values
+  - Guide
+  - Houdini
+  - JavaScript
+  - Learn
+translation_of: Web/API/CSS_Properties_and_Values_API/guide
+---
+<div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div> <strong>CSS Properties and Values API</strong>（<a href="/ja/docs/Web/Houdini">CSS Houdini</a> API の傘の一部）は、<span class="seoSummary"><a href="/ja/docs/Web/CSS/--*" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>css カスタムプロパティ</code></a>の登録を可能にし、プロパティ型のチェック、デフォルト値、および値を継承するまたは継承しないプロパティを許可します。</span>
+
+<h2 id="Registering_a_custom_property" name="Registering_a_custom_property">カスタムプロパティの登録</h2>
+
+<p>カスタムプロパティを登録すると、カスタムプロパティの振る舞い（許可される型、カスタムプロパティがその値を継承するかどうか、カスタムプロパティのデフォルト値は何か）をブラウザーに指示できます。 プロパティを登録するには、JavaScript と CSS の2つの方法があります。</p>
+
+<div class="note notecard">
+<p><strong>注</strong>: JavaScript オプションには使える実装があります。 CSS オプションにはありません。</p>
+</div>
+
+<h3 id="CSS.registerProperty" name="CSS.registerProperty">CSS.registerProperty</h3>
+
+<p>次の例では、<a href="/ja/docs/Web/API/CSS/registerProperty"><code>CSS.registerProperty</code></a> を使用して、<a href="/ja/docs/Web/CSS/--*" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>css カスタムプロパティ</code></a> <code>--my-prop</code> を色として登録し、デフォルト値を指定し、その値を継承しないようにします。</p>
+
+<pre class="brush: js notranslate">window.CSS.registerProperty({
+  name: &apos;--my-prop&apos;,
+  syntax: &apos;&lt;color&gt;&apos;,
+  inherits: false,
+  initialValue: &apos;#c0ffee&apos;,
+});
+</pre>
+
+<h3 id="property" name="property">@property</h3>
+
+<p>CSS で同じ登録を行うことができます。 次の例では、<a href="/ja/docs/Web/CSS/@property" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>@property</code></a> を使用して、<a href="/ja/docs/Web/CSS/--*" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>css カスタムプロパティ</code></a> <code>--my-prop</code> を色として登録し、デフォルト値を指定し、その値を継承しないようにします。</p>
+
+<pre class="brush: css notranslate">@property --my-prop {
+  syntax: &apos;&lt;color&gt;&apos;;
+  inherits: false;
+  initial-value: #c0ffee;
+}</pre>
+
+<h2 id="Using_registered_custom_properties" name="Using_registered_custom_properties">登録したカスタムプロパティの使用</h2>
+
+<p>プロパティを登録することの利点の1つは、遷移（transition）などを通してカスタムプロパティを処理する方法をブラウザーが認識できるようになったことです！ プロパティが登録されていない場合、ブラウザーはその処理方法を知らず、任意の値を使用できるため、アニメーション化できないものと見なされます。 しかし、プロパティに構文（syntax）が登録されている場合、ブラウザーは、それをアニメーション化できるなど、その構文を中心に最適化できます！</p>
+
+<p>この例では、カスタムプロパティ <code>--registered</code> を構文 <code>&lt;color&gt;</code> を使用して登録し、線形グラデーションで使用しています。 そのプロパティは、ホバーまたはフォーカスで別の色に遷移します。 登録されたプロパティでは遷移が機能しますが、未登録のプロパティでは機能しないことに注意してください！</p>
+
+<pre class="brush: css notranslate">.registered {
+  --registered: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--registered));
+  transition: --registered 1s ease-in-out;
+}
+
+.registered:hover,
+.registered:focus {
+  --registered: #b4d455;
+}
+
+.unregistered {
+  --unregistered: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--unregistered));
+  transition: --unregistered 1s ease-in-out;
+}
+
+.unregistered:hover,
+.unregistered:focus {
+  --unregistered: #b4d455;
+}</pre>
+
+<div class="hidden" id="registered">
+<pre class="brush: html notranslate">&lt;button class=&quot;registered&quot;&gt;Background Registered&lt;/button&gt;
+&lt;button class=&quot;unregistered&quot;&gt;Background Not Registered&lt;/button&gt;
+</pre>
+
+<pre class="brush: css notranslate">.registered {
+  --registered: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--registered));
+  transition: --registered 1s ease-in-out;
+}
+
+.registered:hover,
+.registered:focus {
+  --registered: #b4d455;
+}
+
+.unregistered {
+  --unregistered: #c0ffee;
+  background-image: linear-gradient(to right, #fff, var(--unregistered));
+  transition: --unregistered 1s ease-in-out;
+}
+
+.unregistered:hover,
+.unregistered:focus {
+  --unregistered: #b4d455;
+}
+
+button {
+  height: 40vh;
+  display: block;
+  width: 100%;
+  font-size: 3vw;
+}
+
+</pre>
+
+<pre class="brush: js notranslate">window.CSS.registerProperty({
+  name: &apos;--registered&apos;,
+  syntax: &apos;&lt;color&gt;&apos;,
+  inherits: false,
+  initialValue: &apos;red&apos;,
+});</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="320" id="frame_registered" src="https://mdn.mozillademos.org/ja/docs/Web/API/CSS_Properties_and_Values_API/guide$samples/registered?revision=1634344" width="320"></iframe></p>
+
+<p>機能的には正確ではありませんが、上記の例の未登録のプロパティと登録されたプロパティの違いを考える良い方法は、<a href="/ja/docs/Web/CSS/height" title="height は CSS のプロパティで、要素の高さを指定します。既定では、このプロパティはコンテンツ領域の高さを定義します。しかし、 box-sizing が border-box に設定されていた場合は、 境界領域の高さを定義します。"><code>height</code></a> をアニメーション化する際の <a href="/ja/docs/Web/CSS/custom-ident" title="CSS データ型 の &lt;custom-ident&gt; データ値は、識別子 (identifier) として使われる、ユーザ定義の任意の文字列を意味します。これは大文字と小文字を区別し、曖昧さを避けるため、いくつかの値は様々なコンテキストで禁止されています。"><code>&lt;custom-ident&gt;</code></a> と数値の違いです。 ブラウザーは、計算されるまで <code>auto</code> の値がわからないため、<code>auto</code> から数値に遷移またはアニメーション化することはできません。 未登録のプロパティを使用すると、ブラウザーは計算されるまで値が<em>何であるか</em>を同様に認識しません。 そのため、ある値から別の値への遷移を設定できません。 ただし、登録すると、ブラウザーにどのような種類の値を期待するかを伝えており、それを知っているため、遷移を適切に設定できます。</p>
+
+<h2 id="Gotchas" name="Gotchas">落とし穴</h2>
+
+<p>プロパティの登録には2つの落とし穴があります。 1つ目は、プロパティを一度登録すると更新する方法がなく、JavaScript で再登録しようとすると、プロパティが既に定義されていることを示すエラーがスローされることです。</p>
+
+<p>2つ目は、標準のプロパティとは異なり、登録されたプロパティは解析時に検証されません。 むしろ、計算時に検証されます。 つまり、要素のプロパティを検査するときに無効な値が無効として表示されないことと、有効なプロパティの後に無効なプロパティを含めることは、有効なプロパティにフォールバックしないことを意味します。 ただし、無効なプロパティは、登録されているデフォルトにフォールバックします。</p>

@@ -1,0 +1,121 @@
+---
+title: Mozilla JavaScriptインターフェイスを使用したXSL変換
+slug: Web/XSLT/Using_the_Mozilla_JavaScript_interface_to_XSL_Transformations
+tags:
+  - XSLT
+translation_of: Web/XSLT/Using_the_Mozilla_JavaScript_interface_to_XSL_Transformations
+---
+<p>このドキュメントでは、Mozilla 1.2 の JavaScript インターフェイスと、XSLT 処理エンジン (TransforMiiX) について説明します。</p>
+
+<h3 id="Creating_an_XSLTProcessor" name="Creating_an_XSLTProcessor">XSLTProcessorの作成</h3>
+
+<p>まず、<a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param&gt; パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> オブジェクトを作成する必要があります。</p>
+
+<div style="overflow: hidden;">
+<pre class="brush: js">var processor = new XSLTProcessor();
+</pre>
+</div>
+
+<h3 id="Specifying_the_stylesheet" name="Specifying_the_stylesheet">スタイルシートの指定</h3>
+
+<p>これを使用するには、<a href="/ja/docs/Web/API/XSLTProcessor/importStylesheet" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.importStylesheet()</code></a> メソッドを使用してスタイルシートをインポートする必要があります。インポートするXSLTスタイルシートのDOMノードである単一のパラメータがあります。</p>
+
+<p></p><div class="note notecard"><strong>註:</strong> インポートは動的です。つまりスタイルシートDOMを読み込んだ後にスタイルシートDOMを変更すると、処理に反映されます。DOMを変更するのではなく、通常はより簡単でより良いパフォーマンスを与えることができるスタイルシートパラメータを使用することをお勧めします。</div><p></p>
+
+<pre class="brush: js">var testTransform = document.implementation.createDocument(&quot;&quot;, &quot;test&quot;, null);
+// just an example to get a transform into a script as a DOM
+// XMLDocument.load is asynchronous, so all processing happens in the
+// onload handler
+testTransform.addEventListener(&quot;load&quot;, onload, false);
+testTransform.load(&quot;test-transform.xml&quot;);
+function onload() {
+  processor.importStylesheet(testTransform);
+}
+</pre>
+
+<p><a href="/ja/docs/Web/API/XSLTProcessor/importStylesheet" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.importStylesheet()</code></a> には引数、つまり DOM ノードが1つ必要です。そのノードがドキュメントノードの場合、完全なXSL Transformまたは<a href="http://www.w3.org/TR/xslt#result-element-stylesheet">リテラル結果要素の変換</a>を渡すことができます。そうでない場合は、<code>xsl:stylesheet</code> または <code>xsl:transform</code> 要素でなければなりません。</p>
+
+<h3 id="Transforming_the_document" name="Transforming_the_document">文書を変形する</h3>
+
+<p>インポートした XSLT スタイルシートを使用して <a href="/ja/docs/Web/API/XSLTProcessor/transformToDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToDocument()</code></a> または <a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> メソッドを使用してドキュメントを変換できます。</p>
+
+<h4 id="transformToDocument" name="transformToDocument">transformToDocument</h4>
+
+<p><a href="/ja/docs/Web/API/XSLTProcessor/transformToDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToDocument()</code></a> は変換するソースノードを1つ引数として、変換結果とともに新しい <a href="/ja/docs/Web/API/Document" title="Document インターフェイスは、ブラウザーに読み込まれたウェブページを表し、DOM ツリー であるウェブページのコンテンツへのエントリーポイントとして働きます。"><code>Document</code></a> を返します。</p>
+
+<pre class="brush: js">var newDocument = processor.transformToDocument(domToBeTransformed);
+</pre>
+
+<p>結果のオブジェクトはスタイルシートの<a href="http://www.w3.org/TR/xslt#output">出力メソッド</a>に依存します。</p>
+
+<ul>
+ <li><strong>html</strong> - <a href="/ja/docs/Web/API/HTMLDocument" title="HTMLDocument は、document オブジェクトに HTML 特有の機能を追加するために、Document インターフェイスを拡張する抽象的なインターフェイスです。これは HTML 文書のルートを表し、その中に DOM の階層全体が存在しています。"><code>HTMLDocument</code></a></li>
+ <li><strong>xml</strong> - <a href="/ja/docs/Web/API/XMLDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XMLDocument</code></a></li>
+ <li><strong>text</strong> - 子としてのテキストを持つ単一のルート要素 <code>&lt;transformiix:result&gt;</code> を持つ <a href="/ja/docs/Web/API/XMLDocument" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XMLDocument</code></a></li>
+</ul>
+
+<h4 id="transformToFragment" name="transformToFragment">transformToFragment</h4>
+
+<p><a href="/ja/docs/Web/API/DocumentFragment" title="DocumentFragment インターフェイスは、親ノードを持たない最小限の文書オブジェクト (文書の断片) を表します。これは Document の軽量版として使用され、標準の文書のようにノードで構成される文書構造の区間を格納します。重要な違いは、文書の断片はアクティブな文書ツリー構造の一部ではないため、断片に対して変更を行っても、文書に影響したり、再フローを起こしたり、変更が行われたときに性能上の影響を及ぼしたりすることがないことです。"><code>DocumentFragment</code></a> ノードを返す <a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> を使用することもできます。フラグメントを別のノードに追加すると、そのフラグメントのすべての子が透過的に追加され、フラグメント自体はマージされないため、これは便利です。したがってフラグメントは、完全なドキュメントオブジェクトのオーバーヘッドなしにノードを移動して格納するのに便利です。<br>
+ <br>
+ <a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> は、変換するソースドキュメント (上記) とフラグメントを所有する <a href="/ja/docs/Web/API/Document" title="Document インターフェイスは、ブラウザーに読み込まれたウェブページを表し、DOM ツリー であるウェブページのコンテンツへのエントリーポイントとして働きます。"><code>Document</code></a> オブジェクトの2つの引数をとります (すべてのフラグメントは文書が所有しなければなりません) 。</p>
+
+<pre class="brush: js line-numbers  language-js"><code class="language-js"><span class="keyword token">var</span> ownerDocument <span class="operator token">=</span> document<span class="punctuation token">.</span>implementation<span class="punctuation token">.</span><span class="function token">createDocument</span><span class="punctuation token">(</span><span class="string token">&quot;&quot;</span><span class="punctuation token">,</span> <span class="string token">&quot;test&quot;</span><span class="punctuation token">,</span> <span class="keyword token">null</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+<span class="keyword token">var</span> newFragment <span class="operator token">=</span> processor<span class="punctuation token">.</span><span class="function token">transformToFragment</span><span class="punctuation token">(</span>domToBeTransformed<span class="punctuation token">,</span> ownerDocument<span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p>所有者文書自体が <a href="/ja/docs/Web/API/HTMLDocument" title="HTMLDocument は、document オブジェクトに HTML 特有の機能を追加するために、Document インターフェイスを拡張する抽象的なインターフェイスです。これは HTML 文書のルートを表し、その中に DOM の階層全体が存在しています。"><code>HTMLDocument</code></a> の場合、またはスタイルシートの出力メソッドがHTMLの場合、<a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> は HTML DOM オブジェクトを生成します。これは、<a href="/ja/docs/Web/API/XSLTProcessor/transformToFragment" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.transformToFragment()</code></a> がこの要素の作成に使用されることはほとんど<strong>ない</strong>ので、結果の最上位要素のみが <a href="/ja/docs/Web/HTML/Element/html" title="HTML の &lt;html&gt; 要素は HTML 文書においてルート (基点) となる要素 (トップレベル要素) であり、ルート要素とも呼ばれます。他のすべての要素は、この要素の子孫として配置しなければなりません。"><code>&lt;html&gt;</code></a> の場合、HTML DOMオブジェクトを生成しません。これをオーバーライドする場合は、通常の方法で出力メソッドを通常どおりに設定できます。</p>
+
+<h4 id="transforming_HTML" name="transforming_HTML">transforming HTML</h4>
+
+<p>残念ながら、XSLT を使用して HTML ノードを変換することは現在サポートされていません。パターンや式で小文字のノード名を使用してノードがnull名前空間にあるかのように扱う場合、いくつかのことが成り立ちますが、これはあまりうまくテストされていないため、すべての状況で機能しない可能性があります。これは将来のリリースで変更される可能性もあります。<br>
+ <br>
+ しかし XHTML の変換は期待通りに機能するはずです。</p>
+
+<h3 id="Setting_parameters" name="Setting_parameters">パラメータの設定</h3>
+
+<p><a href="http://www.w3.org/TR/xslt#variables">スタイルシートのパラメータ</a>は<a href="/ja/docs/Web/API/XSLTProcessor/setParameter" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.setParameter()</code></a>、<a href="/ja/docs/Web/API/XSLTProcessor/getParameter" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.getParameter()</code></a>、<a href="/ja/docs/Web/API/XSLTProcessor/removeParameter" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.removeParameter()</code></a> メソッドを使用して制御することができます。これらはすべて <a href="/ja/docs/Web/API/XSLTProcessor/setParameter" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.setParameter()</code></a> が設定するパラメータの値の3分の1を使用して、名前空間URIとローカル名を最初の2つのパラメータとして取ります。例については、<a href="/ja/docs/The_XSLT_JavaScript_Interface_in_Gecko">Gecko の XSLT/JavaScript インターフェース</a>を参照してください。</p>
+
+<h3 id="Resetting" name="Resetting">リセット</h3>
+
+<p><a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param&gt; パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> オブジェクトは、すべてのスタイルシートとパラメータを削除してプロセッサを初期状態に戻すために使用できる<a href="/ja/docs/Web/API/XSLTProcessor/reset" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>XSLTProcessor.reset()</code></a> メソッドも実装しています。このメソッドは <a href="/ja/docs/Mozilla/Gecko">Mozilla</a> 1.3 以降で実装されています。</p>
+
+<h3 id="Resources" name="Resources">リソース</h3>
+
+<p>以下は <a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param&gt; パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> オブジェクトのインタフェースを反映しています：</p>
+
+<ul>
+ <li><a href="https://dxr.mozilla.org/mozilla-central/source/dom/xslt/nsIXSLTProcessor.idl" rel="custom">nsIXSLTProcessor.idl</a></li>
+ <li><a href="https://dxr.mozilla.org/mozilla-central/source/dom/webidl/XSLTProcessor.webidl" rel="custom">XSLTProcessor.webidl</a></li>
+</ul>
+
+<h3 id="Using_XSLTProcessor_from_XPCOM_components" name="Using_XSLTProcessor_from_XPCOM_components">XPCOM コンポーネントから XSLTProcessor を使用する</h3>
+
+<p>XPCOMコンポーネントから <a href="/ja/docs/Web/API/XSLTProcessor" title="XSLTProcessor は、XSLT スタイルシート変換を XML 文書に適用して、新しい XML 文書を出力として生成します。XSLT スタイルシートをロードし、&lt;xsl:param&gt; パラメータ値を操作し、変換処理をドキュメントに適用するメソッドを持っています。"><code>XSLTProcessor</code></a> をインスタンス化するには、コンストラクタがコンポーネント内で定義されていないため、別の構文が必要です。</p>
+
+<p>これの代わりに：</p>
+
+<pre class="brush: js">var processor = new XSLTProcessor();
+</pre>
+
+<p>これを行います：</p>
+
+<pre class="brush: js">var processor = Components.classes[&quot;@mozilla.org/document-transformer;1?type=xslt&quot;]
+                          .createInstance(Components.interfaces.nsIXSLTProcessor);
+</pre>
+
+<h3 id="See_also" name="See_also">関連情報</h3>
+
+<ul>
+ <li><a href="/ja/docs/The_XSLT_JavaScript_Interface_in_Gecko" title="The_XSLT//JavaScript_Interface_in_Gecko">Gecko の XSLT/JavaScript インターフェース</a></li>
+ <li>XML文書の読み込みに関する<a href="https://developer.mozilla.org/en/DOM/document.load" title="en/DOM/document.load">document.load()</a> (上で使用したもの)</li>
+</ul>
+
+<div class="originaldocinfo">
+<h3 id="Original_Document_Information" name="Original_Document_Information">オリジナルドキュメント情報</h3>
+
+<ul>
+ <li>著者: <a href="mailto:mike@theoretic.com" class="link-mailto">Mike Hearn</a></li>
+ <li>最終更新日: December 21, 2005</li>
+ <li>著作権情報: Copyright (C) Mike Hearn</li>
+</ul>
+</div>

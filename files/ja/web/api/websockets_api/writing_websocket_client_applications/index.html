@@ -1,0 +1,183 @@
+---
+title: WebSocket クライアントアプリケーションの記述
+slug: Web/API/WebSockets_API/Writing_WebSocket_client_applications
+tags:
+  - Client
+  - Example
+  - Guide
+  - Networking
+  - Web Sockets API
+  - WebSocket
+  - WebSocket API
+  - WebSockets
+  - ガイド
+  - ネットワーク
+  - 例
+translation_of: Web/API/WebSockets_API/Writing_WebSocket_client_applications
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/Websockets_API">Websockets API</a></strong></li><li><strong><a href="/ja/docs/Web/API/WebSockets_API"><code>WebSockets_API</code></a></strong></li><li class="toggle"><details open><summary>Websockets API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/CloseEvent"><code>CloseEvent</code></a></li><li><a href="/ja/docs/Web/API/MessageEvent"><code>MessageEvent</code></a></li><li><a href="/ja/docs/Web/API/WebSocket"><code>WebSocket</code></a></li></ol></details></li></ol></section></div>
+
+<p>WebSocket クライアントアプリケーションは <a href="/ja/docs/Web/API/Websockets_API">WebSocket API</a> を使用して、 WebSocket プロトコルを経由して <a href="/ja/docs/Web/API/WebSockets_API/Writing_WebSocket_servers">WebSocket サーバー</a>と通信します。</p>
+
+<div class="note notecard"><strong>註:</strong> この機能は <a href="/ja/docs/Web/API/Web_Workers_API">Web Workers</a> 内で利用可能です。</div>
+
+<div class="note">
+<p><strong>メモ:</strong> この記事のサンプルスニペットは WebSocket チャットクライアント/サーバーサンプルから取得したものです。 <a href="https://github.com/mdn/samples-server/tree/master/s/websocket-chat">コードを見て</a>から、<a href="https://mdn-samples.mozilla.org/s/websocket-chat">自分で例を試してみてください</a>。</p>
+</div>
+
+<h2 id="Creating_a_WebSocket_object" name="Creating_a_WebSocket_object">WebSocket オブジェクトの作成</h2>
+
+<p>WebSocket プロトコルを使用して通信するには、 <a href="/ja/docs/Web/API/WebSocket"><code>WebSocket</code></a> オブジェクトを作成する必要があります。これにより自動的にサーバーへの接続が開かれます。</p>
+
+<p>WebSocket のコンストラクターは、必須1つ、任意1つの引数を受け取ります。</p>
+
+<pre class="syntaxbox"><em>webSocket</em> = new WebSocket(<em>url</em>, <em>protocols</em>);
+</pre>
+
+<dl>
+ <dt><code>url</code></dt>
+ <dd>接続先 URL。これは、 WebSocket サーバーが応答する URL である必要があります。これは URL スキームに <code>wss://</code> を使用するべきですが、ソフトウェアによってはローカル接続用に安全ではない <code>ws://</code> を使用することを許可していることがあります。</dd>
+ <dt><code>protocols</code> <span class="optional optionalInline notecard inline">Optional</span></dt>
+ <dd>単一のプロトコル文字列または一連のプロトコル文字列。これらの文字列はサブプロトコルを示すのに使用されるため、単一のサーバーで複数の WebSocket サブプロトコルを実装できます (たとえば、特定の <code>protocol</code> に応じて1つのサーバーで異なるタイプのインタラクションを処理できるようにする)。プロトコル文字列を指定しない場合、空文字列であると仮定されます。</dd>
+</dl>
+
+<p>コンストラクターは、接続先がアクセスを許可していない場合に <code>SecurityError</code> 例外を発生させます。これは安全ではない接続を利用しようとしたときに発生することがあります (ほとんどの<a href="/ja/docs/Glossary/User_agent">ユーザーエージェント</a>は、同じ機器か、可能であれば同じネットワークでない限り、すべての WebSocket 接続に安全なリンクを要求します。</p>
+
+<h3 id="Connection_errors" name="Connection_errors">接続エラー</h3>
+
+<p>接続中にエラーが発生した場合、最初に <code>error</code> という名前の単純なイベントが <a href="/ja/docs/Web/API/WebSocket"><code>WebSocket</code></a> オブジェクトに送信され (その結果、その <a href="/ja/docs/Web/API/WebSocket/onerror"><code>onerror</code></a> ハンドラーが呼び出されます)、次に <a href="/ja/docs/Web/API/CloseEvent"><code>CloseEvent</code></a> が <code>WebSocket</code> オブジェクトに送信され (<a href="/ja/docs/Web/API/WebSocket/onclose"><code>onclose</code></a> ハンドラーが呼び出されます) 接続の終了の理由を示します。</p>
+
+<p>ブラウザーはコンソールにも、 <a class="external" href="http://tools.ietf.org/html/rfc6455#section-7.4" title="RFC 6455 Section 7.4">RFC 6455 の 7.4 節</a> で定義されている <a href="/ja/docs/Web/API/CloseEvent"><code>CloseEvent</code></a> 経由の終了コードと同時に、もっと説明的なエラーメッセージを出力することもあります。</p>
+
+<h3 id="Examples" name="Examples">例</h3>
+
+<p>この簡単な例では新しい WebSocket を作成し、 <code><span class="nowiki">wss://www.example.com/socketserver</span></code> のサーバーに接続します。この例では、ソケットの要求で &quot;protocolOne&quot; のカスタムプロトコルが指定されていますが、省略することもできます。</p>
+
+<pre class="brush: js">var exampleSocket = new WebSocket(&quot;wss://www.example.com/socketserver&quot;, &quot;protocolOne&quot;);
+</pre>
+
+<p>返されると、 <a href="/ja/docs/Web/API/WebSocket/readyState"><code>exampleSocket.readyState</code></a> は <code>CONNECTING</code> です。 <code>readyState</code> は接続がデータを転送する準備ができたら <code>OPEN</code>になります。</p>
+
+<p>接続を開き、サポートしているプロトコルについて柔軟に対応したい場合は、プロトコルの配列を指定できます。</p>
+
+<pre class="brush: js">var exampleSocket = new WebSocket(&quot;wss://www.example.com/socketserver&quot;, [&quot;protocolOne&quot;, &quot;protocolTwo&quot;]);
+</pre>
+
+<p>接続が確立されると (つまり <code>readyState</code> が <code>OPEN</code>)、 <a href="/ja/docs/Web/API/WebSocket/protocol"><code>exampleSocket.protocol</code></a> は、サーバーが選択したプロトコルを通知します。</p>
+
+<p>WebSocket を確立するには、<a href="/ja/docs/Web/HTTP/Protocol_upgrade_mechanism">HTTP アップグレードメカニズム</a>が必要です。したがって、 HTTP サーバーを <code><span class="nowiki">ws://www.example.com</span></code> または <code><span class="nowiki">wss://www.example.com</span></code> としてアドレス指定すると、プロトコルのアップグレード要求が暗黙的に行われます。</p>
+
+<h2 id="Sending_data_to_the_server" name="Sending_data_to_the_server">サーバーにデータを送信する</h2>
+
+<p>接続を開くと、サーバーにデータを送信することができます。 これを行うには、送信するメッセージごとに <code>WebSocket</code> オブジェクトの <a href="/ja/docs/Web/API/WebSocket/send"><code>send()</code></a> メソッドを呼び出します。</p>
+
+<pre class="brush: js">exampleSocket.send(&quot;Here&apos;s some text that the server is urgently awaiting!&quot;);
+</pre>
+
+<p>データを文字列、 <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a>、 <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a> のいずれかとして送信することができます。</p>
+
+<p>接続の確立は非同期であり、失敗しやすいため、 <code>send()</code> メソッドの呼び出しが WebSocket オブジェクトの作成直後に成功するという保証はありません。データの送信を試みるのは、少なくともいったん接続が確立してからでなければならないので、作業を行うための <a href="/ja/docs/Web/API/WebSocket/onopen"><code>onopen</code></a> イベントハンドラーを定義してその中で行います。</p>
+
+<pre class="brush: js">exampleSocket.onopen = function (event) {
+  exampleSocket.send(&quot;Here&apos;s some text that the server is urgently awaiting!&quot;);
+};
+</pre>
+
+<h3 id="Using_JSON_to_transmit_objects" name="Using_JSON_to_transmit_objects">JSON を使用したオブジェクトの送信</h3>
+
+<p>サーバーに複雑なデータを合理的に送信するのに手軽な方法の一つとして、 <a href="/ja/docs/Glossary/JSON">JSON</a> を使用する方法があります。たとえば、チャットプログラムがサーバーとやり取りするのに、 JSON でカプセル化されたデータのパケットを使用して実装されたプロトコルを使用することができます。</p>
+
+<pre class="brush: js">// Send text to all users through the server
+function sendText() {
+  // Construct a msg object containing the data the server needs to process the message from the chat client.
+  var msg = {
+    type: &quot;message&quot;,
+    text: document.getElementById(&quot;text&quot;).value,
+    id:   clientID,
+    date: Date.now()
+  };
+
+  // Send the msg object as a JSON-formatted string.
+  exampleSocket.send(JSON.stringify(msg));
+
+  // Blank the text input element, ready to receive the next line of text from the user.
+  document.getElementById(&quot;text&quot;).value = &quot;&quot;;
+}
+</pre>
+
+<h2 id="Receiving_messages_from_the_server" name="Receiving_messages_from_the_server">サーバーからのメッセージの受信</h2>
+
+<p>WebSockets はイベント駆動型 API です。メッセージを受信すると、 <code>message</code> イベント <code>WebSocket</code> オブジェクトに送信されます。これを処理するには、 <code>message</code> イベントのイベントリスナーを追加するか、 <a href="/ja/docs/Web/API/WebSocket/onmessage"><code>onmessage</code></a> イベントハンドラーを使用するかします。受信データの待ち受けを開始するには、次のようにします。</p>
+
+<pre class="brush: js">exampleSocket.onmessage = function (event) {
+  console.log(event.data);
+}
+</pre>
+
+<h3 id="Receiving_and_interpreting_JSON_objects" name="Receiving_and_interpreting_JSON_objects">JSON オブジェクトの受信と解釈</h3>
+
+<p>まず<a href="#Using_JSON_to_transmit_objects">JSON を使用したオブジェクトの送信</a>で述べられているチャットクライアントアプリケーションを考えてみましょう。クライアントが受信するデータパケットの種類は次のとおりです。</p>
+
+<ul>
+ <li>ログインハンドシェイク</li>
+ <li>メッセージテキスト</li>
+ <li>ユーザーリストの更新</li>
+</ul>
+
+<p>これらの受信メッセージを解釈するコードは、次のようになります。</p>
+
+<pre class="brush: js">exampleSocket.onmessage = function(event) {
+  var f = document.getElementById(&quot;chatbox&quot;).contentDocument;
+  var text = &quot;&quot;;
+  var msg = JSON.parse(event.data);
+  var time = new Date(msg.date);
+  var timeStr = time.toLocaleTimeString();
+
+  switch(msg.type) {
+    case &quot;id&quot;:
+      clientID = msg.id;
+      setUsername();
+      break;
+    case &quot;username&quot;:
+      text = &quot;&lt;b&gt;User &lt;em&gt;&quot; + msg.name + &quot;&lt;/em&gt; signed in at &quot; + timeStr + &quot;&lt;/b&gt;&lt;br&gt;&quot;;
+      break;
+    case &quot;message&quot;:
+      text = &quot;(&quot; + timeStr + &quot;) &lt;b&gt;&quot; + msg.name + &quot;&lt;/b&gt;: &quot; + msg.text + &quot;&lt;br&gt;&quot;;
+      break;
+    case &quot;rejectusername&quot;:
+      text = &quot;&lt;b&gt;Your username has been set to &lt;em&gt;&quot; + msg.name + &quot;&lt;/em&gt; because the name you chose is in use.&lt;/b&gt;&lt;br&gt;&quot;
+      break;
+    case &quot;userlist&quot;:
+      var ul = &quot;&quot;;
+      for (i=0; i &lt; msg.users.length; i++) {
+        ul += msg.users[i] + &quot;&lt;br&gt;&quot;;
+      }
+      document.getElementById(&quot;userlistbox&quot;).innerHTML = ul;
+      break;
+  }
+
+  if (text.length) {
+    f.write(text);
+    document.getElementById(&quot;chatbox&quot;).contentWindow.scrollByPages(1);
+  }
+};
+</pre>
+
+<p>ここで <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"><code>JSON.parse()</code></a> を使用して JSON オブジェクトを元のオブジェクトに変換し、その内容を調べて処理します。</p>
+
+<h3 id="Text_data_format" name="Text_data_format">テキストデータ形式</h3>
+
+<p>WebSocket 接続を介して受信されるテキストは、 UTF-8 形式です。</p>
+
+<h2 id="Closing_the_connection" name="Closing_the_connection">接続を閉じる</h2>
+
+<p>WebSocket 接続の使用を終了したら、 WebSocket のメソッド <a href="/ja/docs/Web/API/WebSocket/close"><code>close()</code></a> を呼び出します。</p>
+
+<pre class="brush: js">exampleSocket.close();
+</pre>
+
+<p>接続を閉じようとする前に、ソケットの <a href="/ja/docs/Web/API/WebSocket/bufferedAmount"><code>bufferedAmount</code></a> 属性を確認して、データがネットワーク上でまだ送信されていないかどうかを判断すると有用かもしれません。この値が 0 ではない場合、まだ待ち状態のデータがあるので、接続を閉じる前に待ったほうが良いかもしれません。</p>
+
+<h2 id="Security_considerations" name="Security_considerations">セキュリティの考慮事項</h2>
+
+<p>混合コンテンツ環境では WebSocket を使用しないでください。つまり、 HTTPS を使用もしくはそうでない方法でもロードされたページから、セキュアでない WebSocket 接続を開くべきではありません。最近のブラウザーは安全な WebSocket 接続のみを許可し、また安全ではないコンテキストでの使用には対応しなくなってきています。</p>

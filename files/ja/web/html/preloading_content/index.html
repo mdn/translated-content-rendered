@@ -1,0 +1,245 @@
+---
+title: rel="preload" によるコンテンツの先読み
+slug: Web/HTML/Preloading_content
+tags:
+  - Guide
+  - HTML
+  - JavaScript
+  - Link
+  - Media
+  - Performance
+  - Web Performance
+  - as
+  - preload
+  - rel
+translation_of: Web/HTML/Preloading_content
+---
+<p class="summary"><a href="/ja/docs/Web/HTML/Element/link" title="HTML 外部リソースへのリンク要素 (&lt;link&gt;) は、現在の文書と外部のリソースとの関係を指定します。この要素はスタイルシートへのリンクに最もよく使用されますが、サイトのアイコン (&quot;favicon&quot; スタイルのアイコンと、モバイル端末のホーム画面やアプリのアイコンの両方) の確立や、その他のことにも使用されます。"><code>&lt;link&gt;</code></a> 要素の <code><a href="/ja/docs/Web/HTML/Element/link#attr-rel">rel</a></code> 属性で <code>preload</code> を指定すると、 HTML の <a href="/ja/docs/Web/HTML/Element/head" title="HTML の &lt;head&gt; 要素は、文書に関する機械可読な情報 (メタデータ)、たとえば題名、スクリプト、スタイルシートなどを含みます。"><code>&lt;head&gt;</code></a> 要素内で読み込みリクエストを宣言し、ページのライフサイクルの早期の、ブラウザーの主なレンダリング機構が起動する前に読み込みを始めたい、すぐに必要なリソースを指定することができます。これにより、そのリソースがより早く利用でき、ページのレンダリングがブロックされにくくなり、性能が向上します。</p>
+
+<p class="summary">この記事では <code>&lt;link rel=&quot;preload&quot;&gt;</code> がどのように動作するのかについての基本的なガイドを提供します。</p>
+
+<h2 id="The_basics" name="The_basics">基本概念</h2>
+
+<p>多くの場合は以下のように、 <code>&lt;link&gt;</code> を使用して CSS ファイルを読み込み、ページにスタイルを適用します。</p>
+
+<pre class="brush: html notranslate">&lt;link rel=&quot;stylesheet&quot; href=&quot;styles/main.css&quot;&gt;</pre>
+
+<p>しかしここで、 <code>rel</code> の値に <code>preload</code> を使用すると、 <code>&lt;link&gt;</code> 要素は利用したいあらゆるリソースの先読み指示になります。以下のものも指定する必要があります。</p>
+
+<ul>
+ <li>リソースへのパスを <code><a href="/ja/docs/Web/HTML/Element/link#attr-href">href</a></code> 属性へ。</li>
+ <li>リソースの種類を <code><a href="/ja/docs/Web/HTML/Element/link#attr-as">as</a></code> 属性へ。</li>
+</ul>
+
+<p>簡単な例は以下のようになります (<a href="https://github.com/mdn/html-examples/tree/master/link-rel-preload/js-and-css">JS と CSS のサンプルコード</a> および <a href="https://mdn.github.io/html-examples/link-rel-preload/js-and-css/">デモ</a>) も参照してください)。</p>
+
+<pre class="brush: html notranslate">&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;title&gt;JS and CSS preload example&lt;/title&gt;
+
+  &lt;link rel=&quot;preload&quot; href=&quot;style.css&quot; as=&quot;style&quot;&gt;
+  &lt;link rel=&quot;preload&quot; href=&quot;main.js&quot; as=&quot;script&quot;&gt;
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot;&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;h1&gt;bouncing balls&lt;/h1&gt;
+  &lt;canvas&gt;&lt;/canvas&gt;
+
+  &lt;script src=&quot;main.js&quot; defer&gt;&lt;/script&gt;
+&lt;/body&gt;</pre>
+
+<p>ここで CSS ファイルと JavaScript ファイルを先読みするので、その後のページのレンダリングで必要な時には、すぐに利用できるようになります。ブラウザーはおそらく、 <code>&lt;link rel=&quot;stylesheet&quot;&gt;</code> と <code>&lt;script&gt;</code> 要素を HTML 内の同じチャンクで見つけるので、この例は極端ですが、後に現れるリソースであるほど、また大きいリソースであるほど効果が見られる可能性があります。例えば以下の場合です。</p>
+
+<ul>
+ <li>フォントや画像など、 CSS の中から指しているリソース</li>
+ <li>JSON やインポートされたスクリプト、ウェブワーカーなどの JavaScript がリクエストする可能性があるリソース</li>
+ <li>より大きな画像や動画ファイル。</li>
+</ul>
+
+<p><code>preload</code> には他の利点もあります。 <code>as</code> によって先読みされるコンテンツの種類をブラウザーに指示することで、以下のようなことが実現できます。</p>
+
+<ul>
+ <li>リソースの読み込みの優先付けがより正確にできます。</li>
+ <li>可能であれば、将来のリクエストのためにキャッシュに格納してリソースを再利用します。</li>
+ <li>リソースに対して正しく<a href="/ja/docs/Web/HTTP/CSP">コンテンツセキュリティポリシー</a>を適用できます。</li>
+ <li>正しい <a href="/ja/docs/Web/HTTP/Headers/Accept" title="HTTP の Accept リクエストヘッダーは、クライアントが理解できるコンテンツタイプを MIME タイプで伝えます。 コンテンツネゴシエーションを使用して、サーバーは提案のうちの一つを選択し、それを使用してクライアントに Content-Type レスポンスヘッダーで選択を伝えます。ブラウザーはリクエストを行う場面に応じて適切な値をこのヘッダーに設定します。 CSS スタイルシートを取得するときは、画像、動画、スクリプトを取得するときとは異なる値をリクエストで設定します。"><code>Accept</code></a> リクエストヘッダーを設定できます。</li>
+</ul>
+
+<h3 id="What_types_of_content_can_be_preloaded" name="What_types_of_content_can_be_preloaded">先読みできるコンテンツの種類</h3>
+
+<p>さまざまな種類のコンテンツが先読みできます。 <code>as</code> 属性で使用できる値は以下の通りです。</p>
+
+<ul>
+ <li><code>audio</code>: 通常は <a href="/ja/docs/Web/HTML/Element/audio" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>&lt;audio&gt;</code></a> で使用される音声ファイル。</li>
+ <li><code>document</code>: <a href="/ja/docs/Web/HTML/Element/frame" title="&lt;frame&gt; は、別の HTML 文書を表示できる個々の領域を定義する HTML 要素です。 frame 要素は &lt;frameset&gt; の内部で使用します。"><code>&lt;frame&gt;</code></a> や <a href="/ja/docs/Web/HTML/Element/iframe" title="HTML のインラインフレーム要素 (&lt;iframe&gt;) は、入れ子になった閲覧コンテキストを表現し、現在の HTML ページに他のページを埋め込むことができます。"><code>&lt;iframe&gt;</code></a> に埋め込まれる HTML 文書。</li>
+ <li><code>embed</code>: <a href="/ja/docs/Web/HTML/Element/embed" title="HTML の &lt;embed&gt; 要素は、外部のコンテンツを文書中の指定された場所に埋め込みます。コンテンツは外部アプリケーションや、対話型コンテンツの他の出所 (ブラウザーのプラグインなど) によって提供されます。"><code>&lt;embed&gt;</code></a> 要素の中に埋め込まれるリソース。</li>
+ <li><code>fetch</code>: ArrayBuffer や JSON ファイルのような、フェッチまたは XHR 要求でアクセスされるリソース。</li>
+ <li><code>font</code>: フォントファイル。</li>
+ <li><code>image</code>: 画像ファイル。</li>
+ <li><code>object</code>: <a href="/ja/docs/Web/HTML/Element/object" title="HTML の &lt;object&gt; 要素は、画像、内部の閲覧コンテキスト、プラグインによって扱われるリソースなどのように扱われる外部リソースを表現します。"><code>&lt;object&gt;</code></a> 要素の中に埋め込まれるリソース。</li>
+ <li><code>script</code>: JavaScript ファイル。</li>
+ <li><code>style</code>: CSS スタイルシート。</li>
+ <li><code>track</code>: WebVTT ファイル。</li>
+ <li><code>worker</code>: JavaScript ウェブワーカーまたは共有ワーカー。</li>
+ <li><code>video</code>: 通常は <a href="/ja/docs/Web/HTML/Element/video" title="HTML の映像要素 (&lt;video&gt;) は、文書中に映像再生に対応するメディアプレイヤーを埋め込みます。 &lt;video&gt; を音声コンテンツのために使用することもできますが、 &lt;audio&gt; 要素の方がユーザーに取って使い勝手が良いかもしれません。"><code>&lt;video&gt;</code></a> で使用される動画ファイル。</li>
+</ul>
+
+<div class="note">
+<p><strong>メモ</strong>: 使用されると予想されるこれらの値やウェブ機能について、もっと詳細は Preload の仕様書にあります。 — <a href="https://w3c.github.io/preload/#link-element-extensions">link element extensions</a> を参照してください。また、フェッチの仕様書で管理されている <code>as</code> 属性の値の完全な一覧は、 <a href="https://fetch.spec.whatwg.org/#concept-request-destination">request destinations</a> を参照してください。</p>
+</div>
+
+<h2 id="Including_a_MIME_type" name="Including_a_MIME_type">MIME タイプを含める</h2>
+
+<p><code>&lt;link&gt;</code> 要素は <code><a href="/ja/docs/Web/HTML/Element/link#attr-type">type</a></code> 要素を受け付け、要素が指す先のリソースの MIME タイプを指定することができます。これは特にリソースの先読み時に便利です。 — ブラウザーは <code>type</code> 属性の値を使用して対応しているリソースであるかどうかを確認し、その場合だけダウンロードを開始し、そうでない場合は開始しないようにすることができます。</p>
+
+<p>この例を動画のデモで見ることができます (<a href="https://github.com/mdn/html-examples/tree/master/link-rel-preload/video">ソースコード全体</a>と<a href="https://mdn.github.io/html-examples/link-rel-preload/video/">デモ版</a>もご覧ください。)。</p>
+
+<pre class="brush: html notranslate">&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;title&gt;Video preload example&lt;/title&gt;
+
+  &lt;link rel=&quot;preload&quot; href=&quot;sintel-short.mp4&quot; as=&quot;video&quot; type=&quot;video/mp4&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;video controls&gt;
+    &lt;source src=&quot;sintel-short.mp4&quot; type=&quot;video/mp4&quot;&gt;
+    &lt;source src=&quot;sintel-short.webm&quot; type=&quot;video/webm&quot;&gt;
+    &lt;p&gt;Your browser doesn&apos;t support HTML5 video. Here is a &lt;a href=&quot;sintel-short.mp4&quot;&gt;link to the video&lt;/a&gt; instead.&lt;/p&gt;
+  &lt;/video&gt;
+&lt;/body&gt;</pre>
+
+<p>この場合、MP4 をサポートしているブラウザーは MP4 を先読みして使用し、ユーザーにとって動画プレイヤーをよりスムーズまたはレスポンシブにできるでしょう。ブラウザーが MP4 をサポートしていない場合は WebM バージョンを読み込みますが、先読みの利点は得られません。これは、どのように先読みコンテンツがプログレッシブエンハンスメントの哲学と結ばれているかを示しています。</p>
+
+<h2 id="Cross-origin_fetches" name="Cross-origin_fetches">オリジンをまたいだフェッチ</h2>
+
+<p>If you&apos;ve got your sites&apos; <a href="/en-US/docs/Web/HTTP/Access_control_CORS">CORS</a> settings worked out properly, you can successfully preload cross-origin resources as long as you set a <code><a href="/ja/docs/Web/HTML/Element/link#attr-crossorigin">crossorigin</a></code> attribute on your <code>&lt;link&gt;</code> element.</p>
+
+<p>One interesting case where this applies, even if the fetch is not cross-origin, is font files. Because of various reasons, these have to be fetched using anonymous mode CORS (see <a href="https://drafts.csswg.org/css-fonts/#font-fetching-requirements">Font fetching requirements</a>).</p>
+
+<p>Let&apos;s use this case as an example. You can see the full <a href="https://github.com/mdn/html-examples/tree/master/link-rel-preload/fonts">example source code on GitHub</a> (<a href="https://mdn.github.io/html-examples/link-rel-preload/fonts/">also see it live</a>):</p>
+
+<pre class="brush: html notranslate">&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;title&gt;Web font example&lt;/title&gt;
+
+  &lt;link rel=&quot;preload&quot; href=&quot;fonts/cicle_fina-webfont.woff2&quot; as=&quot;font&quot; type=&quot;font/woff2&quot; crossorigin&gt;
+  &lt;link rel=&quot;preload&quot; href=&quot;fonts/zantroke-webfont.woff2&quot; as=&quot;font&quot; type=&quot;font/woff2&quot; crossorigin&gt;
+
+  &lt;link href=&quot;style.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  …
+&lt;/body&gt;</pre>
+
+<p>Not only are we providing the MIME type hints in the <code>type</code> attributes, but we are also providing the <code>crossorigin</code> attribute to handle the CORS issue.</p>
+
+<h2 id="Including_media" name="Including_media">media を含める</h2>
+
+<p>One nice feature of <code>&lt;link&gt;</code> elements is their ability to accept <code><a href="/ja/docs/Web/HTML/Element/link#attr-media">media</a></code> attributes. These can accept <a href="/en-US/docs/Web/CSS/@media#Media_types">media types</a> or full-blown <a href="/en-US/docs/Web/CSS/Media_Queries/Using_media_queries">media queries</a>, allowing you to do responsive preloading!</p>
+
+<p>Let&apos;s look at an example (see it on GitHub — <a href="https://github.com/mdn/html-examples/tree/master/link-rel-preload/media">source code</a>, <a href="https://mdn.github.io/html-examples/link-rel-preload/media/">live example</a>):</p>
+
+<pre class="brush: html notranslate">&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;title&gt;Responsive preload example&lt;/title&gt;
+
+  &lt;link rel=&quot;preload&quot; href=&quot;bg-image-narrow.png&quot; as=&quot;image&quot; media=&quot;(max-width: 600px)&quot;&gt;
+  &lt;link rel=&quot;preload&quot; href=&quot;bg-image-wide.png&quot; as=&quot;image&quot; media=&quot;(min-width: 601px)&quot;&gt;
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;main.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;My site&lt;/h1&gt;
+  &lt;/header&gt;
+
+  &lt;script&gt;
+    var mediaQueryList = window.matchMedia(&quot;(max-width: 600px)&quot;);
+    var header = document.querySelector(&apos;header&apos;);
+
+    if (mediaQueryList.matches) {
+      header.style.backgroundImage = &apos;url(bg-image-narrow.png)&apos;;
+    } else {
+      header.style.backgroundImage = &apos;url(bg-image-wide.png)&apos;;
+    }
+  &lt;/script&gt;
+&lt;/body&gt;</pre>
+
+<p>We include <code>media</code> attributes on our <code>&lt;link&gt;</code> elements so that a narrow image is preloaded if the user has a narrow viewport, and a wider image is loaded if they have a wide viewport. We use <a href="/ja/docs/Web/API/Window/matchMedia"><code>Window.matchMedia</code></a> / <a href="/ja/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> to do this (see <a href="/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries">Testing media queries</a> for more).</p>
+
+<p>This makes it much more likely that the font will be available for the page render, cutting down on FOUT (flash of unstyled text).</p>
+
+<p>This doesn&apos;t have to be limited to images, or even files of the same type — think big! You could perhaps preload and display a simple SVG diagram if the user is on a narrow screen where bandwidth and CPU is potentially more limited, or preload a complex chunk of JavaScript then use it to render an interactive 3D model if the user&apos;s resources are more plentiful.</p>
+
+<h2 id="Scripting_and_preloads" name="Scripting_and_preloads">スクリプトと先読み</h2>
+
+<p>これらのプリロードに関するもう一つの良い点として、スクリプトを使って実行できることが挙げられます。例えば、ここでは <a href="/ja/docs/Web/API/HTMLLinkElement"><code>HTMLLinkElement</code></a> インスタンスを作成し、それを DOM に適用させています。</p>
+
+<pre class="brush: js notranslate"><code class="language-javascript"><span class="keyword token">var</span> preloadLink <span class="operator token">=</span> document<span class="punctuation token">.</span><span class="function token">createElement</span><span class="punctuation token">(</span><span class="string token">&quot;link&quot;</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+preloadLink<span class="punctuation token">.</span>href <span class="operator token">=</span> <span class="string token">&quot;myscript.js&quot;</span><span class="punctuation token">;</span>
+preloadLink<span class="punctuation token">.</span>rel <span class="operator token">=</span> <span class="string token">&quot;preload&quot;</span><span class="punctuation token">;</span>
+preloadLink<span class="punctuation token">.</span><span class="keyword token">as</span> <span class="operator token">=</span> <span class="string token">&quot;script&quot;</span><span class="punctuation token">;</span>
+document<span class="punctuation token">.</span>head<span class="punctuation token">.</span><span class="function token">appendChild</span><span class="punctuation token">(</span>preloadLink<span class="punctuation token">)</span><span class="punctuation token">;</span></code>
+</pre>
+
+<p>これは、ブラウザは <code>myscript.js</code> ファイルをプリロードしますが、実際はまだ使用されていません。これを使用するには、以下のようにします。</p>
+
+<pre class="brush: js notranslate"><code class="language-javascript"><span class="keyword token">var</span> preloadedScript <span class="operator token">=</span> document<span class="punctuation token">.</span><span class="function token">createElement</span><span class="punctuation token">(</span><span class="string token">&quot;script&quot;</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+preloadedScript<span class="punctuation token">.</span>src <span class="operator token">=</span> <span class="string token">&quot;myscript.js&quot;</span><span class="punctuation token">;</span>
+document<span class="punctuation token">.</span>body<span class="punctuation token">.</span><span class="function token">appendChild</span><span class="punctuation token">(</span>preloadedScript<span class="punctuation token">)</span><span class="punctuation token">;</span>
+</code></pre>
+
+<p>これは、スクリプトをプリロードしたいが、必要なときまで実行を延期する場合に便利です。</p>
+
+<h2 id="Other_resource_preloading_mechanisms" name="Other_resource_preloading_mechanisms">他のリソースの先読み機構</h2>
+
+<p>Other preloading features exist, but none are quite as fit for purpose as <code>&lt;link rel=&quot;preload&quot;&gt;</code>:</p>
+
+<ul>
+ <li><code>&lt;link rel=&quot;prefetch&quot;&gt;</code> has been supported in browsers for a long time, but it is intended for prefetching resources that will be used in the <strong><em>next</em></strong> navigation/page load (e.g. when you go to the next page). This is fine, but isn&apos;t useful for the current page! In addition, browsers will give <code>prefetch</code> resources a lower priority than <code>preload</code> ones — the current page is more important than the next. See <a href="/en-US/docs/Web/HTTP/Link_prefetching_FAQ">Link prefetching FAQ</a> for more details.</li>
+ <li><code>&lt;link rel=&quot;prerender&quot;&gt;</code> renders a specified webpage in the background, speeding up its load if the user navigates to it. Because of the potential to waste users bandwidth, Chrome treats <code>prerender</code> as a <a href="https://developers.google.com/web/updates/2018/07/nostate-prefetch">NoState prefetch</a> instead.</li>
+ <li><code>&lt;link rel=&quot;subresource&quot;&gt;</code> <span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span> was supported in Chrome a while ago, and was intended to tackle the same issue as <code>preload</code>, but it had a problem: there was no way to work out a priority for the items (<code>as</code> didn&apos;t exist back then), so they all got fetched with fairly low priority.</li>
+ <li>There are a number of script-based resource loaders out there, but they don&apos;t have any power over the browser&apos;s fetch prioritization queue, and are subject to much the same performance problems.</li>
+</ul>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+   <th scope="col">備考</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/preload/#x2.link-type-preload" hreflang="en" lang="en">Preload<br><small lang="ja">preload の定義</small></a></td>
+   <td><span class="spec-CR">勧告候補</span></td>
+   <td><code>preload</code> の詳細</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/#link-type-preload" hreflang="en" lang="en">HTML Living Standard<br><small lang="ja">rel=preload の定義</small></a></td>
+   <td><span class="spec-Living">現行の標準</span></td>
+   <td><code>preload</code> の定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの対応</h2>
+
+<p class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</p>
+
+<div class="bc-data" id="bcd:html.elements.link.rel.preload"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="https://www.smashingmagazine.com/2016/02/preload-what-is-it-good-for/">Preload: What Is It Good For?</a> by Yoav Weiss</li>
+</ul>
+
+<section class="Quick_links" id="Quick_Links">
+<ol><li><a href="/ja/docs/Web/HTML/Applying_color">CSS を使った HTML の要素への色の適用</a></li><li><a href="/ja/docs/Web/HTML/Forms_in_HTML">Forms in HTML5</a></li><li><a href="/ja/docs/Web/HTML/DASH_Adaptive_Streaming_for_HTML_5_Video">HTML 5 ビデオ用の DASH アダプティブストリーミング</a></li><li><a href="/ja/docs/Web/HTML/HTML_Extensions">HTML Extensions</a></li><li><a href="/ja/docs/Web/HTML/Date_and_time_formats">HTML で使われる日付や時刻の形式</a></li><li><a href="/ja/docs/Web/HTML/Index">HTML ドキュメントの索引</a></li><li><a href="/ja/docs/Web/HTML/Reference">HTML リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Attributes">HTML 属性リファレンス</a><ol><li><a href="/ja/docs/Web/HTML/Attributes">HTML 属性リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Attributes/step">HTML attribute: step</a></li><li><a href="/ja/docs/Web/HTML/Attributes/crossorigin">HTML crossorigin 属性</a></li><li><a href="/ja/docs/Web/HTML/Attributes/autocomplete">HTML の autocomplete 属性</a></li><li><a href="/ja/docs/Web/HTML/Attributes/max">HTML 属性: max</a></li><li><a href="/ja/docs/Web/HTML/Attributes/maxlength">HTML 属性: maxlength</a></li><li><a href="/ja/docs/Web/HTML/Attributes/min">HTML 属性: min</a></li><li><a href="/ja/docs/Web/HTML/Attributes/minlength">HTML 属性: minlength</a></li><li><a href="/ja/docs/Web/HTML/Attributes/multiple">HTML 属性: multiple</a></li><li><a href="/ja/docs/Web/HTML/Attributes/required">HTML 属性: required</a></li><li><a href="/ja/docs/Web/HTML/Attributes/size">HTML 属性: size</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Element">HTML 要素リファレンス</a><ol><li><a href="/ja/docs/Web/HTML/Element">HTML 要素リファレンス</a></li><li><a href="/ja/docs/Web/HTML/Element/a">&lt;a&gt;: アンカー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/abbr">&lt;abbr&gt;: 略語要素</a></li><li><a href="/ja/docs/Web/HTML/Element/acronym">&lt;acronym&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/address">&lt;address&gt;: 連絡先要素</a></li><li><a href="/ja/docs/Web/HTML/Element/applet">&lt;applet&gt;: 埋め込み Java アプレット要素</a></li><li><a href="/ja/docs/Web/HTML/Element/area">&lt;area&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/article">&lt;article&gt;: 記事コンテンツ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/aside">&lt;aside&gt;: 余談要素</a></li><li><a href="/ja/docs/Web/HTML/Element/audio">&lt;audio&gt;: 埋め込み音声要素</a></li><li><a href="/ja/docs/Web/HTML/Element/b">&lt;b&gt;: 注目付け要素</a></li><li><a href="/ja/docs/Web/HTML/Element/base">&lt;base&gt;: 文書の基底 URL 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/basefont">&lt;basefont&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/bdi">&lt;bdi&gt;: 書字方向分離要素</a></li><li><a href="/ja/docs/Web/HTML/Element/bdo">&lt;bdo&gt;: 双方向文字列上書き要素</a></li><li><a href="/ja/docs/Web/HTML/Element/bgsound">&lt;bgsound&gt;: 背景音の要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/big">&lt;big&gt;: 大きめの文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/blink">&lt;blink&gt;: 点滅文字列要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/blockquote">&lt;blockquote&gt;: ブロック引用要素</a></li><li><a href="/ja/docs/Web/HTML/Element/body">&lt;body&gt;: 文書の本文要素</a></li><li><a href="/ja/docs/Web/HTML/Element/br">&lt;br&gt;: 改行要素</a></li><li><a href="/ja/docs/Web/HTML/Element/button">&lt;button&gt;: ボタン要素</a></li><li><a href="/ja/docs/Web/HTML/Element/canvas">&lt;canvas&gt;: グラフィックキャンバス要素</a></li><li><a href="/ja/docs/Web/HTML/Element/caption">&lt;caption&gt;: 表キャプション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/center">&lt;center&gt;: 文字列の中央揃え要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/cite">&lt;cite&gt;: 引用元要素</a></li><li><a href="/ja/docs/Web/HTML/Element/code">&lt;code&gt;: 行内コード要素</a></li><li><a href="/ja/docs/Web/HTML/Element/col">&lt;col&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/colgroup">&lt;colgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/command">&lt;command&gt;: HTML コマンド要素</a></li><li><a href="/ja/docs/Web/HTML/Element/content">&lt;content&gt;: シャドウ DOM のコンテンツのプレイスホルダー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/data">&lt;data&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/datalist">&lt;datalist&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/dd">&lt;dd&gt;: 詳細説明要素</a></li><li><a href="/ja/docs/Web/HTML/Element/del">&lt;del&gt;: 削除文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/details">&lt;details&gt;: 詳細折りたたみ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dfn">&lt;dfn&gt;: 定義要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dialog">&lt;dialog&gt;: ダイアログ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dir">&lt;dir&gt;: ディレクトリ要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/div">&lt;div&gt;: コンテンツ分割要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dl">&lt;dl&gt;: 説明リスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/dt">&lt;dt&gt;: 説明用語要素</a></li><li><a href="/ja/docs/Web/HTML/Element/element">&lt;element&gt;: カスタム要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/em">&lt;em&gt;: 強調要素</a></li><li><a href="/ja/docs/Web/HTML/Element/embed">&lt;embed&gt;: 埋め込み外部コンテンツ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/fieldset">&lt;fieldset&gt;: フィールドセット要素</a></li><li><a href="/ja/docs/Web/HTML/Element/figcaption">&lt;figcaption&gt;: 図キャプション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/figure">&lt;figure&gt;: 任意のキャプション付きの図要素</a></li><li><a href="/ja/docs/Web/HTML/Element/font">&lt;font&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/footer">&lt;footer&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/form">&lt;form&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/frame">&lt;frame&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/frameset">&lt;frameset&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/Heading_Elements">&lt;h1&gt;–&lt;h6&gt;: HTML の見出し要素</a></li><li><a href="/ja/docs/Web/HTML/Element/head">&lt;head&gt;: 文書メタデータ (ヘッダー) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/header">&lt;header&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/hgroup">&lt;hgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/hr">&lt;hr&gt;: 主題分割 (水平線) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/html">&lt;html&gt;: HTML 文書 / ルート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/i">&lt;i&gt;: 興味深いテキスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/iframe">&lt;iframe&gt;: インラインフレーム要素</a></li><li><a href="/ja/docs/Web/HTML/Element/image">&lt;image&gt;: 廃止された画像要素</a></li><li><a href="/ja/docs/Web/HTML/Element/Img">&lt;img&gt;: 画像埋め込み要素</a></li><li><a href="/ja/docs/Web/HTML/Element/input">&lt;input&gt;: 入力欄 (フォーム入力) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ins">&lt;ins&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/isindex">&lt;isindex&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/kbd">&lt;kbd&gt;: キーボード入力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/keygen">&lt;keygen&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/label">&lt;label&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/legend">&lt;legend&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/li">&lt;li&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/link">&lt;link&gt;: 外部リソースへのリンク要素</a></li><li><a href="/ja/docs/Web/HTML/Element/listing">&lt;listing&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/main">&lt;main&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/map">&lt;map&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/mark">&lt;mark&gt;: 文字列マーク要素</a></li><li><a href="/ja/docs/Web/HTML/Element/marquee">&lt;marquee&gt;: マーキー要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/menu">&lt;menu&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/menuitem">&lt;menuitem&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/meta">&lt;meta&gt;: 文書レベルメタデータ要素</a></li><li><a href="/ja/docs/Web/HTML/Element/meter">&lt;meter&gt;: HTML メーター要素</a></li><li><a href="/ja/docs/Web/HTML/Element/multicol">&lt;multicol&gt;: HTML 段組みレイアウト要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/nav">&lt;nav&gt;: ナビゲーションセクション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/nobr">&lt;nobr&gt;: 無改行文字列要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/noembed">&lt;noembed&gt;: 埋め込みフォールバック要素（廃止）</a></li><li><a href="/ja/docs/Web/HTML/Element/noframes">&lt;noframes&gt;: フレームフォールバック要素</a></li><li><a href="/ja/docs/Web/HTML/Element/noscript">&lt;noscript&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/object">&lt;object&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/ol">&lt;ol&gt;: 順序付きリスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/optgroup">&lt;optgroup&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/option">&lt;option&gt;: HTML 選択肢要素</a></li><li><a href="/ja/docs/Web/HTML/Element/output">&lt;output&gt;: 出力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/p">&lt;p&gt;: 段落要素</a></li><li><a href="/ja/docs/Web/HTML/Element/param">&lt;param&gt;: オブジェクト引数要素</a></li><li><a href="/ja/docs/Web/HTML/Element/picture">&lt;picture&gt;: 画像要素</a></li><li><a href="/ja/docs/Web/HTML/Element/plaintext">&lt;plaintext&gt;: プレーンテキスト要素 (非推奨)</a></li><li><a href="/ja/docs/Web/HTML/Element/pre">&lt;pre&gt;: 整形済みテキスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/progress">&lt;progress&gt;: 進捗表示要素</a></li><li><a href="/ja/docs/Web/HTML/Element/q">&lt;q&gt;: 行内引用要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rb">&lt;rb&gt;: ルビベース要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rp">&lt;rp&gt;: ルビのフォールバック用括弧要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rt">&lt;rt&gt;: ルビ文字列要素</a></li><li><a href="/ja/docs/Web/HTML/Element/rtc">&lt;rtc&gt;: ルビ文字列コンテナー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ruby">&lt;ruby&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/s">&lt;s&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/samp">&lt;samp&gt;: サンプル出力要素</a></li><li><a href="/ja/docs/Web/HTML/Element/script">&lt;script&gt;: スクリプト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/section">&lt;section&gt;: 汎用セクション要素</a></li><li><a href="/ja/docs/Web/HTML/Element/select">&lt;select&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/Shadow">&lt;shadow&gt;: 廃止されたシャドウルート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/slot">&lt;slot&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/small">&lt;small&gt;: 附随コメント要素</a></li><li><a href="/ja/docs/Web/HTML/Element/source">&lt;source&gt;: メディアまたは画像のソース要素</a></li><li><a href="/ja/docs/Web/HTML/Element/spacer">&lt;spacer&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/span">&lt;span&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/strike">&lt;strike&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/strong">&lt;strong&gt;: 強い重要性要素</a></li><li><a href="/ja/docs/Web/HTML/Element/style">&lt;style&gt;: スタイル情報要素</a></li><li><a href="/ja/docs/Web/HTML/Element/sub">&lt;sub&gt;: 下付き文字要素</a></li><li><a href="/ja/docs/Web/HTML/Element/summary">&lt;summary&gt;: 概要明示要素</a></li><li><a href="/ja/docs/Web/HTML/Element/sup">&lt;sup&gt;: 上付き文字要素</a></li><li><a href="/ja/docs/Web/HTML/Element/table">&lt;table&gt;: 表要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tbody">&lt;tbody&gt;: テーブル本体要素</a></li><li><a href="/ja/docs/Web/HTML/Element/td">&lt;td&gt;: 表データセル要素</a></li><li><a href="/ja/docs/Web/HTML/Element/template">&lt;template&gt;: コンテンツテンプレート要素</a></li><li><a href="/ja/docs/Web/HTML/Element/textarea">&lt;textarea&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/tfoot">&lt;tfoot&gt;: 表フッター要素</a></li><li><a href="/ja/docs/Web/HTML/Element/th">&lt;th&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/thead">&lt;thead&gt;: 表ヘッダー要素</a></li><li><a href="/ja/docs/Web/HTML/Element/time">&lt;time&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/title">&lt;title&gt;: 文書題名要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tr">&lt;tr&gt;: 表の行要素</a></li><li><a href="/ja/docs/Web/HTML/Element/track">&lt;track&gt;: 埋め込みテキストトラック要素</a></li><li><a href="/ja/docs/Web/HTML/Element/tt">&lt;tt&gt;: テレタイプテキスト要素 (廃止)</a></li><li><a href="/ja/docs/Web/HTML/Element/u">&lt;u&gt;: 非言語的注釈 (下線) 要素</a></li><li><a href="/ja/docs/Web/HTML/Element/ul">&lt;ul&gt;: 順序なしリスト要素</a></li><li><a href="/ja/docs/Web/HTML/Element/var">&lt;var&gt;: 変数要素</a></li><li><a href="/ja/docs/Web/HTML/Element/video">&lt;video&gt;: 動画埋め込み要素</a></li><li><a href="/ja/docs/Web/HTML/Element/wbr">&lt;wbr&gt;</a></li><li><a href="/ja/docs/Web/HTML/Element/xmp">&lt;xmp&gt;</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Preloading_content">rel=&quot;preload&quot; によるコンテンツの先読み</a></li><li><a href="/ja/docs/Web/HTML/Using_the_application_cache">アプリケーションキャッシュの使用</a></li><li><a href="/ja/docs/Web/HTML/Inline_elements">インライン要素</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes">グローバル属性</a><ol><li><a href="/ja/docs/Web/HTML/Global_attributes">グローバル属性</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/accesskey">accesskey</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/autocapitalize">autocapitalize</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/class">class</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/contenteditable">contenteditable</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/contextmenu">contextmenu</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/data-*">data-*</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/dir">dir</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/draggable">draggable</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/dropzone">dropzone</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/hidden">hidden</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/id">id</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/inputmode">inputmode</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/is">is</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemid">itemid</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemprop">itemprop</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemref">itemref</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemscope">itemscope</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/itemtype">itemtype</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/lang">lang</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/part">part</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/slot">slot</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/spellcheck">spellcheck</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/style">style</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/tabindex">tabindex</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/title">title</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/translate">translate</a></li><li><a href="/ja/docs/Web/HTML/Global_attributes/x-ms-format-detection">x-ms-format-detection</a></li></ol></li><li><a href="/ja/docs/Web/HTML/Block-level_elements">ブロックレベル要素</a></li><li><a href="/ja/docs/Web/HTML/Microdata">マイクロデータ</a></li><li><a href="/ja/docs/Web/HTML/microformats">マイクロフォーマット</a></li><li><a href="/ja/docs/Web/HTML/Link_types">リンク種別</a></li><li><a href="/ja/docs/Web/HTML/Quirks_Mode_and_Standards_Mode">後方互換モードと標準準拠モード</a></li><li><a href="/ja/docs/Web/HTML/CORS_enabled_image">画像とキャンバスをオリジン間で利用できるようにする</a></li><li><a href="/ja/docs/Web/Guide/HTML/Tips_for_authoring_fast-loading_HTML_pages">読み込みが速い HTML ページを作成するための Tips</a></li></ol>
+</section>

@@ -1,0 +1,282 @@
+---
+title: メディア要素の記録
+slug: Web/API/MediaStream_Recording_API/Recording_a_media_element
+tags:
+  - API
+  - Audio
+  - Example
+  - Guide
+  - Media
+  - Media Recording
+  - MediaStream Recording
+  - Tutorial
+  - Video
+translation_of: Web/API/MediaStream_Recording_API/Recording_a_media_element
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/MediaStream_Recording_API">MediaStream Recording API</a></strong></li><li class="toggle"><details open><summary>ガイド</summary><ol><li><a href="/ja/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Media​Stream Recording API の使用</a></li><li><a href="/ja/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element">メディア要素の記録</a></li></ol></details></li><li class="toggle"><details open><summary>インターフェイス</summary><ol><li><a href="/ja/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a></li><li><a href="/ja/docs/Web/API/MediaRecorderErrorEvent"><code>MediaRecorderErrorEvent</code></a></li><li><a href="/ja/docs/Web/API/BlobEvent"><code>BlobEvent</code></a></li></ol></details></li></ol></section></div>
+
+<p>MediaStream Recording API の使用の記事では、 <a href="/ja/docs/Web/API/MediaDevices/getUserMedia"><code>navigator.mediaDevices.getUserMedia()</code></a> から返されるように、<a href="/ja/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> インターフェイスを使用してハードウェアデバイスによって生成された <a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a> をキャプチャする方法について説明しましたが、記録する <code>MediaStream</code> のソースとして HTML メディア要素（<a href="/ja/docs/Web/HTML/Element/audio" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>&lt;audio&gt;</code></a> または <a href="/ja/docs/Web/HTML/Element/video" title="HTML の映像要素 (&lt;video&gt;) は、文書中に映像再生に対応するメディアプレイヤーを埋め込みます。 &lt;video&gt; を音声コンテンツのために使用することもできますが、 &lt;audio&gt; 要素の方がユーザーに取って使い勝手が良いかもしれません。"><code>&lt;video&gt;</code></a>）も使用できます。 この記事では、それを実現する例を見ていきます。</p>
+
+<div id="Example">
+<h2 id="HTML_content" name="HTML_content">HTML の内容</h2>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;p&gt;Click the &quot;Start&quot; button to begin video recording for a few seconds. You can stop
+   the video by clicking the creatively-named &quot;Stop&quot; button. The &quot;Download&quot;
+   button will download the received data (although it&apos;s in a raw, unwrapped form
+   that isn&apos;t very useful).
+&lt;/p&gt;
+&lt;br&gt;
+</pre>
+</div>
+
+<p>まずは HTML の要点を見てみましょう。 これ以上のものはありませんが、アプリのコア操作の一部ではなく、単なる情報提供です。</p>
+
+<pre class="brush: html notranslate">&lt;div class=&quot;left&quot;&gt;
+  &lt;div id=&quot;startButton&quot; class=&quot;button&quot;&gt;
+    Start
+  &lt;/div&gt;
+  &lt;h2&gt;Preview&lt;/h2&gt;
+  &lt;video id=&quot;preview&quot; width=&quot;160&quot; height=&quot;120&quot; autoplay muted&gt;&lt;/video&gt;
+&lt;/div&gt;
+</pre>
+
+<p>2つの欄で主要なインターフェースを提示します。 左欄には、Start（開始）ボタンと動画プレビューを表示する <a href="/ja/docs/Web/HTML/Element/video" title="HTML の映像要素 (&lt;video&gt;) は、文書中に映像再生に対応するメディアプレイヤーを埋め込みます。 &lt;video&gt; を音声コンテンツのために使用することもできますが、 &lt;audio&gt; 要素の方がユーザーに取って使い勝手が良いかもしれません。"><code>&lt;video&gt;</code></a> 要素があります。 これは、ユーザーのカメラが見ている動画です。 <code><a href="/ja/docs/Web/HTML/Element/video#attr-autoplay">autoplay</a></code> 属性は、カメラからストリームが到着したらすぐに表示するために使用し、<code><a href="/ja/docs/Web/HTML/Element/video#attr-muted">muted</a></code> 属性は、ユーザーのマイクからの音声をスピーカーに出力しないように使用していることに注意してください。 出力すると醜いフィードバックループ（ハウリング）を引き起こします。</p>
+
+<pre class="brush: html notranslate">&lt;div class=&quot;right&quot;&gt;
+  &lt;div id=&quot;stopButton&quot; class=&quot;button&quot;&gt;
+    Stop
+  &lt;/div&gt;
+  &lt;h2&gt;Recording&lt;/h2&gt;
+  &lt;video id=&quot;recording&quot; width=&quot;160&quot; height=&quot;120&quot; controls&gt;&lt;/video&gt;
+  &lt;a id=&quot;downloadButton&quot; class=&quot;button&quot;&gt;
+    Download
+  &lt;/a&gt;
+&lt;/div&gt;
+</pre>
+
+<p>右欄には、Stop（停止）ボタンと録画された動画の再生に使用する <code>&lt;video&gt;</code> 要素があります。 再生パネルには <code>autoplay</code> を設定せずに（メディアが到着しても再生が開始されない）、<code><a href="/ja/docs/Web/HTML/Element/video#attr-controls">controls</a></code> を設定して、再生や一時停止などのユーザーコントロールを表示するように指示しています。</p>
+
+<p>再生要素の下には、録画した動画をダウンロードするためのボタンがあります。</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;div class=&quot;bottom&quot;&gt;
+  &lt;pre id=&quot;log&quot;&gt;&lt;/pre&gt;
+&lt;/div&gt;</pre>
+<strong>CSS content</strong>
+
+<pre class="brush: css notranslate">body {
+  font: 14px &quot;Open Sans&quot;, &quot;Arial&quot;, sans-serif;
+}
+
+video {
+  margin-top: 2px;
+  border: 1px solid black;
+}
+
+.button {
+  cursor: pointer;
+  display: block;
+  width: 160px;
+  border: 1px solid black;
+  font-size: 16px;
+  text-align: center;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  color: white;
+  background-color: darkgreen;
+  text-decoration: none;
+}
+
+h2 {
+  margin-bottom: 4px;
+}
+
+.left {
+  margin-right: 10px;
+  float: left;
+  width: 160px;
+  padding: 0px;
+}
+
+.right {
+  margin-left: 10px;
+  float: left;
+  width: 160px;
+  padding: 0px;
+}
+
+.bottom {
+  clear: both;
+  padding-top: 10px;
+}</pre>
+</div>
+
+<h2 id="JavaScript_content" name="JavaScript_content">JavaScript の内容</h2>
+
+<p>それでは、JavaScript コードを見てみましょう。 結局のところ、これがアクションの大部分が起こるところです！</p>
+
+<h3 id="Setting_up_global_variables" name="Setting_up_global_variables">グローバル変数の設定</h3>
+
+<p>必要なグローバル変数をいくつか設定することから始めます。</p>
+
+<pre class="brush: js notranslate">let preview = document.getElementById(&quot;preview&quot;);
+let recording = document.getElementById(&quot;recording&quot;);
+let startButton = document.getElementById(&quot;startButton&quot;);
+let stopButton = document.getElementById(&quot;stopButton&quot;);
+let downloadButton = document.getElementById(&quot;downloadButton&quot;);
+let logElement = document.getElementById(&quot;log&quot;);
+
+let recordingTimeMS = 5000;
+</pre>
+
+<p>これらのほとんどは、私たちが取り組む必要がある要素への参照です。 最後の <code>recordingTimeMS</code> は 5000 ミリ秒（5秒）に設定されています。 これは、録画する動画の長さを指定します。</p>
+
+<h3 id="Utility_functions" name="Utility_functions">ユーティリティ関数</h3>
+
+<p>次に、後で使用するユーティリティ関数をいくつか作成します。</p>
+
+<pre class="brush: js notranslate">function log(msg) {
+  logElement.innerHTML += msg + &quot;\n&quot;;
+}
+</pre>
+
+<p><code>log()</code> 関数は、ユーザーと情報を共有できるように、テキスト文字列を <a href="/ja/docs/Web/HTML/Element/div" title="HTML の コンテンツ分割要素 (&lt;div&gt;) は、フローコンテンツの汎用コンテナーです。 CSS を用いてスタイル付けがされるまでは、コンテンツやレイアウトには影響を与えません。"><code>&lt;div&gt;</code></a> に出力するために使用します。 それほどきれいではありませんが、この仕事は私たちの目的のために行われます。</p>
+
+<pre class="brush: js notranslate">function wait(delayInMS) {
+  return new Promise(resolve =&gt; setTimeout(resolve, delayInMS));
+}
+</pre>
+
+<p><code>wait()</code> 関数は、指定したミリ秒数が経過すると解決する新しい <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> を返します。 タイムアウトハンドラ関数として promise の解決ハンドラを指定して、<a href="/ja/docs/Web/API/Window/setTimeout"><code>window.setTimeout()</code></a> を呼び出す<a href="/ja/docs/Web/JavaScript/Reference/Functions/Arrow_functions">アロー関数</a>を使用して動作します。 これにより、タイムアウトを使用するときに promise 構文を使用できます。 これは、後で説明するように、promise を連鎖させるときに非常に便利です。</p>
+
+<h3 id="Starting_media_recording" name="Starting_media_recording">メディア録画の開始</h3>
+
+<p><code>startRecording()</code> 関数は録画プロセスの開始を処理します。</p>
+
+<pre class="brush: js notranslate">function startRecording(stream, lengthInMS) {
+  let recorder = new MediaRecorder(stream);
+  let data = [];
+
+  recorder.ondataavailable = event =&gt; data.push(event.data);
+  recorder.start();
+  log(recorder.state + &quot; for &quot; + (lengthInMS/1000) + &quot; seconds...&quot;);
+
+  let stopped = new Promise((resolve, reject) =&gt; {
+    recorder.onstop = resolve;
+    recorder.onerror = event =&gt; reject(event.name);
+  });
+
+  let recorded = wait(lengthInMS).then(
+    () =&gt; recorder.state == &quot;recording&quot; &amp;&amp; recorder.stop()
+  );
+
+  return Promise.all([
+    stopped,
+    recorded
+  ])
+  .then(() =&gt; data);
+}
+</pre>
+
+<p><code>startRecording()</code> は2つの入力パラメータを取ります。 録画元の <a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a> と記録するミリ秒単位の長さです。 指定されたミリ秒数以下のメディアを常に録画しますが、その時間に達する前にメディアが停止すると、<a href="/ja/docs/Web/API/MediaRecorder"><code>MediaRecorder</code></a> も自動的に録画を停止します。</p>
+
+<dl>
+ <dt>2行目</dt>
+ <dd>入力ストリーム（<code>stream</code>）の録画を処理する <code>MediaRecorder</code> を作成します。</dd>
+ <dt>3行目</dt>
+ <dd>空の配列 <code>data</code> を作成します。 これは、<a href="/ja/docs/Web/API/MediaRecorder/ondataavailable"><code>ondataavailable</code></a> イベントハンドラに提供されたメディアデータの <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a> を保持するために使用します。</dd>
+ <dt>5行目</dt>
+ <dd><code><a href="/ja/docs/Web/Reference/Events/dataavailable" title="/ja/docs/Web/Reference/Events/dataavailable">dataavailable</a></code> イベントのハンドラを設定します。 受信したイベントの <code>data</code> プロパティはメディアデータを含む <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a> です。 イベントハンドラは単純に <code>Blob</code> を <code>data</code> 配列にプッシュ（末尾に追加）します。</dd>
+ <dt>6〜7行目</dt>
+ <dd><a href="/ja/docs/Web/API/MediaRecorder/start"><code>recorder.start()</code></a> を呼び出して録画処理を開始し、<code>recorder</code> の更新された状態と録画される秒数とともにメッセージをログに出力します。</dd>
+ <dt>9〜12行目</dt>
+ <dd><code>stopped</code> という名前の新しい <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> を作成します。 これは、<code>MediaRecorder</code> の <a href="/ja/docs/Web/API/MediaRecorder/onstop"><code>onstop</code></a> イベントハンドラが呼び出されると解決し、<code>MediaRecorder</code> の <a href="/ja/docs/Web/API/MediaRecorder/onerror"><code>onerror</code></a> イベントハンドラが呼び出されると拒否します。 拒否ハンドラは、発生したエラーの名前を入力として受け取ります。</dd>
+ <dt>14〜16行目</dt>
+ <dd><code>recorded</code> という名前の新しい <code>Promise</code> を作成します。 これは、指定されたミリ秒数が経過すると解決します。 解決すると、<code>MediaRecorder</code> が録画中の場合は停止します。</dd>
+ <dt>18〜22行目</dt>
+ <dd>これらの行は、2つの <code>Promise</code>（<code>stopped</code> と <code>recorded</code>）の両方が解決したときに満たされる新しい <code>Promise</code> を作成します。 それが解決すると、配列データは <code>startRecording(</code>) によってその呼び出し元に返されます。</dd>
+</dl>
+
+<h3 id="Stopping_the_input_stream" name="Stopping_the_input_stream">入力ストリームの停止</h3>
+
+<p><code>stop()</code> 関数は単に入力メディアを停止します。</p>
+
+<pre class="brush: js notranslate">function stop(stream) {
+  stream.getTracks().forEach(track =&gt; track.stop());
+}
+</pre>
+
+<p>これは <a href="/ja/docs/Web/API/MediaStream/getTracks"><code>MediaStream.getTracks()</code></a> を呼び出し、<a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code>forEach()</code></a> を使用してストリーム内の各トラックの <a href="/ja/docs/Web/API/MediaStreamTrack/stop"><code>MediaStreamTrack.stop()</code></a> を呼び出すことによって機能します。</p>
+
+<h3 id="Getting_an_input_stream_and_setting_up_the_recorder" name="Getting_an_input_stream_and_setting_up_the_recorder">入力ストリームを取得してレコーダーを設定</h3>
+
+<p>それでは、この例で最も複雑なコードを見てみましょう。 開始ボタンをクリックしたときのイベントハンドラです。</p>
+
+<pre class="brush: js notranslate">startButton.addEventListener(&quot;click&quot;, function() {
+  navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+  }).then(stream =&gt; {
+    preview.srcObject = stream;
+    downloadButton.href = stream;
+    preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+    return new Promise(resolve =&gt; preview.onplaying = resolve);
+  }).then(() =&gt; startRecording(preview.captureStream(), recordingTimeMS))
+  .then (recordedChunks =&gt; {
+    let recordedBlob = new Blob(recordedChunks, { type: &quot;video/webm&quot; });
+    recording.src = URL.createObjectURL(recordedBlob);
+    downloadButton.href = recording.src;
+    downloadButton.download = &quot;RecordedVideo.webm&quot;;
+
+    log(&quot;Successfully recorded &quot; + recordedBlob.size + &quot; bytes of &quot; +
+        recordedBlob.type + &quot; media.&quot;);
+  })
+  .catch(log);
+}, false);</pre>
+
+<p><code><a href="/ja/docs/Web/Reference/Events/click" title="/ja/docs/Web/Reference/Events/click">click</a></code> イベントが発生すると、次のようになります。</p>
+
+<dl>
+ <dt>2〜4行目</dt>
+ <dd><a href="/ja/docs/Web/API/MediaDevices/getUserMedia"><code>navigator.mediaDevices.getUserMedia()</code></a> は、動画トラックと音声トラックの両方を持つ新しい <a href="/ja/docs/Web/API/MediaStream"><code>MediaStream</code></a> を要求するために呼び出します。 これが録画するストリームです。</dd>
+ <dt>5〜9行目</dt>
+ <dd><code>getUserMedia()</code> から返された Promise が解決すると、プレビューの <a href="/ja/docs/Web/HTML/Element/video" title="HTML の映像要素 (&lt;video&gt;) は、文書中に映像再生に対応するメディアプレイヤーを埋め込みます。 &lt;video&gt; を音声コンテンツのために使用することもできますが、 &lt;audio&gt; 要素の方がユーザーに取って使い勝手が良いかもしれません。"><code>&lt;video&gt;</code></a> 要素の <a href="/ja/docs/Web/API/HTMLMediaElement/srcObject"><code>srcObject</code></a> プロパティを入力ストリームに設定し、ユーザーのカメラでキャプチャしている動画をプレビューボックスに表示します。 <code>&lt;video&gt;</code> 要素はミュートしているので、音声は再生しません。 Download（ダウンロード）ボタンのリンクも、ストリームを参照するように設定します。 次に、8行目で、<a href="/ja/docs/Web/API/MediaRecorder/captureStream"><code>MediaRecorder.captureStream()</code></a> メソッドがなければ接頭辞が付いた <code>preview.mozCaptureStream()</code> を呼び出すように <code>preview.captureStream()</code> を設定して、コードが Firefox で機能するようにします。 その後、プレビュー動画の再生開始時に解決する新しい <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a> を作成して返します。</dd>
+ <dt>10行目</dt>
+ <dd>プレビュー動画の再生が開始されると、録画するメディアがあることがわかります。 したがって、先ほど作成した <code><a href="#Starting_media_recording">startRecording()</a></code> 関数を呼び出し、プレビュー動画ストリーム（録画するソースメディアとして）と、<code>recordingTimeMS</code>（録画するメディアのミリ秒数として）を渡します。 前述のように、<code>startRecording()</code> は、録画が完了すると、解決ハンドラが呼び出される <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise"><code>Promise</code></a>（録画されたメディアデータのチャンクを含む <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a> オブジェクトの配列を入力として受け取る）を返します。</dd>
+ <dt>11〜15行目</dt>
+ <dd>録画プロセスの解決ハンドラは、ローカルに <code>recordedChunks</code> として知られるメディアデータの <code>Blob</code> の配列を入力として受け取ります。 最初にすることは、<a href="/ja/docs/Web/API/Blob/Blob"><code>Blob()</code></a> コンストラクターがオブジェクトの配列を1つのオブジェクトに連結するという事実を利用して、チャンクを MIME タイプが <code>&quot;video/webm&quot;</code> の単一の <a href="/ja/docs/Web/API/Blob"><code>Blob</code></a> にマージすることです。 次に、<a href="/ja/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a> を使用して <code>Blob</code> を参照する URL を作成します。 これは、ダウンロードされた動画再生要素の <code><a href="/ja/docs/Web/HTML/Element/video#attr-src">src</a></code> 属性の値（<code>Blob</code> から動画を再生できるようにする）とダウンロードボタンのリンクのターゲットになります。
+ <p>その後、ダウンロードボタンの <code>download</code> 属性が設定されます。 <code><a href="/ja/docs/Web/HTML/Element/a#attr-download">download</a></code> 属性は <code>Boolean</code> にすることができますが、ダウンロードするファイルの名前として使用する文字列に設定することもできます。 そのため、ダウンロードリンクの <code>download</code> 属性を <code>&quot;RecordedVideo.webm&quot;</code> に設定することで、ボタンをクリックすると内容が録画された動画である <code>&quot;RecordedVideo.webm&quot;</code> という名前のファイルをダウンロードするようにブラウザーに指示します。</p>
+ </dd>
+ <dt>17〜18行目</dt>
+ <dd>記録されたメディアのサイズと種類は、2つの動画とダウンロードボタンの下のログ領域に出力されます。</dd>
+ <dt>20行目</dt>
+ <dd>すべての <code>Promise</code> の <code>catch()</code> は、<code>log()</code> 関数を呼び出すことによってエラーをロギング領域に出力します。</dd>
+</dl>
+
+<h3 id="Handling_the_stop_button" name="Handling_the_stop_button">停止ボタンの取り扱い</h3>
+
+<p>最後のコードでは、<a href="/ja/docs/Web/API/EventTarget/addEventListener"><code>addEventListener()</code></a> を使用して停止ボタンの <code><a href="/ja/docs/Web/Reference/Events/click" title="/ja/docs/Web/Reference/Events/click">click</a></code> イベントのハンドラを追加します。</p>
+
+<pre class="brush: js notranslate">stopButton.addEventListener(&quot;click&quot;, function() {
+  stop(preview.srcObject);
+}, false);</pre>
+
+<p>これは先ほど説明した <code><a href="#Stopping_the_input_stream">stop()</a></code> 関数を呼び出すだけです。</p>
+</div>
+
+<h2 id="Result" name="Result">結果</h2>
+
+<p>残りの HTML と上に示されていない CSS をすべてまとめると、次のようになり、動作します。</p>
+
+<p><iframe allow="camera;microphone" class="live-sample-frame sample-code-frame" frameborder="0" height="440" id="frame_Example" src="https://mdn.mozillademos.org/ja/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$samples/Example?revision=1635244" width="600"></iframe></p>
+
+<p>API がどのように使用されているかの説明には重要ではないため上で隠されている部分も含めて、<a href="https://mdn.mozillademos.org/ja/docs/Web/API/MediaStream_Recording_API/Recording_a_media_element$samples/Example?revision=1635244">すべてのコードを見る</a>ことができます。</p>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/MediaStream_Recording_API">MediaStream Recording API</a></li>
+ <li><a href="/ja/docs/Web/API/MediaStream_Recording_API/Using_the_MediaStream_Recording_API">Media​Stream Recording API の使用</a></li>
+ <li><a href="/ja/docs/Web/API/Media_Streams_API">Media Capture and Streams API</a></li>
+</ul>

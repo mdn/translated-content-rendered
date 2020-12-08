@@ -1,0 +1,171 @@
+---
+title: 'FileReader: load イベント'
+slug: Web/API/FileReader/load_event
+tags:
+  - API
+  - Event
+  - FileReader
+  - Web
+  - load
+translation_of: Web/API/FileReader/load_event
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/FileReader"><code>FileReader</code></a></strong></li><li class="toggle"><details open><summary>コンストラクター</summary><ol><li><a href="/ja/docs/Web/API/FileReader/FileReader"><code>FileReader()</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/FileReader/error"><code>error</code></a></li><li><a href="/ja/docs/Web/API/FileReader/onabort"><code>onabort</code></a></li><li><a href="/ja/docs/Web/API/FileReader/onload"><code>onload</code></a></li><li><a href="/ja/docs/Web/API/FileReader/readyState"><code>readyState</code></a></li><li><a href="/ja/docs/Web/API/FileReader/result"><code>result</code></a></li></ol></details></li><li class="toggle"><details open><summary>メソッド</summary><ol><li><a href="/ja/docs/Web/API/FileReader/abort"><code>abort()</code></a></li><li><a href="/ja/docs/Web/API/FileReader/readAsArrayBuffer"><code>readAsArrayBuffer()</code></a></li><li><a href="/ja/docs/Web/API/FileReader/readAsBinaryString"><code>readAsBinaryString()</code></a></li><li><a href="/ja/docs/Web/API/FileReader/readAsDataURL"><code>readAsDataURL()</code></a></li><li><a href="/ja/docs/Web/API/FileReader/readAsText"><code>readAsText()</code></a></li></ol></details></li><li class="toggle"><details open><summary>イベント</summary><ol><li><a href="/ja/docs/Web/API/FileReader/abort_event"><code>abort</code></a></li><li><a href="/ja/docs/Web/API/FileReader/error_event"><code>error</code></a></li><li><em><code>load</code></em></li><li><a href="/ja/docs/Web/API/FileReader/loadend_event"><code>loadend</code></a></li><li><a href="/ja/docs/Web/API/FileReader/loadstart_event"><code>loadstart</code></a></li><li><a href="/ja/docs/Web/API/FileReader/progress_event"><code>progress</code></a></li></ol></details></li><li class="toggle"><details open><summary>継承</summary><ol><li><a href="/ja/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li></ol></section></div>
+
+<p><code>load</code> イベントは、ファイルが正常に読み込めたときに発生します。</p>
+
+<table class="properties">
+ <tbody>
+  <tr>
+   <th scope="row">バブリング</th>
+   <td>なし</td>
+  </tr>
+  <tr>
+   <th scope="row">キャンセル可能</th>
+   <td>いいえ</td>
+  </tr>
+  <tr>
+   <th scope="row">インターフェイス</th>
+   <td><a href="/ja/docs/Web/API/ProgressEvent"><code>ProgressEvent</code></a></td>
+  </tr>
+  <tr>
+   <th scope="row">イベントハンドラープロパティ</th>
+   <td><a href="/ja/docs/Web/API/FileReader/onload"><code>FileReader.onload</code></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Examples" name="Examples">例</h2>
+
+<h3 id="Live_example" name="Live_example">ライブデモ</h3>
+
+<h4 id="HTML">HTML</h4>
+
+<pre class="brush: html notranslate">&lt;div class=&quot;example&quot;&gt;
+
+    &lt;div class=&quot;file-select&quot;&gt;
+        &lt;label for=&quot;avatar&quot;&gt;Choose a profile picture:&lt;/label&gt;
+        &lt;input type=&quot;file&quot;
+               id=&quot;avatar&quot; name=&quot;avatar&quot;
+               accept=&quot;image/png, image/jpeg&quot;&gt;
+    &lt;/div&gt;
+
+    &lt;img src=&quot;&quot; class=&quot;preview&quot; height=&quot;200&quot; alt=&quot;Image preview...&quot;&gt;
+
+    &lt;div class=&quot;event-log&quot;&gt;
+        &lt;label&gt;Event log:&lt;/label&gt;
+        &lt;textarea readonly class=&quot;event-log-contents&quot;&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+
+  &lt;/div&gt;</pre>
+
+<div class="hidden">
+<h4 id="CSS">CSS</h4>
+
+<pre class="brush: css notranslate">img.preview {
+  margin: 1rem 0;
+}
+
+.event-log-contents {
+  width: 18rem;
+  height: 5rem;
+  border: 1px solid black;
+  margin: .2rem;
+  padding: .2rem;
+}
+
+.example {
+  display: grid;
+  grid-template-areas:
+              &quot;select  log&quot;
+              &quot;preview log&quot;;
+}
+
+.file-select {
+  grid-area: select;
+}
+
+.preview {
+  grid-area: preview;
+}
+
+.event-log {
+  grid-area: log;
+}
+
+.event-log&gt;label {
+  display: block;
+}
+
+.event-log-contents {
+  resize: none;
+}</pre>
+</div>
+
+<h4 id="JS">JS</h4>
+
+<pre class="brush: js notranslate">const fileInput = document.querySelector(&apos;input[type=&quot;file&quot;]&apos;);
+const preview = document.querySelector(&apos;img.preview&apos;);
+const eventLog = document.querySelector(&apos;.event-log-contents&apos;);
+const reader = new FileReader();
+
+function handleEvent(event) {
+    eventLog.textContent = eventLog.textContent + `${event.type}: ${event.loaded} bytes transferred\n`;
+
+    if (event.type === &quot;load&quot;) {
+        preview.src = reader.result;
+    }
+}
+
+function addListeners(reader) {
+    reader.addEventListener(&apos;loadstart&apos;, handleEvent);
+    reader.addEventListener(&apos;load&apos;, handleEvent);
+    reader.addEventListener(&apos;loadend&apos;, handleEvent);
+    reader.addEventListener(&apos;progress&apos;, handleEvent);
+    reader.addEventListener(&apos;error&apos;, handleEvent);
+    reader.addEventListener(&apos;abort&apos;, handleEvent);
+}
+
+function handleSelected(e) {
+    eventLog.textContent = &apos;&apos;;
+    const selectedFile = fileInput.files[0];
+    if (selectedFile) {
+        addListeners(reader);
+        reader.readAsDataURL(selectedFile);
+    }
+}
+
+fileInput.addEventListener(&apos;change&apos;, handleSelected);
+</pre>
+
+<h4 id="Result" name="Result">結果</h4>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300px" id="frame_Live_example" src="https://mdn.mozillademos.org/ja/docs/Web/API/FileReader/load_event$samples/Live_example?revision=1468164" width="100%"></iframe></p>
+
+<h2 id="Specifications" name="Specifications">仕様書</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様書</th>
+   <th scope="col">状態</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/FileAPI/#dfn-load-event" hreflang="en" lang="en" title="File APIの仕様書">File API</a></td>
+   <td><span class="spec-WD">草案</span></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの対応</h2>
+
+<div class="hidden">このページの互換性一覧表は構造化データから生成されています。データに協力していただけるのであれば、 <a class="external" href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> をチェックアウトしてプルリクエストを送信してください。</div>
+
+<div class="bc-data" id="bcd:api.FileReader.load_event"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li>関連イベント: <a href="/ja/docs/Web/API/FileReader/loadstart_event"><code>FileReader.loadstart_event</code></a>, <a href="/ja/docs/Web/API/FileReader/loadend_event"><code>FileReader.loadend_event</code></a>, <a href="/ja/docs/Web/API/FileReader/progress_event"><code>FileReader.progress_event</code></a>, <a href="/ja/docs/Web/API/FileReader/error_event"><code>FileReader.error_event</code></a>, <a href="/ja/docs/Web/API/FileReader/abort_event"><code>FileReader.abort_event</code></a></li>
+</ul>
