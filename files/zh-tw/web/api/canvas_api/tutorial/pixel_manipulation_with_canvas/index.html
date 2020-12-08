@@ -1,0 +1,336 @@
+---
+title: Pixel manipulation with canvas
+slug: Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+translation_of: Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/zh-TW/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/zh-TW/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/zh-TW/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/zh-TW/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/zh-TW/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-TW/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/zh-TW/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Advanced_animations" style="float: left;" class="button">« 前頁</a><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">次頁  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>直到目前為止，我們還沒真正了解 pixels 在 canvas上的運用。使用<code>ImageData</code>物件，可直接對pixel 裡的陣列資料<strong>讀(read)</strong>和<strong>寫(write)</strong>。在接下的內容中，也可了解到如何使影像平滑化(反鋸齒)及如何將影像保存在canvas之中。</p>
+</div>
+
+<h2 id="ImageData物件"><code>ImageData</code>物件</h2>
+
+<p><a href="/zh-TW/docs/Web/API/ImageData" title="The documentation about this has not yet been written; please consider contributing!"><code>ImageData</code></a> 物件代表canvas區中最基礎的像素。</p>
+
+<p>包含它只可讀的屬性:</p>
+
+<dl>
+ <dt><code>width</code></dt>
+ <dd>影像中的寬度，以pixels為單位</dd>
+ <dt><code>height</code></dt>
+ <dd>影像中的高度，以pixels為單位</dd>
+ <dt><code>data</code></dt>
+ <dd><a href="/zh-TW/docs/Web/JavaScript/Reference/Uint8ClampedArray" title="The documentation about this has not yet been written; please consider contributing!"><code>Uint8ClampedArray</code></a> 代表一維陣列包含RGBA 格式。整數值介於0到255之間(包含255)。</dd>
+</dl>
+
+<p><code>data</code> 屬性返回一個<a href="/zh-TW/docs/Web/JavaScript/Reference/Uint8ClampedArray" title="The documentation about this has not yet been written; please consider contributing!"><code>Uint8ClampedArray</code></a>，它可被當作為pixel的初始資料。每個pixel用4個1byte值做代表分別為<strong>紅</strong>，<strong>綠</strong>，<strong>藍</strong>，<strong>透明值</strong>(也就是<strong>RGBA</strong>格式)。每個顏色組成皆是介於整數值介於0到255之間。而每個組成在一個陣列中被分配為一個連續的索引。從左上角 pixel 的紅色組成中的陣列由<strong>索引 0</strong> 為始。Pixels 執行順序為從左到右,再由上到下,直到整個陣列。</p>
+
+<p><a href="/zh-TW/docs/Web/JavaScript/Reference/Uint8ClampedArray" title="The documentation about this has not yet been written; please consider contributing!"><code>Uint8ClampedArray</code></a>  包含<code>height</code> × <code>width</code>× 4 bytes的資料,同索引值從0到 (<code>height</code>×<code>width</code>×4)-1</p>
+
+<p>例如,讀取影像的藍色組成的值。從pixel 的第200欄、第50行，你可以照著下面的步驟:</p>
+
+<pre class="brush: js">blueComponent = imageData.data[((50 * (imageData.width * 4)) + (200 * 4)) + 2];</pre>
+
+<p>使用<code>Uint8ClampedArray.length</code>屬性來讀取影像pixel的陣列大小</p>
+
+<pre class="brush: js">var numBytes = imageData.data.length;
+</pre>
+
+<h2 id="創造一個_ImageData物件">創造一個 <code>ImageData</code>物件</h2>
+
+<p>可以使用<a href="/zh-TW/docs/Web/API/CanvasRenderingContext2D/createImageData" title="The documentation about this has not yet been written; please consider contributing!"><code>createImageData()</code></a>方法創造一個全新空白的<code>ImageData</code> 物件。</p>
+
+<p>這裡有兩種<code>createImageData()</code>的方法:</p>
+
+<pre class="brush: js">var myImageData = ctx.createImageData(width, height);</pre>
+
+<p>這個方法是有規定大小尺寸.所有pixels預設是透明的黑色。</p>
+
+<p>下面的方法一樣是由<code>anotherImageData</code>參考尺寸大小，由<code>ImageData</code> 物件創造一個與新的一樣的大小。這些新的物件的pixel皆預設為透明的黑色。</p>
+
+<pre class="brush: js">var myImageData = ctx.createImageData(anotherImageData);</pre>
+
+<h2 id="得到pixel資料的內容">得到pixel資料的內容</h2>
+
+<p>可以使用<code>getImageData()</code>這個方法，去取得canvas內容中<code>ImageData</code> 物件的資料含pixel 數據(data) </p>
+
+<pre class="brush: js">var myImageData = ctx.getImageData(left, top, width, height);</pre>
+
+<p>這個方法會返回<code>ImageData</code>物件，它代表著在這canvas區域之中pixel 的數據(data) 。從各角落的點代表著 (<code>left</code>,<code>top</code>), (<code>left+width</code>, <code>top</code>), (<code>left</code>, <code>top+height</code>), and (<code>left+width</code>, <code>top+height</code>)。這些作標被設定為canvas 的空間座標單位。</p>
+
+<div class="note">
+<p><strong>注釋</strong>: 在<code>ImageData</code> 物件中，任何超出canvas外的pixels皆會返回透明的黑色的形式。</p>
+</div>
+
+<p>這個方法也被展示在<a href="/en-US/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">使用canvas操作影像</a>之中。</p>
+
+<h3 id="調色盤">調色盤</h3>
+
+<p>這個範例使用<a href="/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData() </a>方法去顯示在鼠標下的顏色。</p>
+
+<p>首先，需要一個正確的滑鼠點<code>layerX</code><em>​​​​​​​</em>和 <code>layerY</code>。在從<a href="/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData()</a> 提供pixel 陣列中(array)該點的pixel 數據(data) 。最後，使用陣列數據(array data)在<code>&lt;div&gt;</code>中設置背景色和文字去顯示該色。</p>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;227&quot; style=&quot;float:left&quot;&gt;&lt;/canvas&gt;
+&lt;div id=&quot;color&quot; style=&quot;width:200px;height:50px;float:left&quot;&gt;&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: js;">var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+img.onload = function() {
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+};
+var color = document.getElementById(&apos;color&apos;);
+function pick(event) {
+  var x = event.layerX;
+  var y = event.layerY;
+  var pixel = ctx.getImageData(x, y, 1, 1);
+  var data = pixel.data;
+  var rgba = &apos;rgba(&apos; + data[0] + &apos;, &apos; + data[1] +
+             &apos;, &apos; + data[2] + &apos;, &apos; + (data[3] / 255) + &apos;)&apos;;
+  color.style.background =  rgba;
+  color.textContent = rgba;
+}
+canvas.addEventListener(&apos;mousemove&apos;, pick);
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="240" id="frame_A_color_picker" src="https://mdn.mozillademos.org/zh-TW/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas$samples/A_color_picker?revision=1486930" width="610"></iframe></p>
+
+<h2 id="在內容中寫入pixel_資料">在內容中寫入pixel 資料</h2>
+
+<p>可以使用<a href="/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData">putImageData() </a>方法將自訂pixel 數據(data) 放入內容中:</p>
+
+<pre class="brush: js">ctx.putImageData(myImageData, dx, dy);
+</pre>
+
+<p><code>dx</code> 和 <code>dy</code>參數表示填入你所希望的座標，將它代入內容中左上角的pixel 數據(data)。</p>
+
+<p>For example, to paint the entire image represented by <code>myImageData</code> to the top left corner of the context, you can simply do the following:</p>
+
+<pre class="brush: js">ctx.putImageData(myImageData, 0, 0);
+</pre>
+
+<h3 id="灰階和負片效果">灰階和負片效果</h3>
+
+<p>In this example we iterate over all pixels to change their values, then we put the modified pixel array back to the canvas using <a href="/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData">putImageData()</a>. The invert function simply subtracts each color from the max value 255. The grayscale function simply uses the average of red, green and blue. You can also use a weighted average, given by the formula <code>x = 0.299r + 0.587g + 0.114b</code>, for example. See <a href="http://en.wikipedia.org/wiki/Grayscale">Grayscale</a> on Wikipedia for more information.</p>
+
+<div class="hidden">
+<pre class="brush: html;">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;div&gt;
+  &lt;input id=&quot;grayscalebtn&quot; value=&quot;Grayscale&quot; type=&quot;button&quot;&gt;
+  &lt;input id=&quot;invertbtn&quot; value=&quot;Invert&quot; type=&quot;button&quot;&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: js">var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+img.onload = function() {
+  draw(this);
+};
+
+function draw(img) {
+  var canvas = document.getElementById(&apos;canvas&apos;);
+  var ctx = canvas.getContext(&apos;2d&apos;);
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var data = imageData.data;
+
+  var invert = function() {
+    for (var i = 0; i &lt; data.length; i += 4) {
+      data[i]     = 255 - data[i];     // red
+      data[i + 1] = 255 - data[i + 1]; // green
+      data[i + 2] = 255 - data[i + 2]; // blue
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var grayscale = function() {
+    for (var i = 0; i &lt; data.length; i += 4) {
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = avg; // red
+      data[i + 1] = avg; // green
+      data[i + 2] = avg; // blue
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var invertbtn = document.getElementById(&apos;invertbtn&apos;);
+  invertbtn.addEventListener(&apos;click&apos;, invert);
+  var grayscalebtn = document.getElementById(&apos;grayscalebtn&apos;);
+  grayscalebtn.addEventListener(&apos;click&apos;, grayscale);
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="270" id="frame_Grayscaling_and_inverting_colors" src="https://mdn.mozillademos.org/zh-TW/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas$samples/Grayscaling_and_inverting_colors?revision=1486930" width="330"></iframe></p>
+
+<h2 id="放大和平滑化反鋸齒">放大和平滑化(反鋸齒)</h2>
+
+<p>With the help of the <a href="/zh-TW/docs/Web/API/CanvasRenderingContext2D/drawImage" title="The documentation about this has not yet been written; please consider contributing!"><code>drawImage()</code></a> method, a second canvas and the <a href="/zh-TW/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled" title="The documentation about this has not yet been written; please consider contributing!"><code>imageSmoothingEnabled</code></a> property, we are able to zoom into our picture and see the details.</p>
+
+<p>We get the position of the mouse and crop an image of 5 pixels left and above to 5 pixels right and below. Then we copy that one over to another canvas and resize the image to the size we want it to. In the zoom canvas we resize a 10×10 pixel crop of the original canvas to 200×200.</p>
+
+<pre class="brush: js">zoomctx.drawImage(canvas,
+                  Math.abs(x - 5), Math.abs(y - 5),
+                  10, 10, 0, 0, 200, 200);</pre>
+
+<p>Because anti-aliasing is enabled by default, we might want to disable the smoothing to see clear pixels. You can toggle the checkbox to see the effect of the <code>imageSmoothingEnabled</code> property (which needs prefixes for different browsers).</p>
+
+<h6 class="hidden" id="Zoom_example">Zoom example</h6>
+
+<div class="hidden">
+<pre class="brush: html;">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;canvas id=&quot;zoom&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;div&gt;
+&lt;label for=&quot;smoothbtn&quot;&gt;
+  &lt;input type=&quot;checkbox&quot; name=&quot;smoothbtn&quot; checked=&quot;checked&quot; id=&quot;smoothbtn&quot;&gt;
+  Enable image smoothing
+&lt;/label&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: js">var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+img.onload = function() {
+  draw(this);
+};
+
+function draw(img) {
+  var canvas = document.getElementById(&apos;canvas&apos;);
+  var ctx = canvas.getContext(&apos;2d&apos;);
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+  var zoomctx = document.getElementById(&apos;zoom&apos;).getContext(&apos;2d&apos;);
+
+  var smoothbtn = document.getElementById(&apos;smoothbtn&apos;);
+  var toggleSmoothing = function(event) {
+    zoomctx.imageSmoothingEnabled = this.checked;
+    zoomctx.mozImageSmoothingEnabled = this.checked;
+    zoomctx.webkitImageSmoothingEnabled = this.checked;
+    zoomctx.msImageSmoothingEnabled = this.checked;
+  };
+  smoothbtn.addEventListener(&apos;change&apos;, toggleSmoothing);
+
+  var zoom = function(event) {
+    var x = event.layerX;
+    var y = event.layerY;
+    zoomctx.drawImage(canvas,
+                      Math.abs(x - 5),
+                      Math.abs(y - 5),
+                      10, 10,
+                      0, 0,
+                      200, 200);
+  };
+
+  canvas.addEventListener(&apos;mousemove&apos;, zoom);
+}</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="490" id="frame_Zoom_example" src="https://mdn.mozillademos.org/zh-TW/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas$samples/Zoom_example?revision=1486930" width="620"></iframe></p>
+
+<h2 id="儲存圖片">儲存圖片</h2>
+
+<p>The <a href="/zh-TW/docs/Web/API/HTMLCanvasElement" title="HTMLCanvasElement 介面提供控制 canvas 元素的屬性和方法. HTMLCanvasElement 介面也繼承了 HTMLElement 介面的屬性和方法."><code>HTMLCanvasElement</code></a> provides a <code>toDataURL()</code> method, which is useful when saving images. It returns a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs">data URI</a> containing a representation of the image in the format specified by the <code>type</code> parameter (defaults to <a class="external external-icon" href="https://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a>). The returned image is in a resolution of 96 dpi.</p>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/HTMLCanvasElement/toDataURL" title="HTMLCanvasElement.toDataURL() 方法回傳含有圖像和參數設置特定格式的 data URIs (預設 PNG). 回傳的圖像解析度為 96 dpi."><code>canvas.toDataURL(&apos;image/png&apos;)</code></a></dt>
+ <dd>Default setting. Creates a PNG image.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/HTMLCanvasElement/toDataURL" title="HTMLCanvasElement.toDataURL() 方法回傳含有圖像和參數設置特定格式的 data URIs (預設 PNG). 回傳的圖像解析度為 96 dpi."><code>canvas.toDataURL(&apos;image/jpeg&apos;, quality)</code></a></dt>
+ <dd>Creates a JPG image. Optionally, you can provide a quality in the range from 0 to 1, with one being the best quality and with 0 almost not recognizable but small in file size.</dd>
+</dl>
+
+<p>Once you have generated a data URI from you canvas, you are able to use it as the source of any <a href="/zh-TW/docs/Web/HTML/Element/image" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;image&gt;</code></a> or put it into a hyper link with a <a href="/en-US/docs/Web/HTML/Element/a#attr-download">download attribute</a> to save it to disc, for example.</p>
+
+<p>You can also create a <a href="/zh-TW/docs/Web/API/Blob" title="Blob（Binary Large Object）物件代表了一個相當於檔案（原始資料）的不可變物件。Blob 中的資料並不一定是 JavaScript 原生的格式。File 介面基於 Blob，繼承 blob 並擴充其功能以支援操作使用者系統上的檔案。"><code>Blob</code></a> from the canvas.</p>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/HTMLCanvasElement/toBlob" title="The documentation about this has not yet been written; please consider contributing!"><code>canvas.toBlob(callback, type, encoderOptions)</code></a></dt>
+ <dd>Creates a <code>Blob</code> object representing the image contained in the canvas.</dd>
+</dl>
+
+<h2 id="延伸閱讀">延伸閱讀</h2>
+
+<ul>
+ <li><a href="/zh-TW/docs/Web/API/ImageData" title="The documentation about this has not yet been written; please consider contributing!"><code>ImageData</code></a></li>
+ <li><a href="/en-US/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+ <li><a href="https://codepo8.github.io/canvas-images-and-pixels/">Canvas, images and pixels – by Christian Heilmann</a></li>
+</ul>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Advanced_animations" style="float: left;" class="button">« 前頁</a><a href="/zh-TW/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">次頁  »</a></p>
+</div>

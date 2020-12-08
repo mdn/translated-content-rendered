@@ -1,0 +1,259 @@
+---
+title: WebVR API
+slug: Web/API/WebVR_API
+translation_of: Web/API/WebVR_API
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>這是一個實驗中的功能</strong><br>此功能在某些瀏覽器尚在開發中，請參考<a href="#Browser_compatibility">兼容表格</a>以得到不同瀏覽器用的前輟。</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-TW/docs/Web/API/WebVR_API">WebVR API</a></strong></li><li><strong><a href="/zh-TW/docs/Web/API/WebVR_API"><code>WebVR_API</code></a></strong></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-TW/docs/Web/Events/vrdisplayconnected"><code>vrdisplayconnected</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplaydisconnected"><code>vrdisplaydisconnected</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplayactivate"><code>vrdisplayactivate</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplaydeactivate"><code>vrdisplaydeactivate</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplayblur"><code>vrdisplayblur</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplayfocus"><code>vrdisplayfocus</code></a></li><li><a href="/zh-TW/docs/Web/Events/vrdisplaypresentchange"><code>vrdisplaypresentchange</code></a></li></ol></details></li><li class="toggle"><details open><summary>Related pages for WebVR API</summary><ol><li><a href="/zh-TW/docs/Web/API/Gamepad/displayId"><code>Gamepad.displayId</code></a></li><li><a href="/zh-TW/docs/Web/API/Navigator/getVRDisplays"><code>Navigator.getVRDisplays()</code></a></li><li><a href="/zh-TW/docs/Web/API/VRDisplay"><code>VRDisplay</code></a></li><li><a href="/zh-TW/docs/Web/API/VRDisplayCapabilities"><code>VRDisplayCapabilities</code></a></li><li><a href="/zh-TW/docs/Web/API/VRDisplayEvent"><code>VRDisplayEvent</code></a></li><li><a href="/zh-TW/docs/Web/API/VREyeParameters"><code>VREyeParameters</code></a></li><li><a href="/zh-TW/docs/Web/API/VRFieldOfView"><code>VRFieldOfView</code></a></li><li><a href="/zh-TW/docs/Web/API/VRFrameData"><code>VRFrameData</code></a></li><li><a href="/zh-TW/docs/Web/API/VRLayerInit"><code>VRLayerInit</code></a></li><li><a href="/zh-TW/docs/Web/API/VRPose"><code>VRPose</code></a></li><li><a href="/zh-TW/docs/Web/API/VRStageParameters"><code>VRStageParameters</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">WebVR 可以讓穿戴的VR裝置 (如頭戴裝置 Oculus Rift 或 HTC Vive) 與 web 應用程式結合。開發人員可以將VR裝置所提供的位置與動作資訊轉移到3D的場景中。利用 WebVR可以創造出很多有趣的應用程式: 包含虛擬導覽、互動訓練軟體等等。</p>
+
+<h2 id="用法與基本觀念">用法與基本觀念</h2>
+
+<p>透過呼叫 <a href="/zh-TW/docs/Web/API/Navigator/getVRDisplays" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.getVRDisplays()</code></a> 函數可以得到與電腦連接的VR裝置，每個裝置會回傳一個 <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> 物件</p>
+
+<p><img src="https://mdn.mozillademos.org/files/11035/hw-setup.png" alt="Sketch of a person in a chair with wearing goggles labelled &quot;Head mounted display (HMD)&quot; facing a monitor with a webcam labelled &quot;Position sensor&quot;" style="display: block; height: 78px; margin: 0px auto; width: 60%;"></p>
+
+<p><a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> 是 WebVR API 的核心，提供以下功能:</p>
+
+<ul>
+ <li>Retrieve useful information to allow us to identify the display, what capabilities it has, controllers associated with it, and more.</li>
+ <li>Retrieve <a href="/zh-TW/docs/Web/API/VRFrameData" title="The documentation about this has not yet been written; please consider contributing!"><code>frame data</code></a> for each frame of content you you want to present in a display, and submit those frames for display at a consistent rate.</li>
+ <li>Start and stop presenting to the display.</li>
+</ul>
+
+<p>A typical (simple) WebVR app would work like so:</p>
+
+<ol>
+ <li>呼叫 <a href="/zh-TW/docs/Web/API/Navigator/getVRDisplays" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.getVRDisplays()</code></a> 來取得 VR 顯示器的 reference。</li>
+ <li>呼叫 <a href="/zh-TW/docs/Web/API/VRDisplay/requestPresent" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.requestPresent()</code></a> 來啟動 VR顯示器。</li>
+ <li>WebVR&apos;s dedicated <a href="/zh-TW/docs/Web/API/VRDisplay/requestAnimationFrame" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.requestAnimationFrame()</code></a> method is used to run the app&apos;s rendering loop at the correct refresh rate for the display.</li>
+ <li>Inside the rendering loop, you grab the data required to display the current frame (<a href="/zh-TW/docs/Web/API/VRDisplay/getFrameData" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.getFrameData()</code></a>), draw the displayed scene twice — once for the view in each eye, then submit the rendered view to the display to show to the user (<a href="/zh-TW/docs/Web/API/VRDisplay/submitFrame" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.submitFrame()</code></a>).</li>
+</ol>
+
+<p>In addition, WebVR 1.1 adds a number of events on the <a href="/zh-TW/docs/Web/API/Window" title="window 物件代表了一個包含 DOM 文件的視窗，其中的 document 屬性指向了視窗中載入的 Document 物件。而使用 document 的"><code>Window</code></a> object to allow JavaScript to respond to changes to the status of the display.</p>
+
+<div class="note">
+<p><strong>Note</strong>: You can find a lot more out about how the API works in our <a href="/en-US/docs/Web/API/WebVR_API/Using_the_WebVR_API">Using the WebVR API</a> and <a href="/en-US/docs/Web/API/WebVR_API/Concepts">WebVR Concepts</a> articles.</p>
+</div>
+
+<h3 id="Using_controllers_Combining_WebVR_with_the_Gamepad_API">Using controllers: Combining WebVR with the Gamepad API</h3>
+
+<p>Many WebVR hardware setups feature controllers that go along with the headset. These can be used in WebVR apps via the <a href="/en-US/docs/Web/API/Gamepad_API">Gamepad API</a>, and specifically the <a href="/en-US/docs/Web/API/Gamepad_API#Experimental_Gamepad_extensions">Gamepad Extensions API</a> that adds API features for accessing <a href="/en-US/docs/Web/API/GamepadPose">controller pose</a>, <a href="/en-US/docs/Web/API/GamepadHapticActuator">haptic actuators</a>, and more.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Our <a href="/en-US/docs/Web/API/WebVR_API/Using_VR_controllers_with_WebVR">Using VR controllers with WebVR</a> article explains the basics of how to use VR controllers with WebVR apps.</p>
+</div>
+
+<h2 id="WebVR_Interfaces">WebVR Interfaces</h2>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a></dt>
+ <dd>Represents any VR device supported by this API. It includes generic information such as device IDs and descriptions, as well as methods for starting to present a VR scene, retrieving eye parameters and display capabilities, and other important functionality.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRDisplayCapabilities" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplayCapabilities</code></a></dt>
+ <dd>Describes the capabilities of a <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> — it&apos;s features can be used to perform VR device capability tests, for example can it return position information.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRDisplayEvent" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplayEvent</code></a></dt>
+ <dd>Represents the event object of WebVR-related events (see the <a href="#Window">window object extensions</a> listed below).</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRFrameData" title="The documentation about this has not yet been written; please consider contributing!"><code>VRFrameData</code></a></dt>
+ <dd>Represents all the information needed to render a single frame of a VR scene; constructed by <a href="/zh-TW/docs/Web/API/VRDisplay/getFrameData" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.getFrameData()</code></a>.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRPose" title="The documentation about this has not yet been written; please consider contributing!"><code>VRPose</code></a></dt>
+ <dd>Represents the position state at a given timestamp (which includes orientation, position, velocity, and acceleration.)</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VREyeParameters" title="The documentation about this has not yet been written; please consider contributing!"><code>VREyeParameters</code></a></dt>
+ <dd>Provides access to all the information required to correctly render a scene for each given eye, including field of view information.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRFieldOfView" title="The documentation about this has not yet been written; please consider contributing!"><code>VRFieldOfView</code></a></dt>
+ <dd>Represents a field of view defined by 4 different degree values describing the view from a center point.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRLayerInit" title="The documentation about this has not yet been written; please consider contributing!"><code>VRLayerInit</code></a></dt>
+ <dd>Represents a layer to be presented in a <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a>.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/VRStageParameters" title="The documentation about this has not yet been written; please consider contributing!"><code>VRStageParameters</code></a></dt>
+ <dd>Represents the values describing the the stage area for devices that support room-scale experiences.</dd>
+</dl>
+
+<h3 id="Extensions_to_other_interfaces">Extensions to other interfaces</h3>
+
+<p>The WebVR API extends the following APIs, adding the listed features.</p>
+
+<h4 id="Gamepad">Gamepad</h4>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/Gamepad/displayId" title="The documentation about this has not yet been written; please consider contributing!"><code>Gamepad.displayId</code></a> <span class="readOnly readOnlyInline notecard inline" title="This value may not be changed.">Read only </span></dt>
+ <dd><dfn>Returns the <a href="/zh-TW/docs/Web/API/VRDisplay/displayId" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.displayId</code></a> of the associated <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> — the <code>VRDisplay</code> that the gamepad is controlling the displayed scene of.</dfn></dd>
+</dl>
+
+<h4 id="Navigator">Navigator</h4>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/Navigator/activeVRDisplays" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.activeVRDisplays</code></a> <span class="readOnly readOnlyInline notecard inline" title="This value may not be changed.">Read only </span></dt>
+ <dd>Returns an array containing every <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> object that is currently presenting (<a href="/zh-TW/docs/Web/API/VRDisplay/ispresenting" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay.ispresenting</code></a> is <code>true</code>).</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Navigator/getVRDisplays" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.getVRDisplays()</code></a></dt>
+ <dd>Returns a promise that resolves to an array of <a href="/zh-TW/docs/Web/API/VRDisplay" title="The documentation about this has not yet been written; please consider contributing!"><code>VRDisplay</code></a> objects representing any available VR displays connected to the computer.</dd>
+</dl>
+
+<h4 id="Window_events">Window events</h4>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplaypresentchange" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplaypresentchange</code></a></dt>
+ <dd>Represents an event handler that will run when the presenting state of a VR display changes — i.e. goes from presenting to not presenting, or vice versa (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplaypresentchange" title="/zh-TW/docs/Web/Reference/Events/vrdisplaypresentchange">vrdisplaypresentchange</a></code> event fires).</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplayconnect" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplayconnect</code></a></dt>
+ <dd>Represents an event handler that will run when a compatible VR display has been connected to the computer (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplayconnect" title="/zh-TW/docs/Web/Reference/Events/vrdisplayconnect">vrdisplayconnect</a></code> event fires).</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplaydisconnect" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplaydisconnect</code></a></dt>
+ <dd>Represents an event handler that will run when a compatible VR display has been disconnected from the computer (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplaydisconnect" title="/zh-TW/docs/Web/Reference/Events/vrdisplaydisconnect">vrdisplaydisconnect</a></code> event fires).</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplayactivate" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplayactivate</code></a></dt>
+ <dd>Represents an event handler that will run when a display is able to be presented to (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplayactivate" title="/zh-TW/docs/Web/Reference/Events/vrdisplayactivate">vrdisplayactivate</a></code> event fires), for example if an HMD has been moved to bring it out of standby, or woken up by being put on.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplaydeactivate" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplaydeactivate</code></a></dt>
+ <dd>Represents an event handler that will run when a display can no longer be presented to (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplaydeactivate" title="/zh-TW/docs/Web/Reference/Events/vrdisplaydeactivate">vrdisplaydeactivate</a></code> event fires), for example if an HMD has gone into standby or sleep mode due to a period of inactivity.</dd>
+</dl>
+
+<h4 id="Unimplemented_window_events">Unimplemented window events</h4>
+
+<p>The following events are listed in the spec, but do not currently seem to be implemented anywhere as yet.</p>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplayblur" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplayblur</code></a></dt>
+ <dd>Represents an event handler that will run when presentation to a display has been paused for some reason by the browser, OS, or VR hardware (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplayblur" title="/zh-TW/docs/Web/Reference/Events/vrdisplayblur">vrdisplayblur</a></code> event fires) — for example, while the user is interacting with a system menu or browser, to prevent tracking or loss of experience.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Window/onvrdisplayfocus" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.onvrdisplayfocus</code></a></dt>
+ <dd>Represents an event handler that will run when presentation to a display has resumed after being blurred (when the <code><a href="/zh-TW/docs/Web/Reference/Events/vrdisplayfocus" title="/zh-TW/docs/Web/Reference/Events/vrdisplayfocus">vrdisplayfocus</a></code> event fires).</dd>
+</dl>
+
+<h2 id="Examples">Examples</h2>
+
+<p>You can find a number of examples at these locations:</p>
+
+<ul>
+ <li><a href="https://github.com/mdn/webvr-tests">webvr-tests</a> — very simple examples to accompany the MDN WebVR documentation.</li>
+ <li><a href="https://github.com/facebook/Carmel-Starter-Kit">Carmel starter kit</a> — nice simple, well-commented examples that go along with Carmel, Facebook&apos;s WebVR browser.</li>
+ <li><a href="https://webvr.info/samples/">WebVR.info samples</a> — slightly more in-depth examples plus source code</li>
+ <li><a href="https://webvr.rocks/firefox#demos">WebVR.rocks Firefox demos</a> — showcase examples</li>
+ <li><a href="https://aframe.io/">A-Frame homepage</a> — examples showing A-Frame usage</li>
+</ul>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="The &apos;Gamepad Extensions&apos; specification" href="https://w3c.github.io/gamepad/extensions.html" class="external" hreflang="en">Gamepad Extensions</a></td>
+   <td><span class="spec-ED">Editor&apos;s Draft</span></td>
+   <td>Defines the <a href="/en-US/docs/Web/API/Gamepad_API#Experimental_Gamepad_extensions">Experimental Gamepad extensions</a>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="The &apos;WebVR 1.1&apos; specification" href="https://immersive-web.github.io/webvr/spec/1.1/" class="external" hreflang="en">WebVR 1.1</a></td>
+   <td><span class="spec-Draft">Draft</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-TW/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">No support</span><sup>[1]</sup></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/55" title="Released on 2017-08-08.">55</a> (55)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+  <tr>
+   <td>Gamepad extensions</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span><sup>[4]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+   <th>Samsung Internet for GearVR</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>55.0 (55)</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><sup>[3]</sup></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span><br>
+     </td>
+  </tr>
+  <tr>
+   <td>Gamepad extensions</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span><sup>[4]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] API Available on all platforms behind a flag, but currently only works on desktop in an <a href="https://webvr.info/get-chrome/">experimental version of Chrome</a> (other builds won&apos;t return any devices when <a href="/zh-TW/docs/Web/API/Navigator/getVRDisplays" title="The documentation about this has not yet been written; please consider contributing!"><code>Navigator.getVRDisplays()</code></a> is invoked).</p>
+
+<p>[2] Currently only Windows support is enabled by default. Mac support is <a href="https://hacks.mozilla.org/2017/06/announcing-webvr-on-mac/">available in Firefox Nightly</a>.</p>
+
+<p>[3] Currently supported only by Google Daydream.</p>
+
+<p>[4] Enabled in Firefox Nightly and Beta, versions 55 and above. Enabled/disabled by the <code>dom.gamepad-extensions.enabled</code> pref.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="https://vr.mozilla.org">vr.mozilla.org</a> — The main Mozilla landing pad for WebVR, with demos, utilities, and other information.</li>
+ <li><a href="https://aframe.io/">A-Frame</a> — Open source web framework for building VR experiences.</li>
+ <li><a href="https://webvr.info">webvr.info</a> — Up-to-date information about WebVR, browser setup, and community.</li>
+ <li><a href="http://mozvr.com/">MozVr.com</a> — Demos, downloads, and other resources from the Mozilla VR team.</li>
+ <li><a href="https://github.com/MozVR/vr-web-examples/tree/master/threejs-vr-boilerplate">threejs-vr-boilerplate</a> — A useful starter template for writing WebVR apps into.</li>
+ <li><a href="https://github.com/googlevr/webvr-polyfill/">Web VR polyfill</a> — JavaScript implementation of WebVR.</li>
+</ul>

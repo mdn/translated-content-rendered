@@ -1,0 +1,155 @@
+---
+title: 建立或觸發事件
+slug: Web/Guide/Events/Creating_and_triggering_events
+tags:
+  - Advanced
+  - DOM
+  - Guide
+  - JavaScript
+  - 事件
+translation_of: Web/Guide/Events/Creating_and_triggering_events
+---
+<p>本文介紹如何建立和觸發事件。</p>
+
+<h2 id="建立自定義事件">建立自定義事件</h2>
+
+<p>事件可以用 <a href="/zh-TW/docs/Web/API/Event" title="Event 介面表示了所有在 DOM 物件上發生的事件；部分事件是由瀏覽器偵測使用者的操作行為所產生（如滑鼠或鍵盤事件），而其它則是由 API 所產生（例如動畫執行結束、影片暫停播放的事件等等）。事件分為許多不同的類型，其實體通常是由 Event 的子介面所建構。而 Event 介面則定義了所有事件共通的屬性及方法。"><code>Event</code></a> constructor 建立，如下所示：</p>
+
+<pre class="brush: js">var event = new Event(&apos;build&apos;);
+
+// 監聽事件
+elem.addEventListener(&apos;build&apos;, function (e) { ... }, false);
+
+// 觸發事件
+elem.dispatchEvent(event);</pre>
+
+<p>除了 Internet Explorer 以外，大多數的瀏覽器都支持這個 constructor 。若要能夠支援 Internet Explore 的更詳細的方法，可以參考段落《<a href="#早期的做法" title="早期的作法">早期的做法</a>》。</p>
+
+<h3 id="增加自定義的資料－－CustomEvent()">增加自定義的資料－－CustomEvent()</h3>
+
+<p>要在事件的 object 追加其他資料，能使用 <a href="/zh-TW/docs/Web/API/CustomEvent" title="CustomEvent interface 是應用程式為了任意目的所初始化的事件。"><code>CustomEvent</code></a> 介面。它有 <u><strong>detail</strong></u> 屬性，可以用來傳送自訂資料。<br>
+ <span style="line-height: 1.5;">舉例來說，可以以下面方式建立事件：</span></p>
+
+<pre class="brush: js">var event = new CustomEvent(&apos;build&apos;, { &apos;detail&apos;: elem.dataset.time });</pre>
+
+<p>它可以讓你傳送自訂資料到事件的監聽器：</p>
+
+<pre class="brush: js">function eventHandler(e) {
+  log(&apos;The time is: &apos; + e.detail);
+}
+</pre>
+
+<h3 id="早期的做法">早期的做法</h3>
+
+<p>早期建立事件的方式參考了 Java 的 API 。下為一個早期作法的例子：</p>
+
+<pre class="brush: js">// 建立事件
+var event = document.createEvent(&apos;Event&apos;);
+
+// 設定事件名稱為 “build” 。
+event.initEvent(&apos;build&apos;, true, true);
+
+// 監聽事件
+elem.addEventListener(&apos;build&apos;, function (e) {
+  // e.target matches elem
+}, false);
+
+// 事件對象可以是任一 HTML 元素或是 EventTarget 。
+elem.dispatchEvent(event);
+
+</pre>
+
+<h2 id="觸發自定義事件">觸發自定義事件</h2>
+
+<p>下面的例子演示了一個複選框藉由 DOM 的 methods 模擬一次點擊（換言之，讓程式執行一次「點擊事件」。）。 <a href="http://developer.mozilla.org/samples/domref/dispatchEvent.html" class="external">觀看實例</a>。</p>
+
+<pre class="brush: js">function simulateClick() {
+  var event = new MouseEvent(&apos;click&apos;, {
+    &apos;view&apos;: window,
+    &apos;bubbles&apos;: true,
+    &apos;cancelable&apos;: true
+  });
+  var cb = document.getElementById(&apos;checkbox&apos;);
+  var canceled = !cb.dispatchEvent(event);
+  if (canceled) {
+    // A handler called preventDefault.
+    alert(&quot;canceled&quot;);
+  } else {
+    // None of the handlers called preventDefault.
+    alert(&quot;not canceled&quot;);
+  }
+}</pre>
+
+<h2 style="line-height: 30px; font-size: 2.14285714285714rem;" id="Browser_compatibility" name="Browser_compatibility">瀏覽器的支援度</h2>
+
+<h2 id="sect1"> </h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-TW/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th style="line-height: 16px;">Feature</th>
+   <th style="line-height: 16px;">Chrome</th>
+   <th style="line-height: 16px;">Firefox (Gecko)</th>
+   <th style="line-height: 16px;">Edge</th>
+   <th style="line-height: 16px;">Internet Explorer</th>
+   <th style="line-height: 16px;">Opera</th>
+   <th style="line-height: 16px;">Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td><code>Event()</code> constructor</td>
+   <td>15</td>
+   <td>11</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>11.60</td>
+   <td>6</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th style="line-height: 16px;">Feature</th>
+   <th style="line-height: 16px;">Android</th>
+   <th style="line-height: 16px;">Firefox Mobile (Gecko)</th>
+   <th style="line-height: 16px;">IE Mobile</th>
+   <th style="line-height: 16px;">Opera Mobile</th>
+   <th style="line-height: 16px;">Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>6</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="延伸閱讀">延伸閱讀</h2>
+
+<ul>
+ <li><a href="/zh-TW/docs/Web/API/Document/createEvent" title="The documentation about this has not yet been written; please consider contributing!"><code>document.createEvent()</code></a></li>
+ <li><a href="/zh-TW/docs/Web/API/Event/initEvent" title="The documentation about this has not yet been written; please consider contributing!"><code>Event.initEvent()</code></a></li>
+ <li><a href="/zh-TW/docs/Web/API/EventTarget/dispatchEvent" title="於此 EventTarget 物件上觸發特定的 Event 物件實體，相當於依照註冊的順序呼叫它的 EventListener。一般事件處理規則（包含捕捉（capturing）和可選的冒泡（bubbling）階段）也適用於用 dispatchEvent() 手動觸發事件。"><code>EventTarget.dispatchEvent()</code></a></li>
+ <li><a href="/zh-TW/docs/Web/API/EventTarget/addEventListener" title="EventTarget.addEventListener() 方法能將指定的事件監聽器註冊到 EventTarget 實作物件上。EventTarget 可能是 Document 中的 Element 物件、Document 物件本身、Window 物件，或是其它支援事件的物件（如：XMLHttpRequest）。"><code>EventTarget.addEventListener()</code></a></li>
+</ul>

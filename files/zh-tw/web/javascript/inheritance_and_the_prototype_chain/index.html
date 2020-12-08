@@ -1,0 +1,428 @@
+---
+title: 繼承與原型鏈
+slug: Web/JavaScript/Inheritance_and_the_prototype_chain
+translation_of: Web/JavaScript/Inheritance_and_the_prototype_chain
+---
+<section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/zh-TW/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/zh-TW/docs/Web/JavaScript/Tutorials"><strong>Tutorials:</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>Complete beginners</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics</a></li>
+        <li><a href="/zh-TW/docs/Learn/JavaScript/First_steps">JavaScript first steps</a></li>
+        <li><a href="/zh-TW/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks</a></li>
+        <li><a href="/zh-TW/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>JavaScript Guide</summary>
+      <ol>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Grammar_and_Types">Grammar and types</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Control flow and error handling</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Loops_and_iteration">Loops and iteration</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Functions">Functions</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions and operators</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Numbers_and_dates">Numbers and dates</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Text_formatting">Text formatting</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Regular_Expressions">Regular expressions</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Indexed_collections">Indexed collections</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Keyed_collections">Keyed collections</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Working_with_Objects">Working with objects</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Details of the object model</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Iterators_and_generators">Iterators and generators</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Meta_programming">Meta programming</a></li>
+          <li><a href="/zh-TW/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Intermediate</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/zh-TW/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/A_re-introduction_to_JavaScript">A re-introduction to JavaScript</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Data_structures">JavaScript data structures</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Advanced</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">Inheritance and the prototype chain</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Strict_mode">Strict mode</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Typed_arrays">JavaScript typed arrays</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Memory_Management">Memory Management</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/EventLoop">Concurrency model and Event Loop</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/zh-TW/docs/Web/JavaScript/Reference">References:</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>Built-in objects</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/AggregateError">AggregateError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/AggregateError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction">AsyncFunction</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Atomics$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array">BigInt64Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array">BigUint64Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/BigUint64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/EvalError">EvalError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/EvalError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Float32Array">Float32Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Float32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Float64Array">Float64Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Float64Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Generator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction">GeneratorFunction</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Infinity">Infinity</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int16Array">Int16Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int16Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int8Array">Int8Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Int8Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/InternalError">InternalError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/InternalError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Intl$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/NaN">NaN</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Proxy</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/RangeError">RangeError</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError">ReferenceError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Reflect</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer">SharedArrayBuffer</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/String">字串</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Symbol$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError">SyntaxError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/TypeError">TypeError</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/TypeError$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/URIError">URIError</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array">Uint16Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array">Uint32Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array">Uint8Array</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray">Uint8ClampedArray</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakMap$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakRef$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakSet">WeakSet</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WeakSet$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly">WebAssembly</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/decodeURI">decodeURI()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/decodeURI$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent">decodeURIComponent()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/encodeURI">encodeURI()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/encodeURI$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">encodeURIComponent()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/escape">escape()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/escape$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/eval$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/globalThis">globalThis</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/globalThis$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/isFinite">isFinite()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/isFinite$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/isNaN">isNaN()</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/null">null</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/parseFloat">parseFloat()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/parseFloat$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/parseInt">parseInt()</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/unescape">unescape()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/unescape$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/uneval">uneval()</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/uneval$translate" style="opacity: 0.5;">[Translate]</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Expressions &amp; operators</summary>
+      <ol><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Addition">Addition (+)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Addition$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Addition_assignment">Addition assignment (+=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Addition_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Assignment">Assignment (=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">Bitwise AND (&amp;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_AND$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">Bitwise AND assignment (&amp;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">Bitwise NOT (~)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_OR$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">Bitwise OR assignment (|=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">Bitwise XOR assignment (^=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Comma_Operator">逗號運算子</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">條件運算子</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Decrement">Decrement (--)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Decrement$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">解構賦值</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Division$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Division_assignment">Division assignment (/=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Division_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Equality">Equality (==)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Equality$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Exponentiation$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/function">Function expression</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/function$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Greater_than">Greater than (&gt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Greater_than$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">Greater than or equal (&gt;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Grouping">Grouping operator ( )</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Grouping$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Increment">Increment (++)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Increment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Inequality$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Left_shift">Left shift (&lt;&lt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Left_shift$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Less_than$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">Less than or equal (&lt;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_AND">Logical AND (&amp;&amp;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_AND$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_NOT">Logical NOT (!)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_NOT$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR (||)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_OR$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">Logical nullish assignment (??=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Multiplication">Multiplication (*)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Multiplication$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">Nullish coalescing operator (??)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Object_initializer">Object initializer</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Operator_Precedence">運算子優先序</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Optional_chaining">可選串連</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Pipeline_operator">Pipeline operator (|&gt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Pipeline_operator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Property_Accessors">Property accessors</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Property_Accessors$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Remainder">Remainder (%)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Remainder$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Remainder_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Right_shift">Right shift (&gt;&gt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Right_shift$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Spread_syntax">Spread syntax (...)</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Strict_equality">Strict equality (===)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Strict_equality$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Strict_inequality">Strict inequality (!==)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Strict_inequality$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Subtraction$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unary_negation">Unary negation (-)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unary_negation$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unary_plus$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/async_function">async function expression</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/await">await</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/class">class expression</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/class$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/delete">delete operator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/delete$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/function*">function* expression</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/function*$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/in">in operator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/in$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/instanceof">instanceof</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/instanceof$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/new">new operator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/new$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/new.target">new.target</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/new.target$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/super">super</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/this">this</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/typeof">typeof</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/void">void operator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/void$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/yield">yield</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/yield$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/yield*">yield*</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/yield*$translate" style="opacity: 0.5;">[Translate]</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Statements &amp; declarations</summary>
+      <ol><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/async_function">async function</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/block">區塊</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/break">break</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/class">class</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/class$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/const">const</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/continue">continue</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/continue$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/debugger">debugger</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/do...while">do...while</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/do...while$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/Empty">empty</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/Empty$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/export">export</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for">for</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for-await...of">for await...of</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for-await...of$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for...in">for...in</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for...of">for...of</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/for...of$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/function">function declaration</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/function$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/function*">function*</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/if...else">if...else</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/import">import</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/import.meta">import.meta</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/import.meta$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/label">label</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/let">let</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/return">return</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/switch">switch</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/throw">throw</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/try...catch">try...catch</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/try...catch$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/var">var</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/while">while</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/while$translate" style="opacity: 0.5;">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/with">with</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/with$translate" style="opacity: 0.5;">[Translate]</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Functions</summary>
+      <ol><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/Arrow_functions">箭頭函式</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/Default_parameters">預設參數( Default parameters )</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/Method_definitions">方法定義</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/rest_parameters">其餘參數</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/arguments">Arguments 物件</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/get">getter</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Functions/set">setter</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/Private_class_fields">Private class fields</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/Private_class_fields$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/Public_class_fields">Public class fields</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/Public_class_fields$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/constructor">建構子</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Property_access_denied$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint">RangeError: argument is not a valid code point</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_a_codepoint$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_date">RangeError: invalid date</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_date$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Precision_range">RangeError: precision is out of range</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Precision_range$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_radix">RangeError: radix must be an integer</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_radix$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Resulting_string_too_large$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count">RangeError: repeat count must be non-negative</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Negative_repetition_count$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Undeclared_var$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_access_lexical_declaration_before_init$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_caller_or_arguments_usage$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_assignment_left-hand_side$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Undefined_prop$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_octal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with non-simple parameters</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Strict_Non_Simple_Params$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Reserved_identifier$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/JSON_bad_parse$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Malformed_formal_parameter$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unexpected_token">SyntaxError: Unexpected token</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unexpected_token$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_source_map_pragma$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_for-of_initializer$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Delete_in_strict_mode$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_for-in_initializer$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement">SyntaxError: function statement requires a name</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unnamed_function_statement$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Identifier_after_number$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Illegal_character">SyntaxError: illegal character</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Illegal_character$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_regexp_flag$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_argument_list$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_parenthesis_after_condition$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id">SyntaxError: missing : after property id</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_colon_after_property_id$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_semicolon_before_statement$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_initializer_in_const$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list">SyntaxError: missing ] after element list</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_bracket_after_list$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter">SyntaxError: missing formal parameter</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_formal_parameter$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_name_after_dot_operator$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/No_variable_name">SyntaxError: missing variable name</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/No_variable_name$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body">SyntaxError: missing } after function body</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_function_body$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Equal_as_assign$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal">SyntaxError: unterminated string literal</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unterminated_string_literal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_a_constructor$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/No_non-null_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Read-only">TypeError: &quot;x&quot; is read-only</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Read-only$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/is_not_iterable$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/More_arguments_needed">TypeError: More arguments needed</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/More_arguments_needed$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Reduce_of_empty_array_with_no_initial_value$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type">TypeError: X.prototype.y called on incompatible type</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Called_on_incompatible_type$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Dead_object">TypeError: can&apos;t access dead object</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Dead_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_access_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_assign_to_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_define_property_object_not_extensible$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Non_configurable_array_element$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_redefine_property$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/in_operator_no_object">TypeError: cannot use &apos;in&apos; operator to search for &apos;x&apos; in &apos;y&apos;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/in_operator_no_object$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value">TypeError: cyclic object value</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cyclic_object_value$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/invalid_right_hand_side_instanceof_operand$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Array_sort_argument$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments">TypeError: invalid arguments</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Typed_array_invalid_arguments$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Invalid_const_assignment$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Cant_delete$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Getter_only">TypeError: setting getter-only property &quot;x&quot;</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Getter_only$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Var_hides_argument$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Malformed_URI">URIError: malformed URI sequence</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Malformed_URI$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Already_has_pragma$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_octal">Warning: 08/09 is not a legal ECMA-262 octal constant</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Bad_octal$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_toLocaleFormat$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/For-each-in_loops_are_deprecated$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_String_generics$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures">Warning: expression closures are deprecated</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Deprecated_expression_closures$translate" style="opacity: 0.5;">[Translate]</a></li><li><a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Stmt_after_return">Warning: unreachable code after return statement</a> <a href="/zh-TW/docs/Web/JavaScript/Reference/Errors/Stmt_after_return$translate" style="opacity: 0.5;">[Translate]</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Misc</summary>
+      <ol>
+        <li><a href="/zh-TW/docs/Web/JavaScript/JavaScript_technologies_overview">JavaScript technologies overview</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Lexical_grammar">Lexical grammar</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Data_structures">JavaScript data structures</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">Enumerability and ownership of properties</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Strict_mode">Strict mode</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">Transitioning to strict mode</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Template_literals">Template literals</a></li>
+        <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">Deprecated features</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section>
+
+<p>JavaScript 是個沒有實做 <code>class</code> 關鍵字的動態語言，所以會對那些基於類別（class-based）語言（如 Java 或 C++）背景出身的開發者來說會有點困惑。（在 ES2015 有提供 <code>class</code> 關鍵字，但那只是個語法糖，JavaScript 仍然是基於原型（prototype-based）的語言）。</p>
+
+<p>講到繼承，JavaScript 就只有一個建構子：物件。每個物件都有一個連著其他<strong>原型</strong>（prototype）的私有屬性（private property）物件。原型物件也有著自己的原型，於是原型物件就這樣鏈結，直到撞見 <code>null</code> 為止：<code>null</code> 在定義裡沒有原型、也是<strong>原型鏈</strong>（prototype chain）的最後一個鏈結。</p>
+
+<p>幾乎所有 JavaScript 的物件，都是在原型鏈最頂端的 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a> 實例。</p>
+
+<p>雖然這常被認為是 JavaScript 的一個缺陷，但原型繼承模型實際上，比傳統的 classic 模型更強大。舉例來說，使用原型繼承模型建構一個 classic 模型是相當容易的。</p>
+
+<h2 id="使用原型鍊繼承">使用原型鍊繼承</h2>
+
+<h3 id="繼承屬性">繼承屬性</h3>
+
+<p>JavaScript 物件是一「包」動態的屬性（也就是<strong>它自己</strong>的屬性）並擁有一個原型物件的鏈結，當物件試圖存取一個物件的屬性時，其不僅會尋找該物件，也會尋找該物件的原型、原型的原型……直到找到相符合的屬性，或是到達原型鏈的尾端。</p>
+
+<div class="note">
+<p>遵照 ECMAScript 標準的 <code>someObject.[[Prototype]]</code> 標記，用於指派 <code>someObject</code> 的原型。從 ECMAScript 2015 開始， <code>[[Prototype]]</code> 使用 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/getPrototypeOf"><code>Object.getPrototypeOf()</code></a> 與 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf"><code>Object.setPrototypeOf()</code></a> 這兩個訪問器（accessors）訪問，等同於非標準，但各大瀏覽器已實做的 <code>__proto__</code> 屬性。</p>
+
+<p>不要把 <code>someObject.[[Prototype]]</code> 與函式屬性 <code><em>func</em>.prototype</code> 混淆了。它在函式被用作建構子的時候，指定 <code>[[Prototype]]</code> 要分派到所有由給定函式建立的物件實例（instance）。<code><strong>Object.prototype</strong></code> 屬性代表了原型屬性 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object"><code>Object</code></a>。</p>
+</div>
+
+<p>以下是嘗試存取屬性時會發生的事：</p>
+
+<pre class="brush: js notranslate">// 利用含有 a 與 b 屬性的 f 函式，建立一個 o 物件：
+let f = function () {
+   this.a = 1;
+   this.b = 2;
+}
+let o = new f(); // {a: 1, b: 2}
+
+// 接著針對 f 函式的原型添加屬性
+f.prototype.b = 3;
+f.prototype.c = 4;
+
+// 不要寫 f.prototype = {b:3,c:4}; 因為它會破壞原型鏈
+// o.[[Prototype]] 有 b 與 c 的屬性：{b: 3, c: 4}
+// o.[[Prototype]].[[Prototype]] 是 Object.prototype.
+// 最後 o.[[Prototype]].[[Prototype]].[[Prototype]] 成了 null
+// 這是原型鏈的結末，因為 null 按照定義並沒有 [[Prototype]]。
+// 因此，整個原型鏈看起來就像：
+// {a: 1, b: 2} ---&gt; {b: 3, c: 4} ---&gt; Object.prototype ---&gt; null
+
+console.log(o.a); // 1
+// o 有屬性「a」嗎？有，該數值為 1。
+
+console.log(o.b); // 2
+// o 有屬性「b」嗎？有，該數值為 2。
+// o 還有個原型屬性「b」，但這裡沒有被訪問到。
+// 這稱作「property shadowing」。
+
+console.log(o.c); // 4
+// o 有屬性「c」嗎？沒有，那就找 o 的原型看看。
+// o 在「o.[[Prototype]]」有屬性「c」嗎？有，該數值為 4。
+
+console.log(o.d); // undefined
+// o 有屬性「d」嗎？沒有，那就找 o 的原型看看。
+// o 在「o.[[Prototype]]」有屬性「d」嗎？沒有，那就找 o.[[Prototype]] 的原型看看。
+// o.[[Prototype]].[[Prototype]] 是 Object.prototype，預設並沒有屬性「d」，那再找他的原型看看。
+// o 在「o.[[Prototype]].[[Prototype]].[[Prototype]]」是 null，停止搜尋。
+// 找不到任何屬性，回傳 undefined。
+</pre>
+
+<p>給物件設定屬性，會令其建立自有的屬性。這個行為規則的唯一例外，就是碰上以 <a href="/zh-TW/docs/Web/JavaScript/Guide/Working_with_Objects#Defining_getters_and_setters">getter 或 setter</a> 繼承的屬性時。</p>
+
+<h3 id="繼承方法">繼承方法</h3>
+
+<p>Javascript 並沒有其他基於類別語言那般定義的方法。在 Javascript 裡，任何函式都能以屬性的方式加到物件中。一個被繼承的函式的行為就像是其他屬性一樣，其中也包含了上述的 property shadowing（在這種情況下叫做 method overriding）。</p>
+
+<p>當繼承函式執行時，<a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/this"><code>this</code></a> 值指向繼承的物件，而不是在函式內擁有屬性的原型物件。</p>
+
+<pre class="brush: js notranslate">var o = {
+  a: 2,
+  m: function() {
+    return this.a + 1;
+  }
+};
+
+console.log(o.m()); // 3
+// 在這裡呼叫 o.m 時「this」指的是 o
+
+var p = Object.create(o);
+// p 是個從 o 繼承的物件
+
+p.a = 4; // 在 p 建立屬性「a」
+console.log(p.m()); // 5
+// 呼叫 p.m 時「this」指的是 p
+// 因此在 p 繼承 o 的函式 m 時，
+// 「this.a」指的是 p.a：也就是 p 的自有屬性「a」
+</pre>
+
+<h2 id="產生物件和原型鏈的幾種方法">產生物件和原型鏈的幾種方法</h2>
+
+<h3 id="含有語法結構的物件">含有語法結構的物件</h3>
+
+<pre class="brush: js notranslate">var o = {a: 1};
+
+// 新建的 o 有個自己的 [[Prototype]] 稱為 Object.prototype
+// o 自己並沒有稱為「hasOwnProperty」的屬性
+// 而 hasOwnProperty 是 Object.prototype 的自有屬性。
+// 因此 o 從 Object.prototype 繼承了 hasOwnProperty
+// Object.prototype 作為其原型多了個 null
+// o ---&gt; Object.prototype ---&gt; null
+
+var a = [&apos;yo&apos;, &apos;whadup&apos;, &apos;?&apos;];
+
+// 從 Array.prototype 繼承的陣列，含有諸如 indexOf、forEach……之類的方法
+// 原型鏈看起來就像：
+// a ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null
+
+function f() {
+  return 2;
+}
+
+// 從 Function.prototype 繼承的函式，含有諸如 call、bind……之類的方法
+// f ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null
+</pre>
+
+<h3 id="透過建構子">透過建構子</h3>
+
+<p>JavaScript 建構子，就、只、是、個、被 <a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/new">new 運算子</a>呼叫的函式。</p>
+
+<pre class="brush: js notranslate">function Graph() {
+  this.vertices = [];
+  this.edges = [];
+}
+
+Graph.prototype = {
+  addVertex: function(v) {
+    this.vertices.push(v);
+  }
+};
+
+var g = new Graph();
+// g 是個有著「vertices」與「edges」屬性的物件。
+// 在執行 new Graph() 時 g.[[Prototype]] 是 Graph.prototype 的值。
+</pre>
+
+<h3 id="用_Object.create">用 <code>Object.create</code></h3>
+
+<p>ECMAScript 5 引入了新方法：<a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/create"><code>Object.create()</code></a>。呼叫這個方法就可以建立新的物件。這個物件的原型，為函式的第一個參數。</p>
+
+<pre class="brush: js notranslate">var a = {a: 1};
+// a ---&gt; Object.prototype ---&gt; null
+
+var b = Object.create(a);
+// b ---&gt; a ---&gt; Object.prototype ---&gt; null
+console.log(b.a); // 1 (inherited)
+
+var c = Object.create(b);
+// c ---&gt; b ---&gt; a ---&gt; Object.prototype ---&gt; null
+
+var d = Object.create(null);
+// d ---&gt; null
+console.log(d.hasOwnProperty);
+// undefined, because d doesn&apos;t inherit from Object.prototype
+</pre>
+
+<h3 id="使用關鍵字_class">使用關鍵字 <code>class</code></h3>
+
+<p>ECMAScript 2015 引入了新的<a href="/zh-TW/docs/Web/JavaScript/Reference/Classes">類別</a>實做。儘管對那些基於類別的開發者來說，這種結構體令他們感到熟悉，它們依舊不一樣。JavaScript 依舊是基於原型的。新的關鍵字包括 <a href="/zh-TW/docs/Web/JavaScript/Reference/Statements/class"><code>class</code></a>、<a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/constructor"><code>constructor</code></a>、<a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/static"><code>static</code></a>、<a href="/zh-TW/docs/Web/JavaScript/Reference/Classes/extends"><code>extends</code></a>、<a href="/zh-TW/docs/Web/JavaScript/Reference/Operators/super"><code>super</code></a>。</p>
+
+<pre class="brush: js notranslate">&apos;use strict&apos;;
+
+class Polygon {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+
+class Square extends Polygon {
+  constructor(sideLength) {
+    super(sideLength, sideLength);
+  }
+  get area() {
+    return this.height * this.width;
+  }
+  set sideLength(newLength) {
+    this.height = newLength;
+    this.width = newLength;
+  }
+}
+
+var square = new Square(2);
+</pre>
+
+<h3 id="效能">效能</h3>
+
+<p>原型鏈上的屬性的查詢時間，可能會對效能有負面影響，對程式碼也因而產生明顯問題。另外，試圖尋找不存在的屬性，就一定會遍歷整個原型鏈。</p>
+
+<p>接著，在迭代物件屬性時，<strong>每個</strong>原型鏈的枚舉屬性都會抓出來。</p>
+
+<p>要檢查物件<em>本身</em>有沒有指定的屬性、也不需要查找整個原型鏈時，你必須使用由 <code>Object.prototype</code> 繼承的 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty"><code>hasOwnProperty</code></a> 方法。</p>
+
+<pre class="brush: js notranslate">console.log(g.hasOwnProperty(&apos;vertices&apos;));
+// true
+
+console.log(g.hasOwnProperty(&apos;nope&apos;));
+// false
+
+console.log(g.hasOwnProperty(&apos;addVertex&apos;));
+// false
+
+console.log(g.__proto__.hasOwnProperty(&apos;addVertex&apos;));
+// true
+</pre>
+
+<p>在 JavaScript 裡面 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty"><code>hasOwnProperty</code></a> 是唯一能處理、且<strong>不</strong>遍歷整個原型鏈的方法。</p>
+
+<p>註：如果只有檢查屬性是否為 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/undefined"><code>undefined</code></a> <strong>是不夠的</strong>。該屬性可能存在，只是數值被設定為 <code>undefined</code>。</p>
+
+<h3 id="壞實做：擴充原生的原型">壞實做：擴充原生的原型</h3>
+
+<p>一個常見的誤用，是擴充 <code>Object.prototype</code> 或其他內建的原型。</p>
+
+<p>這種技巧稱為猴子補丁（monkey patching），它會破壞<em>封裝</em>（encapsulation）。儘管有些受歡迎的框架如 Prototype.js 會這麼做，但它們並不是以額外的<em>非標準</em>功能，打亂內建類型的好理由。</p>
+
+<p>擴充內建原型的<strong>唯一</strong>合理理由，就是反向移植新版 JavaScript 引擎的功能，例如 <code>Array.forEach</code>。</p>
+
+<h2 id="示例">示例</h2>
+
+<p><code>B</code> 要繼承自 <code>A</code>：</p>
+
+<pre class="brush: js notranslate">function A(a) {
+  this.varA = a;
+}
+
+// 在 A.prototype.varA 會<em>永遠</em>被 this.varA 鬼隱（shadowed）的情況下，
+// 把 varA 包在給定函式的原型內，其意義為何？
+A.prototype = {
+  varA: null,  // 難道不能因為原型啥都沒作，就把 varA 打斷嗎？
+      // 也許他打算要分配隱藏類別的空間，以便實行最佳化？
+      // https://developers.google.com/speed/articles/optimizing-javascript#Initializing instance variables
+      // 如果 varA 沒有針對每個實例作單一初始化，那麼不就要變有效的？
+  doSomething: function() {
+    // ...
+  }
+};
+
+function B(a, b) {
+  A.call(this, a);
+  this.varB = b;
+}
+B.prototype = Object.create(A.prototype, {
+  varB: {
+    value: null,
+    enumerable: true,
+    configurable: true,
+    writable: true
+  },
+  doSomething: {
+    value: function() { // override
+      A.prototype.doSomething.apply(this, arguments); // call super
+      // ...
+    },
+    enumerable: true,
+    configurable: true,
+    writable: true
+  }
+});
+B.prototype.constructor = B;
+
+var b = new B();
+b.doSomething();
+</pre>
+
+<p>重點是：</p>
+
+<ul>
+ <li>型別被定義在 <code>.prototype</code>。</li>
+ <li>你用了 <code>Object.create()</code> 繼承。</li>
+</ul>
+
+<h2 id="prototype_與_Object.getPrototypeOf"><code>prototype</code> 與 <code>Object.getPrototypeOf</code></h2>
+
+<p>JavaScript 對那些從 Java 或 C++ 學過來的人來說，可能會有點困惑，因為它動態、永遠是執行狀態（all runtime）、還完全沒有 class。一切都只是實例（物件）。即使是「class」關鍵字，也只是函式物件。</p>
+
+<p>你可能早就發現我們的 <code>function A</code> 有個名為 <code>prototype</code> 的特殊屬性。這個特殊屬性會透過 <code>new</code> 運算子運行之。原型物件的參照，會把新實例的 <code>[[Prototype]]</code> 屬性複製到該物件內部。比方說在你 <code>var a1 = new A()</code> 時，JavaScript 在記憶體裡面建立物件後、還有運行已經定義好 <code>this</code> 的函式 <code>A()</code> 前，會設定 <code>a1.[[Prototype]] = A.prototype</code>。在接著訪問實例的屬性前，JavaScript 首先會直接檢查物件的實例屬性是否存在。如果沒有，就檢查 <code>[[Prototype]]</code>。也就是說，在 <code>prototype</code> 定義的東西，能夠有效地共享給各實，甚至，如果想的話，還可以改變並顯現於現有實例中。</p>
+
+<p>如上例所示，首先 <code>var a1 = new A(); var a2 = new A();</code> 接著 <code>a1.doSomething</code> 的話，會參照到 <code>Object.getPrototypeOf(a1).doSomething</code>，他會與早就定義好的 <code>A.prototype.doSomething</code> 相同，例如： <code>Object.getPrototypeOf(a1).doSomething == Object.getPrototypeOf(a2).doSomething == A.prototype.doSomething</code>.</p>
+
+<p>簡而言之，<code>prototype</code> 針對型別，而 <code>Object.getPrototypeOf()</code> 則和實例相同。</p>
+
+<p><code>[[Prototype]]</code> <em>遞歸性地</em>鏈結著，例如說 <code>a1.doSomething</code>, <code>Object.getPrototypeOf(a1).doSomething</code>, <code>Object.getPrototypeOf(Object.getPrototypeOf(a1)).doSomething</code> 這樣，直到找出 <code>Object.getPrototypeOf</code> 或回傳 null。</p>
+
+<p>因此當你：</p>
+
+<pre class="brush: js notranslate">var o = new Foo();</pre>
+
+<p>JavaScript 其實會：</p>
+
+<pre class="brush: js notranslate">var o = new Object();
+o.[[Prototype]] = Foo.prototype;
+Foo.call(o);</pre>
+
+<p>或偶爾這樣：</p>
+
+<pre class="brush: js notranslate">o.someProp;</pre>
+
+<p>時，它檢查了 <code>o</code> 有沒有 <code>someProp</code> 屬性。如果沒有，就檢查 <code>Object.getPrototypeOf(o).someProp</code>；再沒有就檢查 <code>Object.getPrototypeOf(Object.getPrototypeOf(o)).someProp</code>，依此類推。</p>
+
+<h2 id="結論">結論</h2>
+
+<p>在撰寫複雜的可用程式碼之前，理解原型繼承模型<strong>很重要</strong>。另外，請注意程式碼內原型鏈的長度、必要時打破它們，以避免潛在的效能問題。再來，除非要處理 JavaScript 新語法的相容性，否則<strong>絕對不能</strong>擴充原生的原型。</p>

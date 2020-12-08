@@ -1,0 +1,398 @@
+---
+title: 觸控事件
+slug: Web/API/Touch_events
+translation_of: Web/API/Touch_events
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-TW/docs/Web/API/Touch_events">Touch events</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/zh-TW/docs/Web/API/Touch_events/Multi-touch_interaction">Multi-touch interaction</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/API/Touch_events/Multi-touch_interaction$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent">Supporting both TouchEvent and MouseEvent</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/API/Touch_events/Using_Touch_Events">Using Touch Events</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/API/Touch_events/Using_Touch_Events$translate">[Translate]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/zh-TW/docs/Web/API/Touch"><code>Touch</code></a></li><li><a href="/zh-TW/docs/Web/API/TouchEvent"><code>TouchEvent</code></a></li><li><a href="/zh-TW/docs/Web/API/TouchList"><code>TouchList</code></a></li></ol></details></li><li class="toggle"><details open><summary>Events</summary><ol><li><a href="/zh-TW/docs/Web/Events/touchstart"><code>touchstart</code></a></li><li><a href="/zh-TW/docs/Web/Events/touchend"><code>touchend</code></a></li><li><a href="/zh-TW/docs/Web/Events/touchmove"><code>touchmove</code></a></li><li><a href="/zh-TW/docs/Web/Events/touchcancel"><code>touchcancel</code></a></li></ol></details></li></ol></section></div>
+
+<p>為了支援基於觸碰的使用者介面，觸控事件提供了解釋手指或觸控筆於觸控螢幕或觸控板上活動的資訊。</p>
+
+<p>觸控事件介面為相對低階的 API，可用來支援應用程式特定的多點觸控互動，例如兩指手勢。多點觸控互動起始於手指或觸控筆於平面的第一個觸碰，其它的手指可能於其後伴隨著移動才觸碰到平面。而互動則結束於手指自觸控平面離開。在此互動期間，應用程式會於開始、移動以及結束的階段接收到觸控事件。</p>
+
+<p>觸控事件類似於滑鼠事件，但觸控事件支援同時間多個觸碰及其於觸控平面的每個不同點位置。<a href="/zh-TW/docs/Web/API/TouchEvent" title="TouchEvent 介面表示了一個由觸控平面因觸碰而改變狀態所發出的事件。平面可以是觸控螢幕或是觸控板，TouchEvent 能描述一或多個觸碰點，並且支援偵測其移動、增加或減少觸碰點等等功能。"><code>TouchEvent</code></a> 介面封裝了所有當前作用中的觸碰點。<a href="/zh-TW/docs/Web/API/Touch" title="Touch 介面表示了一個於觸控裝置上接觸的單一觸碰點。觸碰點通常是由手指或觸控筆所接觸，而裝置可能為觸控螢幕或觸控板。"><code>Touch</code></a> 介面則表示個別的觸碰點，包括了如觸碰點於瀏覽器 viewport 中的相對位置資訊。</p>
+
+<h2 id="定義">定義</h2>
+
+<dl>
+ <dt>平面（Surface）</dt>
+ <dd>The touch-sensitive surface. This may be a screen or trackpad.</dd>
+</dl>
+
+<dl>
+ <dt>觸碰點（Touch point）</dt>
+ <dd>A point of contact with the surface. This may be a finger (or elbow, ear, nose, whatever, but typically a finger) or stylus.</dd>
+</dl>
+
+<h2 id="介面">介面</h2>
+
+<dl>
+ <dt><a href="/zh-TW/docs/Web/API/TouchEvent" title="TouchEvent 介面表示了一個由觸控平面因觸碰而改變狀態所發出的事件。平面可以是觸控螢幕或是觸控板，TouchEvent 能描述一或多個觸碰點，並且支援偵測其移動、增加或減少觸碰點等等功能。"><code>TouchEvent</code></a></dt>
+ <dd>Represents an event that occurs when the state of touches on the surface changes.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/Touch" title="Touch 介面表示了一個於觸控裝置上接觸的單一觸碰點。觸碰點通常是由手指或觸控筆所接觸，而裝置可能為觸控螢幕或觸控板。"><code>Touch</code></a></dt>
+ <dd>Represents a single point of contact between the user and the touch surface.</dd>
+ <dt><a href="/zh-TW/docs/Web/API/TouchList" title="TouchList 介面表示了一個觸控平面上所有觸碰點的列表；舉例來說，假如使用者有三隻手指於觸控平面（如觸控螢幕或是觸控板）上，則其相對應的 TouchList 物件中就會分別有三個 Touch 物件各代表一個手指的觸碰。"><code>TouchList</code></a></dt>
+ <dd>Represents a group of touches; this is used when the user has, for example, multiple fingers on the surface at the same time.</dd>
+</dl>
+
+<h2 id="範例">範例</h2>
+
+<p>This example tracks multiple touch points at a time, allowing the user to draw in a <a href="/zh-TW/docs/Web/HTML/Element/canvas" title="這個 HTML &lt;canvas&gt; 元素 可以被使用於對腳本程式(JaveScript) 繪圖 .舉例來說, 它能用來畫圖,組合照片,甚至作動畫. 你也許(應該) 在&lt;canvas&gt;區段內提供替代方案的內容 .這內容將能被一些不支援&lt;canvas&gt;以及無法使用Javescript功能的瀏覽器所渲染 ."><code>&lt;canvas&gt;</code></a> with more than one finger at a time. It will only work on a browser that supports touch events.</p>
+
+<div class="note"><strong>Note:</strong> The text below uses the term &quot;finger&quot; when describing the contact with the surface, but it could, of course, also be a stylus or other contact method.</div>
+
+<h3 id="Create_a_canvas">Create a canvas</h3>
+
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;600&quot; height=&quot;600&quot; style=&quot;border:solid black 1px;&quot;&gt;
+  Your browser does not support canvas element.
+&lt;/canvas&gt;
+&lt;br&gt;
+&lt;button onclick=&quot;startup()&quot;&gt;Initialize&lt;/button&gt;
+&lt;br&gt;
+Log: &lt;pre id=&quot;log&quot; style=&quot;border: 1px solid #ccc;&quot;&gt;&lt;/pre&gt;
+</pre>
+
+<h3 id="Setting_up_the_event_handlers">Setting up the event handlers</h3>
+
+<p>When the page loads, the <code>startup()</code> function shown below should be called by our <a href="/zh-TW/docs/Web/HTML/Element/body" title="The documentation about this has not yet been written; please consider contributing!"><code>&lt;body&gt;</code></a> element&apos;s <code>onload</code> attribute (but in the example we use a button to trigger it, due to limitations of the MDN live example system).</p>
+
+<pre class="brush: js">function startup() {
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  el.addEventListener(&quot;touchstart&quot;, handleStart, false);
+  el.addEventListener(&quot;touchend&quot;, handleEnd, false);
+  el.addEventListener(&quot;touchcancel&quot;, handleCancel, false);
+  el.addEventListener(&quot;touchmove&quot;, handleMove, false);
+  log(&quot;initialized.&quot;);
+}
+</pre>
+
+<p>This simply sets up all the event listeners for our <a href="/zh-TW/docs/Web/HTML/Element/canvas" title="這個 HTML &lt;canvas&gt; 元素 可以被使用於對腳本程式(JaveScript) 繪圖 .舉例來說, 它能用來畫圖,組合照片,甚至作動畫. 你也許(應該) 在&lt;canvas&gt;區段內提供替代方案的內容 .這內容將能被一些不支援&lt;canvas&gt;以及無法使用Javescript功能的瀏覽器所渲染 ."><code>&lt;canvas&gt;</code></a> element so we can handle the touch events as they occur.</p>
+
+<h4 id="Tracking_new_touches">Tracking new touches</h4>
+
+<p>We&apos;ll keep track of the touches in-progress.</p>
+
+<pre class="brush: js">var ongoingTouches = [];
+</pre>
+
+<p>When a <code><a href="/zh-TW/docs/Web/Reference/Events/touchstart" title="/zh-TW/docs/Web/Reference/Events/touchstart">touchstart</a></code> event occurs, indicating that a new touch on the surface has occurred, the <code>handleStart()</code> function below is called.</p>
+
+<pre class="brush: js">function handleStart(evt) {
+  evt.preventDefault();
+  log(&quot;touchstart.&quot;);
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  for (var i = 0; i &lt; touches.length; i++) {
+    log(&quot;touchstart:&quot; + i + &quot;...&quot;);
+    ongoingTouches.push(copyTouch(touches[i]));
+    var color = colorForTouch(touches[i]);
+    ctx.beginPath();
+    ctx.arc(touches[i].pageX, touches[i].pageY, 4, 0, 2 * Math.PI, false);  // a circle at the start
+    ctx.fillStyle = color;
+    ctx.fill();
+    log(&quot;touchstart:&quot; + i + &quot;.&quot;);
+  }
+}
+</pre>
+
+<p>This calls <a href="/zh-TW/docs/Web/API/Event/preventDefault" title="如果事件可以被取消，就取消事件（即取消事件的預設行為）。但不會影響事件的傳遞，事件仍會繼續傳遞。"><code>event.preventDefault()</code></a> to keep the browser from continuing to process the touch event (this also prevents a mouse event from also being delivered). Then we get the context and pull the list of changed touch points out of the event&apos;s <a href="/zh-TW/docs/Web/API/TouchEvent/changedTouches" title="The documentation about this has not yet been written; please consider contributing!"><code>TouchEvent.changedTouches</code></a> property.</p>
+
+<p>After that, we iterate over all the <a href="/zh-TW/docs/Web/API/Touch" title="Touch 介面表示了一個於觸控裝置上接觸的單一觸碰點。觸碰點通常是由手指或觸控筆所接觸，而裝置可能為觸控螢幕或觸控板。"><code>Touch</code></a> objects in the list, pushing them onto an array of active touch points and drawing the start point for the draw as a small circle; we&apos;re using a 4-pixel wide line, so a 4 pixel radius circle will show up neatly.</p>
+
+<h4 id="Drawing_as_the_touches_move">Drawing as the touches move</h4>
+
+<p>Each time one or more fingers moves, a <code><a href="/zh-TW/docs/Web/Reference/Events/touchmove" title="/zh-TW/docs/Web/Reference/Events/touchmove">touchmove</a></code> event is delivered, resulting in our <code>handleMove()</code> function being called. Its responsibility in this example is to update the cached touch information and to draw a line from the previous position to the current position of each touch.</p>
+
+<pre class="brush: js">function handleMove(evt) {
+  evt.preventDefault();
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  for (var i = 0; i &lt; touches.length; i++) {
+    var color = colorForTouch(touches[i]);
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    if (idx &gt;= 0) {
+      log(&quot;continuing touch &quot;+idx);
+      ctx.beginPath();
+      log(&quot;ctx.moveTo(&quot; + ongoingTouches[idx].pageX + &quot;, &quot; + ongoingTouches[idx].pageY + &quot;);&quot;);
+      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+      log(&quot;ctx.lineTo(&quot; + touches[i].pageX + &quot;, &quot; + touches[i].pageY + &quot;);&quot;);
+      ctx.lineTo(touches[i].pageX, touches[i].pageY);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+
+      ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
+      log(&quot;.&quot;);
+    } else {
+      log(&quot;can&apos;t figure out which touch to continue&quot;);
+    }
+  }
+}
+</pre>
+
+<p>This iterates over the changed touches as well, but it looks in our cached touch information array for the previous information about each touch in order to determine the starting point for each touch&apos;s new line segment to be drawn. This is done by looking at each touch&apos;s <a href="/zh-TW/docs/Web/API/Touch/identifier" title="The documentation about this has not yet been written; please consider contributing!"><code>Touch.identifier</code></a> property. This property is a unique integer for each touch, and remains consistent for each event during the duration of each finger&apos;s contact with the surface.</p>
+
+<p>This lets us get the coordinates of the previous position of each touch and use the appropriate context methods to draw a line segment joining the two positions together.</p>
+
+<p>After drawing the line, we call <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice"><code>Array.splice()</code></a> to replace the previous information about the touch point with the current information in the <code>ongoingTouches</code> array.</p>
+
+<h4 id="Handling_the_end_of_a_touch">Handling the end of a touch</h4>
+
+<p>When the user lifts a finger off the surface, a <code><a href="/zh-TW/docs/Web/Reference/Events/touchend" title="/zh-TW/docs/Web/Reference/Events/touchend">touchend</a></code> event is sent. We handle both of these the same way: by calling the <code>handleEnd()</code> function below. Its job is to draw the last line segment for each touch that ended and remove the touch point from the ongoing touch list.</p>
+
+<pre class="brush: js">function handleEnd(evt) {
+  evt.preventDefault();
+  log(&quot;touchend&quot;);
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  for (var i = 0; i &lt; touches.length; i++) {
+    var color = colorForTouch(touches[i]);
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    if (idx &gt;= 0) {
+      ctx.lineWidth = 4;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+      ctx.lineTo(touches[i].pageX, touches[i].pageY);
+      ctx.fillRect(touches[i].pageX - 4, touches[i].pageY - 4, 8, 8);  // and a square at the end
+      ongoingTouches.splice(idx, 1);  // remove it; we&apos;re done
+    } else {
+      log(&quot;can&apos;t figure out which touch to end&quot;);
+    }
+  }
+}
+</pre>
+
+<p>This is very similar to the previous function; the only real differences are that we draw a small square to mark the end and that when we call <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice"><code>Array.splice()</code></a>, we simply remove the old entry from the ongoing touch list, without adding in the updated information. The result is that we stop tracking that touch point.</p>
+
+<h4 id="Handling_canceled_touches">Handling canceled touches</h4>
+
+<p>If the user&apos;s finger wanders into browser UI, or the touch otherwise needs to be canceled, the <code><a href="/zh-TW/docs/Web/Reference/Events/touchcancel" title="/zh-TW/docs/Web/Reference/Events/touchcancel">touchcancel</a></code> event is sent, and we call the <code>handleCancel()</code> function below.</p>
+
+<pre class="brush: js">function handleCancel(evt) {
+  evt.preventDefault();
+  log(&quot;touchcancel.&quot;);
+  var touches = evt.changedTouches;
+
+  for (var i = 0; i &lt; touches.length; i++) {
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+    ongoingTouches.splice(idx, 1);  // remove it; we&apos;re done
+  }
+}
+</pre>
+
+<p>Since the idea is to immediately abort the touch, we simply remove it from the ongoing touch list without drawing a final line segment.</p>
+
+<h3 id="Convenience_functions">Convenience functions</h3>
+
+<p>This example uses two convenience functions that should be looked at briefly to help make the rest of the code more clear.</p>
+
+<h4 id="Selecting_a_color_for_each_touch">Selecting a color for each touch</h4>
+
+<p>In order to make each touch&apos;s drawing look different, the <code>colorForTouch()</code> function is used to pick a color based on the touch&apos;s unique identifier. This identifier is an opaque number, but we can at least rely on it differing between the currently-active touches.</p>
+
+<pre class="brush: js">function colorForTouch(touch) {
+  var r = touch.identifier % 16;
+  var g = Math.floor(touch.identifier / 3) % 16;
+  var b = Math.floor(touch.identifier / 7) % 16;
+  r = r.toString(16); // make it a hex digit
+  g = g.toString(16); // make it a hex digit
+  b = b.toString(16); // make it a hex digit
+  var color = &quot;#&quot; + r + g + b;
+  log(&quot;color for touch with identifier &quot; + touch.identifier + &quot; = &quot; + color);
+  return color;
+}
+</pre>
+
+<p>The result from this function is a string that can be used when calling <a href="/zh-TW/docs/Web/HTML/Element/canvas" title="這個 HTML &lt;canvas&gt; 元素 可以被使用於對腳本程式(JaveScript) 繪圖 .舉例來說, 它能用來畫圖,組合照片,甚至作動畫. 你也許(應該) 在&lt;canvas&gt;區段內提供替代方案的內容 .這內容將能被一些不支援&lt;canvas&gt;以及無法使用Javescript功能的瀏覽器所渲染 ."><code>&lt;canvas&gt;</code></a> functions to set drawing colors. For example, for a <a href="/zh-TW/docs/Web/API/Touch/identifier" title="The documentation about this has not yet been written; please consider contributing!"><code>Touch.identifier</code></a> value of 10, the resulting string is &quot;#aaa&quot;.</p>
+
+<h4 id="Copying_a_touch_object">Copying a touch object</h4>
+
+<p>Some browsers (mobile Safari, for one) re-use touch objects between events, so it&apos;s best to copy the bits you care about, rather than referencing the entire object.</p>
+
+<pre class="brush: js">function copyTouch(touch) {
+  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
+}</pre>
+
+<h4 id="Finding_an_ongoing_touch">Finding an ongoing touch</h4>
+
+<p>The <code>ongoingTouchIndexById()</code> function below scans through the <code>ongoingTouches</code> array to find the touch matching the given identifier, then returns that touch&apos;s index into the array.</p>
+
+<pre class="brush: js">function ongoingTouchIndexById(idToFind) {
+  for (var i = 0; i &lt; ongoingTouches.length; i++) {
+    var id = ongoingTouches[i].identifier;
+
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1;    // not found
+}
+</pre>
+
+<h4 id="Showing_what&apos;s_going_on">Showing what&apos;s going on</h4>
+
+<pre class="brush: js">function log(msg) {
+  var p = document.getElementById(&apos;log&apos;);
+  p.innerHTML = msg + &quot;\n&quot; + p.innerHTML;
+}</pre>
+
+<p>If your browser supports it, you can <a href="https://mdn.mozillademos.org/zh-TW/docs/Web/API/Touch_events$samples/Example?revision=1243077">see it live</a>.</p>
+
+<p><a href="http://jsfiddle.net/Darbicus/z3Xdx/10/">jsFiddle example</a></p>
+
+<h2 id="Additional_tips">Additional tips</h2>
+
+<p>This section provides additional tips on how to handle touch events in your web application.</p>
+
+<h3 id="Handling_clicks">Handling clicks</h3>
+
+<p>Since calling <code>preventDefault()</code> on a <code><a href="/zh-TW/docs/Web/Reference/Events/touchstart" title="/zh-TW/docs/Web/Reference/Events/touchstart">touchstart</a></code> or the first <code><a href="/zh-TW/docs/Web/Reference/Events/touchmove" title="/zh-TW/docs/Web/Reference/Events/touchmove">touchmove</a></code> event of a series prevents the corresponding mouse events from firing, it&apos;s common to call <code>preventDefault()</code> on <code><a href="/zh-TW/docs/Web/Reference/Events/touchmove" title="/zh-TW/docs/Web/Reference/Events/touchmove">touchmove</a></code> rather than <code><a href="/zh-TW/docs/Web/Reference/Events/touchstart" title="/zh-TW/docs/Web/Reference/Events/touchstart">touchstart</a></code>. That way, mouse events can still fire and things like links will continue to work. Alternatively, some frameworks have taken to refiring touch events as mouse events for this same purpose. (This example is oversimplified and may result in strange behavior. It is only intended as a guide.)</p>
+
+<pre class="brush: js">function onTouch(evt) {
+  evt.preventDefault();
+  if (evt.touches.length &gt; 1 || (evt.type == &quot;touchend&quot; &amp;&amp; evt.touches.length &gt; 0))
+    return;
+
+  var newEvt = document.createEvent(&quot;MouseEvents&quot;);
+  var type = null;
+  var touch = null;
+
+  switch (evt.type) {
+    case &quot;touchstart&quot;:
+      type = &quot;mousedown&quot;;
+      touch = evt.changedTouches[0];
+      break;
+    case &quot;touchmove&quot;:
+      type = &quot;mousemove&quot;;
+      touch = evt.changedTouches[0];
+      break;
+    case &quot;touchend&quot;:
+      type = &quot;mouseup&quot;;
+      touch = evt.changedTouches[0];
+      break;
+  }
+
+  newEvt.initMouseEvent(type, true, true, evt.originalTarget.ownerDocument.defaultView, 0,
+    touch.screenX, touch.screenY, touch.clientX, touch.clientY,
+    evt.ctrlKey, evt.altKey, evt.shiftKey, evt.metaKey, 0, null);
+  evt.originalTarget.dispatchEvent(newEvt);
+}
+</pre>
+
+<h3 id="Calling_preventDefault()_only_on_a_second_touch">Calling preventDefault() only on a second touch</h3>
+
+<p>One technique for preventing things like <code>pinchZoom</code> on a page is to call <code>preventDefault()</code> on the second touch in a series. This behavior is not well defined in the touch events spec, and results in different behavior for different browsers (i.e., iOS will prevent zooming but still allow panning with both fingers; Android will allow zooming but not panning; Opera and Firefox currently prevent all panning and zooming.) Currently, it&apos;s not recommended to depend on any particular behavior in this case, but rather to depend on meta viewport to prevent zooming.</p>
+
+<h2 id="規範">規範</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://w3c.github.io/touch-events/#touch-interface" class="external" hreflang="en">Touch Events – Level 2<br><small lang="zh-TW">The definition of &apos;Touch&apos; in that specification.</small></a></td>
+   <td><span class="spec-Draft">Draft</span></td>
+   <td>Added <code>radiusX</code>, <code>radiusY</code>, <code>rotationAngle</code>, <code>force</code> properties</td>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://www.w3.org/TR/touch-events/#touch-interface" class="external" hreflang="en">Touch Events<br><small lang="zh-TW">The definition of &apos;Touch&apos; in that specification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="瀏覽器相容性">瀏覽器相容性</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-TW/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<p>Note that unfortunately touch events may not fire at all on laptops with touch functionality (<a href="/en-US/docs/">test page</a>).</p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>22.0</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/18" title="Released on 2013-01-08.">18.0</a> (18.0)<sup>[1]</sup><br>
+    <a href="/en-US/Firefox/Releases/52" title="Released on 2017-03-07.">52.0</a> (52.0)<sup>[2]</sup></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Chrome for Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td>6.0 (6.0)</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td>11</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] The <code>dom.w3c_touch_events.enabled</code> tri-state preference can be used to disable (0), enable (1), and auto-detect (2) support for standard touch events; by default, they&apos;re on auto-detect (2).</p>
+
+<p>As of Gecko 24.0 (Firefox 24.0 / Thunderbird 24.0 / SeaMonkey 2.21), the touch events support introduced with Gecko 18.0 (Firefox 18.0 / Thunderbird 18.0 / SeaMonkey 2.15) has been disabled on the desktop version of Firefox (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=888304" title="FIXED: Content touch-events on Firefox-desktop should be disabled until we can support them properly">bug 888304</a>), as some popular sites including Google and Twitter were not working properly. Once the bug is fixed, the API will be enabled again. To enable it anyway, open <code>about:config</code> and set the <code>dom.w3c_touch_events.enabled</code> preference to <code>2</code>. The mobile versions including <a href="/en-US/docs/Mozilla/Firefox_for_Android">Firefox for Android</a> and <a href="/en-US/docs/Mozilla/Firefox_OS">Firefox OS</a> are not affected by this change.</p>
+
+<p>[2] As of Gecko 52.0, touch events support has been fixed and reenabled in Windows desktop platforms.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Prior to Gecko 6.0 (Firefox 6.0 / Thunderbird 6.0 / SeaMonkey 2.3), Gecko offered a <a href="/en-US/docs/Web/Guide/Events/Touch_events_(Mozilla_experimental)">proprietary touch event API</a>. That API is now deprecated; you should switch to this one.</p>
+</div>

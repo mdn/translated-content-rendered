@@ -1,0 +1,802 @@
+---
+title: 使用 Web Workers
+slug: Web/API/Web_Workers_API/Using_web_workers
+translation_of: Web/API/Web_Workers_API/Using_web_workers
+---
+<div class="summary">
+<p><span style="line-height: inherit;">Web Workers 提供簡單的方法讓網頁在背景執行緒 (Thread) 中執行程式，而不干擾使用者介面運行</span>，<span style="line-height: inherit;">另外，Worker也可以利用 </span><a style="line-height: inherit;" href="https://developer.mozilla.org/en/nsIXMLHttpRequest" title="https://developer.mozilla.org/en/nsIXMLHttpRequest">XMLHttpRequest</a><span style="line-height: inherit;"> 執行輸出/輸入(但是responseXML 和channel這兩個屬性為null)</span>；<span style="line-height: inherit;">一個worker可以藉由事件處理器來和</span> <span style="line-height: inherit;">web worker 創造端互相傳送訊息</span>，接下來本文會提供使用 web worker 的詳細說明。</p>
+</div>
+
+<h2 id="Web_Workers_API">Web Workers API</h2>
+
+<p>透過 worker 建構子 (如 <a href="/zh-TW/docs/Web/API/Worker/Worker" title="The documentation about this has not yet been written; please consider contributing!"><code>Worker()</code></a>) 便可以產生 worker 物件，並且執行 JavaScript 檔案。在 worker 中的 JavaScript 運行在不同於 <a href="/zh-TW/docs/Web/API/Window" title="window 物件代表了一個包含 DOM 文件的視窗，其中的 document 屬性指向了視窗中載入的 Document 物件。而使用 document 的"><code>window</code></a> 的執行緒環境，所以在 worker 中存取全域物件應該要透過 <a href="/zh-TW/docs/Web/API/Window/self" title="The documentation about this has not yet been written; please consider contributing!"><code>self</code></a>，如果透過 <a href="/zh-TW/docs/Web/API/Window" title="window 物件代表了一個包含 DOM 文件的視窗，其中的 document 屬性指向了視窗中載入的 Document 物件。而使用 document 的"><code>window</code></a> 會導致錯誤發生。</p>
+
+<p>Dedicated worker (專有 worker) 是一般 worker，只能被產生它的檔案存取，<a href="/zh-TW/docs/Web/API/DedicatedWorkerGlobalScope" title="The documentation about this has not yet been written; please consider contributing!"><code>DedicatedWorkerGlobalScope</code></a> 物件代表其執行環境；而Shared worker (共享 worker) 則能夠被不同檔案存取，<a href="/zh-TW/docs/Web/API/SharedWorkerGlobalScope" title="The documentation about this has not yet been written; please consider contributing!"><code>SharedWorkerGlobalScope</code></a>) 物件代表其執行環境。</p>
+
+<div class="note">
+<p><strong>Note</strong>: worker 其他文件說明請見 <a href="/en-US/docs/Web/API/Web_Workers_API">The Web Workers API landing page</a> 。</p>
+</div>
+
+<p>基本上 worker 能夠執行任何事情，比如說 <a href="/en-US/docs/Web/API/WebSockets_API">WebSockets</a>、<a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a>、和 Firefox OS 特有的 <a href="/en-US/docs/Web/API/Data_Store_API">Data Store API</a> ，然而直接存取 DOM 或是 <a href="/zh-TW/docs/Web/API/Window" title="window 物件代表了一個包含 DOM 文件的視窗，其中的 document 屬性指向了視窗中載入的 Document 物件。而使用 document 的"><code>window</code></a> 物件的一些方法和屬性則不被允許，更多細節請見 <a href="/en-US/docs/Web/API/Worker/Functions_and_classes_available_to_workers">worker 可存取知函數和類別</a>。</p>
+
+<p>主執行緒和 worker 執行緒之間用 postMessage() 方法發送訊息，然後透過 <code>onmessage</code> 事件接受訊息 (訊息存在 <code><a href="/zh-TW/docs/Web/Reference/Events/Message" title="/zh-TW/docs/Web/Reference/Events/Message">Message</a></code> 事件的 data 屬性之中)，其中被傳送的資料並非共享而是複製一份後傳送。</p>
+
+<p>worker 可以產生新 worker，只要新 worker 的來源 (origin) 和父頁面相同，<span style="line-height: inherit;">也可以利用 </span><a style="line-height: inherit;" href="https://developer.mozilla.org/en/nsIXMLHttpRequest" title="https://developer.mozilla.org/en/nsIXMLHttpRequest">XMLHttpRequest</a> <span style="line-height: inherit;">執行輸出/輸入(但是responseXML 和channel這兩個屬性為null)。</span></p>
+
+<h2 id="Dedicated_workers">Dedicated workers</h2>
+
+<p>dedicated worker 只能被產生它的檔案存取，下面我們先介紹簡單的 <a href="https://github.com/mdn/simple-web-worker" class="external external-icon">Basic dedicated worker example</a> (<a href="http://mdn.github.io/simple-web-worker/" class="external external-icon">run dedicated worker</a>) 範例。這個範例會將兩個數字送入 worker 相乘，然後再於前端頁面顯示相乘結果。</p>
+
+<h3 id="偵測_Worker_功能">偵測 Worker 功能</h3>
+
+<p>為了向下相容、避免錯誤，最好是確保 worker 存在後再取用之 (<a href="https://github.com/mdn/simple-web-worker/blob/gh-pages/main.js">main.js</a>):</p>
+
+<pre class="brush: js">if (window.Worker) {
+
+  ...
+
+}</pre>
+
+<h3 id="產生_dedicated_worker">產生 dedicated worker</h3>
+
+<p>只要呼叫 <a href="/zh-TW/docs/Web/API/Worker/Worker" title="The documentation about this has not yet been written; please consider contributing!"><code>Worker()</code></a> 建構子，傳入 JS 檔案的 URI，便可以生成一個 worker 執行緒 (<a href="https://github.com/mdn/simple-web-worker/blob/gh-pages/main.js">main.js</a>):</p>
+
+<div style="overflow: hidden;">
+<pre class="brush: js">var myWorker = new Worker(&quot;worker.js&quot;);
+</pre>
+</div>
+
+<h3 id="和_dedicated_worker_發送訊息">和 dedicated worker 發送訊息</h3>
+
+<p><a href="/zh-TW/docs/Web/API/Worker/postMessage" title="The documentation about this has not yet been written; please consider contributing!"><code>postMessage()</code></a> 方法以及 <a href="/zh-TW/docs/Web/API/Worker/onmessage" title="The documentation about this has not yet been written; please consider contributing!"><code>onmessage</code></a> 事件處理器就是和 worker 發送訊息的關鍵 (<a href="https://github.com/mdn/simple-web-worker/blob/gh-pages/main.js">main.js</a>):</p>
+
+<pre class="brush: js">first.onchange = function() {
+  myWorker.postMessage([first.value,second.value]);
+  console.log(&apos;Message posted to worker&apos;);
+}
+
+second.onchange = function() {
+  myWorker.postMessage([first.value,second.value]);
+  console.log(&apos;Message posted to worker&apos;);
+}</pre>
+
+<p>範例中有兩個 <a href="/zh-TW/docs/Web/HTML/Element/input" title="The HTML &lt;input&gt; element is used to create interactive controls for web-based forms in order to accept data from the user."><code>&lt;input&gt;</code></a> 元素，first 和 second，當元素值改變時，我們會利用 postMessage() 方法告訴 worker 改變的值 (這邊用陣列，也可以用其他類別)。</p>
+
+<p>然後在 worker 裡我們從 <code>onmessage</code> 接收訊息 (<a href="https://github.com/mdn/simple-web-worker/blob/gh-pages/worker.js">worker.js</a>):</p>
+
+<pre class="brush: js">onmessage = function(e) {
+  console.log(&apos;Message received from main script&apos;);
+  var workerResult = &apos;Result: &apos; + (e.data[0] * e.data[1]);
+  console.log(&apos;Posting message back to main script&apos;);
+  postMessage(workerResult);
+}</pre>
+
+<p><code>onmessage</code> 事件物件的 data 屬性存有傳送過來的訊息資料，也就是 input 值；worker 收到後將傳過來的兩個值相乘，再 postMessage 傳回去。</p>
+
+<p>回到主執行，同樣透過<code> onmessage</code> 事件，收到 worker 回傳還來的計算值 :</p>
+
+<pre class="brush: js">myWorker.onmessage = function(e) {
+  result.textContent = e.data;
+  console.log(&apos;Message received from worker&apos;);
+}</pre>
+
+<p>拿到存在事件 data 中的計算值後，我們接著將值以<code> textContent</code> 顯示出來。</p>
+
+<div class="note">
+<p><strong>Note</strong> : <code>建構 Worker</code> 的URI必須遵從<a href="/en-US/docs/Web/Security/Same-origin_policy"> same-origin policy</a>。目前各家瀏覽器在這方面存有歧異，Gecko 10.0 (Firefox 10.0 / Thunderbird 10.0 / SeaMonkey 2.7) 以後允許 data URI 而 Internet Explorer 10 不允許 Blob URI。</p>
+</div>
+
+<div class="note"><strong>Note</strong>: 在主執行緒中存取 <code>onmessage</code> <code>與 postMessage</code> 需要主動掛在 worker 物件上，在 worker 執行緒則不用，這是因為 worker 執行緒的全域物件便是 worker 物件。</div>
+
+<div class="note"><strong>Note</strong>: 和 worker 傳送的資料並非共享而是複製一份後傳送，詳細請參照 <a href="#Transferring_data_to_and_from_workers:_further_details">Transferring data to and from workers: further details</a>。</div>
+
+<h3 id="結束_worker">結束 worker</h3>
+
+<p><code>在主執行緒裡呼叫</code> <a href="/zh-TW/docs/Web/API/Worker" title="The documentation about this has not yet been written; please consider contributing!"><code>terminate</code></a> 就可結束 worker :</p>
+
+<pre class="brush: js">myWorker.terminate();</pre>
+
+<p>請注意不論 worker 正在執行的運算完成與否，一但呼叫後 worker 便會立刻被終止。</p>
+
+<p>而在 worker 執行緒裡，worker 可以呼叫自己的 <a href="/zh-TW/docs/Web/API/WorkerGlobalScope" title="The documentation about this has not yet been written; please consider contributing!"><code>close</code></a> 方法來結束 :</p>
+
+<pre class="brush: js">close();</pre>
+
+<h3 id="錯誤處理">錯誤處理</h3>
+
+<p>當執行時期錯誤發生時，onerror 事件處理器會被呼叫，onerror事件處理器會收到一名為 error 的事件物件 (實作 ErrorEvent Interface)，該事件不會 bubble 且可取消，如果要避免事件預設行為，可以呼叫 <a href="/en-US/docs/Web/API/Event/preventDefault" class="internal"><code>preventDefault()</code></a>。</p>
+
+<p>以下三個部分是錯誤事件較關鍵的地方:</p>
+
+<dl>
+ <dt><code>message</code></dt>
+ <dd>供人閱讀的錯誤訊息</dd>
+ <dt><code>filename</code></dt>
+ <dd>錯誤發生所在的檔案名稱</dd>
+ <dt><code>lineno</code></dt>
+ <dd>錯誤發生所在的行數</dd>
+</dl>
+
+<h3 id="產生_subworker"><span style="line-height: inherit;">產生</span> subworker</h3>
+
+<p><span style="line-height: inherit;">worker 可以產生其他 worker (subworker)，subworker </span><span style="line-height: inherit;">的來源</span><span style="line-height: inherit;">也必須和主頁相同，另外，subworker 的 URI 的解析是相對於父 worker 的位置而非所在頁面，這項特色有助於追蹤 worker 間的相依性。</span></p>
+
+<h3 id="引入程式腳本與函式庫_(library)">引入程式腳本與函式庫 (library)</h3>
+
+<p>Worker執行緒能存取一個全域函數 (global function), importScripts()。importScripts() 可以讓 worker 端引入相同網域的程式碼腳本與 libraries，importScripts()可接收零到數個要被輸入資源的URI，底下為幾個範例:</p>
+
+<pre class="brush: js">importScripts();                        /* imports nothing */
+importScripts(&apos;foo.js&apos;);                /* imports just &quot;foo.js&quot; */
+importScripts(&apos;foo.js&apos;, &apos;bar.js&apos;);      /* imports two scripts */
+</pre>
+
+<p>瀏覽器會載入並執行每個程式碼腳本，然後 worker 能夠存取程式碼腳本內定義的全域變數，若是腳本無法載入，會產生一個 NETWORK_ERROR，後續的程式碼不會被執行，但是先前執行過的程式碼或用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/window.setTimeout" title="https://developer.mozilla.org/en-US/docs/Web/API/window.setTimeout">window.setTimeout()</a> 延遲執行的程式碼依然有效，而 importScripts() 之後宣告的函數也一樣存在，因為這些程式碼總是在其他程式碼之前就解析過了。</p>
+
+<div class="note"><strong>Note:</strong> <span style="color: #333333; line-height: inherit;">雖然程式碼腳本的下載順序不一定，但執行順序會遵照傳入importScripts()的順序，這是同步完成的，importScripts()不會回傳直到所有的程式碼都下載並執行完。</span></div>
+
+<h2 id="Shared_workers">Shared workers</h2>
+
+<p>shared worker 能夠被多個程式腳本存取，縱使跨越不同 window、iframe 或 worker。這邊的 <a href="https://github.com/mdn/simple-shared-worker" class="external external-icon">Basic shared worker example</a> (<a href="http://mdn.github.io/simple-shared-worker/" class="external external-icon">run shared worker</a>) 範例和 dedicated worker 範例類似，但多了兩個可以讓多個檔案存取的函數：<em>數字相乘以及數字平方</em>。</p>
+
+<p>請注意 dedicated worker 與 shared worker 間的差異處，範例裡會有兩份 HTML 頁面，各自都利用同一個 worker 處理運算。</p>
+
+<div class="note">
+<p><strong>Note:</strong> 所有的瀏覽環境都必需共享相同的來源（相同protocol, host 和 port），shared worker 才能讓不同瀏覽環境存取。</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: 在 Firefox， shared worker 無法在一般和隱私模式間共享 (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1177621" title="FIXED: Do not share a SharedWorker between a private and a non-private document">bug 1177621</a>)。</p>
+</div>
+
+<h3 id="產生_shared_worker">產生 shared worker</h3>
+
+<p>和 dedicated worker 做法差不多，只是用另一個 SharedWorker 建構子來產生  shared worker，見 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/index.html">index.html</a> 和 <a href="http://mdn.github.io/simple-shared-worker/index2.html">index2.html</a>:</p>
+
+<pre class="brush: js">var myWorker = new SharedWorker(&quot;worker.js&quot;);</pre>
+
+<p>相當不 一樣的是和 shared worker 溝通必須要透過 port 物件，其實 dedicated worker 也是如此，只不過一切是在背景後自動完成。</p>
+
+<p>開啟 port 連線一是在 onmessage 事件下背景完成，二是藉由主動呼叫 start() 好開始傳送訊息。範例<a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/multiply.js"> multiply.js</a> 以及 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/worker.js">worker.js</a> 因為註冊了 onmessage 事件，所以其實可以省略呼叫 start()，然而若是 message 事件是經由 <code>addEventListener()註冊，那麼便需要呼叫 start() 了。</code></p>
+
+<p>當使用 start() 開啟 port 連線，那麼雙向溝通便需要主執行緒和 worker 兩端都呼叫 start()。</p>
+
+<pre class="brush: js">myWorker.port.start();  // called in parent thread</pre>
+
+<pre class="brush: js">port.start();  // called in worker thread, assuming the <code>port</code> variable references a port</pre>
+
+<h3 id="和_shared_worker_發送訊息">和 shared worker 發送訊息</h3>
+
+<p>如同前面，現在可以呼叫 <code>postMessage()</code> 發送訊息，只不過這次需要透過 port 物件 (一樣請參考 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/multiply.js">multiply.js</a> 和 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/square.js">square.js</a>):</p>
+
+<pre class="brush: js">squareNumber.onchange = function() {
+  myWorker.port.postMessage([squareNumber.value,squareNumber.value]);
+  console.log(&apos;Message posted to worker&apos;);
+}</pre>
+
+<p>worker 方面也增加了一些程式碼 (<a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/worker.js">worker.js</a>):</p>
+
+<pre class="brush: js">onconnect = function(e) {
+  var port = e.ports[0];
+  port.onmessage = function(e) {
+    var workerResult = &apos;Result: &apos; + (e.data[0] * e.data[1]);
+    port.postMessage(workerResult);
+  }
+  <s>port.start();</s>  // not necessary since onmessage event handler is being used
+}</pre>
+
+<p>首先，先監聽連線建立的 onconnect 事件，例如當主執行緒建立 onmessage 事件或呼叫 <code>start()</code>。</p>
+
+<p>然後從 onconnect 事件物件，我們可以取得 port 物件使用之。</p>
+
+<p>取得 port 之後，我們註冊 port 上的 onmessage 事件，當有訊息進來便取回資料進行運算後回傳回去；註冊 onmessage 事件的同時也自動建立連線，所以說不需要呼叫start() 了。</p>
+
+<p>最後在主執行緒端，我們同樣由 onmessage 事件取回回傳過來的訊息 (一樣請參考 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/multiply.js">multiply.js</a> 和 <a href="https://github.com/mdn/simple-shared-worker/blob/gh-pages/square.js">square.js</a>):</p>
+
+<pre class="brush: js">myWorker.port.onmessage = function(e) {
+  result2.textContent = e.data[0];
+  console.log(&apos;Message received from worker&apos;);
+}</pre>
+
+<p> </p>
+
+<h2 id="執行緒_(Thread)_安全">執行緒 (Thread) 安全</h2>
+
+<p><a href="/zh-TW/docs/Web/API/Worker" title="The documentation about this has not yet been written; please consider contributing!"><code>Worker</code></a> 會產生真正 OS 層級的執行緒，細心的開發者或許會擔心同步問題。</p>
+
+<p>不過 worker 會十分注意和其他執行緒溝通的狀況，不會去存取非執行緒安全的元件，如 DOM ，而且資料的傳遞也都序列化 (serialized) ，所以說很難會發生同步問題。</p>
+
+<h2 id="和_workers_傳遞資料：更多細節">和 workers 傳遞資料：更多細節</h2>
+
+<p>和 workers 傳遞的資料會先被複製一份，而非共享；經過序列化後 (serialized) 傳輸，然後在另一端反序列化 (de-serialized) 取出，大部份的瀏覽器都是以 <a href="/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm">結構化複製 (structured cloning)</a> 實作這項特色.</p>
+
+<p>下面的 <code>emulateMessage() 會模擬和 worker 傳遞訊息時，複製資料的行為。</code></p>
+
+<pre class="brush: js">function emulateMessage (vVal) {
+    return eval(&quot;(&quot; + JSON.stringify(vVal) + &quot;)&quot;);
+}
+
+// Tests
+
+// test #1
+var example1 = new Number(3);
+console.log(typeof example1); // object
+console.log(typeof emulateMessage(example1)); // number
+
+// test #2
+var example2 = true;
+console.log(typeof example2); // boolean
+console.log(typeof emulateMessage(example2)); // boolean
+
+// test #3
+var example3 = new String(&quot;Hello World&quot;);
+console.log(typeof example3); // object
+console.log(typeof emulateMessage(example3)); // string
+
+// test #4
+var example4 = {
+    &quot;name&quot;: &quot;John Smith&quot;,
+    &quot;age&quot;: 43
+};
+console.log(typeof example4); // object
+console.log(typeof emulateMessage(example4)); // object
+
+// test #5
+function Animal (sType, nAge) {
+    this.type = sType;
+    this.age = nAge;
+}
+var example5 = new Animal(&quot;Cat&quot;, 3);
+alert(example5.constructor); // Animal
+alert(emulateMessage(example5).constructor); // Object</pre>
+
+<p>所謂的訊息就是經過複製、非共享的資料，到這邊你應該已經知道 <code>postMessage()</code> 負責發送訊息，然後 <code>message</code> 事件 <a href="/zh-TW/docs/Web/API/MessageEvent/data" title="The documentation about this has not yet been written; please consider contributing!"><code>data</code></a> 的 attribute 則存有傳送的訊息資料。</p>
+
+<p><strong>example.html</strong>: (the main page):</p>
+
+<pre class="brush: js">var myWorker = new Worker(&quot;my_task.js&quot;);
+
+myWorker.onmessage = function (oEvent) {
+  console.log(&quot;Worker said : &quot; + oEvent.data);
+};
+
+myWorker.postMessage(&quot;ali&quot;);</pre>
+
+<p><strong>my_task.js</strong> (the worker):</p>
+
+<pre class="brush: js">postMessage(&quot;I\&apos;m working before postMessage(\&apos;ali\&apos;).&quot;);
+
+onmessage = function (oEvent) {
+  postMessage(&quot;Hi &quot; + oEvent.data);
+};</pre>
+
+<p><a href="/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm">結構化複製（structured cloning）</a> 演算法支援 JSON 以及迴圈參照（circular references）。</p>
+
+<h3 id="資料傳遞範例">資料傳遞範例</h3>
+
+<h4 id="範例_1_非同步_eval()">範例 1: 非同步 <code>eval()</code></h4>
+
+<p>下面透過 <a href="/en-US/docs/Web/HTTP/data_URIs">data URL</a> 和 <code><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a>，</code>示範如何在 worker 非同步執行允許的程式碼：</p>
+
+<pre class="brush: js">// Syntax: asyncEval(code[, listener])
+
+var asyncEval = (function () {
+  var aListeners = [], oParser = new Worker(&quot;data:text/javascript;charset=US-ASCII,onmessage%20%3D%20function%20%28oEvent%29%20%7B%0A%09postMessage%28%7B%0A%09%09%22id%22%3A%20oEvent.data.id%2C%0A%09%09%22evaluated%22%3A%20eval%28oEvent.data.code%29%0A%09%7D%29%3B%0A%7D&quot;);
+
+  oParser.onmessage = function (oEvent) {
+    if (aListeners[oEvent.data.id]) { aListeners[oEvent.data.id](oEvent.data.evaluated); }
+    delete aListeners[oEvent.data.id];
+  };
+
+  return function (sCode, fListener) {
+    aListeners.push(fListener || null);
+    oParser.postMessage({
+      &quot;id&quot;: aListeners.length - 1,
+      &quot;code&quot;: sCode
+    });
+  };
+})();</pre>
+
+<p><a href="en-US/docs/Web/HTTP/data_URIs">data URL</a> 相當於網路請求，範例中的 data URL 會在 worker 執行下列程式碼回應訊息：</p>
+
+<pre class="brush: js">onmessage = function (oEvent) {
+  postMessage({
+    &quot;id&quot;: oEvent.data.id,
+    &quot;evaluated&quot;: eval(oEvent.data.code)
+  });
+}</pre>
+
+<p>應用範例:</p>
+
+<pre class="brush: js">// asynchronous alert message...
+asyncEval(&quot;3 + 2&quot;, function (sMessage) {
+    alert(&quot;3 + 2 = &quot; + sMessage);
+});
+
+// asynchronous print message...
+asyncEval(&quot;\&quot;Hello World!!!\&quot;&quot;, function (sHTML) {
+    document.body.appendChild(document.createTextNode(sHTML));
+});
+
+// asynchronous void...
+asyncEval(&quot;(function () {\n\tvar oReq = new XMLHttpRequest();\n\toReq.open(\&quot;get\&quot;, \&quot;http://www.mozilla.org/\&quot;, false);\n\toReq.send(null);\n\treturn oReq.responseText;\n})()&quot;);</pre>
+
+<h4 id="範例2_JSON_資料進階傳遞與呼叫系統">範例2: JSON 資料進階傳遞與呼叫系統</h4>
+
+<p>下面的範例系統適合需要在主頁面和 worker 傳遞複雜資料和呼叫多個函數的情境。</p>
+
+<p><strong>example.html</strong> (主頁面):</p>
+
+<pre class="brush: html">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;  /&gt;
+&lt;title&gt;MDN Example - Queryable worker&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+  /*
+    QueryableWorker instances methods:
+     * sendQuery(queryable function name, argument to pass 1, argument to pass 2, etc. etc): calls a Worker&apos;s queryable function
+     * postMessage(string or JSON Data): see Worker.prototype.postMessage()
+     * terminate(): terminates the Worker
+     * addListener(name, function): adds a listener
+     * removeListener(name): removes a listener
+    QueryableWorker instances properties:
+     * defaultListener: the default listener executed only when the Worker calls the postMessage() function directly
+  */
+  function QueryableWorker (sURL, fDefListener, fOnError) {
+    var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
+    this.defaultListener = fDefListener || function () {};
+    oWorker.onmessage = function (oEvent) {
+      if (oEvent.data instanceof Object &amp;&amp; oEvent.data.hasOwnProperty(&quot;vo42t30&quot;) &amp;&amp; oEvent.data.hasOwnProperty(&quot;rnb93qh&quot;)) {
+        oListeners[oEvent.data.vo42t30].apply(oInstance, oEvent.data.rnb93qh);
+      } else {
+        this.defaultListener.call(oInstance, oEvent.data);
+      }
+    };
+    if (fOnError) { oWorker.onerror = fOnError; }
+    this.sendQuery = function (/* queryable function name, argument to pass 1, argument to pass 2, etc. etc */) {
+      if (arguments.length &lt; 1) { throw new TypeError(&quot;QueryableWorker.sendQuery - not enough arguments&quot;); return; }
+      oWorker.postMessage({ &quot;bk4e1h0&quot;: arguments[0], &quot;ktp3fm1&quot;: Array.prototype.slice.call(arguments, 1) });
+    };
+    this.postMessage = function (vMsg) {
+      //I just think there is no need to use call() method
+      //how about just oWorker.postMessage(vMsg);
+      //the same situation with terminate
+      //well,just a little faster,no search up the prototye chain
+      Worker.prototype.postMessage.call(oWorker, vMsg);
+    };
+    this.terminate = function () {
+      Worker.prototype.terminate.call(oWorker);
+    };
+    this.addListener = function (sName, fListener) {
+      oListeners[sName] = fListener;
+    };
+    this.removeListener = function (sName) {
+      delete oListeners[sName];
+    };
+  };
+
+  // your custom &quot;queryable&quot; worker
+  var oMyTask = new QueryableWorker(&quot;my_task.js&quot; /* , yourDefaultMessageListenerHere [optional], yourErrorListenerHere [optional] */);
+
+  // your custom &quot;listeners&quot;
+
+  oMyTask.addListener(&quot;printSomething&quot;, function (nResult) {
+    document.getElementById(&quot;firstLink&quot;).parentNode.appendChild(document.createTextNode(&quot; The difference is &quot; + nResult + &quot;!&quot;));
+  });
+
+  oMyTask.addListener(&quot;alertSomething&quot;, function (nDeltaT, sUnit) {
+    alert(&quot;Worker waited for &quot; + nDeltaT + &quot; &quot; + sUnit + &quot; :-)&quot;);
+  });
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a id=&quot;firstLink&quot; href=&quot;javascript:oMyTask.sendQuery(&apos;getDifference&apos;, 5, 3);&quot;&gt;What is the difference between 5 and 3?&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;javascript:oMyTask.sendQuery(&apos;waitSomething&apos;);&quot;&gt;Wait 3 seconds&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;javascript:oMyTask.terminate();&quot;&gt;terminate() the Worker&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p><strong>my_task.js</strong> (worker):</p>
+
+<pre class="brush: js">// your custom PRIVATE functions
+
+function myPrivateFunc1 () {
+  // do something
+}
+
+function myPrivateFunc2 () {
+  // do something
+}
+
+// etc. etc.
+
+// your custom PUBLIC functions (i.e. queryable from the main page)
+
+var queryableFunctions = {
+  // example #1: get the difference between two numbers:
+  getDifference: function (nMinuend, nSubtrahend) {
+      reply(&quot;printSomething&quot;, nMinuend - nSubtrahend);
+  },
+  // example #2: wait three seconds
+  waitSomething: function () {
+      setTimeout(function() { reply(&quot;alertSomething&quot;, 3, &quot;seconds&quot;); }, 3000);
+  }
+};
+
+// system functions
+
+function defaultQuery (vMsg) {
+  // your default PUBLIC function executed only when main page calls the queryableWorker.postMessage() method directly
+  // do something
+}
+
+function reply (/* listener name, argument to pass 1, argument to pass 2, etc. etc */) {
+  if (arguments.length &lt; 1) { throw new TypeError(&quot;reply - not enough arguments&quot;); return; }
+  postMessage({ &quot;vo42t30&quot;: arguments[0], &quot;rnb93qh&quot;: Array.prototype.slice.call(arguments, 1) });
+}
+
+onmessage = function (oEvent) {
+  if (oEvent.data instanceof Object &amp;&amp; oEvent.data.hasOwnProperty(&quot;bk4e1h0&quot;) &amp;&amp; oEvent.data.hasOwnProperty(&quot;ktp3fm1&quot;)) {
+    queryableFunctions[oEvent.data.bk4e1h0].apply(self, oEvent.data.ktp3fm1);
+  } else {
+    defaultQuery(oEvent.data);
+  }
+};
+</pre>
+
+<h3 id="移轉資料所有權_-_可移轉物件_(transferable_objects)">移轉資料所有權 - 可移轉物件 (transferable objects)</h3>
+
+<p>Google Chrome 17+ 以及 Firefox 18+ 能夠和 worker 高效能地傳送另外一種特定型態物件 (可移轉物件, transferable objects，這種物件實作了 <a href="/zh-TW/docs/Web/API/Transferable" title="The documentation about this has not yet been written; please consider contributing!"><code>Transferable</code></a> 介面)，可移轉物件當被傳送到另一端時並不需要複製，因此可以大大提升傳送大型資料物件的效能；這好比像是 C/C++ 的 pass-by-reference，但是不同的是，一旦移轉後原先的環境便失去了持有資料，例如當主頁面傳送 <a href="/zh-TW/docs/Web/API/ArrayBuffer" title="The documentation about this has not yet been written; please consider contributing!"><code>ArrayBuffer</code></a> 後，主頁面便不再能夠使用這筆資料物件了，這筆資料物件的存取連結已經靜靜地移轉到 worker 端了。</p>
+
+<pre class="brush: js">// Create a 32MB &quot;file&quot; and fill it.
+var uInt8Array = new Uint8Array(1024*1024*32); // 32MB
+for (var i = 0; i &lt; uInt8Array.length; ++i) {
+  uInt8Array[i] = i;
+}
+
+worker.postMessage(uInt8Array.buffer, [uInt8Array.buffer]);
+</pre>
+
+<div class="note">
+<p><strong>Note</strong>: 關於更多可移轉物件的資訊, 效能和功能偵測，請參考 HTML5 Rocks 上 <a href="http://updates.html5rocks.com/2011/12/Transferable-Objects-Lightning-Fast">Transferable Objects: Lightning Fast!</a> 一文。</p>
+</div>
+
+<h2 id="Embedded_workers">Embedded workers</h2>
+
+<p>不像 <a href="/zh-TW/docs/Web/HTML/Element/script" title="HTML &lt;script&gt; 元素能嵌入或引用要執行的程式碼。最常見的用途是嵌入或引用 JavaScript 程式碼。"><code>&lt;script&gt;</code></a>，並沒有一套正式標準的方法將 worker 的程式碼嵌入到頁面之中，不過沒有 src 屬性而且 mime-type 不屬於可執行程式碼的 <a href="/zh-TW/docs/Web/HTML/Element/script" title="HTML &lt;script&gt; 元素能嵌入或引用要執行的程式碼。最常見的用途是嵌入或引用 JavaScript 程式碼。"><code>&lt;script&gt;</code></a> 元素會被視為 javascript 可以取用的資料區塊（data block），資料區塊是一項 HTML5 可用於攜帶文字資料的特色功能，利用資料區塊我們就有辦法嵌入 worker 的程式碼到頁面中：</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot; /&gt;
+&lt;title&gt;MDN Example - Embedded worker&lt;/title&gt;
+&lt;script type=&quot;text/js-worker&quot;&gt;
+  // This script WON&apos;T be parsed by JS engines because its mime-type is text/js-worker.
+  var myVar = &quot;Hello World!&quot;;
+  // Rest of your worker code goes here.
+&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+  // This script WILL be parsed by JS engines because its mime-type is text/javascript.
+  function pageLog (sMsg) {
+    // Use a fragment: browser will only render/reflow once.
+    var oFragm = document.createDocumentFragment();
+    oFragm.appendChild(document.createTextNode(sMsg));
+    oFragm.appendChild(document.createElement(&quot;br&quot;));
+    document.querySelector(&quot;#logDisplay&quot;).appendChild(oFragm);
+  }
+&lt;/script&gt;
+&lt;script type=&quot;text/js-worker&quot;&gt;
+  // This script WON&apos;T be parsed by JS engines because its mime-type is text/js-worker.
+  onmessage = function (oEvent) {
+    postMessage(myVar);
+  };
+  // Rest of your worker code goes here.
+&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+  // This script WILL be parsed by JS engines because its mime-type is text/javascript.
+
+  // In the past...:
+  // blob builder existed
+  // ...but now we use Blob...:
+  var blob = new Blob(Array.prototype.map.call(document.querySelectorAll(&quot;script[type=\&quot;text\/js-worker\&quot;]&quot;), function (oScript) { return oScript.textContent; }),{type: &quot;text/javascript&quot;});
+
+  // Creating a new document.worker property containing all our &quot;text/js-worker&quot; scripts.
+  document.worker = new Worker(window.URL.createObjectURL(blob));
+
+  document.worker.onmessage = function (oEvent) {
+    pageLog(&quot;Received: &quot; + oEvent.data);
+  };
+
+  // Start the worker.
+  window.onload = function() { document.worker.postMessage(&quot;&quot;); };
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;&lt;div id=&quot;logDisplay&quot;&gt;&lt;/div&gt;&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>Embedded worker 在 <code>document.worker</code> 之中。</p>
+
+<h2 id="其他範例">其他範例</h2>
+
+<p>下面介紹其他使用 worker 的範例。</p>
+
+<h3 id="在背景中執行運算">在背景中執行運算</h3>
+
+<p>worker 主要的用處在避免重度 CPU 運算的任務阻礙到 UI 執行緒運行；這邊我們用 worker 來跑 Fibonacci 數列運算。</p>
+
+<h4 id="JavaScript">JavaScript</h4>
+
+<p>fibonacci.js 中的程式碼會被另一份 HTML 引用。</p>
+
+<pre class="brush: js">var results = [];
+
+function resultReceiver(event) {
+  results.push(parseInt(event.data));
+  if (results.length == 2) {
+    postMessage(results[0] + results[1]);
+  }
+}
+
+function errorReceiver(event) {
+  throw event.data;
+}
+
+onmessage = function(event) {
+  var n = parseInt(event.data);
+
+  if (n == 0 || n == 1) {
+    postMessage(n);
+    return;
+  }
+
+  for (var i = 1; i &lt;= 2; i++) {
+    var worker = new Worker(&quot;fibonacci.js&quot;);
+    worker.onmessage = resultReceiver;
+    worker.onerror = errorReceiver;
+    worker.postMessage(n - i);
+  }
+ };</pre>
+
+<p>worker 程式碼中註冊了一個 <code>onmessage</code> 事件處理器用來接收另一端 <code>postMessage 過來的訊息</code> (請注意這並非定義一個全域變數或函數，<code>var onmessage</code> 或 <code>function onmessage</code> 會定義全域變數，但不會註冊事件處理器)，然後開始進行遞迴運算。</p>
+
+<h4 id="HTML">HTML</h4>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;  /&gt;
+    &lt;title&gt;Test threads fibonacci&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+
+  &lt;div id=&quot;result&quot;&gt;&lt;/div&gt;
+
+  &lt;script language=&quot;javascript&quot;&gt;
+
+    var worker = new Worker(&quot;fibonacci.js&quot;);
+
+    worker.onmessage = function(event) {
+      document.getElementById(&quot;result&quot;).textContent = event.data;
+      dump(&quot;Got: &quot; + event.data + &quot;\n&quot;);
+    };
+
+    worker.onerror = function(error) {
+      dump(&quot;Worker error: &quot; + error.message + &quot;\n&quot;);
+      throw error;
+    };
+
+    worker.postMessage(&quot;5&quot;);
+
+  &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>onmessage 事件處理器會接收 worker 回傳的運算結果，然後顯示在頁面上，如果有問題， onerror 事件處理器會 <a href="/en-US/docs/Debugging_JavaScript#dump.28.29">輸出</a> 錯誤訊息。</p>
+
+<p>和 worker 溝通則是利用 postMessage。</p>
+
+<p><a href="/samples/workers/fibonacci" class="external">範例測試</a>。</p>
+
+<h3 id="在背景中執行_web_IO">在背景中執行 web I/O</h3>
+
+<p>範例請見 <a href="/en-US/docs/Using_workers_in_extensions" class="internal">Using workers in extensions</a> 。</p>
+
+<h3 id="分割任務到多個_workers">分割任務到多個 workers</h3>
+
+<p>基於多核 cpu 的普及，分割複雜任務到多個 workers 將可能有助於利用多核心 cpu 的優勢。</p>
+
+<h2 id="其他類型的_worker">其他類型的 worker</h2>
+
+<p>除了 dedicated 和 shared web workers，還有其他種類：</p>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorkers</a> 基本上如同介於 web app 和瀏覽器以及網路之間的代理伺服器 (proxy server)，這類 worker 重點在實現離線服務，service worker 會攔截網路請求，然後依據網路連線和資源狀態做出反應，他們可以存取推播和背景同步 APIs。</li>
+ <li>Chrome Workers 是 Firefox 唯一的 worker 類型，他們可以用在開發 add-ons，或是想要使用 <a href="https://developer.mozilla.org/en/js-ctypes">js-ctypes</a>。詳情請見 <a href="/zh-TW/docs/Web/API/ChromeWorker" title="The documentation about this has not yet been written; please consider contributing!"><code>ChromeWorker</code></a>。</li>
+ <li><a href="/en-US/docs/Web/API/Web_Audio_API#Audio_Workers">Audio Workers</a> 主要用於音效處理部分。</li>
+</ul>
+
+<h2 id="Worker_可存取之函數與介面">Worker 可存取之函數與介面</h2>
+
+<p>大多數 Javascript 的功能 workre 皆可以使用，包含：</p>
+
+<ul>
+ <li><a href="/zh-TW/docs/Web/API/Navigator" title="Navigator 介面標示了用戶代理（user agent）的狀態與身份。它允許腳本查詢與註冊，以進行一些活動。"><code>Navigator</code></a></li>
+ <li><a href="/zh-TW/docs/Web/API/XMLHttpRequest" title="使用 XMLHttpRequest（XHR）物件與伺服器互動，你可以從 URL 擷取資料且不須刷新整個頁面。這使得網頁可以只更新其中的一部分而不中斷使用者的操作。"><code>XMLHttpRequest</code></a></li>
+ <li><a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Array" title="JavaScript 中的 Array 全域物件被用於建構陣列；陣列為高階（high-level）、似列表（list-like）的物件。"><code>Array</code></a>, <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Date" title="建立一個  JavaScript Date 物件來指向某一個時間點。Date 物件是基於世界標準時間（UTC） 1970 年 1 月 1 日開始的毫秒數值來儲存時間。"><code>Date</code></a>, <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Math" title="Math 是一個擁有數學常數及數學函數（非函式物件）屬性及方法的內建物件。"><code>Math</code></a>, 與 <a href="/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/String" title="String 全域物件為字串的構造函數，或是一個字符序列。"><code>String</code></a></li>
+ <li><a href="/zh-TW/docs/Web/API/Window/requestAnimationFrame" title="The documentation about this has not yet been written; please consider contributing!"><code>Window.requestAnimationFrame</code></a>, <a href="/zh-TW/docs/Web/API/WindowTimers/setTimeout" title="The documentation about this has not yet been written; please consider contributing!"><code>WindowTimers.setTimeout</code></a>, 與 <a href="/zh-TW/docs/Web/API/WindowTimers/setInterval" title="The documentation about this has not yet been written; please consider contributing!"><code>WindowTimers.setInterval</code></a></li>
+</ul>
+
+<p>worker 無法操作主頁面的物件與 DOM，如有相關需求，必須要間接透過 <a href="/zh-TW/docs/Web/API/DedicatedWorkerGlobalScope/postMessage" title="The documentation about this has not yet been written; please consider contributing!"><code>DedicatedWorkerGlobalScope.postMessage</code></a> 通知主頁面，讓主頁面執行需求。</p>
+
+<div class="note">
+<p><strong>Note</strong>: 所有 worker 可存取功能一覽表，請見 <a href="/en-US/docs/Web/Reference/Functions_and_classes_available_to_workers">Functions and interfaces available to workers</a>.</p>
+</div>
+
+<h2 id="標準規範">標準規範</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="The &apos;HTML Living Standard&apos; specification" href="https://html.spec.whatwg.org/multipage/#toc-workers" class="external" hreflang="en">HTML Living Standard</a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td>No change from <a lang="en" title="The &apos;Unknown&apos; specification" class="external" hreflang="en">Unknown</a>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="The &apos;Unknown&apos; specification" class="external" hreflang="en">Unknown</a></td>
+   <td><span class="spec-">Unknown</span></td>
+   <td>Initial definition.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="瀏覽器相容性">瀏覽器相容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-TW/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>4<sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/3.5" title="Released on 2009-06-30.">3.5</a> (1.9.1)</td>
+   <td>10.0</td>
+   <td>10.6<sup>[1]</sup></td>
+   <td>4<sup>[2]</sup></td>
+  </tr>
+  <tr>
+   <td>Shared workers</td>
+   <td>4<sup>[1]</sup></td>
+   <td><a href="/en-US/Firefox/Releases/29" title="Released on 2014-04-29.">29</a> (29)</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>10.6</td>
+   <td>4<sup>[2]</sup></td>
+  </tr>
+  <tr>
+   <td>Passing data using <a href="/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm">structured cloning</a></td>
+   <td>13</td>
+   <td><a href="/en-US/Firefox/Releases/8" title="Released on 2011-11-08.">8</a> (8)</td>
+   <td>10.0</td>
+   <td>11.5</td>
+   <td>6</td>
+  </tr>
+  <tr>
+   <td>Passing data using <a href="http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#transferable-objects" class="external">transferable objects</a></td>
+   <td>17 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/zh-TW/docs/Web/Guide/Prefixes" title="The name of this feature is prefixed with &apos;webkit&apos; as this browser considers it experimental">webkit</a></span><br>
+    21</td>
+   <td><a href="/en-US/Firefox/Releases/18" title="Released on 2013-01-08.">18</a> (18)</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>15</td>
+   <td>6</td>
+  </tr>
+  <tr>
+   <td>Global <a href="/zh-TW/docs/Web/API/Window/URL" title="The documentation about this has not yet been written; please consider contributing!"><code>URL</code></a></td>
+   <td>10<sup>[3]</sup><br>
+    23</td>
+   <td><a href="/en-US/Firefox/Releases/21" title="Released on 2013-05-14.">21</a> (21)</td>
+   <td>11</td>
+   <td>15</td>
+   <td>6<sup>[3]</sup></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Chrome Mobile</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>4.4</td>
+   <td>4<sup>[1]</sup></td>
+   <td>3.5</td>
+   <td>1.0.1</td>
+   <td>10.0</td>
+   <td>11.5<sup>[1]</sup></td>
+   <td>5.1<sup>[2]</sup></td>
+  </tr>
+  <tr>
+   <td>Shared workers</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>4<sup>[1]</sup></td>
+   <td>8</td>
+   <td>1.0.1</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+  <tr>
+   <td>Passing data using <a href="/en-US/docs/Web/Guide/API/DOM/The_structured_clone_algorithm">structured cloning</a></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>4</td>
+   <td>8</td>
+   <td>1.0.1</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+  <tr>
+   <td>Passing data using <a href="http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#transferable-objects" class="external">transferable objects</a></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td>18</td>
+   <td>1.0.1</td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+   <td><span style="color: #f00;">No support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Chrome 和 Opera 會丟出錯誤：&quot;<code>Uncaught SecurityError: Failed to construct &apos;Worker&apos;: Script at &apos;file:///Path/to/worker.js&apos; cannot be accessed from origin &apos;null&apos;.</code>&quot;，當從 local 端而非網域執行 worker。</p>
+
+<p>[2] Safari 7.1.2 可以從 worker 呼叫 <code>console.log，但並不會任何效果，而更早的版本則是不允許呼叫</code> <code>console.log。</code></p>
+
+<p>[3] 會有前綴 <code>webkitURL</code>.</p>
+
+<h2 id="延伸閱讀">延伸閱讀</h2>
+
+<ul>
+ <li><code><a href="/en-US/docs/Web/API/Worker" class="internal">Worker</a></code> interface</li>
+ <li><code><a href="/en-US/docs/Web/API/SharedWorker" class="internal">SharedWorker</a></code> interface</li>
+ <li><a href="/en-US/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Functions available to workers</a></li>
+ <li><a href="/en-US/docs/Web/API/Web_Workers_API/Using_web_workers">Advanced concepts and examples</a></li>
+</ul>
