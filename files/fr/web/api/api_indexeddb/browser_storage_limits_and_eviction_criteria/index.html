@@ -1,0 +1,139 @@
+---
+title: Limites de stockage du navigateur et critères d'éviction
+slug: Web/API/API_IndexedDB/Browser_storage_limits_and_eviction_criteria
+tags:
+  - Base de données
+  - IndexedDB
+  - LRU
+  - Limites
+  - Stockage
+  - eviction
+translation_of: Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/IndexedDB_API">IndexedDB API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/API_IndexedDB/Using_IndexedDB">Utiliser IndexedDB</a></li><li><a href="/fr/docs/Web/API/API_IndexedDB/Basic_Concepts_Behind_IndexedDB">Les concepts basiques d&apos;IndexedDB</a></li><li><a href="/fr/docs/Web/API/API_IndexedDB/Browser_storage_limits_and_eviction_criteria">Limites de stockage du navigateur et critères d&apos;éviction</a></li><li><a href="/fr/docs/Web/API/IndexedDB_API/Checking_when_a_deadline_is_due">Checking when a deadline is due</a> <a href="/fr/docs/Web/API/IndexedDB_API/Checking_when_a_deadline_is_due$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/IDBCursor"><code>IDBCursor</code></a></li><li><a href="/fr/docs/Web/API/IDBCursorSync"><code>IDBCursorSync</code></a></li><li><a href="/fr/docs/Web/API/IDBCursorWithValue"><code>IDBCursorWithValue</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabase"><code>IDBDatabase</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabaseException"><code>IDBDatabaseException</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabaseSync"><code>IDBDatabaseSync</code></a></li><li><a href="/fr/docs/Web/API/IDBEnvironment"><code>IDBEnvironment</code></a></li><li><a href="/fr/docs/Web/API/IDBEnvironmentSync"><code>IDBEnvironmentSync</code></a></li><li><a href="/fr/docs/Web/API/IDBFactory"><code>IDBFactory</code></a></li><li><a href="/fr/docs/Web/API/IDBFactorySync"><code>IDBFactorySync</code></a></li><li><a href="/fr/docs/Web/API/IDBIndex"><code>IDBIndex</code></a></li><li><a href="/fr/docs/Web/API/IDBIndexSync"><code>IDBIndexSync</code></a></li><li><a href="/fr/docs/Web/API/IDBKeyRange"><code>IDBKeyRange</code></a></li><li><a href="/fr/docs/Web/API/IDBObjectStore"><code>IDBObjectStore</code></a></li><li><a href="/fr/docs/Web/API/IDBObjectStoreSync"><code>IDBObjectStoreSync</code></a></li><li><a href="/fr/docs/Web/API/IDBOpenDBRequest"><code>IDBOpenDBRequest</code></a></li><li><a href="/fr/docs/Web/API/IDBRequest"><code>IDBRequest</code></a></li><li><a href="/fr/docs/Web/API/IDBTransaction"><code>IDBTransaction</code></a></li><li><a href="/fr/docs/Web/API/IDBTransactionSync"><code>IDBTransactionSync</code></a></li><li><a href="/fr/docs/Web/API/IDBVersionChangeEvent"><code>IDBVersionChangeEvent</code></a></li><li><a href="/fr/docs/Web/API/IDBVersionChangeRequest"><code>IDBVersionChangeRequest</code></a></li></ol></details></li></ol></section></div>
+
+<div class="note">
+<p>Il existe un certain nombre de technologies Web qui stockent des données d&apos;un type ou d&apos;un autre du côté client (c&apos;est-à-dire sur le disque local). Le processus par lequel le navigateur calcule l&apos;espace alloué au stockage de données Web et les données à supprimer quand la limite est atteinte n&apos;est pas simple et diffère d&apos;un navigateur à l&apos;autre. Cet article tente d&apos;expliquer comment tout cela fonctionne.</p>
+</div>
+
+<div class="note">
+<p><strong>Note </strong>: Les informations ci-dessous devraient être assez précises pour la plupart des navigateurs modernes, mais les spécificités du navigateur sont évoquées quand elles sont connues. Opera et Chrome devraient se comporter de la même manière dans tous les cas. Mais <a href="http://www.opera.com/mobile/mini">Opera Mini</a> (encore basé sur presto du côté serveur) ne stocke aucune donnée sur le client.</p>
+</div>
+
+<h2 id="Les_différents_types_de_stockage_des_données">Les différents types de stockage des données</h2>
+
+<p>Même dans le même navigateur, en utilisant la même méthode de stockage, il existe différentes classes de stockage de données à comprendre. Cette section traite des différents types que vous pouvez trouver dans différents navigateurs.</p>
+
+<p>Généralement, les deux principaux types de stockage sont les suivants :</p>
+
+<ul>
+ <li>Persistant : ce sont des données qui doivent être conservées pendant une longue période. Elles ne seront évincéés que si l&apos;utilisateur le choisit (par exemple, dans Firefox, il existe un bouton &quot;nettoyer stockage&quot; dans la boîte de dialogue d&apos;informations sur la page pour chaque page).</li>
+ <li>Temporaire : il s&apos;agit de données qui n&apos;ont pas besoin de persister très longtemps. Elles seront évacuées en-dessous d&apos;un minimum d&apos;utilisation (<a href="#LRU_policy">LRU policy</a>) lorsque les limites de stockage sont atteintes.</li>
+</ul>
+
+<p>Par défaut, le stockage temporaire sera utilisé dans la plupart des contextes d&apos;utilisation (par exemple, des applications Web standard) et le persistant pour les applications installées (par exemple, les applications Firefox installées sur le système d&apos;exploitation Firefox OS / Firefox de bureau, les applications Chrome).</p>
+
+<h3 id="Spécificités_de_Firefox">Spécificités de Firefox</h3>
+
+<p>Dans Firefox, vous pouvez choisir le type de stockage que vous souhaitez utiliser en incluant une option propriétaire — <code>storage</code> — lorsque vous créez une base de données IndexedDB en utilisant <a href="/fr/docs/Web/API/IDBFactory/open_" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>open ()</code></a> :</p>
+
+<ul>
+ <li>
+  <pre class="brush: js"><code>var request = indexedDB.open(&quot;myDatabase&quot;, { version: 1, storage: &quot;persistent&quot; });</code></pre>
+ </li>
+ <li>
+  <pre class="brush: js"><code>var request = indexedDB.open(&quot;myDatabase&quot;, { version: 1, storage: &quot;temporary&quot; });</code></pre>
+ </li>
+</ul>
+
+<p>Dans Firefox, quand le stockage persistant est choisi, l&apos;utilisateur reçoit une fenêtre de dialogue d&apos;interface utilisateur pour l&apos;avertir que ces données persisteront et lui demander s&apos;il en est satisfait.</p>
+
+<p>Les données de stockage temporaire ne provoquent aucune fenêtre de dialogue vers l&apos;utilisateur, mais il y a des <a href="#Limites_de_stockage">Limites de stockage</a>.</p>
+
+<h3 id="Default_storage_dans_Firefox_(stockage_par_défaut)">&quot;Default storage&quot; dans Firefox <em>(stockage par défaut)</em></h3>
+
+<p>C&apos;est le troisième type de stockage à envisager dans Firefox — &quot;Default storage&quot; <em>(stockage par défaut)</em>.  C&apos;est une option par défaut, utilisée quand vous ne spécifiez pas le paramètre <code>storage</code>  vu ci-dessus. Les données du stockage par défaut se comportent différemment selon les circonstances : assimilées aux données d&apos;un stockage persistant pour les applications installées de Firefox OS, ou d&apos;un stockage temporaire pour tout autre type d&apos;utilisation.</p>
+
+<h2 id="Où_sont_stockées_les_données">Où sont stockées les données ?</h2>
+
+<p>Chaque type de stockage représente un référentiel distinct, voici la cartographie réelle des répertoires sous le profil Firefox d&apos;un utilisateur (d&apos;autres navigateurs peuvent différer légèrement) :</p>
+
+<ul>
+ <li><code>&lt;profile&gt;/storage</code> — le principal, le plus haut niveau de répertoire pour le stockage maintenu par le &quot; quota manager &quot; <em>(manager de quotas)</em> (voir ci-dessous).</li>
+ <li><code>&lt;profile&gt;/storage/permanent</code> — répertoire de stockage des données persistantes.</li>
+ <li><code>&lt;profile&gt;/storage/temporary</code> — répertoire de stockage des données temporaires.</li>
+ <li><code>&lt;profile&gt;/storage/default</code> — répertoire de stockage des données par défaut.</li>
+</ul>
+
+<div class="note">
+<p><strong>Note :</strong>  Depuis l&apos;introduction de l&apos; <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage_API">API Storage</a> , le dossier &quot;permanent&quot; peut être considéré comme obsolète, il n&apos;est plus utilisé que pour les bases de données de type persistant IndexedDB. Peu importe le mode, &quot;best-effort&quot;<em> (meilleur effort)</em> ou &quot;persistant&quot;, les données sont stockées sous <code>&lt;profile&gt;/storage/default</code>.</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Dans Firefox, vous pouvez trouver votre dossier profil en entrant : <code>support</code> dans la barre d&apos;URL et en appuyant sur le bouton <em>Show in..</em>. <em>(</em><em>Afficher dans ...)</em> (par exemple, <em>&quot;Show in Finder&quot;</em> sur Mac OS X) à côté du titre <em>&quot;Profile Folder&quot; (</em><em>dossier de profil)</em> .</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Si vous regardez dans votre profil les répertoires de données stockées, vous pouvez voir un quatrième dossier : <code>persistent</code> . À la base, le dossier <code>persistent</code> a été renommé <code>permanent,</code> il y a quelques temps, pour faciliter les mises à niveau / migrations.</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Les utilisateurs ne doivent pas ajouter leurs propres répertoires ou fichiers sous <code>&lt;profile&gt;/storage</code> . Cela entraînerait l&apos;échec de l&apos;initialisation du stockage ; par exemple <a href="/fr/docs/Web/API/IDBFactory/open_" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>open ()</code></a> déclencherait un événement d&apos;erreur.</p>
+</div>
+
+<h2 id="Limites_de_stockage">Limites de stockage</h2>
+
+<p>L&apos;espace de stockage maximal du navigateur est dynamique  — il est basé sur la taille de votre disque dur. La limite globale est calculée sur la base de 50% de l&apos;espace disque libre. Dans Firefox, un outil interne du navigateur appelé &quot; Quota Manager &quot; <em>(gestionnaire de quotas)</em> surveille la quantité d&apos;espace disque utilisée par chaque origine et supprime les données si nécessaire.</p>
+
+<p>Donc, si votre disque dur est de 500 Go, le stockage total d&apos;un navigateur est de 250 Go. S&apos;il est dépassé, une procédure appelée <strong>&quot;origin eviction&quot;</strong> <em>(</em><em>éviction d&apos;origine)</em> entre en jeu, en supprimant la valeur totale de l&apos;origine jusqu&apos;à ramener le niveau de stockage en-dessous de la limite. La suppression d&apos;une base de données d&apos;origine peut entraîner des problèmes d&apos;incohérence.</p>
+
+<p>Il y a aussi une autre limite appelée <strong>group limit</strong> — ceci est défini comme 20% de la limite globale. Chaque origine fait partie d&apos;un groupe (groupe d&apos;origines). Il existe un groupe pour chaque domaine eTLD + 1.</p>
+
+<p>Par exemple :</p>
+
+<ul>
+ <li><code>mozilla.org</code> — groupe1, origine1</li>
+ <li><code>www.mozilla.org</code> — groupe1, origine2</li>
+ <li><code>joe.blogs.mozilla.org</code> — groupe1, origine3</li>
+ <li><code>firefox.com</code> — groupe2, origine4</li>
+</ul>
+
+<p>Ces groupes, <code>mozilla.org</code>, <code>www.mozilla.org</code>, et <code>joe.blogs.mozilla.org</code> peuvent utiliser globalement un maximum de 20% de la limite globale. <code>firefox.com</code> a un maximum distinct de 20%.</p>
+
+<p>Les deux limites reagissent différemment quand la limite est atteinte :</p>
+
+<ul>
+ <li>La limite de groupe est également appelée «limite dure»: elle ne déclenche pas l&apos;éviction d&apos;origine.</li>
+ <li>La limite globale est une «limite douce» car il est possible que certains espaces soient libérés et que l&apos;opération puisse se poursuivre.</li>
+</ul>
+
+<div class="note">
+<p><strong>Note</strong>: Si la limite de groupe est dépassée, ou si l&apos;éviction d&apos;origine ne crée pas assez d&apos;espace libre, le navigateur lance  <code>QuotaExceededError</code>.</p>
+</div>
+
+<h2 id="Politique_LRU">Politique LRU</h2>
+
+<p>Lorsque l&apos;espace disque disponible est rempli, le gestionnaire de quotas commence à effacer les données sur la base de la politique LRU — l&apos;origine la moins utilisée sera d&apos;abord supprimée, puis la suivante, jusqu&apos;à ce que le navigateur ne dépasse plus la limite.</p>
+
+<p>Nous traçons le &quot;dernier temps d&apos;accès&quot; pour chaque origine utilisant le stockage temporaire. Une fois que la limite globale du stockage temporaire est atteinte, nous essayons de trouver toutes les origines actuellement inutilisées (c&apos;est-à-dire, sans onglets ou applications ouverts qui conservent des bases de données ouvertes). Celles-ci sont ensuite triées sur le dernier accès. Les origines les moins récemment utilisées sont ensuite supprimées jusqu&apos;à ce qu&apos;il y ait suffisamment d&apos;espace pour répondre à la demande qui a déclenché cette éviction d&apos;origine.</p>
+
+<h2 id="Quelles_technologies_utilisent_le_stockage_de_données_du_navigateur">Quelles technologies utilisent le stockage de données du navigateur ?</h2>
+
+<p>Dans Firefox, les technologies suivantes utilisent le stockage de données du navigateur pour stocker des données au besoin. Nous les qualifions de &quot;quota clients&quot; dans ce contexte :</p>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/fr/docs/Web/API/API_IndexedDB">IndexedDB</a></li>
+ <li><a href="http://asmjs.org/">asm.js</a> caching</li>
+ <li><a href="/fr/docs/Web/API/Cache">Cache API</a></li>
+</ul>
+
+<p>Le «dernier temps d&apos;accès» des origines est mis à jour lorsque l&apos;un de ces éléments est activé / désactivé. L&apos;éviction d&apos;origine supprimera les données pour tous ces &quot;quota clients&quot;.</p>
+
+<p>Dans Chrome / Opera, l&apos;API &quot; Quota Management&quot; gère les quotas pour <a href="/en-US/docs/Web/HTML/Using_the_application_cache">AppCache</a>, <a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a>, WebSQL et <a href="/en-US/docs/Web/API/File_System_API">File System API</a>.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="http://www.html5rocks.com/en/tutorials/offline/quota-research/">Working with quota on mobile browsers</a>, de<a href="http://blog.agektmr.com" title="Eiji Kitamura"> Eiji Kitamura.</a> Une analyse détaillée du stockage côté client sur les navigateurs mobiles.</li>
+ <li><a href="https://developers.google.com/web/updates/2011/11/Quota-Management-API-Fast-Facts">Quota Management API : Fast Facts</a>, de<a href="http://blog.agektmr.com" title="Eiji Kitamura"> Eiji Kitamura.</a> Un regard sur l&apos;API Quota Management dans Chrome / Blink (qui devrait également inclure Opera aussi.)</li>
+</ul>

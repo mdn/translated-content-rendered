@@ -1,0 +1,282 @@
+---
+title: Structure d'une Progressive web app
+slug: Web/Progressive_web_apps/App_structure
+translation_of: Web/Progressive_web_apps/App_structure
+---
+<div><div class="prevnext">
+  <a href="/fr/docs/Web/Apps/Progressive/Introduction" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Web/Apps/Progressive" class="button"><i class="icon-arrow-up"></i> Aperçu : Progressive</a><a href="/fr/docs/Web/Apps/Progressive/Offline_Service_workers" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">Maintenant que nous avons pris connaissances des principes théoriques sur lesquelles sont bâties les PWAs, penchons nous sur la structure recommandée d&apos;une vraie application. Nous commencerons par analyser l&apos;application <a href="https://mdn.github.io/pwa-examples/js13kpwa/">js13kPWA</a> et par examiner pourquoi elle est construite de cette façon et quels bénéfices elle en retire.</p>
+
+<h2 id="Architecture_dune_application">Architecture d&apos;une application</h2>
+
+<p>Il existe deux approches majeures distinctes pour générer un site web - côté serveur ou côté client. Les deux approches ont leurs avantages et leurs inconvénients et vous pouvez panacher jusqu&apos;à un certain point les deux approches. </p>
+
+<ul>
+ <li>La génération côté serveur (Server-side rendering ou SSR) signifie qu&apos;un site web est généré sur le serveur, si bien qu&apos;il bénéficie d&apos;un temps de chargement initial plus court mais la navigation d&apos;une page à l&apos;autre impose de télécharger à chaque foois un nouveau contenu HTML. Cela fonctionne parfaitement pour les navigateurs mais au prix d&apos;un temps de navigation accru pour passer d&apos;une page à l&apos;autre, et donc diminue la performance générale perçue - charger une page nécessite un nouvel allerr-retour avec le serveur.</li>
+ <li>La génération côté client (Client-side rendering ou CSR) permet au site web d&apos;être mis à jour presque instantanément en navigant sur des pages différentes mais nécessite au début un téléchargement intial plus important et un travail de rendu supplémentaires côté client. Le site web est plus lent lors d&apos;une première visite mais peut être plus rapide ensuite quand on y navigue.</li>
+</ul>
+
+<p>Mélanger SSR et CSR peut permettre d&apos;obtenir de meilleurs résultats - vous pouvez générer un site web côté serveur, mettre en cache son contenu puis mettre à jour le rendu côté client si et quand c&apos;est nécessaire. Le chargement de la première page est rapide grâce au SSR et la navigation entre les pages est fluide car le client peut regénérer la page en ne modifiant que les parties qui ont changé.</p>
+
+<p>Les PWAs peuvent être construite en utilisant l&apos;approche que vous préférez, mais certaines fonctionneront mieux que les autres. L&apos;approche la plus populaire est celle utilisant le concept d&apos; &quot;app shell&quot;; qui mélange SSR et CSR exactement comme cela a été décrit plus haut et se conforme de surcroit à la méthodologie &quot;déconnectée d&apos;abord&quot; (&quot;offline first&quot;) que nous expliquerons en détails dans de prochains articles et que nous utiliserons dans notre application exemple. Il existe également une nouvelle approche utilisant l&apos;<a href="/en-US/docs/Web/API/Streams_API">API Streams</a> et dont nous parlerons brièvement.</p>
+
+<h2 id="App_shell">App shell</h2>
+
+<p>Le concept d&apos;App shell s&apos;occupe de charger une interface utilisateur minimale dès que possible puis de la mettre en cache de façon à ce qu&apos;elle soit disponible en mode déconnecté lors des visites suivantes, avant de charger tout le contenu de l&apos;application. De cette façon, la prochaine fois que quelqu&apos;un visite l&apos;application avec un appareil, l&apos;interface utilisateur est chargée immédiatement depuis le cache puis les nouveaux contenus sont demandés au serveur (s&apos;ils ne sont pas déjà disponibles dans le cache).</p>
+
+<p>Cette structure est rapide et est également ressentie comme telle par l&apos;utilisateur car il voit &quot;quelque chose&quot; instantanément, plutôt qu&apos;un indicateur de chargement en train de tourner ou une page blanche. Cela permet également au site web d&apos;être accessible en mode déconnecté si une connexion réseau n&apos;est pas disponible.</p>
+
+<p>Nous pouvons contrôler ce qui est demandé au serveur et ce qui est récupéré dans le cache grâce à un <a href="/en-US/docs/Web/API/Service_Worker_API">service worker</a> qui sera expliqué en détail dans le prochain article - pour le moment, concentrons-nous sur la structure en elle-même.</p>
+
+<h3 id="Pourquoi_dois-je_lutiliser">Pourquoi dois-je l&apos;utiliser ?</h3>
+
+<p>Cette architecture permet à un site web de bénéficier de la plupart des fonctionnalités PWA - elle met en cache l&apos;app shell et gère le contenu dynamique d&apos;une manière qui améliore grandement les performances. En plus de la structure de base, vous pouvez ajouter d&apos;autres fonctionnalités telles que <a href="/en-US/docs/Web/Apps/Progressive/Add_to_home_screen">l&apos;ajouter à l&apos;écran d&apos;accueil</a> ou <a href="/en-US/docs/Web/API/Push_API">l&apos;envoi de notifications</a>, sachant que l&apos;application fonctionnera toujours correctement si elles ne sont pas prises en charge par le navigateur de l&apos;utilisateur - c&apos;est la beauté de l&apos;amélioration continue.</p>
+
+<p>Le site web se comporte comme une application native, offrant une interaction instantannée et de solides performances tout en conservant les avantages du web.</p>
+
+<h3 id="Être_accessible_par_un_lien_progressive_et_de_conception_adaptative">Être accessible par un lien, progressive et de conception adaptative</h3>
+
+<p>Il est important de se rappeler les avantages des PWA et de les garder à l&apos;esprit lorsqu&apos;on conçoit l&apos;application. L&apos;approche app shell permet aux sites web d&apos;être :</p>
+
+<ul>
+ <li>Accessible par un lien: Même s&apos;il se comporte comme une application native, il reste un site web - vous pouvez cliquer sur les liens d&apos;une page et envoyer une URL à quelqu&apos;un si vous voulez le partager.</li>
+ <li>Progressive: Commencer avec un &quot;bon vieux site web basic” et ajouter progressivement de nouvelles fonctionnalités tout en se rappelant de détecter si elles sont disponibles dans le navigateur et de gérer proprement toute erreur qui pourrait survenir si la prise en charge n&apos;est pas disponible. Par exemple, un mode déconnecté possible grâce aux service workers n&apos;est qu&apos;une caractéristique bonus qui améliore l&apos;expérience sur le site web, mais ce dernier reste totalement fonctionnel sans elle.</li>
+ <li>Adaptatif: La conception web adaptative s&apos;applique également aux applications web progressives, attendu que les deux sont principalement destinés aux appareils mobiles. Il y a tellements d&apos;appareils différents en plus des navigateurs - il est important de préparer votre site web à fonctionner sur différentes tailles d&apos;écran, supports d&apos;affichage ou densité de pixels, en utilisant des technologies telles que  <a href="/en-US/docs/Mozilla/Mobile/Viewport_meta_tag">les tags meta viewport</a>, <a href="/en-US/docs/Web/CSS/Media_Queries/Using_media_queries">les reqêtes media CSS</a>, <a href="/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout">les Flexbox</a> et les <a href="/en-US/docs/Web/CSS/CSS_Grid_Layout">Grid CSS</a>.</li>
+</ul>
+
+<h2 id="Approche_différente_les_streams">Approche différente : les streams</h2>
+
+<p>Une approche totalement différente du rendu côté serveur - ou client - peut être obtenue à l&apos;aide de l&apos;<a href="/en-US/docs/Web/API/Streams_API">API Streams</a>. Avec un peu d&apos;aide des service workers, les streams peuvent grandement améliorer la façon dont nous analysons le contenu.</p>
+
+<p>Le modèle app shell nécessite que toutes les ressources soient disponibles avant que le site puisse commencer à être rendu. C&apos;est différent avec HTML pour lequel le navigateur diffuse immédiatement les données si bien que vous pouvez voir quand les éléments sont chargés et et rendus sur le site web. Pour que le JavaScript soit &quot;opérationnel&quot;, cependant, il faut attendre qu&apos;il ait été entièrement téléchargé au préalable.</p>
+
+<p>L&apos;API Streams permet aux développeurs d&apos;avoir un accès direct au flux de données provenant du serveur - si vous voulez exécuter une opération sur les données (par exemple ajouter un filtre à une vidéo), vous n&apos;avez plus besoin d&apos;attendre que tout soit téléchargé et converti en un blob (ou autre) - vous pouvez commencer immédiatement. Cela permet un contrôle fin - le flux peut être démarré, chaîné avec un autre flux, annulé, ses erreurs contrôlées, et plus.</p>
+
+<p>En théorie, le flux est un meilleur modèle, mais il est également plus complexe et au moment de la rédaction (mars 2018), l&apos;API Stream est toujours un travail en cours et pas encore totalement disponible pour l&apos;ensemble des navigateurs principaux. Quand elle sera disponible, elle sera le moyen le plus rapide de servir le contenu - les bénéfices sont sur le point d&apos;être énormes en terme de performance.</p>
+
+<p>Pour voir des exemples fonctionnels et disposer de davantage d&apos;information, voir <a href="/en-US/docs/Web/API/Streams_API">la documention de l&apos;API Streams</a>.</p>
+
+<h2 id="Structure_de_notre_application_exemple">Structure de notre application exemple</h2>
+
+<p>La structure du site web <a href="https://mdn.github.io/pwa-examples/js13kpwa/">js13kPWA</a> est plutôt simple: elle consiste en un simple fichier HTML (<a href="https://github.com/mdn/pwa-examples/blob/master/js13kpwa/index.html">index.html</a>) avec un style CSS basique (<a href="https://github.com/mdn/pwa-examples/blob/master/js13kpwa/style.css">style.css</a>) et quelques images, scripts et polices de caractères. La structure du répertoire ressemble à ceci:</p>
+
+<p><img alt="Folder structure of js13kPWA." src="https://mdn.mozillademos.org/files/15925/js13kpwa-directory.png" style="border-style: solid; border-width: 1px; display: block; height: 356px; margin: 0px auto; width: 320px;"></p>
+
+<h3 id="Le_HTML">Le HTML</h3>
+
+<p>Du point de vue HTML, l&apos;app shell est tout ce qui est à l&apos;extérieur de la section content:</p>
+
+<pre class="brush: html notranslate">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+	&lt;meta charset=&quot;utf-8&quot;&gt;
+	&lt;title&gt;js13kGames A-Frame entries&lt;/title&gt;
+	&lt;meta name=&quot;description&quot; content=&quot;A list of A-Frame entries submitted to the js13kGames 2017 competition, used as an example for the MDN articles about Progressive Web Apps.&quot;&gt;
+	&lt;meta name=&quot;author&quot; content=&quot;end3r&quot;&gt;
+	&lt;meta name=&quot;theme-color&quot; content=&quot;#B12A34&quot;&gt;
+	&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+	&lt;meta property=&quot;og:image&quot; content=&quot;icons/icon-512.png&quot;&gt;
+	&lt;link rel=&quot;shortcut icon&quot; href=&quot;favicon.ico&quot;&gt;
+	&lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot;&gt;
+	&lt;link rel=&quot;manifest&quot; href=&quot;js13kpwa.webmanifest&quot;&gt;
+	&lt;script src=&quot;data/games.js&quot; defer&gt;&lt;/script&gt;
+	&lt;script src=&quot;app.js&quot; defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;
+	&lt;p&gt;&lt;a class=&quot;logo&quot; href=&quot;http://js13kgames.com&quot;&gt;&lt;img src=&quot;img/js13kgames.png&quot; alt=&quot;js13kGames&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/header&gt;
+&lt;main&gt;
+	&lt;h1&gt;js13kGames A-Frame entries&lt;/h1&gt;
+	&lt;p class=&quot;description&quot;&gt;List of games submitted to the &lt;a href=&quot;http://js13kgames.com/aframe&quot;&gt;A-Frame category&lt;/a&gt; in the &lt;a href=&quot;http://2017.js13kgames.com&quot;&gt;js13kGames 2017&lt;/a&gt; competition. You can &lt;a href=&quot;https://github.com/mdn/pwa-examples/blob/master/js13kpwa&quot;&gt;fork js13kPWA on GitHub&lt;/a&gt; to check its source code.&lt;/p&gt;
+	&lt;button id=&quot;notifications&quot;&gt;Request dummy notifications&lt;/button&gt;
+	&lt;section id=&quot;content&quot;&gt;
+		// Le contenu est inséré ici
+	&lt;/section&gt;
+&lt;/main&gt;
+&lt;footer&gt;
+	&lt;p&gt;© js13kGames 2012-2018, created and maintained by &lt;a href=&quot;http://end3r.com&quot;&gt;Andrzej Mazur&lt;/a&gt; from &lt;a href=&quot;http://enclavegames.com&quot;&gt;Enclave Games&lt;/a&gt;.&lt;/p&gt;
+&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>La section <a href="/fr/docs/Web/HTML/Element/head" title="L&apos;élément HTML &lt;head&gt; fournit des informations générales (métadonnées) sur le document, incluant son titre et des liens ou des définitions vers des scripts et feuilles de style."><code>&lt;head&gt;</code></a> contient certaines informations de base telles que le titre, la description et des liens vers les CSS, le manifeste web, le fichier JS contenant les jeux et  app.js — c&apos;est là où notre application JavaScript est initialisée. Le <a href="/fr/docs/Web/HTML/Element/body" title="L&apos;élément &lt;body&gt; représente le contenu principal du document HTML. Il ne peut y avoir qu&apos;un élément &lt;body&gt; par document."><code>&lt;body&gt;</code></a> est divisé en <a href="/fr/docs/Web/HTML/Element/header" title="L&apos;élément HTML &lt;header&gt; représente un groupe de contenu introductif ou de contenu aidant à la navigation. Il peut contenir des éléments de titre, mais aussi d&apos;autres éléments tels qu&apos;un logo, un formulaire de recherche, etc."><code>&lt;header&gt;</code></a> (contenant les images liées), <a href="/fr/docs/Web/HTML/Element/main" title="L’élément HTML &lt;main&gt; représente le contenu majoritaire du &lt;body&gt; du document. Le contenu principal de la zone est constitué de contenu directement en relation, ou qui étend le sujet principal du document ou de la fonctionnalité principale d&apos;une application."><code>&lt;main&gt;</code></a> la page (avec le titre, la description et un emplacement pour le contenu) et  <a href="/fr/docs/Web/HTML/Element/footer" title="L&apos;élément HTML &lt;footer&gt; représente le pied de page de la section ou de la racine de sectionnement la plus proche. Un pied de page ou de section contient habituellement des informations sur l&apos;auteur de la section, les données relatives au droit d&apos;auteur (copyright) ou les liens vers d&apos;autres documents en relation."><code>&lt;footer&gt;</code></a> (le copyright et les liens).</p>
+
+<p>Le seul travail de l&apos;application est de lister toutes les entrées A-Frame de la compétition js13kGames 2017. Comme vous pouvez le voir, c&apos;est un site web en une page tout ce qu&apos;il y a de plus ordinaire - le but est d&apos;avoir quelque chose de simple afin que nous puissions nous concentrer sur l&apos;implémentation des réelles fonctionnalités PWA.</p>
+
+<h3 id="Le_CSS">Le CSS</h3>
+
+<p>Le CSS est également aussi linéaire que possible: il utilise <a href="/fr/docs/Web/CSS/@font-face" title="La règle @ @font-face permet de définir les polices d&apos;écriture à utiliser pour afficher le texte de pages web. Cette police peut être chargée depuis un serveur distant ou depuis l&apos;ordinateur de l&apos;utilisateur. Si la fonction local() est utilisée, elle indique à l&apos;agent utilisateur de prendre en compte une police présente sur le poste de l&apos;utilisateur."><code>@font-face</code></a> pour charger et utiliser une police de caractères personnalisée et il applique quelques mises en forme simples des éléments HTML. L&apos;approche globale est d&apos;avoir une conception qui soit belle à la fois sur les mobiles (avec une approche de conception adaptative) et sur les ordinateurs de bureau.</p>
+
+<h3 id="Le_fichier_JavaScript_principal">Le fichier JavaScript principal</h3>
+
+<p>Le fichier app.js file exécute plusieurs choses que nous regarderons de plus près dans les prochains articles. Avant tout, il génère le contenu à l&apos;aide de ce template:</p>
+
+<pre class="brush: js notranslate">var template = &quot;&lt;article&gt;\n\
+    &lt;img src=&apos;data/img/SLUG.jpg&apos; alt=&apos;NAME&apos;&gt;\n\
+    &lt;h3&gt;#POS. NAME&lt;/h3&gt;\n\
+    &lt;ul&gt;\n\
+    &lt;li&gt;&lt;span&gt;Author:&lt;/span&gt; &lt;strong&gt;AUTHOR&lt;/strong&gt;&lt;/li&gt;\n\
+    &lt;li&gt;&lt;span&gt;Twitter:&lt;/span&gt; &lt;a href=&apos;https://twitter.com/TWITTER&apos;&gt;@TWITTER&lt;/a&gt;&lt;/li&gt;\n\
+    &lt;li&gt;&lt;span&gt;Website:&lt;/span&gt; &lt;a href=&apos;http://WEBSITE/&apos;&gt;WEBSITE&lt;/a&gt;&lt;/li&gt;\n\
+    &lt;li&gt;&lt;span&gt;GitHub:&lt;/span&gt; &lt;a href=&apos;https://GITHUB&apos;&gt;GITHUB&lt;/a&gt;&lt;/li&gt;\n\
+    &lt;li&gt;&lt;span&gt;More:&lt;/span&gt; &lt;a href=&apos;http://js13kgames.com/entries/SLUG&apos;&gt;js13kgames.com/entries/SLUG&lt;/a&gt;&lt;/li&gt;\n\
+    &lt;/ul&gt;\n\
+&lt;/article&gt;&quot;;
+var content = &apos;&apos;;
+for(var i=0; i&lt;games.length; i++) {
+    var entry = template.replace(/POS/g,(i+1))
+        .replace(/SLUG/g,games[i].slug)
+        .replace(/NAME/g,games[i].name)
+        .replace(/AUTHOR/g,games[i].author)
+        .replace(/TWITTER/g,games[i].twitter)
+        .replace(/WEBSITE/g,games[i].website)
+        .replace(/GITHUB/g,games[i].github);
+    entry = entry.replace(&apos;&lt;a href=\&apos;http:///\&apos;&gt;&lt;/a&gt;&apos;,&apos;-&apos;);
+    content += entry;
+};
+document.getElementById(&apos;content&apos;).innerHTML = content;</pre>
+
+<p>Ensuite, il enregistre un service worker:</p>
+
+<pre class="brush: js notranslate">if(&apos;serviceWorker&apos; in navigator) {
+    navigator.serviceWorker.register(&apos;/pwa-examples/js13kpwa/sw.js&apos;);
+};</pre>
+
+<p>Le bloc de code suivant demande la permission d&apos;émettre des notifications quand un bouton est cliqué:</p>
+
+<pre class="brush: js notranslate">var button = document.getElementById(&quot;notifications&quot;);
+button.addEventListener(&apos;click&apos;, function(e) {
+    Notification.requestPermission().then(function(result) {
+        if(result === &apos;granted&apos;) {
+            randomNotification();
+        }
+    });
+});</pre>
+
+<p>Le dernier bloc crée des notifications qui affichent  un élément choisi au hasard dans la liste des jeux:</p>
+
+<pre class="brush: js notranslate">function randomNotification() {
+    var randomItem = Math.floor(Math.random()*games.length);
+    var notifTitle = games[randomItem].name;
+    var notifBody = &apos;Created by &apos;+games[randomItem].author+&apos;.&apos;;
+    var notifImg = &apos;data/img/&apos;+games[randomItem].slug+&apos;.jpg&apos;;
+    var options = {
+        body: notifBody,
+        icon: notifImg
+    }
+    var notif = new Notification(notifTitle, options);
+    setTimeout(randomNotification, 30000);
+}</pre>
+
+<h3 id="Le_service_worker">Le service worker</h3>
+
+<p>Le dernier fichier que nous allons rapidement regarder est le service worker: sw.js — il importe d&apos;abord les données du fichier games.js:</p>
+
+<pre class="brush: js notranslate">self.importScripts(&apos;data/games.js&apos;);</pre>
+
+<p>Ensuite, il crée une liste de tous les fichiers à mettre en cache, à la fois à partir de l&apos;app shell et du contenu:</p>
+
+<pre class="brush: js notranslate">var cacheName = &apos;js13kPWA-v1&apos;;
+var appShellFiles = [
+  &apos;/pwa-examples/js13kpwa/&apos;,
+  &apos;/pwa-examples/js13kpwa/index.html&apos;,
+  &apos;/pwa-examples/js13kpwa/app.js&apos;,
+  &apos;/pwa-examples/js13kpwa/style.css&apos;,
+  &apos;/pwa-examples/js13kpwa/fonts/graduate.eot&apos;,
+  &apos;/pwa-examples/js13kpwa/fonts/graduate.ttf&apos;,
+  &apos;/pwa-examples/js13kpwa/fonts/graduate.woff&apos;,
+  &apos;/pwa-examples/js13kpwa/favicon.ico&apos;,
+  &apos;/pwa-examples/js13kpwa/img/js13kgames.png&apos;,
+  &apos;/pwa-examples/js13kpwa/img/bg.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-32.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-64.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-96.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-128.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-168.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-192.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-256.png&apos;,
+  &apos;/pwa-examples/js13kpwa/icons/icon-512.png&apos;
+];
+var gamesImages = [];
+for(var i=0; i&lt;games.length; i++) {
+  gamesImages.push(&apos;data/img/&apos;+games[i].slug+&apos;.jpg&apos;);
+}
+var contentToCache = appShellFiles.concat(gamesImages);</pre>
+
+<p>Le bloc suivant définit la phase d&apos;initialisation de notre service worker lors de laquelle tous les fichiers contenus dans la liste précédente sont effectivement mis en cache:</p>
+
+<pre class="brush: js notranslate">self.addEventListener(&apos;install&apos;, function(e) {
+  console.log(&apos;[Service Worker] Install&apos;);
+  e.waitUntil(
+    caches.open(cacheName).then(function(cache) {
+      console.log(&apos;[Service Worker] Caching all: app shell and content&apos;);
+      return cache.addAll(contentToCache);
+    })
+  );
+});</pre>
+
+<p>Finalement, nous définissons ici le gestionnaire de l&apos;événement fetch du service worker afin qu&apos;il récupère le contenu du cache s&apos;il y est disponible, offrant un fonctionnement hors connexion:</p>
+
+<pre class="brush: js notranslate">self.addEventListener(&apos;fetch&apos;, function(e) {
+  e.respondWith(
+    caches.match(e.request).then(function(r) {
+      console.log(&apos;[Service Worker] Fetching resource: &apos;+e.request.url);
+      return r || fetch(e.request).then(function(response) {
+        return caches.open(cacheName).then(function(cache) {
+          console.log(&apos;[Service Worker] Caching new resource: &apos;+e.request.url);
+          cache.put(e.request, response.clone());
+          return response;
+        });
+      });
+    })
+  );
+});</pre>
+
+<h3 id="Les_données_JavaScript">Les données JavaScript</h3>
+
+<p>Les données des jeux sont présentes dans le dossier data sous la forme d&apos;un objet JavaScript (<a href="https://github.com/mdn/pwa-examples/blob/master/js13kpwa/data/games.js">games.js</a>):</p>
+
+<pre class="brush: js notranslate">var games = [
+    {
+        slug: &apos;lost-in-cyberspace&apos;,
+        name: &apos;Lost in Cyberspace&apos;,
+        author: &apos;Zosia and Bartek&apos;,
+        twitter: &apos;bartaz&apos;,
+        website: &apos;&apos;,
+        github: &apos;github.com/bartaz/lost-in-cyberspace&apos;
+    },
+    {
+        slug: &apos;vernissage&apos;,
+        name: &apos;Vernissage&apos;,
+        author: &apos;Platane&apos;,
+        twitter: &apos;platane_&apos;,
+        website: &apos;github.com/Platane&apos;,
+        github: &apos;github.com/Platane/js13k-2017&apos;
+    },
+// ...
+    {
+        slug: &apos;emma-3d&apos;,
+        name: &apos;Emma-3D&apos;,
+        author: &apos;Prateek Roushan&apos;,
+        twitter: &apos;&apos;,
+        website: &apos;&apos;,
+        github: &apos;github.com/coderprateek/Emma-3D&apos;
+    }
+];</pre>
+
+<p>Chaque entrée possède sa propre image dans le dossier data/img. Ceci est notre contenu chargé dans la section content via JavaScript.</p>
+
+<h2 id="A_suivre">A suivre</h2>
+
+<p>Dans le prochain article, nous regarderons plus en détail comment l&apos;app shell et le contenu sont mis en cache pour une utilisation en mode déconnecté grâce au service worker.</p>
+
+<div class="prevnext">
+  <a href="/fr/docs/Web/Apps/Progressive/Introduction" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Web/Apps/Progressive" class="button"><i class="icon-arrow-up"></i> Aperçu : Progressive</a><a href="/fr/docs/Web/Apps/Progressive/Offline_Service_workers" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<section class="Quick_links" id="Quick_Links">
+<ol></ol>
+</section>

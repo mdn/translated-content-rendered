@@ -1,0 +1,573 @@
+---
+title: Le placement automatique sur une grille CSS
+slug: Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS
+tags:
+  - CSS
+  - CSS Grids
+  - Grilles CSS
+  - Guide
+  - Intermédiaire
+translation_of: Web/CSS/CSS_Grid_Layout/Auto-placement_in_CSS_Grid_Layout
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/Reference">Référence CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/CSS_Grid_Layout">CSS Grid Layout</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS">Le placement automatique sur une grille CSS</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Les_concepts_de_base">Les concepts de base des grilles CSS</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Alignement_des_bo%C3%AEtes_avec_les_grilles_CSS">L&apos;alignement des boîtes avec les grilles CSS</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Les_grilles_CSS_et_l_accessibilit%C3%A9">Les grilles CSS et l&apos;accessibilité</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Les_grilles_CSS_et_l_am%C3%A9lioration_progressive">Les grilles CSS et l&apos;amélioration progressive</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Les_grilles_CSS_les_valeurs_logiques_les_modes_d_%C3%A9criture">Les grilles CSS, les valeurs logiques et les modes d&apos;écriture</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/D%C3%A9finir_des_zones_sur_une_grille">Définir des zones sur une grille</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Utiliser_des_lignes_nomm%C3%A9es_sur_une_grille">Utiliser des lignes nommées sur une grille</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Placer_les_%C3%A9l%C3%A9ments_sur_les_lignes_d_une_grille_CSS">Placer les éléments sur les lignes d&apos;une grille CSS</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Construire_des_dispositions_courantes_avec_des_grilles_CSS">Construire des dispositions courantes avec des grilles CSS</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Mod%C3%A8le_de_grille_et_autres_mod%C3%A8les_de_disposition">Le modèle de grille et les autres modèles de disposition</a></li><li><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Subgrid">Subgrid</a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/CSS/flex"><code>flex</code></a></li><li><a href="/fr/docs/Web/CSS/grid"><code>grid</code></a></li><li><a href="/fr/docs/Web/CSS/grid-area"><code>grid-area</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/CSS/grid-auto-columns"><code>grid-auto-columns</code></a></li><li><a href="/fr/docs/Web/CSS/grid-auto-flow"><code>grid-auto-flow</code></a></li><li><a href="/fr/docs/Web/CSS/grid-auto-rows"><code>grid-auto-rows</code></a></li><li><a href="/fr/docs/Web/CSS/grid-column"><code>grid-column</code></a></li><li><a href="/fr/docs/Web/CSS/grid-column-end"><code>grid-column-end</code></a></li><li><a href="/fr/docs/Web/CSS/grid-column-start"><code>grid-column-start</code></a></li><li><a href="/fr/docs/Web/CSS/grid-row"><code>grid-row</code></a></li><li><a href="/fr/docs/Web/CSS/grid-row-end"><code>grid-row-end</code></a></li><li><a href="/fr/docs/Web/CSS/grid-row-start"><code>grid-row-start</code></a></li><li><a href="/fr/docs/Web/CSS/grid-template"><code>grid-template</code></a></li><li><a href="/fr/docs/Web/CSS/grid-template-areas"><code>grid-template-areas</code></a></li><li><a href="/fr/docs/Web/CSS/grid-template-columns"><code>grid-template-columns</code></a></li><li><a href="/fr/docs/Web/CSS/grid-template-rows"><code>grid-template-rows</code></a></li></ol></details></li></ol></section></div>
+
+<div class="prevnext">
+  <a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Utiliser_des_lignes_nommées_sur_une_grille" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Web/CSS/CSS_Grid_Layout" class="button"><i class="icon-arrow-up"></i> Aperçu : CSS Grid Layout</a><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Alignement_des_boîtes_avec_les_grilles_CSS" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<p>En plus de pouvoir placer des objets de façon précise sur une grille, la spécification pour les grilles CSS définit le comportement obtenu lorsque certains des objets ne sont pas placés sur la grille (voire aucun). Pour voir comment fonctionne le placement automatique, il suffit de créer une grille avec un ensemble d&apos;objets. Sans fournir aucune information de placement, ces objets se placeront chacun sur une cellule de la grille.</p>
+
+<div id="placement_1">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+}
+</pre>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="230" id="frame_placement_1" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_1?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h2 id="Définir_des_règles_pour_le_placement_automatique">Définir des règles pour le placement automatique</h2>
+
+<p>Comme on peut le voir dans l&apos;exemple précédent, si on crée une grille sans définir de placement, tous les objets occuperont chacun une cellule de la grille. Par défaut, les objets sont placés au fur et à mesure sur les lignes horizontales de la grille. Si on a créé des lignes supplémentaires avec <code>grid-template-rows</code>, les objets suivants seront placés sur ces lignes. En revanche, si la grille ne possède pas suffisamment de lignes sur la grille explicite, de nouvelles lignes, implicites, seront créées.</p>
+
+<h3 id="Dimensionner_les_lignes_de_la_grille_implicite">Dimensionner les lignes de la grille implicite</h3>
+
+<p>Par défaut, les lignes implicites créées automatiquement ont une taille automatique. Autrement dit, elles seront dimensionnées pour contenir les éléments qu&apos;elles doivent placer sans que ceux-ci dépassent.</p>
+
+<p>Il est toutefois possible de contrôler la taille de ces lignes grâce à la propriété <code>grid-auto-rows</code>. Ainsi, si on veut que les lignes créées automatiquement mesurent 100 pixels de haut, on utilisera :</p>
+
+<div id="placement_2">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: 100px;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="330" id="frame_placement_2" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_2?revision=1617318" width="500"></iframe></p>
+</div>
+
+<p>On peut utiliser la fonction <a href="/fr/docs/Web/CSS/minmax" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>minmax()</code></a> pour la valeur de <a href="/fr/docs/Web/CSS/grid-auto-rows" title="La propriété grid-auto-rows définit la taille d&apos;une ligne de grille créée de façon implicite."><code>grid-auto-rows</code></a> afin de créer des lignes avec une taille minimale mais qui puissent être plus grandes si le contenu est plus grand que cette taille minimale.</p>
+
+<div id="placement_3">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre
+    &lt;br&gt;Cette cellule
+    &lt;br&gt;a du contenu
+    &lt;br&gt;supplémentaire
+    &lt;br&gt;et max vaut auto
+    &lt;br&gt;afin que la ligne
+    &lt;br&gt;se développe.
+  &lt;/div&gt;
+  &lt;div&gt;Five&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(100px, auto);
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="330" id="frame_placement_3" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_3?revision=1617318" width="500"></iframe></p>
+</div>
+
+<p>On peut aussi passer en argument une liste de pistes qui se répèteront. Dans l&apos;exemple ci-après, on crée une piste implicite pour une ligne de 100 pixels et une seconde de <code>200px</code>. Ce motif sera utilisé tant que du contenu sera ajouté à la grille implicite.</p>
+
+<div id="placement_4">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+   border: 2px solid #f76707;
+   border-radius: 5px;
+   background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+   border: 2px solid #ffa94d;
+   border-radius: 5px;
+   background-color: #ffd8a8;
+   padding: 1em;
+   color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+   &lt;div&gt;Un&lt;/div&gt;
+   &lt;div&gt;Deux&lt;/div&gt;
+   &lt;div&gt;Trois&lt;/div&gt;
+   &lt;div&gt;Quatre&lt;/div&gt;
+   &lt;div&gt;Cinq&lt;/div&gt;
+   &lt;div&gt;Six&lt;/div&gt;
+   &lt;div&gt;Sept&lt;/div&gt;
+   &lt;div&gt;Huit&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: 100px 200px;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="330" id="frame_placement_4" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_4?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h3 id="Utiliser_le_placement_automatique_pour_les_colonnes">Utiliser le placement automatique pour les colonnes</h3>
+
+<p>On peut également paramétrer la grille pour que les objets soient placés automatiquement en suivant les colonnes de la grille. Pour obtenir ce résultat, on utilisera la propriété <a href="/fr/docs/Web/CSS/grid-auto-flow" title="La propriété grid-auto-flow permet de contrôler la façon dont fonctionne l&apos;algorithme de placement automatique. Celui-ci définit exactement comme les objets placés automatiquement s&apos;inscrivent dans la grille."><code>grid-auto-flow</code></a> avec la valeur <code>column</code>. Dans ce cas, la grille ajoutera les objets dans les lignes verticales définies avec <a href="/fr/docs/Web/CSS/grid-template-rows" title="La propriété grid-template-rows définit les noms des lignes et les fonctions de taille (track sizing) pour les lignes de la grille."><code>grid-template-rows</code></a>. Lorsqu&apos;une colonne sera pleine, les prochains objets seront placés dans la colonne explicite suivante ou dans une colonne implicite créée automatiquement s&apos;il n&apos;y a plus assez de colonnes explicites. La taille des pistes pour les colonnes implicites peut être définie avec <a href="/fr/docs/Web/CSS/grid-auto-columns" title="La propriété grid-auto-columns définit la taille d&apos;une colonne de grille créée de façon implicite."><code>grid-auto-columns</code></a>, cette dernière fonctionne de façon analogue à <a href="/fr/docs/Web/CSS/grid-auto-rows" title="La propriété grid-auto-rows définit la taille d&apos;une ligne de grille créée de façon implicite."><code>grid-auto-rows</code></a>.</p>
+
+<p>Dans le prochain exemple, on crée une grille avec trois lignes qui mesurent chacune 200 pixels de haut. On utilise le placement automatique en colonne. La première colonne qui sera créée mesurera 300 pixels de large, ensuite on aura une colonne de 100 pixels de large et ainsi de suite jusqu&apos;à ce que tous les éléments puissent être placés.</p>
+
+<div id="placement_5">
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-rows: repeat(3, 200px);
+  grid-gap: 10px;
+  grid-auto-flow: column;
+  grid-auto-columns: 300px 100px;
+}
+</pre>
+
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+  &lt;div&gt;Six&lt;/div&gt;
+  &lt;div&gt;Sept&lt;/div&gt;
+  &lt;div&gt;Huit&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="640" id="frame_placement_5" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_5?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h2 id="Lordre_des_éléments_placés_automatiquement">L&apos;ordre des éléments placés automatiquement</h2>
+
+<p>Une grille peut contenir un mélange d&apos;éléments. Certains éléments peuvent avoir une position définie et d&apos;autres être placés automatiquement. Ce placement automatique peut s&apos;avérer utile lorsque l&apos;ordre des éléments dans le document est celui qu&apos;on veut utiliser pour organiser la grille : il n&apos;y a alors pas besoin d&apos;écrire de règles CSS pour positionner les éléments un par un. La spécification détaille exhaustivement <a href="https://drafts.csswg.org/css-grid/#auto-placement-algo">l&apos;algorithme de placement des objets sur la grille</a>, mais voyons ici les quelques règles simples qu&apos;il faut principalement retenir.</p>
+
+<h3 id="Modification_de_lordre_du_document">Modification de l&apos;ordre du document</h3>
+
+<p>Le placement des éléments qui n&apos;ont pas eu d&apos;ordre défini sont placés selon l&apos;algorithme décrit dans la section  <em>“order modified document order”</em>. Cela signifie que si on utilise uniquement la propriété <code>order</code>, les éléments seront placés selon cet ordre plutôt que selon l&apos;ordre indiqué par le DOM. Sinon, l&apos;ordre des éléments sera celui décrit par le document source.</p>
+
+<h3 id="Les_éléments_avec_des_propriétés_de_placement">Les éléments avec des propriétés de placement</h3>
+
+<p>La grille commencera par placer les éléments pour lesquels on a défini une position. Dans l&apos;exemple qui suit, on a une grille avec 12 éléments, l&apos;élément 2 et l&apos;élément 5 sont placés en utilisant les lignes. On put voir comment ces deux éléments sont placés et comment les autres sont placés automatiquement dans les espaces restants. Les objets placés automatiquement seront placés avant les éléments qui sont placés, dans l&apos;ordre du DOM.</p>
+
+<div id="placement_6">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+  &lt;div&gt;Six&lt;/div&gt;
+  &lt;div&gt;Sept&lt;/div&gt;
+  &lt;div&gt;Huit&lt;/div&gt;
+  &lt;div&gt;Neuf&lt;/div&gt;
+  &lt;div&gt;Dix&lt;/div&gt;
+  &lt;div&gt;Onze&lt;/div&gt;
+  &lt;div&gt;Douze&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 100px;
+  grid-gap: 10px;
+}
+.wrapper div:nth-child(2) {
+  grid-column: 3;
+  grid-row: 2 / 4;
+}
+.wrapper div:nth-child(5) {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="450" id="frame_placement_6" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_6?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h3 id="Gérer_les_éléments_qui_sétalent_sur_plusieurs_pistes">Gérer les éléments qui s&apos;étalent sur plusieurs pistes</h3>
+
+<p>On peut utiliser les propriétés de placement tout en tirant parti du placement automatique. Dans le prochain exemple, on complète la disposition en indiquant que les éléments 1, 4 et 9 (4n+1) doivent occuper deux pistes, pour les colonnes et pour les lignes. Pour obtenir ce résultat, on utilise les propriétés <a href="/fr/docs/Web/CSS/grid-column-end" title="La propriété grid-column-end définit la position de la fin d&apos;un élément de la grille dans une zone donnée ou sur un fragment de colonne donné."><code>grid-column-end</code></a> et <a href="/fr/docs/Web/CSS/grid-row-end" title="La propriété grid-row-end définit la position de la fin d&apos;un élément de la grille dans une zone donnée ou sur un fragment de ligne donné."><code>grid-row-end</code></a> avec la valeur <code>span 2</code>. La ligne de début sera déterminée automatiquement et la ligne de fin sera deux pistes plus loin.</p>
+
+<p>On peut voir coment cela laisse des espaces dans la grille car lorsqu&apos;un élément placé automatiquement n&apos;a pas suffisamment de place sur une piste, une nouvelle ligne sera créée jusqu&apos;à ce que l&apos;élément ait la place.</p>
+
+<div id="placement_7">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+  &lt;div&gt;Six&lt;/div&gt;
+  &lt;div&gt;Sept&lt;/div&gt;
+  &lt;div&gt;Huit&lt;/div&gt;
+  &lt;div&gt;Neuf&lt;/div&gt;
+  &lt;div&gt;Dix&lt;/div&gt;
+  &lt;div&gt;Onze&lt;/div&gt;
+  &lt;div&gt;Douze&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 100px;
+  grid-gap: 10px;
+}
+.wrapper div:nth-child(4n+1) {
+  grid-column-end: span 2;
+  grid-row-end: span 2;
+  background-color: #ffa94d;
+}
+.wrapper div:nth-child(2) {
+  grid-column: 3;
+  grid-row: 2 / 4;
+}
+.wrapper div:nth-child(5) {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="770" id="frame_placement_7" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_7?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h3 id="Combler_les_espaces">Combler les espaces</h3>
+
+<p>En dehors des éléments placés explicitement, la grille place les éléments automatiques en respectant l&apos;ordre du DOM. C&apos;est généralement le résultat qu&apos;on souhaite lorsqu&apos;on met en forme un document comme un formulaire. Toutefois on veut parfois obtenir une disposition plus dense, sans vide entre les différents éléments.</p>
+
+<p>Pour cela, sur le conteneur, on ajoute la propriété <a href="/fr/docs/Web/CSS/grid-auto-flow" title="La propriété grid-auto-flow permet de contrôler la façon dont fonctionne l&apos;algorithme de placement automatique. Celui-ci définit exactement comme les objets placés automatiquement s&apos;inscrivent dans la grille."><code>grid-auto-flow</code></a> avec la valeur <code>dense</code>. C&apos;est la même propriété qu&apos;on utilise pour modifier l&apos;ordre du flux avec <code>column</code>. On peut aussi obtenir une disposition dense, rangée par colonne en utilisant les deux valeurs pour la propriété : <code>grid-auto-flow: column dense</code>.</p>
+
+<p>Avec cette valeur, la grille cherchera donc à combler les espaces qu&apos;elle a laissés quitte à ne pas respecter l&apos;ordre du DOM. En revanche, l&apos;ordre de la navigation au clavier (<em>tab order</em>) suivra toujours l&apos;ordre du document. Nous étudierons cet aspect plus en détails dans <a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Les_grilles_CSS_et_l_accessibilit%C3%A9">un article sur l&apos;accessibilité</a>.</p>
+
+<div id="placement_8">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper &gt; div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;div&gt;Un&lt;/div&gt;
+  &lt;div&gt;Deux&lt;/div&gt;
+  &lt;div&gt;Trois&lt;/div&gt;
+  &lt;div&gt;Quatre&lt;/div&gt;
+  &lt;div&gt;Cinq&lt;/div&gt;
+  &lt;div&gt;Six&lt;/div&gt;
+  &lt;div&gt;Sept&lt;/div&gt;
+  &lt;div&gt;Huit&lt;/div&gt;
+  &lt;div&gt;Neuf&lt;/div&gt;
+  &lt;div&gt;Dix&lt;/div&gt;
+  &lt;div&gt;Onze&lt;/div&gt;
+  &lt;div&gt;Douze&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">.wrapper div:nth-child(4n+1) {
+  grid-column-end: span 2;
+  grid-row-end: span 2;
+  background-color: #ffa94d;
+}
+.wrapper div:nth-child(2) {
+  grid-column: 3;
+  grid-row: 2 / 4;
+}
+.wrapper div:nth-child(5) {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 100px;
+  grid-gap: 10px;
+  grid-auto-flow: dense;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="730" id="frame_placement_8" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_8?revision=1617318" width="500"></iframe></p>
+</div>
+
+<h3 id="Les_éléments_anonymes_de_la_grille">Les éléments anonymes de la grille</h3>
+
+<p>Dans la spécification, on utilise le concept d&apos;élément anonyme. Ces éléments sont ceux qui sont créés lorsqu&apos;on a une chaîne de caractères dans le conteneur de la grille et que celle-ci n&apos;est pas contenue dans un autre élément. Dans l&apos;exemple ci-après, on a trois éléments sur la grille : le premier est un élément anonyme car il n&apos;est placé dans aucun élément, il sera alors placé automatiquement. Les deux éléments suivants sont placés dans des <code>div</code> et peuvent être placés automatiquement ou grâce à une autre méthode de positionnement.</p>
+
+<pre class="brush: css">&lt;div class=&quot;grid&quot;&gt;
+  Je suis une chaîne de caractères et je serai placé
+  automatiquement.
+  &lt;div&gt;Un élément de la grille&lt;/div&gt;
+  &lt;div&gt;Un élément de la grille&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Les éléments anonymes sont toujours placés automatiquement car on ne peut pas les cibler autrement. Aussi, si on a du texte sans balise dans la grille, il faut se rappeler que celui-ci peut être placé à un endroit imprévu du fait des règles de placement automatique.</p>
+
+<h3 id="Les_cas_dutilisation_pour_le_placement_automatique">Les cas d&apos;utilisation pour le placement automatique</h3>
+
+<p>Le placement automatique peut être utile lorsqu&apos;on a un ensemble d&apos;objets qui se ressemblent. Ce peut être des éléments qui n&apos;ont pas d&apos;ordre logique particulier : une galerie de photos, une liste de produits. Dans ces cas de figure, on peut choisir d&apos;utiliser une disposition dense afin de combler les trous de la grille. Dans l&apos;exemple qui représente la galerie d&apos;images, on a certaines images en paysage et d&apos;autres en portrait (lorsqu&apos;on utilise la classe <code>landscape</code> l&apos;élément s&apos;étend sur deux colonnes). On utilise ensuite <code>grid-auto-flow: dense</code> afin de créer une grille dense.</p>
+
+<div id="placement_9">
+<pre class="brush: css">.wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-gap: 10px;
+  grid-auto-flow: dense;
+  list-style: none;
+  margin: 1em auto;
+  padding: 0;
+  max-width: 800px;
+}
+.wrapper li {
+  border: 1px solid #ccc;
+}
+.wrapper li.landscape {
+  grid-column-end: span 2;
+}
+.wrapper li img {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+</pre>
+
+<pre class="brush: html">&lt;ul class=&quot;wrapper&quot;&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;landscape&quot;&gt;&lt;img src=&quot;http://placehold.it/350x200&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;landscape&quot;&gt;&lt;img src=&quot;http://placehold.it/350x200&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;landscape&quot;&gt;&lt;img src=&quot;http://placehold.it/350x200&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li class=&quot;landscape&quot;&gt;&lt;img src=&quot;http://placehold.it/350x200&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img src=&quot;http://placehold.it/200x300&quot; alt=&quot;placeholder&quot;&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="1300" id="frame_placement_9" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_9?revision=1617318" width="500"></iframe></p>
+</div>
+
+<p>Le placement automatique peut également aider à disposer des éléments d&apos;interface utilisateur qui ont un ordre logique. Dans l&apos;exemple suivant, on voit comment manipuler les listes de définition. Les listes de définition sont intéressantes car il n&apos;y a pas de niveau de regroupement pour regrouper un terme et ses définitions. Dans cet exemple, on autorise le placement automatique mais on a une classe pour qu&apos;un élément <code>dt</code> démarre sur la première ligne et que l&apos;élément  <code>dd</code> sur la  ligne 2. On s&apos;assure ainsi que les termes sont bien en face de chaque définition, peu importe le nombre de définitions qu&apos;on a pour un terme.</p>
+
+<div id="placement_10">
+<div class="hidden">
+<pre class="brush: css">* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+</pre>
+</div>
+
+<pre class="brush: html">&lt;div class=&quot;wrapper&quot;&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;Mammals&lt;/dt&gt;
+    &lt;dd&gt;Cat&lt;/dd&gt;
+    &lt;dd&gt;Dog&lt;/dd&gt;
+    &lt;dd&gt;Mouse&lt;/dd&gt;
+    &lt;dt&gt;Fish&lt;/dt&gt;
+    &lt;dd&gt;Guppy&lt;/dd&gt;
+    &lt;dt&gt;Birds&lt;/dt&gt;
+    &lt;dd&gt;Pied Wagtail&lt;/dd&gt;
+    &lt;dd&gt;Owl&lt;/dd&gt;
+  &lt;dl&gt;
+&lt;/div&gt;
+</pre>
+
+<pre class="brush: css">dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  max-width: 300px;
+  margin: 1em;
+  line-height: 1.4;
+}
+dt {
+  grid-column: 1;
+  font-weight: bold;
+}
+dd {
+  grid-column: 2;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="230" id="frame_placement_10" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Grid_Layout/Placement_automatique_sur_une_grille_CSS$samples/placement_10?revision=1617318" width="500"></iframe></p>
+
+<div class="note">
+<p><strong>Note :</strong> Voir <a href="https://www.sitepoint.com/understanding-masonry-layout/">cet article de SitePoint</a> à propos de la disposition en briques pour d&apos;autres cas d&apos;utilisation.</p>
+</div>
+</div>
+
+<h2 id="Quest-ce_que_le_placement_automatique_ne_permet_pas_de_réaliser_actuellement">Qu&apos;est-ce que le placement automatique ne permet pas de réaliser (actuellement) ?</h2>
+
+<p>Certaines questions se posent encore. Actuellement on ne peut pas cibler toutes les autres cellules de la grille. On ne peut pas non plus définir une règle pour « placer tous les éléments automatiquement après la prochaine ligne intitulée <code>n</code> » (pour que certaines lignes soient sautées). Cette question <a href="https://github.com/w3c/csswg-drafts/issues/796">est décrite sur le dépôt GitHub du CSSWG</a>, n&apos;hésitez pas à ajouter vos exemples de scénarios.</p>
+
+<p>Si vous rencontrez des cas d&apos;utilisation problématiques avec le placement automatique et les grilles, vous pouvez consulter les <em>issues</em> existantes et les compléter ou ajouter les vôtres. Cela permettra que les prochaines versions de la spécification soient meilleures.</p>
+
+<div class="prevnext">
+  <a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Utiliser_des_lignes_nommées_sur_une_grille" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Web/CSS/CSS_Grid_Layout" class="button"><i class="icon-arrow-up"></i> Aperçu : CSS Grid Layout</a><a href="/fr/docs/Web/CSS/CSS_Grid_Layout/Alignement_des_boîtes_avec_les_grilles_CSS" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div>

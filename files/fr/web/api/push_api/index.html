@@ -1,0 +1,125 @@
+---
+title: Push API
+slug: Web/API/Push_API
+tags:
+  - API
+  - Chargement
+  - Experimental
+  - Notifications
+  - Push
+  - Reference
+  - Service Workers
+translation_of: Web/API/Push_API
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Push_API">Push API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/Push_API/Best_Practices">Web Push API Notifications best practices</a> <a href="/fr/docs/Web/API/Push_API/Best_Practices$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/PushManager"><code>PushManager</code></a></li><li><a href="/fr/docs/Web/API/PushSubscription"><code>PushSubscription</code></a></li><li><a href="/fr/docs/Web/API/PushEvent"><code>PushEvent</code></a></li><li><a href="/fr/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/ServiceWorkerRegistration/pushManager"><code>ServiceWorkerRegistration.pushManager</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/onpush"><code>ServiceWorkerGlobalScope.onpush</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/onpushsubscriptionchange"><code>ServiceWorkerGlobalScope.onpushsubscriptionchange</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/push_event"><code>ServiceWorkerGlobalScope</code>: <code>push</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/pushsubscriptionchange_event"><code>ServiceWorkerGlobalScope</code>: <code>pushsubscriptionchange</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>Cette fonction est expérimentale</strong><br>Puisque cette fonction est toujours en développement dans certains navigateurs, veuillez consulter le <a href="#Compatibilité_des_navigateurs">tableau de compatibilité</a> pour les préfixes à utiliser selon les navigateurs.<br>Il convient de noter qu&apos;une fonctionnalité expérimentale peut voir sa syntaxe ou son comportement modifié dans le futur en fonction des évolutions de la spécification.</p>
+</div></div>
+
+<p>L&apos; <strong>API Push </strong> donne aux applications web la possibilité de recevoir des messages qui leur sont poussés depuis un serveur, qu&apos;il s&apos;agisse ou non d&apos;une application active au premier plan, ou même actuellement chargée, sur un agent utilisateur. Ceci permet aux développeurs de délivrer des notifications asynchrones et des mises-à-jour aux utilisateurs qui le choisissent, entrainant un meilleur engagement [de l&apos;utilisateur] avec du nouveau contenu au moment opportun.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Cette documentation couvre les spécifications W3C de l&apos;API Push; si vous recherchez la documentation du système propriétaire de Push de Firefox OS, merci de vous reporter à <a href="/fr/docs/Web/API/Simple_Push_API">Simple Push</a>.</p>
+</div>
+
+<h2 id="Concepts_et_usages_de_Push">Concepts et usages de Push</h2>
+
+<div class="warning notecard">
+<p>Lors de la mise en œuvre des abonnements PushManager, il est d&apos;une importance vitale de se protéger contre les problèmes de CSRF/XSRF dans votre application. Voir les articles suivants pour plus d&apos;informations :</p>
+
+<ul>
+ <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html">Feuille de prévention contre les Cross-Site Request Forgery (CSRF)</a><sup> (en)</sup></li>
+ <li><a href="https://blog.codinghorror.com/preventing-csrf-and-xsrf-attacks/">Prévention conte les attaques CSRF et XSRF</a> <sup>(en)</sup></li>
+</ul>
+</div>
+
+<p>Pour qu&apos;une application web puisse recevoir des messages Push, elle doit avoir un <a href="/en-US/docs/Web/API/ServiceWorker_API">service worker</a> actif. Quand le service worker est actif, on peut souscrire aux notifications Push en utilisant <a href="/fr/docs/Web/API/PushManager/subscribe"><code>PushManager.subscribe()</code></a>.</p>
+
+<p>L&apos;élément <a href="/fr/docs/Web/API/PushSubscription"><code>PushSubscription</code></a> qui en résulte inclut toutes les informations dont l&apos;application a besoin pour transmettre un message Push: un point de terminaison et la clé de chiffrement nécessaire à l&apos;envoi des données.</p>
+
+<p>Le service worker sera démarré, comme nécessaire, pour réceptionner les messages Push, qui sont délivrés au gestionnaire d&apos;évènement <a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/onpush"><code>ServiceWorkerGlobalScope.onpush</code></a>. Ceci permet aux applications de réagir au message Push reçu, par exemple en affichant une notification (en utilisant <a href="/fr/docs/Web/API/ServiceWorkerRegistration/showNotification"><code>ServiceWorkerRegistration.showNotification()</code></a>.)</p>
+
+<p>Chaque souscription est unique à un service worker. Le point de terminaison de la souscription est une <a class="external" href="http://www.w3.org/TR/capability-urls/">URL fonctionnelle</a> unique: la connaissance du point de terminaison est tout ce qui est nécessaire pour envoyer un message à votre application. L&apos;URL du point de terminaison doit cependant rester secrète, sinon d&apos;autres applications seront capables d&apos;envoyer des messages Push à votre application.</p>
+
+<p>Activer un service worker pour délivrer un message Push peut accroître l&apos;utilisation des ressources, particulièrement de la batterie. Les différents navigateurs ont des régimes différents pour gèrer ça — Il n&apos;y a pas de mécanisme standard. Firefox permet à un nombre limité (quota) de messages Push d&apos;être envoyé à une application, cependant les messages Push qui générent les notifications sont exempts de cette limite. La limite est rafraichie chaque fois que le site est visité. En comparaison, Chrome n&apos;applique pas de limites mais nécessite que chaque message Push lance une notification pour pouvoir être affiché.</p>
+
+<div class="note">
+<p><strong>Note</strong>: comme pour Gecko 44, le quota de messages Push par application n&apos;est pas incrémenté quand une nouvelle notification se lance et qu&apos;une autre est déjà visible, pendant une période de 3 secondes. Cela permet de gèrer le cas où une rafale de messages Push est reçue et qu&apos;ils n&apos;afficheraient pas tous une notification.</p>
+</div>
+
+<div class="note">
+<p><strong>Note</strong>: Chrome nécessite actuellement de configurer un projet sur <a class="external" href="https://developers.google.com/cloud-messaging/">Google Cloud Messaging</a> pour envoyer des messages Push et utilise le numero du projet associé ainsi que la clé durant l&apos;envoi des messages Push. Il requiert aussi un manifeste applicatif avec des paramètres spéciaux pour utiliser ce service. Nous espérons que cette restriction sera supprimée dans le futur..</p>
+</div>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/PushEvent"><code>PushEvent</code></a></dt>
+ <dd>Représente une action push envoyée à l&apos;élément de <a href="/en-US/docs/Web/API/ServiceWorkerGlobalScope">portée global</a> (global scope) d&apos;un <a href="/fr/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a>. Elle contient les informations envoyées depuis l&apos;application à un <a href="/fr/docs/Web/API/PushSubscription"><code>PushSubscription</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/PushManager"><code>PushManager</code></a></dt>
+ <dd>Fournit un moyen de recevoir des notifications de serveurs tiers ainsi que de demander les URL pour les notifications Push. Cette interface remplace les fonctionnalités obsolètes de l&apos;interface <a href="/fr/docs/Web/API/PushRegistrationManager"><code>PushRegistrationManager</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></dt>
+ <dd>Fournit l&apos;accès pour pousser des données transmises par un serveur et inclut des méthodes pour manipuler les données reçues.</dd>
+ <dt><a href="/fr/docs/Web/API/PushSubscription"><code>PushSubscription</code></a></dt>
+ <dd>Fournit une URL de point de terminaison et permet la désinscription à un service Push.</dd>
+</dl>
+
+<h2 id="Complément_au_Service_worker">Complément au Service worker</h2>
+
+<p>Les ajouts à <a href="/fr/docs/Web/API/Service_Worker_API">l&apos;API Service Worker </a>suivants ont été spécifiés dans l&apos;API Push, pour fournir un point d&apos;entrée à l&apos;utilisation de messages Push pour surveiller et répondre aux événements de changement liés aux messages push et aux souscriptions.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/ServiceWorkerRegistration/pushManager"><code>ServiceWorkerRegistration.pushManager</code></a> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></dt>
+ <dd>Retourne une référence de l&apos;interface <a href="/fr/docs/Web/API/PushManager"><code>PushManager</code></a> pour gèrer les souscriptions push incluant la souscription, récupèrer une souscription existante, et accèder au statut des permissions push. C&apos;est le point d&apos;entrée dans l&apos;utilisation de la communication push.</dd>
+ <dt><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/onpush"><code>ServiceWorkerGlobalScope.onpush</code></a></dt>
+ <dd>Un gestionnaire d&apos;événement lancé chaque fois qu&apos;un événement <code><a href="/fr/docs/Web/Reference/Events/push" title="/fr/docs/Web/Reference/Events/push">push</a></code> se produit ; c&apos;est à chaque fois qu&apos;un message push du serveur est reçu.</dd>
+ <dt><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope/onpushsubscriptionchange"><code>ServiceWorkerGlobalScope.onpushsubscriptionchange</code></a></dt>
+ <dd>Un gestionnaire d&apos;événement lancé chaque fois qu&apos;un événement <code><a href="/fr/docs/Web/Reference/Events/pushsubscriptionchange" title="/fr/docs/Web/Reference/Events/pushsubscriptionchange">pushsubscriptionchange</a></code> se produit; par exemple, quand une souscription push a été invalidée, ou va être invalidée (c.à.d. quand un service push définit une durée d&apos;expiration).</dd>
+</dl>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/push-api/" hreflang="en" lang="en" title="La spécificaction &apos;Push API&apos;">Push API</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div>
+<div>
+<h3 id="PushEvent"><code>PushEvent</code></h3>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.PushEvent"></div>
+
+<h3 id="PushMessageData"><code>PushMessageData</code></h3>
+
+<div>
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.PushMessageData"></div>
+</div>
+</div>
+</div>
+</div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Push_API/Using_the_Push_API">Using the Push API [EN]</a></li>
+ <li><a class="external" href="https://github.com/chrisdavidmills/push-api-demo">Démo API Push</a>, sur Github</li>
+ <li><a class="external" href="http://updates.html5rocks.com/2015/03/push-notificatons-on-the-open-web">Push Notifications on the Open Web</a>, Matt Gaunt</li>
+ <li><a href="/fr/docs/Web/API/Service_Worker_API">API Service Worker</a></li>
+</ul>

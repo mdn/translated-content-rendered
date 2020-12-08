@@ -1,0 +1,109 @@
+---
+title: IDBFactory
+slug: Web/API/IDBFactory
+translation_of: Web/API/IDBFactory
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/IndexedDB_API">IndexedDB API</a></strong></li><li><strong><a href="/fr/docs/Web/API/IDBFactory"><code>IDBFactory</code></a></strong></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/IDBFactory/cmp"><code>cmp()</code></a></li><li><a href="/fr/docs/Web/API/IDBFactory/databases"><code>databases</code></a> <a href="/fr/docs/Web/API/IDBFactory/databases$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/IDBFactory/deleteDatabase"><code>deleteDatabase()</code></a></li><li><a href="/fr/docs/Web/API/IDBFactory/open"><code>open()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Pages liées à IndexedDB</summary><ol><li><a href="/fr/docs/Web/API/IDBCursor"><code>IDBCursor</code></a></li><li><a href="/fr/docs/Web/API/IDBCursorSync"><code>IDBCursorSync</code></a></li><li><a href="/fr/docs/Web/API/IDBCursorWithValue"><code>IDBCursorWithValue</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabase"><code>IDBDatabase</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabaseException"><code>IDBDatabaseException</code></a></li><li><a href="/fr/docs/Web/API/IDBDatabaseSync"><code>IDBDatabaseSync</code></a></li><li><a href="/fr/docs/Web/API/IDBEnvironment"><code>IDBEnvironment</code></a></li><li><a href="/fr/docs/Web/API/IDBEnvironmentSync"><code>IDBEnvironmentSync</code></a></li><li><a href="/fr/docs/Web/API/IDBFactorySync"><code>IDBFactorySync</code></a></li><li><a href="/fr/docs/Web/API/IDBIndex"><code>IDBIndex</code></a></li><li><a href="/fr/docs/Web/API/IDBIndexSync"><code>IDBIndexSync</code></a></li><li><a href="/fr/docs/Web/API/IDBKeyRange"><code>IDBKeyRange</code></a></li><li><a href="/fr/docs/Web/API/IDBObjectStore"><code>IDBObjectStore</code></a></li><li><a href="/fr/docs/Web/API/IDBObjectStoreSync"><code>IDBObjectStoreSync</code></a></li><li><a href="/fr/docs/Web/API/IDBOpenDBRequest"><code>IDBOpenDBRequest</code></a></li><li><a href="/fr/docs/Web/API/IDBRequest"><code>IDBRequest</code></a></li><li><a href="/fr/docs/Web/API/IDBTransaction"><code>IDBTransaction</code></a></li><li><a href="/fr/docs/Web/API/IDBTransactionSync"><code>IDBTransactionSync</code></a></li><li><a href="/fr/docs/Web/API/IDBVersionChangeEvent"><code>IDBVersionChangeEvent</code></a></li><li><a href="/fr/docs/Web/API/IDBVersionChangeRequest"><code>IDBVersionChangeRequest</code></a></li></ol></details></li></ol></section></div>
+
+<p>L&apos;interface <strong><code>IDBFactory</code></strong> fait partie de l&apos;<a href="/fr/docs/Web/API/API_IndexedDB">API IndexedDB</a> et permet aux applications d&apos;accéder à des bases de données de façon asynchrone. L&apos;objet qui implémente cette interface  est <code>window.indexedDB</code>. Autrement dit, on créera et on accèdera à une base de données (voire on la supprimera) directement via cet objet plutôt qu&apos;en utilisant l&apos;objet <code>IDBFactory</code>.</p>
+
+<div class="note notecard"><strong>Note :</strong> Cette fonctionnalité est disponible via les <a href="/fr/docs/Web/API/Web_Workers_API">Web Workers</a>.</div>
+
+<h2 id="Méthodes">Méthodes</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/IDBFactory/open"><code>IDBFactory.open</code></a></dt>
+ <dd>Une méthode qui permet d&apos;ouvrir une connexion à une base de données.</dd>
+ <dt><a href="/fr/docs/Web/API/IDBFactory/deleteDatabase"><code>IDBFactory.deleteDatabase</code></a></dt>
+ <dd>Une méthode qui permet de demander la suppression d&apos;une base de données.</dd>
+ <dt><a href="/fr/docs/Web/API/IDBFactory/cmp"><code>IDBFactory.cmp</code></a></dt>
+ <dd>Une méthode qui compare deux clés et renvoie un résultat qui indique laquelle est la plus grande.</dd>
+ <dt><a href="/fr/docs/Web/API/IDBFactory/databases"><code>IDBFactory.databases</code></a></dt>
+ <dd>Une méthode qui répertorie toutes les bases de données disponibles, y compris leurs noms et leurs versions.</dd>
+</dl>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Dans l&apos;exemple qui suit, on effectue une requête sur une base de données et on gère les cas de succès et d&apos;erreur. Vous pouvez consulter un exemple complet sur <a class="external" href="https://github.com/mdn/to-do-notifications/tree/gh-pages">notre application To-do Notifications</a> (<a class="external" href="https://mdn.github.io/to-do-notifications/">voir l&apos;exemple en <em>live</em></a>).</p>
+
+<pre class="brush:js;highlight:[10] notranslate">var note = document.querySelector(&quot;ul&quot;);
+
+// Dans la ligne suivante, inclure les préfixes des
+// implémentations à tester
+window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+// attention à ne pas utiliser &quot;var indexedDB = ...&quot;
+// si on n&apos;est pas dans une fonction
+
+// On pourra éventuellement avoir besoin de références
+// envers les objets window.IDB* :
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+// (Mozilla n&apos;a jamais préfixé ces objets,
+// il n&apos;est pas nécessaire d&apos;écrire window.mozIDB*)
+
+// On ouvre la version 4 de notre base de données
+var DBOpenRequest = window.indexedDB.open(&quot;toDoList&quot;, 4);
+
+// On ajoute ensuite les gestionnaires d&apos;évènements
+// pour gérer le succès ou l&apos;échec de l&apos;ouverture
+// de la base de données
+DBOpenRequest.onerror = function(event) {
+  note.innerHTML += &apos;&lt;li&gt;Erreur lors du chargement de la base.&lt;/li&gt;&apos;;
+};
+
+DBOpenRequest.onsuccess = function(event) {
+  note.innerHTML += &apos;&lt;li&gt;Base de données initialisée.&lt;/li&gt;&apos;;
+
+  // store the result of opening the database in the db
+  // variable. This is used a lot later on, for opening
+  // transactions and suchlike.
+  db = DBOpenRequest.result;
+};
+</pre>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/IndexedDB/#idl-def-IDBFactory" hreflang="en" lang="en">Indexed Database API 2.0<br><small lang="fr">La définition de &apos;IDBFactory&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/IndexedDB/#factory-interface" hreflang="en" lang="en">Indexed Database API Draft<br><small lang="fr">La définition de &apos;IDBFactory&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en">Unknown<br><small lang="fr">La définition de &apos;IDBFactory&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-">Statut inconnu</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="hidden">
+<p>The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<div class="bc-data" id="bcd:api.IDBFactory"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/API_IndexedDB/Using_IndexedDB">Manipuler IndexedDB</a></li>
+ <li>Démarrer des transactions : <a href="/fr/docs/Web/API/IDBDatabase"><code>IDBDatabase</code></a></li>
+ <li>Manipuler des transactions : <a href="/fr/docs/Web/API/IDBTransaction"><code>IDBTransaction</code></a></li>
+ <li>Définir un intervalle de clés : <a href="/fr/docs/Web/API/IDBKeyRange"><code>IDBKeyRange</code></a></li>
+ <li>Récupérer des données et les modifier : <a href="/fr/docs/Web/API/IDBObjectStore"><code>IDBObjectStore</code></a></li>
+ <li>Manipuler des curseurs : <a href="/fr/docs/Web/API/IDBCursor"><code>IDBCursor</code></a></li>
+ <li>Exemple de référence pour IndexedDB : <a href="https://github.com/mdn/to-do-notifications/tree/gh-pages">To-do Notifications</a></li>
+</ul>

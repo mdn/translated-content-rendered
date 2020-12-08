@@ -1,0 +1,84 @@
+---
+title: CredentialsContainer.get()
+slug: Web/API/CredentialsContainer/get
+tags:
+  - API
+  - Credential Management API
+  - CredentialsContainer
+  - Méthode
+  - Reference
+  - Web Authentication API
+  - WebAuthn
+translation_of: Web/API/CredentialsContainer/get
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/CredentialsContainer"><code>CredentialsContainer</code></a></strong></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/CredentialsContainer/create"><code>create()</code></a></li><li><em><code>get()</code></em></li><li><a href="/fr/docs/Web/API/CredentialsContainer/preventSilentAccess"><code>preventSilentAccess()</code></a></li><li><a href="/fr/docs/Web/API/CredentialsContainer/store"><code>store()</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>Cette fonction est expérimentale</strong><br>Puisque cette fonction est toujours en développement dans certains navigateurs, veuillez consulter le <a href="#Compatibilité_des_navigateurs">tableau de compatibilité</a> pour les préfixes à utiliser selon les navigateurs.<br>Il convient de noter qu&apos;une fonctionnalité expérimentale peut voir sa syntaxe ou son comportement modifié dans le futur en fonction des évolutions de la spécification.</p>
+</div>
+
+<p>La méthode <strong><code>get()</code></strong>, rattachée à l&apos;interface <a href="/fr/docs/Web/API/CredentialsContainer"><code>CredentialsContainer</code></a>, renvoie une promesse (<a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise"><code>Promise</code></a>) qui est résolue en une instance de <a href="/fr/docs/Web/API/Credential"><code>Credential</code></a> correspondant aux paramètres fournis. Si aucune correspondance n&apos;est trouvée, la promesse sera résolue avec la valeur <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/null"><code>null</code></a>.</p>
+
+<p>Cette méthode collecte l&apos;ensemble des informations d&apos;authentification stockées dans l&apos;objet <a href="/fr/docs/Web/API/CredentialsContainer"><code>CredentialsContainer</code></a> et qui respectent les critères indiqués (définis grâce à l&apos;argument <code><strong>options</strong></code>). À partir de cet ensemble, l&apos;agent utilisateur sélectionne la meilleure information d&apos;authentification. Selon les options fournies, l&apos;agent utilisateur pourra afficher une boîte de dialogue et demander à l&apos;utilisateur de sélectionner la bonne information.</p>
+
+<p>Cette méthode récupère les informations d&apos;authentification en appelant la méthode <code>CollectFromCredentialStore</code> pour chaque type d&apos;authentification permis par l&apos;argument <code><strong>options</strong></code>. Ainsi, si la propriété <code>options.password</code> existe dans l&apos;argument passé,   <a href="/fr/docs/Web/API/PasswordCredential"><code>PasswordCredential</code></a><code>.[[CollectFromCredentialStore]]</code> sera appelée.</p>
+
+<div class="note">
+<p><strong>Note :</strong> Cette méthode ne peut être utilisé que pour les contextes de navigation les plus hauts. Les appels lancés depuis une <a href="/fr/docs/Web/HTML/Element/iframe" title="Le code source de cet exemple interactif est disponible dans un dépôt GitHub. Si vous souhaitez contribuez à ces exemples, n&apos;hésitez pas à cloner https://github.com/mdn/interactive-examples et à envoyer une pull request !"><code>&lt;iframe&gt;</code></a> résoudront la promesse sans aucun effet.</p>
+</div>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="syntaxbox notranslate">var promise = CredentialsContainer.get([options])</pre>
+
+<h3 id="Paramètres">Paramètres</h3>
+
+<dl>
+ <dt><code>options</code> <span class="optional optionalInline notecard inline">Facultatif</span></dt>
+ <dd>Un objet de type <a href="/fr/docs/Web/API/CredentialRequestOptions"><code>CredentialRequestOptions</code></a> qui contient les critères de la requête. et les options d&apos;interaction avec l&apos;utilisateur. Cet objet peut contenir les propriétés suivantes :
+ <ul>
+  <li><code>password</code> : un booléen (<a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a>) qui indique que l&apos;instance <a href="/fr/docs/Web/API/Credential"><code>Credential</code></a> renvoyée devrait contenir les informations sur l&apos;utilisateur (contrairement aux informations d&apos;authentification fédérées).</li>
+  <li><code>federated</code> : un objet <a href="/fr/docs/Web/API/FederatedCredentialRequestOptions"><code>FederatedCredentialRequestOptions</code></a> qui contient les critères que doivent respecter les informations d&apos;authentification fédérées. Les options disponibles sont :
+   <ul>
+    <li><code>providers</code> : un tableau de chaînes de caractères <a href="/fr/docs/Web/API/DOMString"><code>DOMString</code></a> listant les fournisseurs d&apos;identité potentiels</li>
+    <li><code>protocols</code> : un tableau de chaînes de caractères <a href="/fr/docs/Web/API/DOMString"><code>DOMString</code></a> listant les protocoles de fédération à rechercher.</li>
+   </ul>
+  </li>
+  <li><code>publicKey</code> : un objet <a href="/fr/docs/Web/API/PublicKeyCredentialRequestOptions"><code>PublicKeyCredentialRequestOptions</code></a> contenant les conditions que doivent respecter les informations d&apos;authentification <a href="/fr/docs/Web/API/Web_Authentication_API">WebAuthn</a> qui seront renvoyées.</li>
+  <li><code>mediation</code> : une chaîne de caractères <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String"><code>String</code></a> qui indique si l&apos;utilisateur devra se reconnecter à chaque visite sur le site. Les valeurs valides sont <code>&quot;silent&quot;</code>, <code>&quot;optional&quot;</code> ou <code>&quot;required&quot;</code>.</li>
+  <li><code>unmediated</code> : <span class="icon-only-inline" title="Cette API obsolète ne doit plus être utilisée, mais elle peut continuer à fonctionner."><i class="icon-thumbs-down-alt"> </i></span> un booléen (<a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a>) qui indique que l&apos;instance <a href="/fr/docs/Web/API/Credential"><code>Credential</code></a> renvoyée ne devrait pas nécessiter de médiation avec l&apos;utilisateur.</li>
+ </ul>
+ </dd>
+</dl>
+
+<h3 id="Valeur_de_retour">Valeur de retour</h3>
+
+<p>Une promesse (<a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise"><code>Promise</code></a>) qui est résolue avec une instance <a href="/fr/docs/Web/API/Credential"><code>Credential</code></a> correspondant aux paramètres fournis. S&apos;il n&apos;est pas possible d&apos;obtenir une seule instance sans ambiguïté, la promesse sera résolue avec la valeur <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/null"><code>null</code></a>.</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-get" hreflang="en" lang="en">Credential Management Level 1<br><small lang="fr">La définition de &apos;get()&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webauthn/" hreflang="en" lang="en" title="La spécificaction &apos;Web Authentication: An API for accessing Public Key Credentials Level 1&apos;">Web Authentication: An API for accessing Public Key Credentials Level 1</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="hidden">Le tableau de compatibilité de cette page a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à consulter <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> et à nous envoyer une <em>pull request</em>.</div>
+
+<div class="bc-data" id="bcd:api.CredentialsContainer.get"></div>

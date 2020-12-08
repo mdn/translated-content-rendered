@@ -1,0 +1,204 @@
+---
+title: hashchange
+slug: Web/API/Window/hashchange_event
+tags:
+  - Reference
+  - Web
+translation_of: Web/API/Window/hashchange_event
+---
+<p>L&apos;événement <code>hashchange</code> est déclenché lorsque l&apos;identificateur de fragment de l&apos;URL a changé (la partie de l&apos;URL qui suit le symbole #, y compris le symbole # lui-même).</p>
+
+<table class="properties">
+ <tbody>
+  <tr>
+   <td>Bulles</td>
+   <td>Oui</td>
+  </tr>
+  <tr>
+   <td>Annulable</td>
+   <td>Non</td>
+  </tr>
+  <tr>
+   <td>Objets cibles</td>
+   <td><a href="/fr/docs/Web/API/Window"><code>Window</code></a></td>
+  </tr>
+  <tr>
+   <td>Interface</td>
+   <td><a href="/fr/docs/Web/API/HashChangeEvent"><code>HashChangeEvent</code></a></td>
+  </tr>
+  <tr>
+   <td>Action par défaut</td>
+   <td>Aucune</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Propriétés">Propriétés</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Propriété</th>
+   <th scope="col">Type</th>
+   <th scope="col">Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>target</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/API/EventTarget"><code>EventTarget</code></a></td>
+   <td>The browsing context (<code>window</code>).</td>
+  </tr>
+  <tr>
+   <td><code>type</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/API/DOMString"><code>DOMString</code></a></td>
+   <td>Type de l&apos;évènement</td>
+  </tr>
+  <tr>
+   <td><code>bubbles</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event normally bubbles or not.</td>
+  </tr>
+  <tr>
+   <td><code>cancelable</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event is cancellable or not.</td>
+  </tr>
+  <tr>
+   <td><code>oldURL</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String"><code>String</code></a></td>
+   <td>The previous URL from which the window was navigated.</td>
+  </tr>
+  <tr>
+   <td>newURL <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String"><code>String</code></a></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<p>Il existe plusieurs scripts de secours listés sur <a href="https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills">cette page</a>. Fondamentalement, ces scripts vérifient le <code>location.hash</code> à intervalles réguliers. Voici une version qui n&apos;autorise qu&apos;un seul gestionnaire à être lié à la propriété <code>window.onhashchange</code>:</p>
+
+<pre class="brush:js;">;(function(window) {
+
+  // Sortir si le navigateur implémente cet événement
+  if (&quot;onhashchange&quot; in window) { return; }
+
+  var location = window.location,
+    oldURL = location.href,
+    oldHash = location.hash;
+
+  // Vérifie la hash de la barre d&apos;adresse toutes les 100ms
+  setInterval(function() {
+    var newURL = location.href,
+      newHash = location.hash;
+
+    // Si le hash a été changé et qu&apos;un gestionnaire a été lié...
+    if (newHash != oldHash &amp;&amp; typeof window.onhashchange === &quot;function&quot;) {
+      // exécute le gestionnaire
+      window.onhashchange({
+        type: &quot;hashchange&quot;,
+        oldURL: oldURL,
+        newURL: newURL
+      });
+
+      oldURL = newURL;
+      oldHash = newHash;
+    }
+  }, 100);
+
+})(window);
+</pre>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/indices.html#event-hashchange" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;hashchange&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Définition initiale</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td>5.0</td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><a href="/en-US/Firefox/Releases/3.6" title="Sorti le 2010-01-21.">3.6</a> (1.9.2)<sup>[1]</sup></td>
+   <td>8.0<sup>[2]</sup></td>
+   <td>10.6</td>
+   <td>5.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td>2.2</td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>1.0 (1.9.2)</td>
+   <td>9.0</td>
+   <td>11.0</td>
+   <td>5.0</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Support pour les attributs <code>oldURL</code>/<code>newURL</code> ajouté à  Firefox 6.</p>
+
+<p>[2] Les attributs <code>oldURL</code>/<code>newURL</code> ne sont pas supportés.</p>
+
+<h2 id="Voir_également">Voir également</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Mozilla_event_reference/popstate"><code>popstate</code></a></li>
+ <li><a href="/en-US/docs/Web/API/WindowEventHandlers/onhashchange">WindowEventHandlers.onhashchange</a></li>
+</ul>

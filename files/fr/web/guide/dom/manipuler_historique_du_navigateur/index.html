@@ -1,0 +1,256 @@
+---
+title: Manipuler l'historique du navigateur
+slug: Web/Guide/DOM/Manipuler_historique_du_navigateur
+tags:
+  - API
+  - DOM
+  - Historique
+translation_of: Web/API/History_API
+---
+<p>L&apos;objet DOM <a href="/fr/docs/Web/API/Window" title="L&apos;objet window représente une fenêtre contenant un document DOM ; la propriété document pointe vers le document DOM chargé dans cette fenêtre."><code>window</code></a> fournit un accès à l&apos;historique du navigateur via l&apos;objet <a href="/fr/docs/Web/API/Window/history" title="La propriété en lecture seule Window.history renvoie une référence à l&apos;objet History, qui offre la possibilité de manipuler l&apos;historique de session du navigateur (pages visitées dans l&apos;onglet ou le cadre dans lesquels la page courante est chargée)."><code>history</code></a>. Il expose un ensemble de méthodes et de propriétés qui permettent d&apos;avancer et de reculer dans l&apos;historique de l&apos;utilisateur ainsi que -- à partir d&apos;HTML5 -- manipuler le contenu de l&apos;ensemble de l&apos;historique.</p>
+
+<h2 id="Se_déplacer_dans_l&apos;historique">Se déplacer dans l&apos;historique</h2>
+
+<p>Avancer ou reculer dans l&apos;historique de l&apos;utilisateur est possible en utilisant les méthodes <code>back()</code>, <code>forward()</code> et <code>go()</code>.</p>
+
+<h3 id="Avancer_et_reculer">Avancer et reculer</h3>
+
+<p>Pour reculer dans l&apos;historique, il vous suffit de faire :</p>
+
+<pre class="brush: js">window.history.back();
+</pre>
+
+<p>Cela agira exactement comme si l&apos;utilisateur cliquait sur le bouton Retour de la barre d&apos;outils de son navigateur.</p>
+
+<p>De la même manière, il est possible d&apos;avancer (comme si l&apos;utilisateur cliquait sur le bouton Avancer) :</p>
+
+<pre class="brush: js">window.history.forward();
+</pre>
+
+<h3 id="Se_déplacer_à_un_élément_précis_de_l&apos;historique">Se déplacer à un élément précis de l&apos;historique</h3>
+
+<p>Vous pouvez utiliser la méthode <code>go()</code> pour charger une page spécifique de l&apos;historique de la session, identifiée par sa position relative par rapport à la page en cours (la page courante étant, évidemment, d&apos;index 0).</p>
+
+<p>Pour reculer d&apos;une page (l&apos;équivalent d&apos;un appel à <code>back()</code>):</p>
+
+<pre class="brush: js"><code>window.history.go(-1);</code>
+</pre>
+
+<p>Pour avancer d&apos;une page, comme en appelant <code>forward()</code>:</p>
+
+<pre class="brush: js"><code>window.history.go(1);</code>
+</pre>
+
+<p>De la même manière, vous pouvez avancer de 2 pages en passant la valeur 2, et ainsi de suite.</p>
+
+<p>Vous pouvez déterminer le nombre de pages de l&apos;historique en accédant à la valeur de la propriété length (<em>longeur</em>) :</p>
+
+<pre class="brush: js">var numberOfEntries = window.history.length;
+</pre>
+
+<div class="note"><strong>Note:</strong> Internet Explorer supporte le passage d&apos;une URL sous forme de chaîne de caractères comme paramètre de la méthode <code>go()</code>; ce comportement est non standard et non supporté par Gecko.</div>
+
+<h2 id="Ajouter_et_modifier_des_entrées_de_l&apos;historique">Ajouter et modifier des entrées de l&apos;historique</h2>
+
+<p></p>
+
+<p>HTML5 a introduit les méthodes <a href="/fr/docs/Web/Guide/DOM/Manipuler_historique_du_navigateur#La_méthode_pushState()">history.pushState()</a> et <a href="/fr/docs/Web/Guide/DOM/Manipuler_historique_du_navigateur#La_méthode_replaceState()">history.replaceState()</a>, qui permettent, respectivement, d&apos;ajouter et de modifier des entrées de l&apos;historique. Ces méthodes fonctionnent conjointement avec l&apos;événement <a href="/fr/docs/Web/API/WindowEventHandlers/onpopstate">onpopstate</a>.</p>
+
+<p>L&apos;utilisation de <code>history.pushState()</code> change le référent créé habituellement dans l&apos;en-tête HTTP pour les objets <a href="/en/DOM/XMLHttpRequest" title="en/XMLHttpRequest"><code>XMLHttpRequest</code></a>, chaque fois que son état a été changé. Le référent sera l&apos;URL de la page dont l&apos;objet window est <code>this</code> au moment de la création de l&apos;objet <a href="/en/DOM/XMLHttpRequest" title="en/XMLHttpRequest"><code>XMLHttpRequest</code></a>.</p>
+
+<h3 id="Exemple_de_la_méthode_pushState()"><a id="Exemple de la méthode pushState()" name="Exemple de la méthode pushState()"></a>Exemple de la méthode pushState()</h3>
+
+<p>Supposons que <span class="nowiki">http://mozilla.org/foo.html</span> exécute la séquence JavaScript suivante :</p>
+
+<pre class="brush: js">var stateObj = { foo: &quot;bar&quot; };
+history.pushState(stateObj, &quot;page 2&quot;, &quot;bar.html&quot;);
+</pre>
+
+<p>Cela va provoquer l&apos;apparition dans la barre de navigation de <span class="nowiki">http://mozilla.org/bar.html</span>, mais ne provoquera pas le chargement effectif de <code>bar.html</code> ni même le test d&apos;existence de <code>bar.html</code>.</p>
+
+<p>Supposons à présent que l&apos;utilisateur accède à la page <span class="nowiki">http://google.com</span>, puis clique sur l&apos;icône &quot;Recul&quot;. La barre de navigation va alors afficher <span class="nowiki">http://mozilla.org/bar.html</span>, et si vous lisez l&apos;<code>history.state</code>, vous obtiendrez le <code>stateObj</code>.  L&apos;événement <code>popstate</code> ne sera pas lancé car la page a été rechargée. La page elle-même ressemblera à <code>bar.html</code>.</p>
+
+<p>Si on clique à nouveau sur Recul, l&apos;URL de la barre de navigation va se changer en <span class="nowiki">http://mozilla.org/foo.html</span> et le document va recevoir un autre événement <code>popstate</code>, qui comportera, cette fois, un état null. Dans ce cas aussi, revenir en arrière ne modifie pas le contenu du document par rapport à ce qu&apos;il était à l&apos;étape précédente, cela bien qu&apos;il ait pu être mis à jour manuellement sur réception de l&apos;événement <code>popstate</code>.</p>
+
+<h3 id="La_méthode_pushState()">La méthode pushState()</h3>
+
+<p><code>La méthode pushState()</code> utilise trois paramètres : un objet état, un titre (qui est pour l&apos;instant ignoré) et, éventuellement, une URL. Examinons chacun de ces paramètres en détail :</p>
+
+<ul>
+ <li>
+  <p><strong>state object</strong> (<em><strong>objet état</strong></em>) — L&apos;objet état est un objet JavaScript qui est associé à une nouvelle entrée de l&apos;historique par <code>pushState()</code>. Chaque fois qu&apos;un utilisateur ouvre une nouvelle page, un événement <code>popstate</code> est émis et la propriété <code>state</code> de l&apos;événement contient une copie de l&apos;objet état de ce nouvel élément de l&apos;historique.<br>
+   L&apos;objet état peut être tout ce qui peut être sous forme de liste. Puisque Firefox sauvegarde les objets état sur le disque de l&apos;utilisateur de façon à ce qu&apos;ils puissent être rétablis après redémarrage du navigateur, le codage de l&apos;objet état est limité à une taille de 640k octets. Si vous donnez à <code>pushState()</code> un objet état dont la représentation a une taille plus importante, la méthode génèrera une exception. Si vous avez un besoin d&apos;espace plus important, il est conseillé d&apos;utiliser <code>sessionStorage</code> et/ou <code>localStorage</code>.</p>
+ </li>
+ <li>
+  <p><strong>title</strong> (<strong><em>titre</em>)</strong> — Firefox, pour l&apos;instant, ignore ce paramètre, bien qu&apos;il puisse être utilisé plus tard. Afin de prévenir les changements futurs de cette méthode, il serait prudent de fournir ici, en paramètre, une chaîne vide. Vous pourriez aussi donner un titre court à l&apos;état vers lequel vous vous dirigez.</p>
+ </li>
+ <li>
+  <p><strong>URL</strong> — L&apos;URL de la nouvelle entrée de l&apos;historique est donnée par ce paramètre. Il convient de préciser que le navigateur n&apos;essaiera pas de charger la page pointée par cette URL après un appel à <code>pushState()</code>, mais il se peut qu&apos;il tente de le faire plus tard, par exemple, lorsque l&apos;utilisateur relancera son navigateur. Il n&apos;est pas nécessaire que la nouvelle URL soit absolue ; si elle est relative, ce sera par rapport à l&apos;URL courante. La nouvelle URL doit avoir la même origine (domaine) que l&apos;URL courante ; dans le cas contraire, <code>pushState()</code> génèrera une exception. Ce paramètre est optionnel ; s&apos;il n&apos;est pas spécifié, sa valeur par défaut est l&apos;URL de la page courante.</p>
+ </li>
+</ul>
+
+<div class="note"><strong>Note :</strong> Dans Gecko 2.0 (Firefox 4 / Thunderbird 3.3 / SeaMonkey 2.1) jusqu&apos;à Gecko 5.0 (Firefox 5.0 / Thunderbird 5.0 / SeaMonkey 2.2), l&apos;objet fourni est sérialisé en utilisant JSON. À partir de  Gecko 6.0 (Firefox 6.0 / Thunderbird 6.0 / SeaMonkey 2.3), l&apos;objet est sérialisé à l&apos;aide de<a href="/en/DOM/The_structured_clone_algorithm" title="en/DOM/The structured clone algorithm"> &quot;structured clone algorithm&quot;</a> qui autorise, en particulier, la sérialisation d&apos;arbres récursifs cycliques. Cela permet de passer de façon sûre une plus grande diversité d&apos;objets.</div>
+
+<p>On peut assimiler l&apos;appel à <code>pushState()</code> à l&apos;affectation <code>window.location = &quot;#foo&quot;</code>, en cela que l&apos;un comme l&apos;autre auront pour effet de créer et déclencher une autre entrée de l&apos;historique associée au document courant. Mais <code>pushState()</code> a quelques avantages :</p>
+
+<ul>
+ <li>La nouvelle URL peut être quelconque pourvu qu&apos;elle ait la même origine que l&apos;URL courante. En revanche, affecter <code>window.location</code> vous maintient  au même <a href="/fr/docs/Web/API/Document" title="L&apos;interface Document représente n&apos;importe quelle page Web chargée dans le navigateur et sert de point d&apos;entrée dans le contenu de la page Web, qui est l&apos;arborescence DOM. L&apos;arborescence DOM inclut des éléments tels que &lt;body&gt; (corps) et &lt;table&gt; (tableau), parmi beaucoup d&apos;autres. Il fournit des fonctionnalités globales au document, comme le moyen d&apos;obtenir l&apos;URL de la page et de créer de nouveaux éléments dans le document."><code>document</code></a> seulement si vous modifiez uniquement le hash.</li>
+ <li>Vous n&apos;êtes pas contraint de modifier l&apos;URL si vous ne le voulez pas. Par contre, affecter <code>window.location = &quot;#foo&quot;;</code> crée une nouvelle entrée de l&apos;historique seulement si le hash courant n&apos;est pas <code>#foo</code>.</li>
+ <li>Vous pouvez associer des données quelconques avec votre nouvelle entrée de l&apos;historique. Avec l&apos;approche basée sur le hash, il est nécessaire de coder toute donnée pertinente en une chaîne courte.</li>
+</ul>
+
+<p>Notez que <code>pushState()</code> n&apos;entraîne jamais le déclenchement d&apos;un événement <code>hashchange</code>, même si la nouvelle URL diffère de l&apos;ancienne seulement par son hash.</p>
+
+<p>Dans un document <a href="https://developer.mozilla.org/fr/docs/Mozilla/Tech/XUL">XUL</a> elle crée l&apos;élément XUL spécifié.</p>
+
+<p>Dans d&apos;autres documents, elle crée un élément avec l&apos;URI d&apos;espace de nom <code>null</code>. </p>
+
+<h3 id="La_méthode_replaceState()">La méthode replaceState()</h3>
+
+<p><code>history.replaceState()</code> fonctionne exactement comme <code>history.pushState()</code> hormis le fait que <code>replaceState()</code> modifie l&apos;entrée courante de l&apos;historique au lieu d&apos;en créer une nouvelle. À noter que ceci n&apos;empêche pas la création d&apos;une nouvelle entrée dans l&apos;historique global du navigateur.</p>
+
+<p><code>replaceState()</code> est particulièrement utile si vous désirez mettre à jour l&apos;objet état ou l&apos;URL de l&apos;entrée courante de l&apos;historique en réponse à une action de l&apos;utilisateur.</p>
+
+<div class="note"><strong>Note :</strong> Dans Gecko 2.0 (Firefox 4 / Thunderbird 3.3 / SeaMonkey 2.1) jusqu&apos;à Gecko 5.0 (Firefox 5.0 / Thunderbird 5.0 / SeaMonkey 2.2), l&apos;objet transmis est sérialisé avec JSON. À partir de  Gecko 6.0 (Firefox 6.0 / Thunderbird 6.0 / SeaMonkey 2.3), l&apos;objet est sérialisé à l&apos;aide de<a href="/en/DOM/The_structured_clone_algorithm" title="en/DOM/The structured clone algorithm"> &quot;structured clone algorithm&quot;</a> qui autorise, en particulier, la sérialisation d&apos;arbres récursifs cycliques. Cela permet de passer de façon sûre une plus grande diversité d&apos;objets.</div>
+
+<h3 id="Exemple_de_la_méthode_replaceState()">Exemple de la méthode replaceState()</h3>
+
+<p><span lang="fr" id="result_box"><span>Supposons que http://mozilla.org/foo.html exécute le code JavaScript suivant :</span></span></p>
+
+<pre class="brush: js line-numbers  language-js"><code class="language-js"><span class="keyword token">var</span> stateObj <span class="operator token">=</span> <span class="punctuation token">{</span> foo<span class="punctuation token">:</span> <span class="string token">&quot;bar&quot;</span> <span class="punctuation token">}</span><span class="punctuation token">;</span>
+history<span class="punctuation token">.</span><span class="function token">pushState</span><span class="punctuation token">(</span>stateObj<span class="punctuation token">,</span> <span class="string token">&quot;page 2&quot;</span><span class="punctuation token">,</span> <span class="string token">&quot;bar.html&quot;</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p>L&apos;explication des deux lignes ci-dessus peut être trouvée dans la section &quot;<a href="#">Exemple de la méthode pushState()</a>&quot;. Supposons ensuite que http://mozilla.org/bar.html exécute le code JavaScript suivant :</p>
+
+<pre class="brush: js line-numbers  language-js"><code class="language-js">history<span class="punctuation token">.</span><span class="function token">replaceState</span><span class="punctuation token">(</span>stateObj<span class="punctuation token">,</span> <span class="string token">&quot;page 3&quot;</span><span class="punctuation token">,</span> <span class="string token">&quot;bar2.html&quot;</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+
+<p>Cela entraînera l&apos;affichage de la barre d&apos;URL http://mozilla.org/bar2.html, mais le navigateur ne chargera pas <code>bar2.html</code> ou même vérifiera que <code>bar2.html</code> existe.</p>
+
+<p>Supposons maintenant que l&apos;utilisateur accède à http://www.microsoft.com, puis clique sur le bouton Précédent. À ce stade, la barre d&apos;URL affichera http://mozilla.org/bar2.html. Si l&apos;utilisateur clique à nouveau sur Retour, la barre d&apos;URL affichera http://mozilla.org/foo.html et contournera totalement bar.html.</p>
+
+<h3 id="L&apos;événement_popstate">L&apos;événement popstate</h3>
+
+<p>Un événement <code>popstate</code> est envoyé à la fenêtre chaque fois que l&apos;entrée active de l&apos;historique change. Si l&apos;entrée de l&apos;historique activée a été créée par un appel à <code>replaceState</code>, la propriété <code>state </code>de l&apos;événement <code>popstate</code> contient une copie de l&apos;objet état  de l&apos;entrée de l&apos;historique.</p>
+
+<p>Voir <a href="/fr/docs/Web/API/Window/onpopstate" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>window.onpopstate</code></a> pour un exemple d&apos;utilisation.</p>
+
+<h3 id="Lire_l&apos;état_courant">Lire l&apos;état courant</h3>
+
+<p>Quand votre page est chargée, il se pourrait qu&apos;elle ait un objet état non nul. Cela peut se produire, par exemple, si la page fixe un objet état (avec  <code>pushState()</code> ou <code>replaceState()</code>) et qu&apos;ensuite l&apos;utilisateur redémarre le navigateur.  Quand votre page sera rechargée, elle recevra l&apos;événement  <span style="font-family: courier new;">onload</span><span style="font-family: helvetica;"> , mais pas l&apos;événement <span style="font-family: courier new;">popstate</span>.</span>  Néanmoins, si vous lisez la propriété <span style="font-family: courier new;">history.state</span>, vous récupèrerez l&apos;objet état que vous auriez obtenu si un événement <span style="font-family: courier new;">popstate</span> avait été déclenché.</p>
+
+<p>Vous pouvez lire l&apos;état de l&apos;entrée courante de l&apos;historique sans devoir attendre un événement <code>popstate</code> en utilisant la propriété <code>history.state</code> comme ceci :</p>
+
+<pre class="brush: js">var currentState = history.state;
+</pre>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Pour un exemple comple de site web AJAX, vous pouvez voir : <a href="https://developer.mozilla.org/fr/docs/Web/Guide/DOM/Manipuler_historique_du_navigateur/Example" title="/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history/Example">Exemple de navigation en Ajax</a>.</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://html.spec.whatwg.org/multipage/browsers.html#history" class="external" hreflang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;History&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Pas de changement de <a lang="en" title="La spécificaction &apos;HTML5&apos;" href="https://www.w3.org/TR/html50/" class="external" hreflang="en">HTML5</a>.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://www.w3.org/TR/html50/browsers.html#history" class="external" hreflang="en">HTML5<br><small lang="fr">La définition de &apos;History&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>replaceState, pushState</td>
+   <td>5</td>
+   <td><a href="/en-US/Firefox/Releases/4" title="Sorti le 2011-03-22.">4.0</a> (2.0)</td>
+   <td>10</td>
+   <td>11.50</td>
+   <td>5.0</td>
+  </tr>
+  <tr>
+   <td>history.state</td>
+   <td>18</td>
+   <td><a href="/en-US/Firefox/Releases/4" title="Sorti le 2011-03-22.">4.0</a> (2.0)</td>
+   <td>10</td>
+   <td>11.50</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>replaceState, pushState</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td>history.state</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>Vous pouvez utiliser <a href="https://github.com/browserstate/history.js" class="link-https" title="https://github.com/balupton/history.js">History.js</a> pour contourner les <a href="https://github.com/balupton/history.js/wiki/The-State-of-the-HTML5-History-API" class="link-https" title="https://github.com/balupton/history.js/wiki/The-State-of-the-HTML5-History-API">problèmes</a> de compatibilité entre navigateurs.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/Window/history" title="La propriété en lecture seule Window.history renvoie une référence à l&apos;objet History, qui offre la possibilité de manipuler l&apos;historique de session du navigateur (pages visitées dans l&apos;onglet ou le cadre dans lesquels la page courante est chargée)."><code>window.history</code></a></li>
+ <li><a href="/fr/docs/Web/API/Window/onpopstate" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>window.onpopstate</code></a></li>
+</ul>

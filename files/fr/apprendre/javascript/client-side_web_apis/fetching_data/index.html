@@ -1,0 +1,824 @@
+---
+title: Récupérer des données du serveur
+slug: Apprendre/JavaScript/Client-side_web_APIs/Fetching_data
+tags:
+  - API
+  - Apprendre
+  - Article
+  - Codage
+  - Débutant
+  - Fetch
+  - JavaScript
+  - XHR
+  - data
+translation_of: Learn/JavaScript/Client-side_web_APIs/Fetching_data
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/Getting_started_with_the_web"><strong>Bienvenue aux débutants !</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Commencer avec le Web</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web">Vue d&apos;ensemble de Commencer avec le Web</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Installing_basic_software">Installation des outils de base</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">Quel sera l&apos;aspect de votre site web ?</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Dealing_with_files">Gérer les fichiers</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/HTML_basics">Les bases de HTML</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/CSS_basics">Les bases de CSS</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/JavaScript_basics">Les bases de JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Publishing_your_website">Publier votre site web</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/How_the_Web_works">Le fonctionnement du Web</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/HTML"><strong>HTML</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Introduction au HTML</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML">Vue d&apos;ensemble de Introduction au HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Commencer avec le HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">Qu&apos;y-a-t-il dans l&apos;en-tête ? Métadonnées en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">Fondamentaux du texte en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">Création d&apos;hyperliens</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Formatage avancé du texte</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Structure de site web et de document</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Déboguer en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Baliser une lettre</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Structurer une page de contenu</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Multimedia and embedding</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding">Multimedia and embedding overview</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Images in HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Video and audio content</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">From object to iframe — other embedding technologies</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Adding vector graphics to the Web</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Responsive images</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Assessment: Mozilla splash page</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/CSS"><strong>CSS — Styling the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Styling text</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text">Styling text overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Fundamentals">Fundamental text and font styling</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Styling_lists">Styling lists</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Styling_links">Styling links</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Web_fonts">Web fonts</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Assessment: Typesetting a community school homepage</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS layout</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout">CSS layout overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Introduction">Introduction</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Grids">Grids</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Floats">Floats</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Positioning">Positioning</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/JavaScript"><strong>JavaScript — Dynamic client-side scripting</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript first steps</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps">JavaScript first steps overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/What_is_JavaScript">What is JavaScript?</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/A_first_splash">A first splash into JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/What_went_wrong">What went wrong? Troubleshooting JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Variables">Storing the information you need — Variables</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Math">Basic math in JavaScript — Numbers and operators</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Strings">Handling text — Strings in JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Useful_string_methods">Useful string methods</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Arrays">Arrays</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Silly_story_generator">Assessment: Silly story generator</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript building blocks</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/conditionals">Making decisions in your code — Conditionals</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Looping_code">Looping code</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Functions">Functions — Reusable blocks of code</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Build your own function</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Return_values">Function return values</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Events">Introduction to events</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Image_gallery">Assessment: Image gallery</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Introducing JavaScript objects</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects">Introducing JavaScript objects overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Basics">Object basics</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object-oriented_JS">Object-oriented JavaScript for beginners</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object_prototypes">Object prototypes</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Inheritance">Inheritance in JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/JSON">Working with JSON data</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object_building_practice">Object building practice</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Assessment: Adding features to our bouncing balls demo</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/fr/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/fr/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/fr/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Tools_and_testing"><strong>Tools and testing</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Cross browser testing</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing">Cross browser testing overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/Server-side"><strong>Server-side website programming</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>First steps</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps">First steps overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Introduction">Introduction to the server-side</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-Server overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Web_frameworks">Server-side web frameworks</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Website_security">Website security</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Django web framework (Python)</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/Django">Django web framework (Python) overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Introduction">Introduction</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/development_environment">Setting up a development environment</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Tutorial_local_library_website">Tutorial: The Local Library website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/skeleton_website">Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Models">Tutorial Part 3: Using models</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Admin_site">Tutorial Part 4: Django admin site</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Home_page">Tutorial Part 5: Creating our home page</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Generic_views">Tutorial Part 6: Generic list and detail views</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Sessions">Tutorial Part 7: Sessions framework</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Authentication">Tutorial Part 8: User authentication and permissions</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Forms">Tutorial Part 9: Working with forms</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Testing">Tutorial Part 10: Testing a Django web application</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Deployment">Tutorial Part 11: Deploying Django to production</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/web_application_security">Web application security</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/django_assessment_blog">Assessment: DIY mini blog</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Further resources</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Common questions</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/HTML/Howto">HTML questions</a></li>
+          <li><a href="/fr/docs/Learn/CSS/Howto">CSS questions</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#How_the_Web_works">Le fonctionnement du Web</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#Tools_and_setup">Tools and setup</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#Design_and_accessibility">Design and accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/How_to_contribute">How to contribute</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs" class="button"><i class="icon-arrow-up"></i> Aperçu : Client-side web APIs</a><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">Une autre tâche courante dans les sites et applications web modernes est de récupérer des données à partir du serveur pour mettre à jour des sections de la page web sans la recharger entièrement. Ce qui pourrait paraître comme un petit détail a, en vérité, eu un impact énorme sur les performances et le comportement des sites. Dans cet article, nous allons expliquer le concept et les technologies qui rendent cela possible, tels que XMLHttpRequest et l&apos;API Fetch.</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">Prérequis :</th>
+   <td>Notions de base de JavaScript (voir <a href="/fr/docs/Learn/JavaScript/First_steps">premiers pas</a>, <a href="/fr/Apprendre/JavaScript/Building_blocks">les briques JavaScript</a>, <a href="/fr/docs/Learn/JavaScript/Objects">les objets JavaScript</a>), les <a href="/fr/Apprendre/JavaScript/Client-side_web_APIs/Introduction">notions de bases des APIs côté client</a></td>
+  </tr>
+  <tr>
+   <th scope="row">Objectif :</th>
+   <td>Apprendre à récupérer des données du serveur web et les utiliser pour mettre à jour le contenu de la page.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Quel_est_le_problème">Quel est le problème?</h2>
+
+<p>À la base, le chargement d&apos;une page web est simple — vous envoyez une requête à un serveur et, tant qu&apos;il n&apos;y a pas eu de problème, les ressources de la page web sont téléchargées et affichées sur votre ordinateur.</p>
+
+<p><img alt="A basic representation of a web site architecture" src="https://mdn.mozillademos.org/files/6475/web-site-architechture@2x.png" style="display: block; height: 134px; margin: 0px auto; width: 484px;"></p>
+
+<p>Le problème avec ce modèle c&apos;est qu&apos;à chaque fois que vous voulez mettre à jour une partie de la page, par exemple pour afficher la page suivante d&apos;une liste de produits, vous devez recharger toute la page. Ce surcoût est tout à fait inutile et résulte en une mauvaise expérience utilisateur, particulièrement pour les pages qui sont lourdes, complexes et du coup longues à charger.</p>
+
+<h3 id="Larrivée_dAjax">L&apos;arrivée d&apos;Ajax</h3>
+
+<p>Pour traiter ce problème, des technologies ont été élaborées qui permettent de récupérer à la demande de petites portions de données (comme du <a href="/fr/docs/Web/HTML">HTML</a>, <a href="/fr/docs/Glossaire/XML">XML</a>, <a href="/fr/docs/Learn/JavaScript/Objects/JSON">JSON</a>, ou texte brut) et de les afficher dans la page web.</p>
+
+<p>Nous avons pour cela l&apos;API <a href="/fr/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> à notre disposition ou — plus récemment — l&apos;<a href="/fr/docs/Web/API/Fetch_API">API Fetch</a>. Elles permettent de réaliser des requêtes <a href="/fr/docs/Web/HTTP">HTTP</a> pour récupérer des ressources spécifiques disponibles sur un serveur et de formater les données retournées selon les besoins avant l&apos;affichage dans la page.</p>
+
+<div class="note">
+<p><strong>Note </strong>: Dans les premiers temps, cette technique était appelée &quot;Asynchronous JavaScript and XML&quot; (JavaScript asychrone et XML), dit AJAX, parce qu&apos;elle utilisait <a href="/fr/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> pour requêter des données XML. De nos jours, c&apos;est rarement le cas; la plupart du temps, on utilise <code>XMLHttpRequest</code> ou Fetch pour requêter des données JSON. Quoi qu&apos;il en soit, le procédé reste le même et le terme &quot;Ajax&quot; est resté pour décrire cette technique.</p>
+</div>
+
+<p><img alt="A simple modern architecture for web sites" src="https://mdn.mozillademos.org/files/6477/moderne-web-site-architechture@2x.png" style="display: block; height: 235px; margin: 0px auto; width: 559px;"></p>
+
+<p>Le modèle Ajax implique une API web comme proxy pour requêter les données plus intelligemment que simplement rafraîchir la page à chaque fois. Voyons plutôt l&apos;impact que cela a :</p>
+
+<ol>
+ <li>Allez sur un site riche en information de votre choix, comme Amazon, YouTube, CNN...</li>
+ <li>Cherchez quelque chose dans la barre de recherche, comme un nouveau produit. Le contenu principal va changer, mais la plupart de ce qui l&apos;entoure reste statique, comme l&apos;entête, le pied de page, le menu de navigation, etc.</li>
+</ol>
+
+<p>C&apos;est une bonne chose puisque :</p>
+
+<ul>
+ <li>La mise à jour de la page est beaucoup plus rapide et vous n&apos;avez pas à attendre que la page se rafraîchisse, si bien que le site paraît être plus rapide et plus réactif.</li>
+ <li>Moins de données doivent être téléchargées pour mettre à jour la page, et donc moins de bande passante est utilisée. Cela ne fait peut-être pas une grande différence sur un ordinateur de bureau, mais cela peut devenir un problème majeur sur mobile ou dans les pays en développement, qui n&apos;ont pas partout un service Internet ultra-rapide.</li>
+</ul>
+
+<p>Notez que pour accélerer les choses encore davantage, certains sites stockent les ressources et données chez le client lors de sa première visite, si bien que les visites suivantes, les fichiers locaux sont utilisés et non re-téléchargés du serveur. Le contenu n&apos;est rechargé que lorsqu&apos;il a été mis à jour sur le serveur.</p>
+
+<p><img alt="A basic web app data flow architecture" src="https://mdn.mozillademos.org/files/6479/web-app-architecture@2x.png" style="display: block; height: 383px; margin: 0px auto; width: 562px;"></p>
+
+<h2 id="Une_requête_Ajax_basique">Une requête Ajax basique</h2>
+
+<p>Voyons maintenant comment ces requêtes sont gérées, en utilisant soit <a href="/fr/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> soit <a href="/fr/docs/Web/API/Fetch_API">Fetch</a>. Pour ces exemples, nous allons requêter les données de différents fichiers texte et les utiliserons pour remplir une zone de contenu.</p>
+
+<p>Ces fichiers agiront comme une fausse base de données ; dans une vraie application, il est plus probable que vous utiliseriez un langage côté serveur comme PHP, Python, ou Node pour récupérer les données à partir d&apos;une véritable base de données. En revanche, nous voulons ici garder les choses simples ; nous allons donc nous concentrer sur le côté client.</p>
+
+<h3 id="XMLHttpRequest">XMLHttpRequest</h3>
+
+<p><code>XMLHttpRequest</code> (qui est fréquemment abrégé XHR) est une technologie assez vieille maintenant — elle a été inventée par Microsoft dans les années 90 et a été standardisée dans les autres navigateurs il y a longtemps.</p>
+
+<ol>
+ <li>
+  <p>Pour commencer cet exemple, faites une copie locale de <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/ajax-start.html">ajax-start.html</a> et des quatre fichiers texte — <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse1.txt">verse1.txt</a>, <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse2.txt">verse2.txt</a>, <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse3.txt">verse3.txt</a>, et <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse4.txt">verse4.txt</a> — dans un nouveau répertoire sur votre ordinateur. Dans cet exemple, nous allons charger le verset d&apos;un poème (que vous pourriez bien reconnaître), quand il est sélectionné dans le menu déroulant, en utilisant XHR.</p>
+ </li>
+ <li>
+  <p>À l&apos;intérieur de l&apos;élément <a href="/fr/docs/Web/HTML/Element/script" title="L&apos;élément HTML &lt;script&gt; est utilisé pour intégrer ou faire référence à un script exécutable. Cela fait généralement référence à du code JavaScript mais ce peut également être un autre type de script (par exemple WebGL)."><code>&lt;script&gt;</code></a>, ajoutez le code qui suit. Il stocke une référence aux éléments <a href="/fr/docs/Web/HTML/Element/select" title="L&apos;élément HTML &lt;select&gt; représente un contrôle qui fournit une liste d&apos;options parmi lesquelles l&apos;utilisateur pourra choisir."><code>&lt;select&gt;</code></a> et <a href="/fr/docs/Web/HTML/Element/pre" title="L&apos;élément HTML &lt;pre&gt; représente du texte préformaté, généralement écrit avec une police à chasse fixe. Le texte est affiché tel quel, les espaces utilisés dans le document HTML seront retranscrits."><code>&lt;pre&gt;</code></a> dans des variables et définit un gestionnaire d&apos;événement <a href="/fr/docs/Web/API/GlobalEventHandlers/onchange"><code>onchange</code></a>, pour que, quand la valeur du menu déroulant est changée, la valeur sélectionnée soit passée comme paramètre à la fonction  <code>updateDisplay()</code>.</p>
+
+  <pre class="brush: js notranslate">var verseChoose = document.querySelector(&apos;select&apos;);
+var poemDisplay = document.querySelector(&apos;pre&apos;);
+
+verseChoose.onchange = function() {
+  var verse = verseChoose.value;
+  updateDisplay(verse);
+};</pre>
+ </li>
+ <li>
+  <p>Définissons maintenant la fonction <code>updateDisplay()</code>. Tout d&apos;abord, mettez ce qui suit au bas de votre JavaScript — c&apos;est la structure vide de la fonction :</p>
+
+  <pre class="brush: js notranslate">function updateDisplay(verse) {
+
+};</pre>
+ </li>
+ <li>
+  <p>Nous allons commencer notre fonction en construisant une URL relative qui pointe vers le fichier texte que nous voulons charger, nous en aurons besoin plus tard. La valeur de l&apos;élément <a href="/fr/docs/Web/HTML/Element/select" title="L&apos;élément HTML &lt;select&gt; représente un contrôle qui fournit une liste d&apos;options parmi lesquelles l&apos;utilisateur pourra choisir."><code>&lt;select&gt;</code></a> à tout instant est la même que l&apos;élément <a href="/fr/docs/Web/HTML/Element/option" title="L&apos;élément HTML &lt;option&gt;, utilisé dans un formulaire, permet de représenter un contrôle au sein d&apos;un élément &lt;select&gt;, &lt;optgroup&gt; ou &lt;datalist&gt;. Cet élément peut donc représenter des éléments d&apos;un menu dans un document HTML."><code>&lt;option&gt;</code></a> sélectionné (c&apos;est à dire le texte de l&apos;élément sélectionné, ou son attribut <code>value</code> s&apos;il est spécifié) — par exemple &quot;Verse 1&quot;. Le fichier correspondant est &quot;verse1.txt&quot; et il est situé dans le même répertoire que le fichier HTML, le nom du fichier seul suffira donc.</p>
+
+  <p>Les serveurs web sont généralement sensibles à la casse, le nom de fichier n&apos;a pas d&apos;espace et a une extension de fichier. Pour convertir &quot;Verse 1&quot; en &quot;verse1.txt&quot; nous allons convertir le &quot;V&quot; en minuscles avec <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String/toLowerCase"><code>toLowerCase()</code></a>, supprimer l&apos;espace avec <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String/replace"><code>replace()</code></a> et ajouter &quot;.txt&quot; à la fin avec une simple <a href="/fr/docs/Learn/JavaScript/First_steps/Strings#Concaténation_de_chaînes">concaténation de chaînes</a>. Ajoutez les lignes suivantes à l&apos;intérieur de la fonction <code>updateDisplay()</code> :</p>
+
+  <pre class="brush: js notranslate">verse = verse.replace(&quot; &quot;, &quot;&quot;);
+verse = verse.toLowerCase();
+var url = verse + &apos;.txt&apos;;</pre>
+ </li>
+ <li>
+  <p>Pour commencer à créer une requête XHR, vous allez devoir créer un nouvel objet avec le constructeur <a href="/fr/docs/Web/API/XMLHttpRequest/XMLHttpRequest"><code>XMLHttpRequest()</code></a>. Vous pouvez appeler cet objet comme vous le voulez, mais nous l&apos;appellerons <code>request</code> pour plus de clarté. Ajoutez ce qui suit à vos lignes précédentes :</p>
+
+  <pre class="brush: js notranslate">var request = new XMLHttpRequest();</pre>
+ </li>
+ <li>
+  <p>Ensuite, vous allez devoir utiliser la méthode <a href="/fr/docs/Web/API/XMLHttpRequest/open"><code>open()</code></a> pour spécifier la <a href="/fr/docs/Web/HTTP/Méthode">méthode HTTP</a> et l&apos;URL à utiliser pour récupérer la ressource. Nous allons ici utiliser la méthode <code><a href="/fr/docs/Web/HTTP/Méthode/GET">GET</a></code> et passer notre variable <code>url</code> pour URL. Ajoutez ceci à la suite de la ligne précédente :</p>
+
+  <pre class="brush: js notranslate">request.open(&apos;GET&apos;, url);</pre>
+ </li>
+ <li>
+  <p>Nous allons définir le type de réponse que nous attendons — définit par la propriété <a href="/fr/docs/Web/API/XMLHttpRequest/responseType"><code>responseType</code></a> de la requête — comme <code>text</code>. Ce n&apos;est pas strictement nécessaire ici — XHR retourne du texte par défaut — mais c&apos;est une bonne idée d&apos;en prendre l&apos;habitude pour les cas où vous aurez besoin de définir un type différent. Ajoutez ceci à la suite :</p>
+
+  <pre class="brush: js notranslate">request.responseType = &apos;text&apos;;</pre>
+ </li>
+ <li>
+  <p>Récupérer une ressource sur le réseau est une opération <a href="/fr/docs/Glossaire/Asynchronous">asynchrone</a>, ce qui signifie que vous devez attendre que cette opération se termine (par exemple, que la ressource soit renvoyée) avant de pouvoir récupérer la réponse — sans quoi une erreur est levée. XHR permet d&apos;exécuter du code lorsque la réponse est reçue grâce au gestionnaire d&apos;événement <a href="/fr/docs/Web/API/XMLHttpRequest/onload"><code>onload</code></a> — quand l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/load" title="/fr/docs/Web/Reference/Events/load">load</a></code> est déclenché. Une fois que la réponse a été reçue, alors la réponse est accessible via la propriété <code>response</code> de l&apos;objet XHR utilisé.</p>
+
+  <p>Ajoutez le bloc de code qui suit toujours au bas de la fonction <code>updateDisplay()</code>. Vous verrez qu&apos;à l&apos;intérieur du gestionnaire d&apos;événément <code>onload</code>, nous assignons la propriété <code><a href="/en-US/docs/Web/API/Node/textContent">textContent</a></code> de <code>poemDisplay</code> (l&apos;élément <a href="/fr/docs/Web/HTML/Element/pre" title="L&apos;élément HTML &lt;pre&gt; représente du texte préformaté, généralement écrit avec une police à chasse fixe. Le texte est affiché tel quel, les espaces utilisés dans le document HTML seront retranscrits."><code>&lt;pre&gt;</code></a>) à la valeur de la propriété <a href="/fr/docs/Web/API/XMLHttpRequest/response"><code>request.response</code></a>.</p>
+
+  <pre class="brush: js notranslate">request.onload = function() {
+  poemDisplay.textContent = request.response;
+};</pre>
+ </li>
+ <li>
+  <p>Les étapes précédentes nous ont permis de configurer la requête XHR, mais celle-ci n&apos;est exécutée que lorsqu&apos;on le demande explicitement. Pour ce faire, il faut appeler la méthode <a href="/fr/docs/Web/API/XMLHttpRequest/send"><code>send()</code></a>. Ajoutez la ligne suivante à la suite du code déjà écrit :</p>
+
+  <pre class="brush: js notranslate">request.send();</pre>
+
+  <p>Voyez la section <a href="#Serving_your_example_from_a_server">Servir votre exemple depuis un serveur</a> pour pouvoir tester.</p>
+ </li>
+ <li>
+  <p>Un dernier problème avec cet exemple est qu&apos;il ne montre rien au chargement de la page (mais uniquement à la sélection d&apos;un verset). Pour corriger cela, ajoutez ce qui suit au bas de votre code (juste au-dessus de la balise fermante <code>&lt;/script&gt;</code>), pour charger le verset 1 par défaut, et s&apos;assurer que l&apos;élément <a href="/fr/docs/Web/HTML/Element/select" title="L&apos;élément HTML &lt;select&gt; représente un contrôle qui fournit une liste d&apos;options parmi lesquelles l&apos;utilisateur pourra choisir."><code>&lt;select&gt;</code></a> montre toujours la bonne valeur :</p>
+
+  <pre class="brush: js notranslate">updateDisplay(&apos;Verse 1&apos;);
+verseChoose.value = &apos;Verse 1&apos;;</pre>
+ </li>
+</ol>
+
+<h3 id="Servir_votre_exemple_depuis_un_serveur">Servir votre exemple depuis un serveur</h3>
+
+<p>Certains navigateurs (dont Chrome) n&apos;exécuteront pas de requêtes XHR si vous exécutez votre script simplement à partir d&apos;un fichier local. Cela est dû à des restrictions de sécurité (pour plus d&apos;infos sur la sécurité web, consultez l&apos;article <a href="/fr/docs/Learn/Server-side/First_steps/Website_security">La sécurité d&apos;un site web</a>).</p>
+
+<p>Pour règler ce problème, vous devez tester l&apos;exemple à travers un serveur web local. Pour savoir comment procéder, lisez <a href="/fr/Apprendre/Common_questions/configurer_un_serveur_de_test_local">Comment configurer un serveur de test local?</a></p>
+
+<h3 id="Fetch">Fetch</h3>
+
+<p>L&apos;API Fetch est une solution moderne qui vient remplacer XHR — elle a été introduite récemment dans les navigateurs pour rendre les requêtes HTTP asynchrones plus simples en JavaScript, à la fois pour les développeurs et pour les autres APIs qui utilisent cette technologie.</p>
+
+<p>Voyons comment convertir le dernier exemple, en remplaçant XHR par Fetch.</p>
+
+<ol>
+ <li>
+  <p>Faites une copie du répertoire de votre dernier exemple. (Ou si vous ne l&apos;avez pas fait, créez un nouveau répertoire et copiez le fichier <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/xhr-basic.html">xhr-basic.html</a> et les quatre fichiers texte — <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse1.txt">verse1.txt</a>, <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse2.txt">verse2.txt</a>, <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse3.txt">verse3.txt</a>, and <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/verse4.txt">verse4.txt</a> — à l&apos;intérieur).</p>
+ </li>
+ <li>
+  <p>À l&apos;intérieur de la fonction <code>updateDisplay()</code>, vous avez le code XHR suivant :</p>
+
+  <pre class="brush: js notranslate">var request = new XMLHttpRequest();
+request.open(&apos;GET&apos;, url);
+request.responseType = &apos;text&apos;;
+
+request.onload = function() {
+  poemDisplay.textContent = request.response;
+};
+
+request.send();</pre>
+ </li>
+ <li>
+  <p>Remplacez-le avec ce qui suit :</p>
+
+  <pre class="brush: js notranslate">fetch(url).then(function(response) {
+  response.text().then(function(text) {
+    poemDisplay.textContent = text;
+  });
+});</pre>
+ </li>
+ <li>
+  <p>Chargez l&apos;exemple dans votre navigateur (en l&apos;exécutant à travers un serveur web) et il devrait produire le même résultat que la version XHR  — pourvu que vous utilisiez un navigateur moderne.</p>
+ </li>
+</ol>
+
+<h4 id="Que_se_passe-t-il_dans_le_code_Fetch">Que se passe-t-il dans le code Fetch?</h4>
+
+<p>Tout d&apos;abord, nous invoquons la méthode <a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/fetch"><code>fetch()</code></a>, en lui passant l&apos;URL de la ressource que nous voulons récupérer. C&apos;est la version moderne équivalente à <a href="/fr/docs/Web/API/XMLHttpRequest/open"><code>request.open()</code></a> de XHR, et n&apos;avez pas à appeler <code>.send()</code> — la requête est exécutée directemment.</p>
+
+<p>Ensuite, la méthode <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise/then"><code>.then()</code></a> est chaînée à la suite de <code>fetch()</code> — cette méthode fait partie des <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise"><code>Promesses</code></a>, une fonctionnalité JavaScript moderne qui permet d&apos;effectuer des opérations asynchrones. <code>fetch()</code> retourne une promesse, qui est résolue lorsque la réponse est reçue du serveur — et nous utilisons <code>.then()</code> pour exécuter du code à ce moment là. C&apos;est l&apos;équivalent du gestionnaire d&apos;événément <code>onload</code> dans la version XHR.</p>
+
+<p>La fonction définie dans le <code>.then()</code> reçoit la réponse du serveur comme paramètre, une fois que la promesse retournée par <code>fetch()</code> est résolue. À l&apos;intérieur de cette fonction, nous utilisons la méthode <a href="/fr/docs/Web/API/Body/text"><code>text()</code></a> pour récupérer le contenu de la réponse en texte brut. C&apos;est l&apos;équivalent de <code>request.responseType = &apos;text&apos;</code> dans la version XHR.</p>
+
+<p>Vous verrez que <code>text()</code> retourne également une promesse, nous y chaînons donc un nouveau <code>.then()</code>, à l&apos;intérieur de quoi nous définissons une fonction. Cette dernière récupère quant à elle le texte brut que la promesse précédente résout.</p>
+
+<p>Enfin, dans le corps de la fonction, nous faisons la même chose que nous faisions dans la version XHR — définir le contenu texte de l&apos;élément <a href="/fr/docs/Web/HTML/Element/pre" title="L&apos;élément HTML &lt;pre&gt; représente du texte préformaté, généralement écrit avec une police à chasse fixe. Le texte est affiché tel quel, les espaces utilisés dans le document HTML seront retranscrits."><code>&lt;pre&gt;</code></a> au texte récupéré.</p>
+
+<h3 id="À_propos_des_promesses">À propos des promesses</h3>
+
+<p>Les promesses peuvent être un peu déroutantes au premier abord, ne vous en souciez pas trop pour l&apos;instant. Vous vous y ferez après un certain temps, d&apos;autant plus après en avoir appris davantage sur les APIs JavaScript modernes — la plupart des APIs récentes utilisent beaucoup les promesses.</p>
+
+<p>Regardons à nouveau la structure d&apos;une promesse pour voir si nous pouvons en donner plus de sens.</p>
+
+<h4 id="Promesse_1">Promesse 1</h4>
+
+<pre class="brush: js notranslate">fetch(url).then(function(response) {
+  //...
+});</pre>
+
+<p>Si l&apos;on traduit en bon français les instructions JavaScript, on pourrait dire</p>
+
+<ul>
+ <li><code>fetch(url)</code> : récupérer la ressource située à l&apos;adresse <code>url</code></li>
+ <li><code>.then(function() { ... })</code>: quand c&apos;est fait, exécuter la fonction spécifiée</li>
+</ul>
+
+<p>On dit qu&apos;une promesse est &quot;résolue&quot; (resolved) lorsque l&apos;opération spécifiée à un moment donné est terminée. En l&apos;occurence, l&apos;opération spécifiée est de récupérer une ressource à une URL donnée (en utilisant une requête HTTP) et de retourner la réponse reçue du serveur.</p>
+
+<p>La fonction passée à <code>then()</code> n&apos;est pas exécutée immédiatement — elle est exécutée à un moment dans le futur, dès que la promesse est résolue (c&apos;est à dire qu&apos;elle a retourné la réponse du serveur).</p>
+
+<p>Notez que vous pouvez également choisir de stocker votre promesse dans une variable, et de chaîner le <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise/then"><code>.then()</code></a> sur cette variable. L&apos;exemple suivant fait la même chose que le précédent :</p>
+
+<pre class="brush: js notranslate">var myFetch = fetch(url);
+
+myFetch.then(function(response) {
+  //...
+});</pre>
+
+<p>Parce que la méthode <code>fetch()</code> retourne une promesse qui résout une réponse HTTP, la fonction définie à l&apos;intérieur du <code>.then()</code> reçoit la réponse en tant que paramètre. Vous pouvez appeler le paramètre comme vous souhaitez — l&apos;exemple ci-dessous fait toujours la même chose :</p>
+
+<pre class="brush: js notranslate">fetch(url).then(function(dogBiscuits) {
+  //...
+});</pre>
+
+<p>Mais il est plus logique de donner un nom de paramètre qui décrit son contenu !</p>
+
+<h4 id="Promesse_2">Promesse 2</h4>
+
+<p>Voyons maintenant la fonction appelé dans <code>.then()</code>:</p>
+
+<pre class="brush: js notranslate">function(response) {
+  response.text().then(function(text) {
+    poemDisplay.textContent = text;
+  });
+}</pre>
+
+<p>L&apos;objet <code>response</code> a une méthode <a href="/fr/docs/Web/API/Body/text"><code>text()</code></a>, qui convertit les données brutes contenues dans la réponse en texte brut — c&apos;est le format que nous voulons. Cette méthode retourne également une promesse, qui se résout lorsque la réponse est convertie en texte, nous utilisons donc un deuxième <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise/then"><code>.then()</code></a> pour cette deuxième promesse.</p>
+
+<p>À l&apos;intérieur de ce dernier <code>.then()</code>, nous définissons une nouvelle fonction, qui décide de ce que nous faisons avec le texte récupéré. Nous nous contentons de définir la propriété <code><a href="/en-US/docs/Web/API/Node/textContent">textContent</a></code> de l&apos;élément <a href="/fr/docs/Web/HTML/Element/pre" title="L&apos;élément HTML &lt;pre&gt; représente du texte préformaté, généralement écrit avec une police à chasse fixe. Le texte est affiché tel quel, les espaces utilisés dans le document HTML seront retranscrits."><code>&lt;pre&gt;</code></a> à la valeur du texte.</p>
+
+<h4 id="Chaîner_les_then">Chaîner les then()</h4>
+
+<p>Notez que le résultat de la fonction appelée par le <code>.then()</code> est également retourné par ce dernier, nous pouvons donc mettre les <code>.then()</code> bout à bout, en passant le résultat du bloc précédent au prochain.</p>
+
+<p>Ainsi, le bloc de code suivant fait la même chose que notre exemple original, mais écrit dans un style différent :</p>
+
+<pre class="brush: js notranslate">fetch(url).then(function(response) {
+  return response.text()
+}).then(function(text) {
+  poemDisplay.textContent = text;
+});</pre>
+
+<p>Beaucoup de développeurs préfèrent ce style, plus &quot;plat&quot; : il évite de définir des fonctions à l&apos;intérieur de fonctions et est plus facile à lire lorsqu&apos;il y a beaucoup de promesses qui s&apos;enchaînent. La seule différence ici est que nous avons une instruction <code><a href="/fr/Apprendre/JavaScript/Building_blocks/Return_values">return</a></code> pour retourner <code>response.text()</code>, et ce résultat est passé au prochain <code>.then()</code>.</p>
+
+<h3 id="Quel_mécanisme_devriez-vous_utiliser">Quel mécanisme devriez-vous utiliser?</h3>
+
+<p>Cela dépend du projet sur lequel vous travaillez. XHR existe depuis longtemps maintenant et bénéficie d&apos;un très bon support sur les différents navigateurs. Fetch et les promesses, en revanche, sont un ajout plus récent à la plateforme web, bien qu&apos;ils soient pris en charge par la plupart des navigateurs, Internet Explorer et Safari font exception.</p>
+
+<p>Si vous voulez un support des anciens navigateurs, alors XHR est probablement la solution préférable. En revanche, si vous travaillez sur un projet plus progressif, et que vous n&apos;êtes pas tant préoccupé par les anciens navigateurs, alors Fetch peut être un bon choix.</p>
+
+<p>Vous devriez apprendre les deux alternatives — Fetch deviendra plus populaire au fur et à mesure que l&apos;utilisation d&apos;Internet Explorer diminue (IE n&apos;est plus développé, en faveur du nouveau navigateur de Microsoft, Edge), mais vous allez avoir besoin de XHR pendant un moment encore.</p>
+
+<h2 id="Un_exemple_plus_complexe">Un exemple plus complexe</h2>
+
+<p>Pour clore l&apos;article, nous allons regarder un exemple un peu plus complexe, qui montre des utilisations plus intéressantes de Fetch. Nous avons créé un site d&apos;exemple appelé The Can Store (le magasin de conserves) — c&apos;est un supermarché fictif qui ne vend que des boites de conserves. Vous pouvez trouver cet <a href="https://mdn.github.io/learning-area/javascript/apis/fetching-data/can-store/">exemple en direct sur GitHub</a>, et <a href="https://github.com/mdn/learning-area/tree/master/javascript/apis/fetching-data/can-store">voir le code source</a>.</p>
+
+<p><img alt="A fake ecommerce site showing search options in the left hand column, and product search results in the right hand column." src="https://mdn.mozillademos.org/files/14779/can-store.png" style="display: block; margin: 0 auto;"></p>
+
+<p>Par défaut, le site affiche tous les produits ; mais vous pouvez utiliser le formulaire dans la colonne de gauche pour les filtrer par catégorie, ou chercher un terme, ou les deux.</p>
+
+<p>Il y a du code plutôt complexe pour traiter le filtrage des produits par catégorie et par terme de recherche, manipulant les chaînes de caractères pour afficher les données correctement dans l&apos;interface utilisateur, etc. Nous n&apos;allons pas en discuter dans cet article, mais vous pouvez trouver des commentaires très complets dans le code (voir <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/can-store/can-script.js">can-script.js</a>). Nous allons expliquer le code Fetch.</p>
+
+<h4 id="Premier_Fetch">Premier Fetch</h4>
+
+<p>Le premier bloc qui utilise Fetch se trouve au début du JavaScript :</p>
+
+<pre class="brush: js notranslate">fetch(&apos;products.json&apos;).then(function(response) {
+  if(response.ok) {
+    response.json().then(function(json) {
+      products = json;
+      initialize();
+    });
+  } else {
+    console.log(&apos;Network request for products.json failed with response &apos; + response.status + &apos;: &apos; + response.statusText);
+  }
+});</pre>
+
+<p>Cela ressemble à ce que vous avons vu précédemment, sauf que la deuxième promesse est à l&apos;intérieur d&apos;une condition. Cette condition vérifie si la réponse retournée est un succès ou non — la propriété <a href="/fr/docs/Web/API/Response/ok"><code>response.ok</code></a> contient un booléen qui vaut <code>true</code> si le statut de la réponse était OK (<a href="/fr/docs/Web/HTTP/Status/200">statut HTTP 200, &quot;OK&quot;</a>), ou <code>false</code> sinon.</p>
+
+<p>Si la réponse était un succès, nous déclenchons la deuxième promesse — cette fois-ci en utilisant <a href="/fr/docs/Web/API/Body/json"><code>json()</code></a> et non <a href="/fr/docs/Web/API/Body/text"><code>text()</code></a>, puisque nous voulons récupérer la réponse sous forme de données structurées JSON et non de texte brut.</p>
+
+<p>Si la réponse n&apos;est pas un succès, nous affichons une erreur dans la console indiquant que la requête réseau a échoué, avec le statut et le message obtenus (contenus dans les propriétés <a href="/fr/docs/Web/API/Response/status"><code>response.status</code></a> et <a href="/fr/docs/Web/API/Response/statusText"><code>response.statusText</code></a> respectivement). Bien sûr, un véritable site web traiterait cette erreur plus gracieusement, en affichant un message à l&apos;écran en offrant peut-être des options pour remédier à la situation.</p>
+
+<p>Vous pouvez tester le cas d&apos;échec vous-même :</p>
+
+<ol>
+ <li>Faites une copie locale des fichiers d&apos;exemple (téléchargez et dézippez le <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/can-store/can-store.zip?raw=true">fichier ZIP can-store</a>)</li>
+ <li>Éxecutez le code via un serveur web (comme vu précédemment dans <a href="#Serving_your_example_from_a_server">Servir votre exemple depuis un serveur</a>)</li>
+ <li>Modifiez le chemin du fichier à récupérer, mettez un nom de fichier qui n&apos;existe pas, comme &apos;produc.json&apos;.</li>
+ <li>Maintenant, chargez le fichier index dans votre navigateur (via <code>localhost:8000</code>) et regardez dans la console de développement. Vous verrez un message parmi les lignes &quot;Network request for products.json failed with response 404: File not found&quot; (la requête réseau pour products.json a échoué avec la réponse 404: Fichier non trouvé).</li>
+</ol>
+
+<h4 id="Deuxième_Fetch">Deuxième Fetch</h4>
+
+<p>Le deuxième bloc Fetch se trouve dans la fonction <code>fetchBlob()</code>:</p>
+
+<pre class="brush: js notranslate">fetch(url).then(function(response) {
+  if(response.ok) {
+    response.blob().then(function(blob) {
+      objectURL = URL.createObjectURL(blob);
+      showProduct(objectURL, product);
+    });
+  } else {
+    console.log(&apos;Network request for &quot;&apos; + product.name + &apos;&quot; image failed with response &apos; + response.status + &apos;: &apos; + response.statusText);
+  }
+});</pre>
+
+<p>Cela fonctionne à peu près de la même manière que le précédent, sauf qu&apos;au lieu d&apos;utiliser <a href="/fr/docs/Web/API/Body/json"><code>json()</code></a>, on utilise <a href="/fr/docs/Web/API/Body/blob"><code>blob()</code></a> — en l&apos;occurence, nous voulons récupérer la réponse sous la forme d&apos;un fichier image, et le format de données que nous utilisons est <a href="/fr/docs/Web/API/Blob">Blob</a> — ce terme est une abbréviation de &quot;Binary Large Object&quot; (large objet binaire) et peut être utilisé pour représenter de gros objets fichier — tels que des fichiers images ou vidéo.</p>
+
+<p>Une fois que nous avons reçu notre blob avec succès, nous créons un objet URL, en utilisant <a href="/fr/docs/Web/API/URL/createObjectURL"><code>createObjectURL()</code></a>. Cela renvoie une URL interne temporaire qui pointe vers un blob en mémoire dans le navigateur. Cet objet n&apos;est pas très lisible, mais vous pouvez voir à quoi il ressemble en ouvrant l&apos;application Can Store, Ctrl + Clic droit sur l&apos;image, et sélectionner l&apos;option &quot;Afficher l&apos;image&quot; (peut légèrement varier selon le navigateur que vous utilisez). L&apos;URL créée sera visible à l&apos;intérieur de la barre d&apos;adresse et devrait ressembler à quelque chose comme ça :</p>
+
+<pre class="notranslate">blob:http://localhost:7800/9b75250e-5279-e249-884f-d03eb1fd84f4</pre>
+
+<h3 id="Challenge_une_version_XHR_de_Can_Store">Challenge : une version XHR de Can Store</h3>
+
+<p>Comme exercice pratique, nous aimerions que vous essayiez de convertir la version Fetch de l&apos;application en une version XHR. Faites une <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/can-store/can-store.zip?raw=true">copie du fichier ZIP</a> et essayiez de modifier le JavaScript en conséquence.</p>
+
+<p>Quelques conseils qui pourraient s&apos;avérer utiles :</p>
+
+<ul>
+ <li>Vous pourriez trouver la référence <a href="/fr/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> utile.</li>
+ <li>Vous allez devoir utiliser le même modèle que vous avez vu plus tôt dans l&apos;exemple <a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/xhr-basic.html">XHR-basic.html</a>.</li>
+ <li>Vous devrez ajouter la gestion des erreurs que nous vous avons montré dans la version Fetch de Can Store :
+  <ul>
+   <li>La réponse se situe dans <code>request.response</code> une fois que l&apos;événement <code>load</code> a été déclenché et non dans une promesse.</li>
+   <li>Le meilleur équivalent à <code>response.ok</code> en XHR est de vérifier si <a href="/fr/docs/Web/API/XMLHttpRequest/status"><code>request.status</code></a> vaut 200 ou si <a href="/fr/docs/Web/API/XMLHttpRequest/readyState"><code>request.readyState</code></a> est égal à 4.</li>
+   <li>Les propriétés permettant d&apos;obtenir le status et le message en cas d&apos;erreur sont toujours <code>status</code> et <code>statusText</code> mais elles se situent sur l&apos;objet <code>request</code> (XHR) et non sur l&apos;objet <code>response</code>.</li>
+  </ul>
+ </li>
+</ul>
+
+<div class="note">
+<p><strong>Note </strong>: Si vous avez des difficultés à le faire, vous pouvez comparer votre code à la version finale sur GitHub (<a href="https://github.com/mdn/learning-area/blob/master/javascript/apis/fetching-data/can-store-xhr/can-script.js">voir le code source</a>, ou <a href="https://mdn.github.io/learning-area/javascript/apis/fetching-data/can-store-xhr/">voir en direct</a>).</p>
+</div>
+
+<h2 id="Sommaire">Sommaire</h2>
+
+<p>Voilà qui clôt notre article sur la récupération de données à partir du serveur. À ce stade, vous devriez savoir comment travailler avec XHR et Fetch.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<p>Il y a beaucoup de sujets abordés dans cet article, dont nous n&apos;avons qu&apos;égratigné la surface. Pour plus de détails sur ces sujets, essayez les articles suivants:</p>
+
+<ul>
+ <li><a href="/fr/docs/Web/Guide/AJAX/Premiers_pas">Ajax — Premiers pas</a></li>
+ <li><a href="/fr/docs/Web/API/Fetch_API/Using_Fetch">Utiliser Fetch</a></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise">Promesses</a></li>
+ <li><a href="/fr/docs/Learn/JavaScript/Objects/JSON">Manipuler des données JSON</a></li>
+ <li><a href="/fr/docs/Web/HTTP/Aperçu">Un aperçu de HTTP</a></li>
+ <li><a href="/fr/docs/Learn/Server-side">Programmation de sites web, côté serveur</a></li>
+</ul>
+
+<div><div class="prevnext">
+  <a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs" class="button"><i class="icon-arrow-up"></i> Aperçu : Client-side web APIs</a><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<div>
+<h2 id="Dans_ce_module">Dans ce module</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Introduction">Introduction aux API du Web</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipuler des documents</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Fetching_data">Récupérer des données du serveur</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Third_party_APIs">APIs tierces</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Drawing_graphics">Dessiner des éléments graphiques</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">APIs vidéo et audio</a></li>
+ <li><a href="https://developer.mozilla.org/fr/Apprendre/JavaScript/Client-side_web_APIs/Client-side_storage">Stockage côté client</a></li>
+</ul>
+</div>

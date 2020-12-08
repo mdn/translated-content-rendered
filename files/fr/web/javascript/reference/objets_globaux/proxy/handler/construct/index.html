@@ -1,0 +1,137 @@
+---
+title: handler.construct()
+slug: Web/JavaScript/Reference/Objets_globaux/Proxy/handler/construct
+tags:
+  - ECMAScript 2015
+  - JavaScript
+  - Méthode
+  - Proxy
+  - Reference
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/construct
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux">Objets standards</a></strong></li><li><strong><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p>La méthode <code><strong>handler.construct()</strong></code> est une trappe pour l&apos;opérateur <a href="/fr/docs/Web/JavaScript/Reference/Opérateurs/L_opérateur_new"><code>new</code></a>. Afin que l&apos;opération <code>new</code> puisse être valide sur le proxy correspondant, la cible utilisée doit avoir une méthode interne <code>[[Construct]]</code> (autrement dit, l&apos;instruction <code>new cible</code> doit être valide).</p>
+
+<div><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-construct.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></div>
+
+<p class="hidden">Le code source de cet exemple interactif est disponible dans un dépôt GitHub. Si vous souhaitez contribuez à ces exemples, n&apos;hésitez pas à cloner <a href="https://github.com/mdn/interactive-examples">https://github.com/mdn/interactive-examples</a> et à envoyer une <em>pull request</em> !</p>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="brush: js notranslate">var p = new Proxy(cible, {
+  construct: function(cible, listeArguments, newTarget) {
+  }
+});
+</pre>
+
+<h3 id="Paramètres">Paramètres</h3>
+
+<p>Les paramètres suivants sont passés à la méthode <code>construct</code>.  <code>this</code> est ici lié au gestionnaire (<em>handler</em>).</p>
+
+<dl>
+ <dt><code>cible</code></dt>
+ <dd>L&apos;objet cible.</dd>
+ <dt><code>listeArguments</code></dt>
+ <dd>La liste des arguments passés au constructeur.</dd>
+ <dt><code>newTarget</code></dt>
+ <dd>Le constructeur originellement appelé.</dd>
+</dl>
+
+<h3 id="Valeur_de_retour">Valeur de retour</h3>
+
+<p>La méthode <code>construct</code> doit renvoyer un objet.</p>
+
+<h2 id="Description">Description</h2>
+
+<p>La méthode <code><strong>handler.construct()</strong></code> est une trappe pour l&apos;opérateur <a href="/fr/docs/Web/JavaScript/Reference/Opérateurs/L_opérateur_new"><code>new</code></a>.</p>
+
+<h3 id="Interceptions">Interceptions</h3>
+
+<p>Ce trappe intercepte les opérations suivantes :</p>
+
+<ul>
+ <li><code>new proxy(...args)</code></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Reflect/construct"><code>Reflect.construct()</code></a></li>
+</ul>
+
+<h3 id="Invariants">Invariants</h3>
+
+<p>Si les invariants suivants ne sont pas respectés, le proxy renverra une exception <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/TypeError"><code>TypeError</code></a> :</p>
+
+<ul>
+ <li>Le résultat doit être un <code>Object</code>.</li>
+</ul>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Dans l&apos;exemple qui suit, on piège l&apos;opérateur <a href="/fr/docs/Web/JavaScript/Reference/Opérateurs/L_opérateur_new"><code>new</code></a>.</p>
+
+<pre class="brush: js notranslate">var p = new Proxy(function() {}, {
+  construct: function(target, argumentsList) {
+    console.log(&quot;called: &quot; + argumentsList.join(&quot;, &quot;));
+    return { value: argumentsList[0] * 10 };
+  }
+});
+
+console.log(new p(1).value); // &quot;appel sur : 1&quot;
+                             // 10
+</pre>
+
+<p>Dans cette version, on ne respecte pas la contrainte d&apos;invariance :</p>
+
+<pre class="brush: js notranslate">var p = new Proxy(function() {}, {
+  construct: function(target, argumentsList) {
+    return 1;
+  }
+});
+
+new p(); // Une exception TypeError est levée
+</pre>
+
+<p>Dans le code qui suit, le proxy n&apos;est pas correctement initialisé. La cible du proxy doit être un constructeur valide qui puisse être utilisé avec <code>new</code>.</p>
+
+<pre class="brush: js notranslate">var p = new Proxy({}, {
+  construct: function(target, argumentsList, newTarget){
+    return {};
+  }
+});
+
+new p(); // TypeError: p is not a constructor</pre>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget" hreflang="en" lang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="fr">La définition de &apos;[[Construct]]&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Standard">Standard</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="fr">La définition de &apos;[[Construct]]&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="hidden">Ce tableau de compatibilité a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à envoyer une <em>pull request</em> sur <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a>.</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.construct"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy/handler"><code>handler</code></a></li>
+ <li>L&apos;opérateur <a href="/fr/docs/Web/JavaScript/Reference/Opérateurs/L_opérateur_new"><code>new</code></a></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Reflect/construct"><code>Reflect.construct()</code></a></li>
+</ul>

@@ -1,0 +1,603 @@
+---
+title: Utiliser les Service Workers
+slug: Web/API/Service_Worker_API/Using_Service_Workers
+tags:
+  - Guide
+  - Service
+  - ServiceWorker
+  - Workers
+  - basics
+translation_of: Web/API/Service_Worker_API/Using_Service_Workers
+---
+<section id="Quick_Links">
+ <ol>
+  <li><a href="/fr/docs/Web/API/Service_Worker_API"><strong>Service Worker API</strong></a></li>
+  <li class="toggle">
+    <details open>
+        <summary>Service Worker guides</summary>
+        <ol>
+          <li><a href="/fr/docs/Web/API/Service_Worker_API/Using_Service_Workers">Using Service Workers</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Interfaces</summary>
+        <ol>
+          <li><a href="/fr/docs/Web/API/Cache"><code>Cache</code></a></li>
+          <li><a href="/fr/docs/Web/API/CacheStorage"><code>CacheStorage</code></a></li>
+          <li><a href="/fr/docs/Web/API/Client"><code>Client</code></a></li>
+          <li><a href="/fr/docs/Web/API/Clients"><code>Clients</code></a></li>
+          <li><a href="/fr/docs/Web/API/ExtendableEvent"><code>ExtendableEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/FetchEvent"><code>FetchEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/InstallEvent"><code>InstallEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/Navigator/serviceWorker"><code>Navigator.serviceWorker</code></a></li>
+          <li><a href="/fr/docs/Web/API/NotificationEvent"><code>NotificationEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/PeriodicSyncEvent"><code>PeriodicSyncEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/PeriodicSyncManager"><code>PeriodicSyncManager</code></a></li>
+          <li><a href="/fr/docs/Web/API/PeriodicSyncRegistration"><code>PeriodicSyncRegistration</code></a></li>
+          <li><a href="/fr/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li>
+          <li><a href="/fr/docs/Web/API/ServiceWorkerContainer"><code>ServiceWorkerContainer</code></a></li>
+          <li><a href="/fr/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a></li>
+          <li><a href="/fr/docs/Web/API/ServiceWorkerRegistration"><code>ServiceWorkerRegistration</code></a></li>
+          <li><a href="/fr/docs/Web/API/SyncEvent"><code>SyncEvent</code></a></li>
+          <li><a href="/fr/docs/Web/API/SyncManager"><code>SyncManager</code></a></li>
+          <li><a href="/fr/docs/Web/API/SyncRegistration"><code>SyncRegistration</code></a></li>
+          <li><a href="/fr/docs/Web/API/WindowClient"><code>WindowClient</code></a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Related APIs</summary>
+        <ol>
+          <li><a href="/fr/docs/Web/API/Channel_Messaging_API">Channel Messaging API</a></li>
+          <li><a href="/fr/docs/Web/API/Notifications_API">Notifications API</a></li>
+          <li><a href="/fr/docs/Web/API/Push_API">Push API</a></li>
+          <li><a href="/fr/docs/Web/API/Web_Workers_API">Web Workers API</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><strong><a href="/fr/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+        <summary>Useful lists</summary>
+        <ol>
+          <li><a href="/fr/docs/tag/ServiceWorker">Pages tagged &quot;ServiceWorker&quot;</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Contribute</summary>
+        <ol>
+          <li><a href="/fr/docs/MDN/Doc_status/API/ServiceWorkers">Service Worker doc status</a></li>
+          <li><a href="/fr/docs/MDN">The MDN project</a></li>
+        </ol>
+    </details>
+  </li>
+ </ol>
+</section>
+
+<div class="experimental indicator-warning notecard">
+    <p><strong>Cette fonction est expérimentale</strong><br>Puisque cette fonction est toujours en développement dans certains navigateurs, veuillez consulter le <a href="#Compatibilité_des_navigateurs">tableau de compatibilité</a> pour les préfixes à utiliser selon les navigateurs.<br>Il convient de noter qu&apos;une fonctionnalité expérimentale peut voir sa syntaxe ou son comportement modifié dans le futur en fonction des évolutions de la spécification.</p>
+</div>
+
+<div class="summary">
+<p>Cet article fournit des informations pour bien débuter avec les service workers, en présentant une architecture de base, l&apos;inscription d&apos;un service worker, l&apos;installation et l&apos;activation d&apos;un processus pour un nouveau service worker, la mise à jour d&apos;un service worker, le contrôle du cache et la personnalisation des réponses, le tout dans le contexte d&apos;une application de base disponible en mode déconnecté.</p>
+</div>
+
+<h2 id="Le_préambule_aux_Service_Workers">Le préambule aux Service Workers</h2>
+
+<p>La perte de connexion est un problème majeur auquel sont confrontés les utilisateurs du web depuis des années. La meilleure application web au monde produirait un bien mauvais effet si vous ne pouviez pas la télécharger. Il y a eu de nombreuses tentatives pour mettre en place des technologies susceptibles de résoudre ce problème, comme le montre notre page <a href="/fr/Apps/Build/Hors-ligne">Offline</a>, et certains problèmes ont été résolus. Mais le problème principal reste l&apos;absence d&apos;un mécanisme de contrôle global pour la mise en cache des ressources et la personnalisation des requêtes réseau.<br>
+ <br>
+ La première tentative— AppCache — semblait être une bonne idée parce qu&apos;elle permettait de spécifier les ressources à mettre en cache de manière très simple. Cependant, elle faisait beaucoup de suppositions sur la manière de le mettre en place et échouait implacablement si votre application ne se pliait pas exactement à ces suppositions. Lisez <a href="http://alistapart.com/article/application-cache-is-a-douchebag">Application Cache is a Douchebag</a> de Jake Archibald pour plus de détails.</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: à partir de Firefox 44, lorsque <a href="/fr/docs/Web/HTML/Utiliser_Application_Cache">AppCache</a> est utilisé pour fournir un support déconnecté à une page, un message d&apos;avertissement est alors affiché dans la console pour signaler aux développeurs d&apos;utiliser plutôt les <a href="/fr/docs/Web/API/Service_Worker_API/Using_Service_Workers">Service workers</a> (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1204581">bug 1204581</a>.)</p>
+</div>
+
+<p>Les service workers devraient finalement résoudre ces problèmes. La syntaxe du service Worker est plus complexe que celle de l&apos;AppCache, mais en contrepartie vous pouvez utiliser JavaScript pour contrôler les comportements induits par votre cache local avec une granularité beaucoup plus fine, vous permettant ainsi d&apos;adresser ce problème et beaucoup d&apos;autres. Avec l&apos;aide d&apos;un Service Worker, vous pouvez facilement configurer une application pour d&apos;abord utiliser des ressources mises en cache, fournissant ainsi une première expérience par défaut même en mode déconnecté, avant de récupérer davantage de données depuis le réseau (principe connu généralement sous le nom de <a href="http://offlinefirst.org/">Offline First</a>). Cette façon de faire est déjà disponible avec les applications natives, ce qui est l&apos;une des raisons principales de la préférence accordée à ces applications plutôt qu&apos;aux applications web.</p>
+
+<h2 id="Préparatifs_aux_Service_Workers">Préparatifs aux Service Workers</h2>
+
+<p>De nombreuses fonctionnalités des service workers sont désormais disponibles par défaut dans les plus récentes versions des navigateurs qui les supportent. Cependant, si vous constatez que le code de la démo ne fonctionne pas dans votre version actuelle, vous pourriez avoir besoin d&apos;activer une configuration :</p>
+
+<ul>
+ <li><strong>Firefox Nightly </strong>: rendez-vous sur <code>about:config</code> et configurer  <code>dom.serviceWorkers.enabled</code> à true; redémarrer le navigateur.</li>
+ <li><strong>Chrome Canary </strong>: rendez-vous sur <code>chrome://flags</code> et activer <code>experimental-web-platform-features</code>; redémarrer le navigateur (à noter que certaines fonctionnalités sont désormais activées par défaut dans Chrome.)</li>
+ <li><strong>Opera </strong>: rendez-vous sur <code>opera://flags</code> et activer <code>Support for ServiceWorker</code>; redémarrer le navigateur.</li>
+</ul>
+
+<p>Vous aurez aussi besoin de servir votre code via HTTPS — les Service Workers sont contraints à s&apos;exécuter au travers d&apos;HTTPS pour des raisons de sécurité. GitHub est donc un bon endroit pour héberger des expérimentations, puisqu&apos;il supporte HTTPS. Et pour faciliter le développement en local, le <strong>localhost </strong>est considéré comme une origine sécurisée.</p>
+
+<h2 id="Architecture_de_base">Architecture de base</h2>
+
+<p><img alt src="https://mdn.mozillademos.org/files/8241/flowchart-production-version.png" style="float: right; height: 600px; margin-left: 20px; width: 300px;"></p>
+
+<p>Avec les service workers, les étapes suivantes sont généralement observées pour une configuration simple :</p>
+
+<ol>
+ <li>L&apos;URL du service worker URL est récupérée et enregistrée via <a href="/fr/docs/Web/API/ServiceWorkerContainer/register"><code>serviceWorkerContainer.register()</code></a>.</li>
+ <li>En cas de succès, le service worker est exécuté dans un <a href="/fr/docs/Web/API/ServiceWorkerGlobalScope"><code>ServiceWorkerGlobalScope</code></a>; c&apos;est en gros une sorte de contexte de worker spécial, fonctionnant hors du fil d&apos;exécution du script principal, sans accès au DOM.</li>
+ <li>Le service worker est désormais prêt à traiter des événements.</li>
+ <li>Une tentative d&apos;installation du worker a lieu lorsque les pages contrôlées par le service worker sont accédées par la suite. Un événement install est toujours le premier envoyé à un service worker (ça peut être le point de départ pour procéder au remplissage d&apos;une base IndexedDB, et à la mise en cache de ressources du site). C&apos;est tout à fait le même type de procédure que l&apos;installation d&apos;une application native ou Firefox OS — en mettant l&apos;ensemble à disposition pour un usage déconnecté.</li>
+ <li>Lorsque le gestionnaire <code>oninstall</code> se termine, on considère que le service worker est installé.</li>
+ <li>L&apos;étape suivante est l&apos;activation. Lorsque le service worker est installé, il reçoit alors un événement activate. L&apos;utilité première de <code>onactivate</code> est de nettoyer les ressources utilisées dans les versions précédentes du script du Service Worker.</li>
+ <li>Le Service Worker contrôle désormais les pages, mais seulement celles ouvertes après que le <code>register()</code> ait réussi. Ainsi un document à sa création s&apos;accompagne ou non d&apos;un Service Worker et conserve cet état tout au long de sa durée de vie. Ainsi les documents devront être rechargés pour réellement être contrôlés.</li>
+</ol>
+
+<h3 id="Promesses">Promesses</h3>
+
+<p><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise">Les Promesses</a> sont un puissant mécanisme pour exécuter des opérations asynchrones, dont le succès de l&apos;une dépend du succès de l&apos;autre. Ce mécanisme est au coeur du fonctionnement des service workers.<br>
+ <br>
+ Les promesses peuvent effectuer bien des choses, mais pour le moment il suffit de savoir que si une promesse est retournée, on peut lui attacher un <code>.then()</code> et inclure des fonctions de rappel en cas de succès, d&apos;échec, etc., ou bien un <code>.catch()</code> et inclure une fonction de rappel en cas d&apos;échec.</p>
+
+<p>Comparons la structure d&apos;une fonction classique de rappel synchrone à la promesse asynchrone équivalente.</p>
+
+<h4 id="sync">sync</h4>
+
+<pre class="brush: js notranslate">try {
+  var value = myFunction();
+  console.log(value);
+} catch(err) {
+  console.log(err);
+}</pre>
+
+<h4 id="async">async</h4>
+
+<pre class="brush: js notranslate">myFunction().then(function(value) {
+  console.log(value);
+  }).catch(function(err) {
+  console.log(err);
+});</pre>
+
+<p>Dans le premier exemple, on doit attendre que l&apos;exécution de <code>myFunction()</code> retourne <code>value</code> avant de poursuivre l&apos;exécution de tout autre code. Dans le second exemple, <code>myFunction()</code> retourne une promesse pour <code>value</code>, ainsi le reste du code peut continuer à s&apos;exécuter. Lorsque la promesse est résolue, le code à l&apos;intérieur de <code>then</code> s&apos;exécutera, de manière asynchrone.<br>
+ <br>
+ Qu&apos;en est-il sur un exemple concret — qu&apos;en est-il si, lors d&apos;un chargement dynamique d&apos;images, on veut être sûre qu&apos;elles soient bien chargées avant de les afficher ? C&apos;est une démarche standard à adopter, mais parfois problématique. On peut utiliser <code>.onload</code> pour n&apos;afficher l&apos;image qu&apos;après qu&apos;elle soit chargée, mais qu&apos;en est-il des événements qui démarrent avant qu&apos;on ne commence à les écouter ? On pourrait essayer un contournement en utilisant <code>.complete</code>, mais ce n&apos;est toujours pas infaillible, et que faire en cas d&apos;images multiples ? Et, ummm, tout cela reste synchrone, et bloque donc le fil d&apos;exécution principal.<br>
+ <br>
+ Alternativement, on pourrait faire notre propre promesse pour gérer ce genre de cas. (Voir l&apos;exemple du <a href="https://github.com/mdn/promises-test">test de promesses</a> pour le code source, ou <a href="https://mdn.github.io/promises-test/">le voir fonctionner en direct</a>.)</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: la mise en place d&apos;un véritable service worker utiliserait la mise en cache et onfetch plutôt que l&apos;API obsolète XMLHttpRequest. Ces fonctionnalités ne sont pas utilisées ici afin de se concentrer sur la compréhension des promesses.</p>
+</div>
+
+<pre class="brush: js notranslate">function imgLoad(url) {
+  return new Promise(function(resolve, reject) {
+    var request = new XMLHttpRequest();
+    request.open(&apos;GET&apos;, url);
+    request.responseType = &apos;blob&apos;;
+
+    request.onload = function() {
+      if (request.status == 200) {
+        resolve(request.response);
+      } else {
+        reject(Error(&apos;Image didn\&apos;t load successfully; error code:&apos; + request.statusText));
+      }
+    };
+
+    request.onerror = function() {
+      reject(Error(&apos;There was a network error.&apos;));
+    };
+
+    request.send();
+  });
+}</pre>
+
+<p>On retourne une nouvelle promesse en utilisant le constructeur <code>Promise()</code>, qui prend en argument une fonction de rappel avec les paramètres <code>resolve</code> et <code>reject</code>. Quelque part dans la fonction, on a besoin de définir à quoi correspond pour la promesse d&apos;être résolue avec succès ou bien d&apos;être rejetée — dans ce cas, retourner un statut 200 OK status ou pas — et donc appleler <code>resolve</code> en cas de succès, ou <code>reject</code> en cas d&apos;échec. Le reste du contenu de cette fonction correspond à une utilisation plutôt classique d&apos;XHR, et n&apos;appelle pas de commentaires particuliers pour le moment.</p>
+
+<p>Lorsqu&apos;on appelle la fonction <code>imgLoad()</code>, on l&apos;appelle avec l&apos;url de l&apos;image à charger, comme on pourrait s&apos;en douter, mais le reste du code est un peu différent :</p>
+
+<pre class="brush: js notranslate">var body = document.querySelector(&apos;body&apos;);
+var myImage = new Image();
+
+imgLoad(&apos;myLittleVader.jpg&apos;).then(function(response) {
+  var imageURL = window.URL.createObjectURL(response);
+  myImage.src = imageURL;
+  body.appendChild(myImage);
+}, function(Error) {
+  console.log(Error);
+});</pre>
+
+<p>A la fin de l&apos;appel de la fonction, on ajoute la méthode <code>then()</code> de la promesse, qui contient deux fonctions — la première est exécutée lorsque la promesse est résolue avec succès, et la seconde est appelée lorsque la promesse est rejetée. Dans le cas d&apos;une résolution, on affiche l&apos;image dans : <code>myImage</code> et on l&apos;ajoute au <code>body</code> (son argument est la valeur <code>request.response</code> contenue dans la méthode <code>resolve</code> de la promesse); en cas de rejet, on retourne une erreur dans la console.</p>
+
+<p>Le tout se déroule de manière asynchrone.</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: il est possible d&apos;assembler des appels de promesse, par exemple:<br>
+ <code>myPromise().then(success, failure).then(success).catch(failure);</code></p>
+</div>
+
+<div class="note">
+<p><strong>Remarque </strong>: pour en savoir plus sur les promesses, consulter l&apos;excellent article de Jake Archibald <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">JavaScript Promises: there and back again</a>.</p>
+</div>
+
+<h2 id="Démo_de_service_workers">Démo de service workers</h2>
+
+<p>Pour illustrer quelques principes de base de l&apos;enregistrement et de l&apos;installation d&apos;un service worker, voici une simple démo appelée <a href="https://github.com/mdn/sw-test">sw-test</a>, qui présente juste une galerie d&apos;images Star wars Lego. Elle utilise une fonction pilotée par une promesse pour lire les données d&apos;une image à partir d&apos;un objet JSON et charger les images en utilisant Ajax, avant d&apos;afficher les images en bas de page. Les choses restent statiques et simples pour le moment. Elle enregistre aussi, installe et active un service worker, et lorsque la specification est davantage supportée par les navigateurs, elle met en cache tous les fichiers requis pour un fonctionnement déconnecté !</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/8243/demo-screenshot.png" style="display: block; height: 410px; margin: 0px auto; width: 480px;"><br>
+ <br>
+ <br>
+ Vous pouvez consulter le <a href="https://github.com/mdn/sw-test/">code source sur GitHub</a>, et <a href="https://mdn.github.io/sw-test/">voir l&apos;exemple en direct</a>. Le bout de code qui sera appelé est la promesse (voir <a href="https://github.com/mdn/sw-test/blob/gh-pages/app.js#L17-L42">app.js lines 17-42</a>), qui est une version modifiée du code présenté ci-dessus, dans la <a href="https://github.com/mdn/promises-test">démo du test de promesses</a>. Il en diffère de la façon suivante :</p>
+
+<ol>
+ <li>Dans l&apos;original, on considère l&apos;URL d&apos;une image à charger. Dans cette version, on passe un fragment JSON contenant toutes les données d&apos;une seule image (voir à quoi il ressemble dans <a href="https://github.com/mdn/sw-test/blob/gh-pages/image-list.js">image-list.js</a>). C&apos;est parce que toutes les données pour que chaque promesse soit résolue doivent être passé avec la promesse, que c&apos;est asynchrone. Si l&apos;on passe juste l&apos;url, et si l&apos;on essaie alors d&apos;accéder aux autres éléments dans le JSON séparément lorsqu&apos;on itère plus tard avec la boucle <code>for()</code>, cela ne marchera pas, puisque la promesse ne se résolvera pas en même temps que les itérations sont faites (c&apos;est un mécanisme synchrone.)</li>
+ <li>La promesse est résolue en réalité avec un tableau, puisqu&apos;on veut rendre le blob de l&apos;image chargée disponible à la fonction de résolution plus tard dans le code, mais aussi le nom de l&apos;image, les crédits et le texte alternatif (voir <a href="https://github.com/mdn/sw-test/blob/gh-pages/app.js#L26-L29">app.js lines 26-29</a>). Les promesses se résolvent seulement avec un seul argument, aussi si l&apos;on souhaite la résoudre avec des valeurs multiples, on a besoin d&apos;utiliser un tableau ou un objet.</li>
+ <li>Pour accéder aux valeurs de la promesse résolue, on accède alors à cette fonction comme on peut s&apos;y attendre (voir <a href="https://github.com/mdn/sw-test/blob/gh-pages/app.js#L55-L59">app.js lines 55-59</a>.) Cela peut sembler un peu étrange au premier abord, mais c&apos;est la manière dont les promesses fonctionnent.</li>
+</ol>
+
+<h2 id="Introduction_aux_service_workers">Introduction aux service workers</h2>
+
+<p>Maintenant, c&apos;est au tour des service workers !</p>
+
+<h3 id="Enregistrer_un_worker">Enregistrer un worker</h3>
+
+<p>Le premier bloc de code dans le fichier JavaScript de l&apos;application — <code>app.js</code> — se présente comme suit. C&apos;est le point d&apos;entrée pour utiliser des service workers.</p>
+
+<pre class="brush: js notranslate">if (&apos;serviceWorker&apos; in navigator) {
+  navigator.serviceWorker.register(&apos;/sw-test/sw.js&apos;, { scope: &apos;/sw-test/&apos; }).then(function(reg) {
+    // registration worked
+    console.log(&apos;Registration succeeded. Scope is &apos; + reg.scope);
+  }).catch(function(error) {
+    // registration failed
+    console.log(&apos;Registration failed with &apos; + error);
+  });
+};</pre>
+
+<ol>
+ <li>Le bloc extérieur effectue un test de détection de fonctionnalité pour s&apos;assurer que les service workers sont supportés avant d&apos;essayer d&apos;en enregistrer un.</li>
+ <li>Ensuite, la fonction <a href="/fr/docs/Web/API/ServiceWorkerContainer/register"><code>ServiceWorkerContainer.register()</code></a> est utilisée pour enregistrer le service worker de ce site, qui est juste un fichier JavaScript présent au sein de notre application (à noter qu&apos;il s&apos;agit de l&apos;URL relative du fichier par rapport à l&apos;origine, et non seulement le fichier JS qui le référence.)</li>
+ <li>Le paramètre <code>scope</code> est optionnel, et peut être utilisé pour spécifier le sous-ensemble du contenu qui doit être soumis au contrôle du service worker. Dans ce cas, on a spécifié &apos;<code>/sw-test/&apos;</code>, ce qui signifie tous les contenus présents sous l&apos;origine de l&apos;application. S&apos;il n&apos;est pas précisé, il correspondra de toute façon par défaut à cette valeur; il a été explicitement spécifié ici à titre d&apos;illustration.</li>
+ <li>La fonction <code>.then()</code> de la promesse est utilisée pour chaîner un traitement en cas de succès à la structure de la promesse. Lorsque la promesse est résolue avec succès, le code qu&apos;elle contient est exécuté.</li>
+ <li>Finalement, une fonction <code>.catch()</code> est chaînée à la fin, qui s&apos;exécutera si la promesse est rejetée.</li>
+</ol>
+
+<p>A ce stade un service worker est enregistré, qui s&apos;exécute dans le contexte d&apos;un worker, et n&apos;a donc aucun accès au DOM. Le code s&apos;exécute ainsi dans le service worker, extérieurement aux pages normales dont il contrôle le chargement.<br>
+ <br>
+ Un seul service worker peut contrôler de nombreuses pages. Chaque fois qu&apos;une page au sein du scope est chargée, le service worker est installé et opère sur la page. Attention, il faut faire un usage prudent des variables globales dans le script du service worker : chaque page ne dispose pas de son propre et unique worker.</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: un service worker fonctionne comme un serveur proxy, permettant de modifier les requêtes et les réponses, de les remplacer par des éléments de son propre cache, et bien plus.</p>
+</div>
+
+<div class="note">
+<p><strong>Remarque </strong>: une chose importante à savoir au sujet des service workers est que si la détection de fonctionnalité est utilisée comme ci-dessus, les navigateurs qui ne supportent pas les service workers peuvent simplement utiliser l&apos;application de la manière normalement attendue. De plus, si vous utilisez AppCache et SW sur une page, les navigateurs qui ne supportent pas SW mais supportent AppCache l&apos;utiliseront, et les navigateurs qui supportent les deux ignoreront AppCache au profit de SW.</p>
+</div>
+
+<h4 id="Pourquoi_mon_service_worker_échoue_à_senregistrer">Pourquoi mon service worker échoue à s&apos;enregistrer ?</h4>
+
+<p>Ce pourrait être pour les raisons suivantes :</p>
+
+<ol>
+ <li>L&apos;application ne fonctionne pas au travers d&apos;HTTPS</li>
+ <li>Le chemin du fichier du service worker file est syntaxiquement incorrect — il a besoin d&apos;être exprimé relativement à l&apos;origine, et non pas par rapport au répertoire racine. Dans l&apos;exemple, le worker a comme emplacement <code>https://mdn.github.io/sw-test/sw.js</code>, et la racine de l&apos;application est <code>https://mdn.github.io/sw-test/</code>. Mais la syntaxe du chemin s&apos;écrit <code>/sw-test/sw.js</code>, <code>et non /sw.js</code>.</li>
+ <li>Le service worker considéré se trouve sur une origine différente de celle de l&apos;application. Ce qui n&apos;est pas permis.</li>
+</ol>
+
+<h3 id="Installer_et_activer_remplir_le_cache">Installer et activer : remplir le cache</h3>
+
+<p>Après l&apos;enregistrement du service worker, le navigateur tente d&apos;installer puis d&apos;activer le service worker sur la page ou le site.<br>
+ <br>
+ L&apos;événement install est déclenché lorsqu&apos;une installation se termine avec succès. L&apos;événement install est généralement utilisé pour remplir le cache local du navigateur avec les ressources nécessitées pour faire fonctionner l&apos;application en mode déconnecté. A cet effet, la toute nouvelle API de stockage est utilisée — <a href="/fr/docs/Web/API/Cache"><code>cache</code></a> — un espace global au niveau du service worker qui permet de stocker les ressources fournies par les réponses, et indexées par leurs requêtes. Cette API fonctionne d&apos;une manière similaire au cache standard du navigateur, mais le cache demeure spécifique au domaine. Il persiste jusqu&apos;à ce qu&apos;il en soit décidé autrement — de nouveau, le contrôle reste total.</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: L&apos;API Cache n&apos;est pas supportée par tous les navigateurs. (Voir la section <a href="#Compatibilité_des_navigateurs">Compatibilité des navigateurs</a> pour plus d&apos;informations.) Pour l&apos;utiliser à l&apos;heure actuelle, on peut envisager un polyfill comme celui fournit par la <a href="https://github.com/Polymer/topeka/blob/master/sw.js">démo Topeka de Google</a>, ou peut-être stocker les ressources dans <a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a>.</p>
+</div>
+
+<p>Commençons cette section par l&apos;examen d&apos;un exemple de code — c&apos;est le <a href="https://github.com/mdn/sw-test/blob/gh-pages/sw.js#L1-L18">premier bloc présent dans le service worker</a>:</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;install&apos;, function(event) {
+  event.waitUntil(
+    caches.open(&apos;v1&apos;).then(function(cache) {
+      return cache.addAll([
+        &apos;/sw-test/&apos;,
+        &apos;/sw-test/index.html&apos;,
+        &apos;/sw-test/style.css&apos;,
+        &apos;/sw-test/app.js&apos;,
+        &apos;/sw-test/image-list.js&apos;,
+        &apos;/sw-test/star-wars-logo.jpg&apos;,
+        &apos;/sw-test/gallery/&apos;,
+        &apos;/sw-test/gallery/bountyHunters.jpg&apos;,
+        &apos;/sw-test/gallery/myLittleVader.jpg&apos;,
+        &apos;/sw-test/gallery/snowTroopers.jpg&apos;
+      ]);
+    })
+  );
+});</pre>
+
+<ol>
+ <li>Un écouteur d&apos;événement <code>install</code> est d&apos;abord ajouté au service worker (d&apos;où le  <code>this</code>), puis une méthode <a href="/fr/docs/Web/API/ExtendableEvent/waitUntil"><code>ExtendableEvent.waitUntil()</code></a> est chaînée à l&apos;événement — cela garantit que le Service Worker ne s&apos;installera pas tant que le code à l&apos;intérieur de <code>waitUntil()</code> n&apos;a pas été exécuté avec succès.</li>
+ <li>A l&apos;intérieur de <code>waitUntil()</code> la méthode <a href="/en-US/docs/Web/API/CacheStorage/open"><code>caches.open()</code></a> est utilisée pour créer un nouveau cache appelé <code>v1</code>, ce qui constitue la version 1 du cache de ressources de notre site. Cette fonction retourne une promesse lorsque le cache est créé; une fois résolue, est appelée une fonction qui appelle elle-même <code>addAll()</code> sur le cache créé, avec pour paramètre un tableau d&apos;URLs relatives à l&apos;origine correspondant aux ressources à mettre en cache.</li>
+ <li>Si la promesse est rejetée, l&apos;installation échoue, et le worker ne fait rien de plus. Le code peut être alors corrigé et l&apos;opération retentée la prochaine fois que l&apos;enregistrement survient.</li>
+ <li>Après une installation couronnée de succès, le service worker est activé. Cela ne fait pas une grande différence  la première fois que le service worker est installé/activé, mais cela fait plus sens lorsque le service worker est mis à jour (voir la section <a href="#Updating_your_service_worker">Updating your service worker</a> plus bas.)</li>
+</ol>
+
+<div class="note">
+<p><strong>Remarque </strong>: <a href="/fr/docs/Web/API/Web_Storage_API">localStorage</a> fonctionne de la même façon que le cache du service worker, mais de manière synchrone, et il n&apos;est donc pas autorisé dans les service workers.</p>
+</div>
+
+<div class="note">
+<p><strong>Remarque </strong>: <a href="/fr/docs/Web/API/API_IndexedDB">IndexedDB</a> peut être utilisé dans un service worker pour le stockage des donnés si nécessaire.</p>
+</div>
+
+<h3 id="Réponses_personnalisées_aux_requêtes">Réponses personnalisées aux requêtes</h3>
+
+<p>Une fois que les ressources du site sont mise en cache, les service workers doivent savoir quoi faire de ce contenu en cache. L&apos;événement <code>fetch</code> permet de gérer cela facilement.</p>
+
+<p>Un événement <code>fetch</code> se déclenche à chaque fois qu&apos;une ressource contrôlée par un service worker est retournée, ce qui inclut les documents à l&apos;intérieur du contour spécifié, et toute ressource référencée dans ces documents (par exemple <code>si index.html</code> effectue une requête vers un autre domaine pour l&apos;insertion d&apos;une image, cela se fait encore au travers de son service worker.)</p>
+
+<p>On peut attacher un écouteur de l&apos;événement <code>fetch</code> au service worker, puis appeler la méthode <code>respondWith()</code> sur l&apos;événement pour détourner les réponses HTTP et les mettre à jour en leur jetant un sort particulier.</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  event.respondWith(
+    // la magie opère ici
+  );
+});</pre>
+
+<p>On peut déjà simplement répondre avec la ressource en cache dont l&apos;url correspond à celle de la requête réseau, dans chaque cas :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  event.respondWith(
+    caches.match(event.request)
+  );
+});</pre>
+
+<p><code>caches.match(event.request)</code> permet de mettre en correspondance chaque ressource demandée sur le réseau avec la ressource équivalente en cache, si elle se trouve être disponible. La comparaison est effectuée via l&apos;url et diverses en-têtes, comme habituellement avec des requêtes HTTP normales.</p>
+
+<p>Voici quelques autres options disponibles pour que la magie opère (voir la <a href="/fr/docs/Web/API/Fetch_API">documentation de l&apos;API Fetch </a>pour plus d&apos;informations sur les objets <a href="/fr/docs/Web/API/Request"><code>Request</code></a> et <a href="/fr/docs/Web/API/Response"><code>Response</code></a>.)</p>
+
+<ol>
+ <li>
+  <p>Le constructeur <code><a href="/fr/docs/Web/API/Response/Response"><code>Response()</code></a></code> permet de créer une réponse personnalisée. Dans cet exemple, une chaîne de caractères est simplement retournée :</p>
+
+  <pre class="brush: js notranslate">new Response(&apos;Hello from your friendly neighbourhood service worker!&apos;);</pre>
+ </li>
+ <li>
+  <p>La <code>Response</code> plus complexe ci-dessous montre qu&apos;il est possible de passer optionnellement un ensemble d&apos;en-têtes avec la réponse, émulant ainsi des en-têtes de réponse HTTP standards. Ici, on signale au navigateur quel est le type de contenu de notre réponse artificielle :</p>
+
+  <pre class="brush: js notranslate">new Response(&apos;&lt;p&gt;Hello from your friendly neighbourhood service worker!&lt;/p&gt;&apos;, {
+  headers: { &apos;Content-Type&apos;: &apos;text/html&apos; }
+})</pre>
+ </li>
+ <li>
+  <p>Si une correspondance n&apos;est pas trouvée en cache, on peut indiquer simplement au navigateur d&apos;effectuer (<a href="/fr/docs/Web/API/GlobalFetch/fetch"><code>fetch</code></a>) la requête réseau par défaut pour cette ressource, afin de récupérer cette nouvelle ressource sur le réseau si disponible :</p>
+
+  <pre class="brush: js notranslate">fetch(event.request)</pre>
+ </li>
+ <li>
+  <p>Si une correspondance n&apos;est pas trouvée en cache et que le réseau n&apos;est pas disponible, on peut alors faire correspondre la requête avec une page de rechange par défaut en guise de réponse en utilisant <a href="/fr/docs/Web/API/CacheStorage/match"><code>match()</code></a>, comme suit :</p>
+
+  <pre class="brush: js notranslate">caches.match(&apos;/fallback.html&apos;);</pre>
+ </li>
+ <li>
+  <p>On peut récupérer beaucoup d&apos;informations à propos de chaque requête en interrogeant les paramètres de l&apos;objet <a href="/fr/docs/Web/API/Request"><code>Request</code></a> retourné par <a href="/fr/docs/Web/API/FetchEvent"><code>FetchEvent</code></a> :</p>
+
+  <pre class="brush: js notranslate">event.request.url
+event.request.method
+event.request.headers
+event.request.body</pre>
+ </li>
+</ol>
+
+<h2 id="Récupérer_des_requêtes_en_erreur">Récupérer des requêtes en erreur</h2>
+
+<p>On vient de voir que <code>caches.match(event.request)</code> est important lorsqu&apos;il y a correspondance avec le cache du service worker, mais qu&apos;en est-il des cas où rien ne correspond ? Si aucune sorte de gestionnaire d&apos;erreur n&apos;est fourni, la promesse est rejetée et une erreur réseau est retournée lorsqu&apos;aucune correspondance n&apos;est trouvée.</p>
+
+<p>Heureusement, la structure des service workers qui repose sur les promesses rend trivial la gestion des alternatives à une situation de succès. On pourrait faire ceci :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  event.respondWith(
+    caches.match(event.request).catch(function() {
+      return fetch(event.request);
+    })
+  );
+});</pre>
+
+<p>Si la promesse est rejetée, la fonction <code>catch()</code> retourne à la place la requête réseau par défaut, ce qui signifie que si le réseau est disponible la ressource sera chargée à partir du serveur.</p>
+
+<p>Plus malin encore, on pourrait non seulement récupérer la ressource à partir du serveur, mais aussi la sauvegarder dans le cache afin que les requêtes ultérieures pour cette ressource puissent être disponibles aussi en mode déconnecté. Cela signifierait que toute image supplémentaire ajoutée à la galerie Star Wars pourrait être récupérée par l&apos;application et mise en cache. Le code suivant illustre ce mécanisme :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  event.respondWith(
+    caches.match(event.request).catch(function() {
+      return fetch(event.request).then(function(response) {
+        return caches.open(&apos;v1&apos;).then(function(cache) {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      });
+    })
+  );
+});</pre>
+
+<p>Ici on retourne la requête réseau par défaut au moyen de <code>return fetch(event.request)</code>, qui retourne lui-même une promesse. Lorsque cette promesse est résolue, on exécute une fonction qui sollicite le cache en utilisant <code>caches.open(&apos;v1&apos;)</code>; une promesse est de nouveau retournée. Lorsque cette promesse est résolue, <code>cache.put()</code> est utilisée pour ajouter la ressource au cache. La ressource est récupérée à partir de <code>event.request</code>, et la réponse est alors clonée avec <code>response.clone()</code> et ajoutée au cache. Le clone est placé dans le cache, et la réponse originale est retournée au navigateur et délivrée à la page qui la requiert.</p>
+
+<p>Pourquoi un clone ? Il se trouve que les flux de requête et de réponse peuvent seulement être lus une fois.  Afin de retourner la réponse au navigateur et de la mettre en cache, elle doit être clonée. Aussi, l&apos;original est retourné au navigateur tandis que le clone est envoyé dans le cache. Ils sont chacun lus une seule fois.</p>
+
+<p>Le dernier problème qui demeure alors est l&apos;échec de la requête au cas où elle n&apos;a aucune correspondance dans le cache et que le réseau n&apos;est pas disponible. Fournir un document de rechange par défaut permet quoiqu&apos;il arrive, à l&apos;utilisateur de récupérer quelque chose :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  event.respondWith(
+    caches.match(event.request).catch(function() {
+      return fetch(event.request).then(function(response) {
+        return caches.open(&apos;v1&apos;).then(function(cache) {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      });
+    }).catch(function() {
+      return caches.match(&apos;/sw-test/gallery/myLittleVader.jpg&apos;);
+    })
+  );
+});</pre>
+
+<p>Une image de rechange a été choisie parce que les seules mises à jour susceptibles d&apos;échouer sont les nouvelles images, puisque tous les autres éléments dépendent de l&apos;installation comme vu précédemment dans la description de l&apos;écouteur de l&apos;événement <code>install</code>.</p>
+
+<h2 id="Suggestion_damélioration_dun_modèle_de_code">Suggestion d&apos;amélioration d&apos;un modèle de code</h2>
+
+<p>Ce code utilise un chaînage de promesses plus standard et retourne la réponse au document sans avoir à attendre que <code>caches.open()</code> soit résolue :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;fetch&apos;, function(event) {
+  var response;
+  event.respondWith(caches.match(event.request).catch(function() {
+    return fetch(event.request);
+  }).then(function(r) {
+    response = r;
+    caches.open(&apos;v1&apos;).then(function(cache) {
+      cache.put(event.request, response);
+    });
+    return response.clone();
+  }).catch(function() {
+    return caches.match(&apos;/sw-test/gallery/myLittleVader.jpg&apos;);
+  }));
+});</pre>
+
+<h2 id="Mettre_à_jour_le_service_worker"><a id="Updating your service worker" name="Updating your service worker">Mettre à jour le service worker</a></h2>
+
+<p>Si le service worker a été précédemment installé, et qu&apos;une nouvelle version du worker est disponible au chargement ou au rafraîchissement de la page, la nouvelle version est installée en arrière-plan, mais pas encore activée. Elle ne sera activé que lorsqu&apos;il n&apos;y aura plus aucune page chargée qui utilise encore l&apos;ancien service worker. Dès lors qu&apos;il n&apos;y a plus de telles pages encore chargées, le nouveau service worker est activé.</p>
+
+<p>On souhaite mettre à jour l&apos;écouteur d&apos;événement <code>install</code> dans le nouveau service worker de la façon suivante (à noter le nouveau numéro de version) :</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;install&apos;, function(event) {
+  event.waitUntil(
+    caches.open(&apos;v2&apos;).then(function(cache) {
+      return cache.addAll([
+        &apos;/sw-test/&apos;,
+        &apos;/sw-test/index.html&apos;,
+        &apos;/sw-test/style.css&apos;,
+        &apos;/sw-test/app.js&apos;,
+        &apos;/sw-test/image-list.js&apos;,
+
+             …
+
+              // include other new resources for the new version...
+      ]);
+    });
+  );
+});</pre>
+
+<p>Tandis que la mise à jour se produit, la version précédente est encore en charge de récupérer des ressources. La nouvelle version est installée en arrière-plan. Le nouveau cache se nomme v2, et ainsi ne perturbe en rien le précédent cache nommé v1.</p>
+
+<p>Lorsque plus aucune page n&apos;utilise la version actuelle, le nouveau worker est activé et prend en charge les requêtes.</p>
+
+<h3 id="Supprimer_les_anciens_caches">Supprimer les anciens caches</h3>
+
+<p>Il existe un événement <code>activate</code>. Il est généralement utilisé pour faire un travail qui aurait interrompu le fonctionnement d&apos;une version précédente alors qu&apos;elle était encore en cours d&apos;utilisation, comme par exemple se débarrasser des anciens caches. Il est aussi utile pour supprimer des données qui ne sont plus nécessaires afin d&apos;éviter de surcharger l&apos;espace disque — chaque navigateur dispose d&apos;une limite physique quant à la capacité de stockage en cache dont le service worker peut bénéficier. Le navigateur gère au mieux l&apos;espace disque, mais il peut supprimer le stockage du Cache pour une origine. Le navigateur supprimera généralement toutes les données d&apos;une origine ou bien aucune.</p>
+
+<p>Les promesses passées à <code>waitUntil()</code> bloqueront les autres événements jusqu&apos;à réalisation complète, ainsi on a l&apos;assurance que l&apos;opération de nettoyage aura été menée à terme au moment où surviendra le premier événement <code>fetch</code> du nouveau cache.</p>
+
+<pre class="brush: js notranslate">this.addEventListener(&apos;activate&apos;, function(event) {
+  var cacheWhitelist = [&apos;v2&apos;];
+
+  event.waitUntil(
+    caches.keys().then(function(keyList) {
+      return Promise.all(keyList.map(function(key) {
+        if (cacheWhitelist.indexOf(key) === -1) {
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
+});</pre>
+
+<h2 id="Outils_de_développement">Outils de développement</h2>
+
+<p>Chrome dispose de <code>chrome://inspect/#service-workers</code>, qui montre l&apos;activité du service worker courant et le stockage sur l&apos;appareil, et <code>chrome://serviceworker-internals</code>, qui offre plus de détails et permet de démarrer/arrêter/déboguer le processus du worker. A l&apos;avenir, des modes dégradé/déconnecté seront ajoutés pour simuler des connexions mauvaises ou inexistantes, ce qui sera une bonne chose.</p>
+
+<p>Firefox a aussi commencé à implanter quelques outils utiles concernant les service workers :</p>
+
+<ul>
+ <li>Consulter <a>about:serviceworkers</a> pour voir quels SWs sont enregistrés et les mettre à jour ou les supprimer.</li>
+ <li>Lors de tests, il est possible de contourner la restriction HTTPS en cochant l&apos;option &quot;Activer les Service Workers via HTTP (lorsque la boîte à outils est ouverte)&quot; dans les options des outils de développement de Firefox (la roue dentée dans le menu.)</li>
+</ul>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/ServiceWorker/" hreflang="en" lang="en" title="La spécificaction &apos;Service Workers&apos;">Service Workers</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale .</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>40.0</td>
+   <td><a href="/en-US/Firefox/Releases/33" title="Sorti le 2014-10-14.">33.0</a> (33.0)</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>24</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>40.0</td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="https://jakearchibald.github.io/isserviceworkerready/">Is ServiceWorker ready?</a></li>
+ <li><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a></li>
+ <li><a href="/en-US/docs/Web/Guide/Performance/Using_web_workers">Using web workers</a></li>
+</ul>

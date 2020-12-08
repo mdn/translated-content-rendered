@@ -1,0 +1,205 @@
+---
+title: L'API de périphérique WebXR
+slug: Web/API/WebXR_Device_API
+tags:
+  - API
+  - AR
+  - Réalité augmentée
+  - Réalité virtuelle
+  - VR
+  - WebXR
+  - WebXR API
+translation_of: Web/API/WebXR_Device_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/WebXR_Device_API">WebXR Device API</a></strong></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/XR"><code>XR</code></a></li><li><a href="/fr/docs/Web/API/XRBoundedReferenceSpace"><code>XRBoundedReferenceSpace</code></a></li><li><a href="/fr/docs/Web/API/XRFrame"><code>XRFrame</code></a></li><li><a href="/fr/docs/Web/API/XRInputSource"><code>XRInputSource</code></a></li><li><a href="/fr/docs/Web/API/XRInputSourceArray"><code>XRInputSourceArray</code></a></li><li><a href="/fr/docs/Web/API/XRInputSourceEvent"><code>XRInputSourceEvent</code></a></li><li><a href="/fr/docs/Web/API/XRInputSourcesChangeEvent"><code>XRInputSourcesChangeEvent</code></a></li><li><a href="/fr/docs/Web/API/XRPose"><code>XRPose</code></a></li><li><a href="/fr/docs/Web/API/XRReferenceSpace"><code>XRReferenceSpace</code></a></li><li><a href="/fr/docs/Web/API/XRReferenceSpaceEvent"><code>XRReferenceSpaceEvent</code></a></li><li><a href="/fr/docs/Web/API/XRRenderState"><code>XRRenderState</code></a></li><li><a href="/fr/docs/Web/API/XRRigidTransform"><code>XRRigidTransform</code></a></li><li><a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a></li><li><a href="/fr/docs/Web/API/XRSessionEvent"><code>XRSessionEvent</code></a></li><li><a href="/fr/docs/Web/API/XRSpace"><code>XRSpace</code></a></li><li><a href="/fr/docs/Web/API/XRView"><code>XRView</code></a></li><li><a href="/fr/docs/Web/API/XRViewerPose"><code>XRViewerPose</code></a></li><li><a href="/fr/docs/Web/API/XRViewport"><code>XRViewport</code></a></li><li><a href="/fr/docs/Web/API/XRWebGLLayer"><code>XRWebGLLayer</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/Navigator/xr"><code>Navigator.xr</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/WebGLRenderingContext/makeXRCompatible"><code>WebGLRenderingContext.makeXRCompatible()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/XR/devicechange_event"><code>XR</code>: <code>devicechange</code></a></li><li><a href="/fr/docs/Web/API/XRReferenceSpace/reset_event"><code>XRReferenceSpace</code>: <code>reset</code></a></li><li><a href="/fr/docs/Web/API/XRSession/end_event"><code>XRSession</code>: <code>end</code></a></li><li><a href="/fr/docs/Web/API/XRSession/inputsourceschange_event"><code>XRSession</code>: <code>inputsourceschange</code></a></li><li><a href="/fr/docs/Web/API/XRSession/select_event"><code>XRSession</code>: <code>select</code></a></li><li><a href="/fr/docs/Web/API/XRSession/selectend_event"><code>XRSession</code>: <code>selectend</code></a></li><li><a href="/fr/docs/Web/API/XRSession/selectstart_event"><code>XRSession</code>: <code>selectstart</code></a></li><li><a href="/fr/docs/Web/API/XRSession/visibilitychange_event"><code>XRSession</code>: <code>visibilitychange</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary"><strong>WebXR</strong> est un ensemble de standards utilisés pour supporter le rendu de scènes 3D vers du matériel conçu pour présenter des mondes virtuels (<strong>Réalité Virtuelle</strong>, ou <strong>VR</strong>), ou pour ajouter des contenus graphiques dans le monde réel, (<strong>Réalité Augmentée</strong>, ou <strong>AR</strong>).</span> L&apos;<strong>API de périphérique WebXR </strong>implémente le coeur des fonctionnalités WebXR, gère la sélection de périphériques de sortie, affiche la scène 3D sur le périphérique choisi à la fréquence d&apos;images appropriée, et gère les vecteurs de mouvement créés en utilisant les contrôleurs d&apos;entrée.</p>
+
+<p>Les périphèriques compatibles WebXR comprennent les casques 3D entièrement immersifs avec le suivi du mouvement et de l&apos;orientation, les lunettes qui supperposent des contenus graphiques par dessus la scène du monde réel au travers des images, et les smartphones qui augmentent la realité en capturant le monde via une camera et en qui augmentent la scène avec des images générées par ordinateur.</p>
+
+<p>Pour accomplir toutes ces choses, l&apos;API de périphériques WebXR fournit les fonctionnalités clés suivantes:</p>
+
+<ul>
+ <li>Trouver un périphérique de sortie VR ou AR compatible</li>
+ <li>Afficher une scène 3D sur le périphérique à la fréquence d&apos;images appropriée</li>
+ <li>(Optionellement) refléter la sortie sur un affichage 2D</li>
+ <li>Créer des vecteurs représentant les mouvements des commandes d&apos;entrée</li>
+</ul>
+
+<p>Au niveau le plus basique, une scène est présentée en 3D en calculant la perspective à appliquer à la scène dans le but de l&apos;afficher du point de vue de chacun des yeux de l&apos;utilisateur en calculant la position de chaque oeil et en affichant la scène de cette position, regardant dans la même direction que l&apos;utilisateur. Ces deux images sont conçuent à l&apos;intérieur d&apos;une seule mémoire tampon, avec l&apos;image de rendu pour l&apos;oeil gauche dans la partie gauche et l&apos;image de rendu de l&apos;oeil droit dans la partie droite de la mémoire tampon. Une fois que les perspectives des deux yeux sur la scène ont été conçues, la mémoire résultante est délivrée au périphérique WebXR pour être présentée à l&apos;utilisateur via son casque ou tout autre périphérique d&apos;affichage approprié.</p>
+
+<h2 id="Les_concepts_et_lutilisation_des_périphériques_WebXR">Les concepts et l&apos;utilisation des périphériques WebXR</h2>
+
+<figure style="background: #eee; padding: 0.5em; border: 1px solid #aaa; border-radius: 1em; max-width: 20em; margin-bottom: 1em; margin-right: 2em; float: left;">
+<figcaption><strong>Exemple de configuration matérielle WebXR</strong></figcaption>
+<img alt="Sketch of a person in a chair with wearing goggles labelled &quot;Head mounted display (HMD)&quot; facing a monitor with a webcam labeled &quot;Position sensor&quot;" src="https://mdn.mozillademos.org/files/11035/hw-setup.png"></figure>
+
+<p>Alors que l&apos;ancienne <a href="/en-US/docs/Web/API/WebVR_API">WebVR API</a> avait été conçue uniquement pour le support de la réalité virtuelle (VR), l&apos;API WebXR supporte à la fois la VR et la réalité augmentée (AR) sur le web. Le support pour la fonctionnalité de réalité augmentée est ajouté par le module WebXR Augmented Reality.</p>
+
+<p>Un périphérique XR typique peut avoir aussi bien 3 que 6 degrés de liberté et peut ou non posséder un capteur de position externe.</p>
+
+<p>L&apos;équipement peut également inclure un accéléromètre, un baromètre, ou d&apos;autres capteurs qui sont utilisés pour détecter lorsque l&apos;utilisateur se déplace dans l&apos;espace, tourne sa tête, ou similaires.</p>
+
+<h2 id="Accéder_à_lAPI_WebXR">Accéder à l&apos;API WebXR</h2>
+
+<p>Pour accéder à l&apos;API WebXR à l&apos;intérieur du contexte d&apos;une fenêtre donnée, utiliser la propriété <a href="/fr/docs/Web/API/Navigator/xr"><code>navigator.xr</code></a>, qui retourne un objet <a href="/fr/docs/Web/API/XRSystem"><code>XRSystem</code></a> au travers duquel toute l&apos;API de périphérique WebXR Device API est alors exposée.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/Navigator/xr"><code>navigator.xr</code></a> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></dt>
+ <dd>Cette propriété, ajoutée à l&apos;interface <a href="/fr/docs/Web/API/Navigator"><code>Navigator</code></a>, retourne l&apos;objet  <a href="/fr/docs/Web/API/XRSystem"><code>XRSystem</code></a> au travers duquel l&apos;API WebXR est exposée. Si cette propriété est missing ou <code>null</code>, WebXR n&apos;est pas disponible.</dd>
+</dl>
+
+<h2 id="Les_interfaces_WebXR">Les interfaces WebXR</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/XRSystem"><code>XRSystem</code></a></dt>
+ <dd>La propriété <a href="/fr/docs/Web/API/Navigator/xr"><code>navigator.xr</code></a> retourne l&apos;instance de la fenêtre de <a href="/fr/docs/Web/API/XRSystem"><code>XRSystem</code></a>, qui est le mécanisme par lequel votre code acède à l&apos;API WebXR. En utilisant l&apos;interface <code>XRSystem</code>, vous pouvez créer <a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a> pour représenter les sessions AR et/ou VR actuelles.</dd>
+ <dt><a href="/fr/docs/Web/API/XRFrame"><code>XRFrame</code></a></dt>
+ <dd>Lors de la présentation d&apos;une session XR, l&apos;état de tous les objets suivis qui composent la session sont représentés par une <code>XRFrame</code>. Pour obtenir un <code>XRFrame</code>, appeler la méthode <a href="/fr/docs/Web/API/XRSession/requestAnimationFrame"><code>requestAnimationFrame()</code></a> de la session, en fournissant un callback qui sera appelé avec le <code>XRFrame</code> une fois disponible. Les événements qui communiquent avec des états de suivi utiliseront aussi <code>XRFrame</code> pour contenir ces informations.</dd>
+ <dt><a href="/fr/docs/Web/API/XRRenderState"><code>XRRenderState</code></a></dt>
+ <dd>Fournis un ensemble de propriétés configurables qui changent la façon dont les images produites par une <code>XRSession</code> sont composées.</dd>
+ <dt><a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a></dt>
+ <dd>Fournit l&apos;interface pour interagir avec le matériel XR. Une fois que la <code>XRSession</code> est obtenue depuis <a href="/fr/docs/Web/API/XRSystem/requestSession"><code>navigator.xr.requestSession()</code></a>, la session peut être utilisée pour vérifier la position et l&apos;orientation du visualiseur, interroger le périphérique pour obtenir des informations sur l&apos;environnement, et présenter le monde virtuel ou augmenté à l&apos;utilisateur.</dd>
+ <dt><a href="/fr/docs/Web/API/XRSpace"><code>XRSpace</code></a></dt>
+ <dd><code>XRSpace</code> est une classe de base opaque sur laquelle toutes les interfaces de système de coordonnées virtuelles sont basées. Les positions dans WebXR sotn toujours exprimées par rapport à un <code>XRSpace</code> particulier au moment où un <a href="/fr/docs/Web/API/XRFrame"><code>XRFrame</code></a> a lieu. Ce système de coordonnées dans l&apos;espace a son origine à une position physique donnée.</dd>
+ <dt><a href="/fr/docs/Web/API/XRReferenceSpace"><code>XRReferenceSpace</code></a></dt>
+ <dd>Une sous classe de <a href="/fr/docs/Web/API/XRSpace"><code>XRSpace</code></a> qui est utilisée pour identifier une relation spatiale en relation avec l&apos;environnement physique de l&apos;utilisateur. Le système de coordonées <code>XRReferenceSpace</code> devrait rester inchangé pendant toute la durée de vie du <a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a>. Le monde n&apos;a pas de frontières et s&apos;étend infiniment dans toutes les directions.</dd>
+ <dt><a href="/fr/docs/Web/API/XRBoundedReferenceSpace"><code>XRBoundedReferenceSpace</code></a></dt>
+ <dd><code>XRBoundedReferenceSpace</code> étend le système de coordonées <a href="/fr/docs/Web/API/XRReferenceSpace"><code>XRReferenceSpace</code></a> pour inclure en plus la prise en charge d&apos;un monde aux limites définies. Contrairement à <code>XRReferenceSpace</code>, l&apos;origine doit être localisée au niveau du sol (c&apos;est à dire <em>y</em> = 0). Les composantes x et z de l&apos;origine sont présumées être localisées au centre ou à proximité du centre de la pièce ou de la surface.</dd>
+ <dt><a href="/fr/docs/Web/API/XRView"><code>XRView</code></a></dt>
+ <dd>Représente une vue unique dans la scène XR pour une image particulière. Chaque XRView correspond à la surface d&apos;affichage vidéo utilisée pour présenter la scène à l&apos;utilisateur. Par exemple, un appareil XR donné peut avoir deux vues: une pour l&apos;œil gauche et une pour la droite. Chaque vue a un décalage utilisé pour déplacer la position de la vue par rapport à la caméra, afin de permettre la création d&apos;effets stéréographiques.</dd>
+ <dt><a href="/fr/docs/Web/API/XRViewport"><code>XRViewport</code></a></dt>
+ <dd>Décrit un viewport. Un viewport est une partie rectangulaire d&apos;une surface graphique. Dans WebXR, un viewport représente la zone d&apos;une surface de dessin correspondant à un <a href="/fr/docs/Web/API/XRView"><code>XRView</code></a> particulier, tel que la partie de l&apos;image tampon WebGL utilisée pour rendre l&apos;une des perspectives des deux yeux sur la scène.</dd>
+ <dt><a href="/fr/docs/Web/API/XRRigidTransform"><code>XRRigidTransform</code></a></dt>
+ <dd>Une transformation définie en utilisant une position et une orientation dans le système de coordonnées de l&apos;espace virtuel comme décrit par le <a href="/fr/docs/Web/API/XRSpace"><code>XRSpace</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/XRPose"><code>XRPose</code></a></dt>
+ <dd>Décrit une position et une orientation dans l&apos;espace par rapport à un <a href="/fr/docs/Web/API/XRSpace"><code>XRSpace</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/XRViewerPose"><code>XRViewerPose</code></a></dt>
+ <dd>Basé sur <a href="/fr/docs/Web/API/XRPose"><code>XRPose</code></a>, <code>XRViewerPose</code> spécifie l&apos;état d&apos;un spectateur de la scène WebXR comme indiqué par le périphérique XR. Un tableau d&apos;objets <a href="/fr/docs/Web/API/XRView"><code>XRView</code></a> est inclus, chacun représentant une perspective de la scène. Par exemple, il faut deux vues pour créer la vue stéréoscopique telle que perçue par la vision humaine: une pour l&apos;œil gauche et une seconde pour l&apos;œil droit. Une vue est légèrement décalée vers la gauche par rapport à la position du visualiseur et l&apos;autre vue est décalée vers la droite de la même distance. La liste de vues peut également être utilisée pour représenter les perspectives de chacun des spectateurs d&apos;une scène, dans un environnement multi-utilisateurs.</dd>
+ <dt><a href="/fr/docs/Web/API/XRInputSource"><code>XRInputSource</code></a></dt>
+ <dd>Représente tout périphérique d&apos;entrée que l&apos;utilisateur peut utiliser pour effectuer des actions ciblées dans le même espace virtuel que le visualiseur. Les sources d&apos;entrée peuvent inclure des dispositifs tels que des contrôleurs manuels, des systèmes de suivi optique et d&apos;autres dispositifs explicitement associés au dispositif XR. Les autres périphériques d&apos;entrée tels que les claviers, les souris et les manettes de jeu ne sont pas présentés comme des instances <code>XRInputSource</code>.</dd>
+ <dt><a href="/fr/docs/Web/API/XRWebGLLayer"><code>XRWebGLLayer</code></a></dt>
+ <dd>Une couche qui sert de tampon d&apos;image <a href="/en-US/docs/Web/API/WebGL_API">WebGL</a> dans lequel la vue d&apos;une scène est rendue. L&apos;utilisation de WebGL pour afficher la scène offre des avantages de performances substantiels grâce à l&apos;accélération graphique.</dd>
+</dl>
+
+<h3 id="Interfaces_événementielles">Interfaces événementielles</h3>
+
+<p>Les interfaces suivantes sont utilisées pour représenter les événements utilisés par l&apos;API WebXR.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/XRInputSourceEvent"><code>XRInputSourceEvent</code></a></dt>
+ <dd>Envoyé lorsque l&apos;état d&apos;un <a href="/fr/docs/Web/API/XRInputSource"><code>XRInputSource</code></a> change. Cela peut se produire, par exemple, lorsque la position et/ou l&apos;orientation de l&apos;appareil change, ou lorsque des boutons sont enfoncés ou relâchés.</dd>
+ <dt><a href="/fr/docs/Web/API/XRInputSourcesChangeEvent"><code>XRInputSourcesChangeEvent</code></a></dt>
+ <dd>Envoyé pour indiquer que l&apos;ensemble des sources d&apos;entrée disponibles a changé pour le <a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/XRReferenceSpaceEvent"><code>XRReferenceSpaceEvent</code></a></dt>
+ <dd>Envoyé lorsque l&apos;état d&apos;un <a href="/fr/docs/Web/API/XRReferenceSpace"><code>XRReferenceSpace</code></a> change.</dd>
+ <dt><a href="/fr/docs/Web/API/XRSessionEvent"><code>XRSessionEvent</code></a></dt>
+ <dd>Envoyé pour indiquer que l&apos;état d&apos;un <a href="/fr/docs/Web/API/XRSession"><code>XRSession</code></a> a changé. <s>Par exemple, si la position et/ou l&apos;orientation </s></dd>
+</dl>
+
+<h2 id="Extensions_de_lAPI_WebGL">Extensions de l&apos;API WebGL</h2>
+
+<p>L&apos;API WebGL est étendue par la spécification WebXR pour augmenter le contexte WebGL afin de lui permettre d&apos;être utilisée pour afficher des vues dans un périphérique WebXR.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/WebGLRenderingContextBase/makeXRCompatibile"><code>WebGLRenderingContextBase.makeXRCompatibile()</code></a></dt>
+ <dd>Configure le contexte WebGL pour qu&apos;il soit compatible avec WebXR. Si le contexte n&apos;a pas été créé initialement avec la propriété <a href="/fr/docs/Web/API/WebGLContextAttributes/xrCompatible"><code>xrCompatible</code></a> définie sur <code>true</code>, vous devez appeler <code>makeXRCompatible()</code> avant d&apos;essayer d&apos;utiliser le contexte WebGL pour le rendu WebXR. Renvoie un <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise"><code>Promise</code></a> qui se résout une fois que le contexte a été préparé, ou est rejeté si le contexte ne peut pas être configuré pour être utilisé par WebXR.</dd>
+</dl>
+
+<h2 id="Guides_et_tutoriels">Guides et tutoriels</h2>
+
+<p>Les guides et didacticiels suivants sont une excellente ressource pour apprendre à comprendre WebXR et les concepts graphiques 3D/VR/AR sous-jacents.</p>
+
+<h3 id="Les_bases">Les bases</h3>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Fundamentals">Fundamentals of WebXR</a></dt>
+ <dd>Avant de plonger dans les détails de la création de contenu à l&apos;aide de WebXR, il peut être utile de lire cet aperçu de la technologie, qui comprend des introductions à une terminologie qui peut ne pas vous être familière ou qui peut être utilisée d&apos;une nouvelle manière.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebGL_API/Matrix_math_for_the_web">Matrix math for the web</a></dt>
+ <dd>Un guide expliquant comment les matrices peuvent être utilisées sur le Web, y compris pour les transformations CSS et à des fins WebGL, ainsi que pour gérer le positionnement et l&apos;orientation des objets dans des contextes WebXR.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Lifecycle">WebXR application life cycle </a></dt>
+ <dd>An overview of the overall life cycle of a WebXR application, from startup to shutdown. This article serves as an introduction to the basics of what&apos;s involved in creating a WebXR experience without diving into the code in detail. It&apos;s a good way to prepare for the next steps.Un aperçu du cycle de vie global d&apos;une application WebXR, du démarrage à l&apos;arrêt. Cet article sert d&apos;introduction aux bases de ce qu&apos;implique la création d&apos;une expérience WebXR sans plonger dans le code en détail. C&apos;est un bon moyen de se préparer aux prochaines étapes.</dd>
+</dl>
+
+<h3 id="Créer_une_expérience_de_réalité_mixte">Créer une expérience de réalité mixte</h3>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Startup_and_shutdown">Starting up and shutting down a WebXR session</a></dt>
+ <dd>Avant de présenter une scène à l&apos;aide d&apos;un appareil XR tel qu&apos;un casque ou des lunettes, vous avez besoin de créer une session WebXR liée à une couche de rendu qui dessine la scène pour la présentation dans chacun des écrans de l&apos;appareil XR pour que l&apos;effet 3D puisse être présenté à l&apos;utilisateur. Ce guide explique comment créer et arrêter des sessions WebXR.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Geometry">Geometry and reference spaces in WebXR</a></dt>
+ <dd>Dans ce guide, les concepts requis de la géométrie 3D sont brièvement passés en revue, et les fondamentaux de cette géométrie représentés dans WebXR sont détaillés. Apprenez comment les espaces de référence sont utilisés pour positionner les objets - et le visualiseur - et les différences entre les types d&apos;espace de référence disponibles, ainsi que leurs cas d&apos;utilisation.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Spatial_tracking">Spatial tracking in WebXR</a></dt>
+ <dd>Ce guide décrit comment les objets—incluant le corps de l&apos;utilisateur et ses parties—sont situés dans l&apos;espace, et comment leur mouvement et leur orientation les uns par rapport aux autres sont surveillés et gérés au fil du temps. Cet article explique la relation entre les espaces, les poses/attitudes, les spectateurs et les vues.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Rendering">Rendering and the WebXR frame animation callback</a></dt>
+ <dd>En commençant par la planification des images à afficher, ce guide explique ensuite comment déterminer le placement des objets dans la vue et comment les afficher dans la mémoire tampon WebGL utilisée pour chacune des deux vues de la scène pour les deux yeux.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Cameras">Viewpoints and viewers: Simulating cameras in WebXR </a></dt>
+ <dd> through a world in which the viewer doesn&apos;t really move.WebGL (et donc WebXR) n&apos;a pas vraiment de concept de caméra, qui est le concept traditionnel utilisé pour représenter un point de vue dans les graphiques 3D. Dans cet article, nous voyons comment simuler une caméra et comment créer l&apos;illusion de déplacer un spectateur dans un monde même si ce n&apos;est pas le cas.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Lighting">Lighting a WebXR setting</a></dt>
+ <dd>Le rendu WebXR étant basé sur WebGL, les mêmes techniques d&apos;éclairage utilisées pour toute application 3D sont appliquées aux scènes WebXR. Cependant, il existe des problèmes spécifiques à la création de paramètres de réalité augmentée et virtuelle qui doivent être pris en compte lors de l&apos;écriture de votre code d&apos;éclairage. Cet article traite de ces problèmes.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Bounded_reference_spaces">Using bounded reference spaces</a></dt>
+ <dd>Dans cet article, nous examinons comment utiliser un espace de référence <code>bounded-floor</code> pour définir les limites des endroits où le spectateur peut se déplacer en toute sécurité sans quitter la zone suivie par son matériel XR ou entrer en collision avec un obstacle physique. Sur les appareils qui le prennent en charge, le <code>bounded-floor</code> peut être un outil utile dans votre répertoire.</dd>
+</dl>
+
+<h3 id="Rendre_interactif">Rendre interactif</h3>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Movement_and_motion">Movement, orientation, and motion: A WebXR example</a></dt>
+ <dd>Dans cet exemple et tutoriel, nous utilisons les informations apprises tout au long de la documentation WebXR pour créer une scène contenant un cube et l&apos;utilisateur peut déplacer autour en utilisant à la fois le casque VR, le clavier et la souris.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Inputs">Inputs and input sources</a></dt>
+ <dd>Un guide sur les sources d&apos;entrée et comment gérer efficacement les périphériques d&apos;entrée utilisés pour contrôler la session WebXR, et comment recevoir et traiter les entrées utilisateur de ces périphériques.</dd>
+ <dt><a href="/en-US/docs/Web/API/Web_Audio_API/Targeting">Targeting and hit detection </a></dt>
+ <dd>Comment utiliser le mode rayon de ciblage et l&apos;espace de rayon de ciblage d&apos;une source d&apos;entrée pour afficher un rayon de ciblage, identifier les surfaces ou les objets ciblés et effectuer des tâches associées.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Input_profiles">Using WebXR input profiles</a></dt>
+ <dd>Un guide pour interpréter les données <a href="/fr/docs/Glossaire/JSON">JSON</a> fournies par le <a href="https://github.com/immersive-web/webxr-input-profiles/tree/master/packages/registry">WebXR Input Profiles Registry</a>, qui peut être utilisé pour déterminer les options et commandes disponibles sur les périphériques d&apos;entrée de l&apos;utilisateur.</dd>
+ <dt><a href="/en-US/docs/Web/WebXR_Device_API/Gamepads">Supporting advanced controllers and gamepads in WebXR applications</a></dt>
+ <dd>WebXR utilise l&apos;objet <a href="/fr/docs/Web/API/Gamepad"><code>Gamepad</code></a> pour décrire les commandes disponibles sur les périphériques d&apos;entrée complexes (tels que les manettes avec plusieurs boutons et/ou axes) et les périphériques tels que les manettes de jeu. Dans ce guide, découvrez comment faire usage des commandes de ces périphériques.</dd>
+</dl>
+
+<h3 id="Performance_and_sécurité">Performance and sécurité</h3>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Performance">WebXR performance guide</a></dt>
+ <dd>Recommandations et astuces pour vous aider à optimiser les performances de votre application WebXR.</dd>
+ <dt><a href="/en-US/docs/Web/API/WebXR_Device_API/Permissions_and_security">Permissions and security for WebXR</a></dt>
+ <dd>L&apos;API de périphérique WebXR doit faire face à de nombreux domaines de sécurité, de l&apos;établissement d&apos;une politique de fonctionnalité à l&apos;assurance que l&apos;utilisateur a l&apos;intention d&apos;utiliser la présentation en réalité mixte avant de l&apos;activer.</dd>
+</dl>
+
+<h3 id="Inclure_dautres_médias">Inclure d&apos;autres médias</h3>
+
+<dl>
+ <dt><a href="/en-US/docs/Web/Media/3D_audio">Positional audio in a 3D environment</a></dt>
+ <dd>Dans les environnements 3D, qui peuvent être soit des scènes 3D rendues à l&apos;écran, soit une expérience de réalité mixte expérimentée à l&apos;aide d&apos;un casque, il est important que l&apos;audio soit exécuté de sorte qu&apos;il semble provenir de la direction de sa source. Ce guide explique comment y parvenir.</dd>
+ <dt><a href="/en-US/docs/Web/Media/3D_video">Playing video in a 3D environment</a></dt>
+ <dd>Dans ce guide, nous examinons comment lire une vidéo dans une scène 3D. Cette technique peut être utilisée à la fois dans des applications <a href="/en-US/docs/Web/API/WebGL_API">WebGL</a> standard présentées sur un écran plat d&apos;ordinateur, ou dans un environnement de réalité virtuelle ou augmentée généré par <a href="/en-US/docs/Web/API/WebXR_Device_API">WebXR</a>.</dd>
+</dl>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://immersive-web.github.io/webxr/" hreflang="en" lang="en" title="La spécificaction &apos;WebXR Device API&apos;">WebXR Device API</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="bc-data" id="bcd:api.Navigator.xr"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/Guide/Graphics">Graphics on the web</a></li>
+ <li><a href="/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+ <li><a href="/en-US/docs/Web/API/WebGL_API">WebGL API</a>: Graphiques 2D et 3D sur le web</li>
+ <li><a href="/en-US/docs/Web/API/Canvas_API">Canvas API</a>: Le dessin en 2D pour le web</li>
+ <li><a href="/en-US/docs/Web/API/Canvas_API/Tutorial">Canvas tutorial</a></li>
+</ul>

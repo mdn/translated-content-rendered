@@ -1,0 +1,329 @@
+---
+title: Manipulation de pixels avec canvas
+slug: Web/API/Canvas_API/Tutoriel_canvas/Pixel_manipulation_with_canvas
+translation_of: Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/fr/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/fr/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/fr/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/fr/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/fr/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/fr/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/fr/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/fr/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/fr/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/fr/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Tutoriel_canvas/Advanced_animations" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">Suivant  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>Jusqu&apos;à présent, nous n&apos;avons pas examiné dans le détail les pixels réels de notre canevas. Avec l&apos;objet ImageData, vous pouvez directement lire et écrire dans le tableau de données de l&apos;image, pour manipuler les pixels un par un. Nous verrons également comment le lissage (anticrénelage) de l&apos;image peut être contrôlé et comment sauvegarder des images depuis votre canevas.</p>
+</div>
+
+<h2 id="Lobjet_ImageData">L&apos;objet <code>ImageData</code></h2>
+
+<p>L&apos;objet <a href="/fr/docs/Web/API/ImageData"><code>ImageData</code></a> représente les données de pixels sous-jacentes à une zone d&apos;un objet canevas. Il contient les attributs (en lecture seule) suivants :</p>
+
+<dl>
+ <dt><code>width</code></dt>
+ <dd>La largeur de l&apos;image en pixels.</dd>
+ <dt><code>height</code></dt>
+ <dd>La hauteur de l&apos;image en pixels.</dd>
+ <dt><code>data</code></dt>
+ <dd>Un <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint8ClampedArray"><code>Uint8ClampedArray</code></a> représentant un tableau monodimensionnel contenant les données dans l&apos;ordre RVBA, ayant des valeurs entières entre 0 et  255 (inclus).</dd>
+</dl>
+
+<p>La propriété <code>data</code> retourne un tableau <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint8ClampedArray"><code>Uint8ClampedArray</code></a> auquel on peut accéder pour voir plus en détail les données brutes des pixels ; chaque pixel est représenté par quatre valeurs sur un octet (rouge, vert, bleu et alpha, dans cet ordre ; c&apos;est-à-dire, le format &quot;RVBA&quot;).  Chaque composante de couleur est représentée par un entier entre 0 et 255. Chaque composante reçoit un indice à l&apos;intérieur du tableau, la composante rouge du pixel supérieur gauche étant à l&apos;indice 0 à l&apos;intérieur du tableau. Les pixels continuent ensuite de gauche à droite, puis vers le bas, jusqu&apos;au bout du tableau.</p>
+
+<p>Le <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint8ClampedArray"><code>Uint8ClampedArray</code></a> contient <code>height</code><em>(hauteur)</em> × <code>width</code><em>(largeur)</em>  × 4 octets, dont les valeurs d&apos;indices vont de 0 à (<code>height</code>×<code>width</code>×4)-1.</p>
+
+<p>Par exemple, pour lire la valeur de la composante bleue d&apos;un pixel situé en colonne 200, ligne 50  de l&apos;image, vous pouvez faire ce qui suit :</p>
+
+<pre class="brush: js notranslate">composanteBleue = imageData.data[((50 * (imageData.width * 4)) + (200 * 4)) + 2];</pre>
+
+<p>Vous pouvez accéder à la taille en octets du tableau de pixels en lisant l&apos;attribut <code>Uint8ClampedArray.length</code> :</p>
+
+<pre class="brush: js notranslate">var nbOctets = imageData.data.length;
+</pre>
+
+<h2 id="Création_dun_objet_ImageData">Création d&apos;un objet <code>ImageData</code></h2>
+
+<p>Pour créer un nouvel objet <code>ImageData</code> vierge, vous pouvez utiliser la méthode  <a href="/fr/docs/Web/API/CanvasRenderingContext2D/createImageData"><code>createImageData()</code></a>. Il existe deux versions de la méthode <code>createImageData() </code>:</p>
+
+<pre class="brush: js notranslate">var monImageData = ctx.createImageData(largeur, hauteur);</pre>
+
+<p>Cela crée un nouvel objet <code>ImageData</code> avec les dimensions spécifiées. Tous les pixels sont prédéfinis comme étant noirs transparents.</p>
+
+<p>Vous pouvez aussi créer un nouvel objet <code>ImageData</code> ayant les mêmes dimensions que celles de l&apos;objet indiqué par <code>autreImageData</code>. Les pixels du nouvel objet sont tous prédéfinis comme étant noirs transparents. <strong>Cela ne copie pas les données d&apos;image !</strong></p>
+
+<pre class="brush: js notranslate">var monImageData = ctx.createImageData(autreImageData);</pre>
+
+<h2 id="Obtention_des_données_pixel_pour_un_contexte">Obtention des données pixel pour un contexte</h2>
+
+<p>Pour obtenir un objet  <code>ImageData</code> contenant une copie des données pixel pour un contexte de canevas, vous pouvez utiliser la méthode <code>getImageData()</code> :</p>
+
+<pre class="brush: js notranslate">var monImageData = ctx.getImageData(gauche, haut, largeur, hauteur);</pre>
+
+<p>Cette méthode retourne un objet <code>ImageData</code> représentant les données pixel pour la zone du canevas dont les coins sont représentés par les points  (<code>left</code>,<code>top</code>) <em><code> (gauche,haut)</code></em>, (<code>left+width</code>, <code>top</code>) <em>(gauche+largeur, haut)</em>, (<code>left</code>, <code>top+height</code>)<em> (gauche, haut+hauteur)</em> et  (<code>left+width</code>, <code>top+height</code>) <em>(gauche+largeur, haut+hauteur)</em>. Les coordonnées sont spécifiées en unités d&apos;espace de coordonnées du canevas.</p>
+
+<div class="note">
+<p><strong>Note </strong>: Tous les pixels en dehors du canevas seront retournés comme noirs transparents dans l&apos;objet <code>ImageData</code> résultant.</p>
+</div>
+
+<p>Cette méthode est aussi présentée dans l&apos;article <a href="https://developer.mozilla.org/fr/docs/HTML/Manipulating_video_using_canvas">Manipulation vidéo utilisant canvas</a>.</p>
+
+<h3 id="Une_pipette_à_couleur">Une pipette à couleur</h3>
+
+<p>Dans cet exemple, nous utilisons la méthode <a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData() </a>pour afficher la couleur en dessous du curseur de la souris. Pour cela, nous avons besoin de la position en cours de la souris donnée par <code>layerX</code> et <code>layerY</code>, nous recherchons ensuite les données pixel à cette position dans le tableau de pixels que <a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData()</a> nous fournit. Finalement, nous utilisons les données du tableau pour définir une couleur d&apos;arrière-plan et un texte dans le <code>&lt;div&gt;</code> pour afficher la couleur.</p>
+
+<div class="hidden">
+<pre class="brush: html; notranslate">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;227&quot; style=&quot;float:left&quot;&gt;&lt;/canvas&gt;
+&lt;div id=&quot;color&quot; style=&quot;width:200px;height:50px;float:left&quot;&gt;&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="notranslate"><code>var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+var canvas = document.getElementById(&apos;canvas&apos;);
+var ctx = canvas.getContext(&apos;2d&apos;);
+img.onload = function() {
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+};
+var color = document.getElementById(&apos;color&apos;);
+function pick(event) {
+  var x = event.layerX;
+  var y = event.layerY;
+  var pixel = ctx.getImageData(x, y, 1, 1);
+  var data = pixel.data;
+  var rgba = &apos;rgba(&apos; + data[0] + &apos;, &apos; + data[1] +
+             &apos;, &apos; + data[2] + &apos;, &apos; + (data[3] / 255) + &apos;)&apos;;
+  color.style.background =  rgba;
+  color.textContent = rgba;
+}
+canvas.addEventListener(&apos;mousemove&apos;, pick);</code></pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="240" id="frame_A_color_picker" src="https://mdn.mozillademos.org/fr/docs/Web/API/Canvas_API/Tutoriel_canvas/Pixel_manipulation_with_canvas$samples/A_color_picker?revision=1653485" width="610"></iframe></p>
+
+<h2 id="Peinture_des_données_pixel_dans_un_contexte">Peinture des données pixel dans un contexte</h2>
+
+<p>Vous pouvez utiliser la méthode <a href="https://developer.mozilla.org/fr/docs/Web/API/CanvasRenderingContext2D/putImageData">putImageData() </a>pour peindre les données pixel dans un contexte :</p>
+
+<pre class="brush: js notranslate">ctx.putImageData(monImageData, dx, dy);
+</pre>
+
+<p>Les paramètres <code>dx</code> et <code>dy</code> indiquent les coordonnées système dans le contexte du coin supérieur gauche des données pixel qui doivent être peintes.</p>
+
+<p>Par exemple, pour peindre l&apos;image entière représentée par <code>monImageData</code> dans le coin supérieur gauche du contexte, vous pouvez simplement faire ce qui suit :</p>
+
+<pre class="brush: js notranslate">ctx.putImageData(monImageData, 0, 0);
+</pre>
+
+<h3 id="Niveaux_de_gris_et_inversion_de_couleurs">Niveaux de gris et inversion de couleurs</h3>
+
+<p>Dans cet exemple, nous itérons sur tous les pixels pour changer leurs valeurs, puis nous remettons le tableau de pixels modifié sur le canevas à l&apos;aide de <a href="/fr-FR/docs/Web/API/CanvasRenderingContext2D/putImageData">putImageData()</a>. La fonction inversion soustrait simplement chaque couleur de la valeur maximale 255. La fonction  grayscale <em>(niveaux de gris)</em> fait simplement la moyenne du rouge, du vert et du bleu. Vous pouvez également utiliser une moyenne pondérée, donnée par la formule x = 0.299r + 0.587v + 0.114b, par exemple. Voir <a href="https://fr.wikipedia.org/wiki/Niveau_de_gris">Niveaux de gris</a> sur Wikipedia pour plus d&apos;informations.</p>
+
+<div class="hidden">
+<pre class="brush: html; notranslate">&lt;canvas id=&quot;canevas&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;div&gt;
+  &lt;input id=&quot;btnniveaudegris&quot; value=&quot;Niveau de gris&quot; type=&quot;button&quot;&gt;
+  &lt;input id=&quot;btninversion&quot; value=&quot;Inversion&quot; type=&quot;button&quot;&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: js notranslate">var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+img.onload = function() {
+  dessiner(this);
+};
+
+function dessiner(img) {
+  var canevas = document.getElementById(&apos;canevas&apos;);
+  var ctx = canevas.getContext(&apos;2d&apos;);
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+  var imageData = ctx.getImageData(0, 0, canevas.width, canevas.height);
+  var data = imageData.data;
+
+  var inversion = function() {
+    for (var i = 0; i &lt; data.length; i += 4) {
+      data[i]     = 255 - data[i];     // rouge
+      data[i + 1] = 255 - data[i + 1]; // vert
+      data[i + 2] = 255 - data[i + 2]; // bleu
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var niveaudegris = function() {
+    for (var i = 0; i &lt; data.length; i += 4) {
+      var moy = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i]     = moy; // rouge
+      data[i + 1] = moy; // vert
+      data[i + 2] = moy; // bleu
+    }
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  var btninversion = document.getElementById(&apos;btninversion&apos;);
+  btninversion.addEventListener(&apos;click&apos;, inversion);
+  var btnniveaudegris = document.getElementById(&apos;btnniveaudegris&apos;);
+  btnniveaudegris.addEventListener(&apos;click&apos;, niveaudegris);
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="270" id="frame_Grayscaling_and_inverting_colors" src="https://mdn.mozillademos.org/fr/docs/Web/API/Canvas_API/Tutoriel_canvas/Pixel_manipulation_with_canvas$samples/Grayscaling_and_inverting_colors?revision=1653485" width="330"></iframe></p>
+
+<h2 id="Zoom_et_anticrénelage">Zoom et anticrénelage</h2>
+
+<p><span id="result_box" lang="fr"><span>A l&apos;aide de la méthode <a href="/fr/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage ()</code></a>, un deuxième canevas, et la propriété </span></span> <a href="/fr/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled"><code>imageSmoothingEnabled</code></a> , nous pouvons<span lang="fr"><span> zoomer sur notre image et voir les détails.</span></span></p>
+
+<p><span id="result_box" lang="fr"><span>Nous obtenons la position de la souris et recadrons une image de 5 pixels à gauche et au-dessus à 5 pixels à droite et en-dessous.</span> <span>Ensuite, nous copions celle-ci sur un autre canevas et redimensionnons l&apos;image à la taille que nous voulons.</span> <span>Dans la zone de zoom, nous redimensionnons une zone de 10 × 10 pixels du canevas d&apos;origine à 200 × 200.</span></span></p>
+
+<pre class="brush: js notranslate">zoomctx.drawImage(canvas,
+                  Math.abs(x - 5), Math.abs(y - 5),
+                  10, 10, 0, 0, 200, 200);</pre>
+
+<p><span id="result_box" lang="fr"><span>Étant donné que l&apos;anticrénelage est activé par défaut, nous pouvons désactiver le lissage pour voir les pixels clairs.</span> <span>Vous pouvez basculer la case à cocher pour voir l&apos;effet de la propriété <code>imageSmoothingEnabled</code> (qui a besoin de préfixes pour différents navigateurs).</span></span></p>
+
+<h6 class="hidden" id="Zoom_example">Zoom example</h6>
+
+<div class="hidden">
+<pre class="brush: html; notranslate">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;canvas id=&quot;zoom&quot; width=&quot;300&quot; height=&quot;227&quot;&gt;&lt;/canvas&gt;
+&lt;div&gt;
+&lt;label for=&quot;smoothbtn&quot;&gt;
+  &lt;input type=&quot;checkbox&quot; name=&quot;smoothbtn&quot; checked=&quot;checked&quot; id=&quot;smoothbtn&quot;&gt;
+  Enable image smoothing
+&lt;/label&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<pre class="brush: js notranslate">var img = new Image();
+img.src = &apos;https://mdn.mozillademos.org/files/5397/rhino.jpg&apos;;
+img.onload = function() {
+  draw(this);
+};
+
+function draw(img) {
+  var canvas = document.getElementById(&apos;canvas&apos;);
+  var ctx = canvas.getContext(&apos;2d&apos;);
+  ctx.drawImage(img, 0, 0);
+  img.style.display = &apos;none&apos;;
+  var zoomctx = document.getElementById(&apos;zoom&apos;).getContext(&apos;2d&apos;);
+
+  var smoothbtn = document.getElementById(&apos;smoothbtn&apos;);
+  var toggleSmoothing = function(event) {
+    zoomctx.imageSmoothingEnabled = this.checked;
+    zoomctx.mozImageSmoothingEnabled = this.checked;
+    zoomctx.webkitImageSmoothingEnabled = this.checked;
+    zoomctx.msImageSmoothingEnabled = this.checked;
+  };
+  smoothbtn.addEventListener(&apos;change&apos;, toggleSmoothing);
+
+  var zoom = function(event) {
+    var x = event.layerX;
+    var y = event.layerY;
+    zoomctx.drawImage(canvas,
+                      Math.abs(x - 5),
+                      Math.abs(y - 5),
+                      10, 10,
+                      0, 0,
+                      200, 200);
+  };
+
+  canvas.addEventListener(&apos;mousemove&apos;, zoom);
+}</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="490" id="frame_Zoom_example" src="https://mdn.mozillademos.org/fr/docs/Web/API/Canvas_API/Tutoriel_canvas/Pixel_manipulation_with_canvas$samples/Zoom_example?revision=1653485" width="620"></iframe></p>
+
+<h2 id="Sauvegarde_des_images">Sauvegarde des images</h2>
+
+<p><span id="result_box" lang="fr"><span>L&apos; <a href="/fr/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a> fournit une méthode <code>toDataURL ()</code>, utile lors de l&apos;enregistrement d&apos;images.</span> <span>Il retourne un <a href="https://developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">URI de données</a> contenant une représentation de l&apos;image dans le format spécifié par le paramètre de <code>type</code> (par défaut en </span></span> <a class="external external-icon" href="https://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a> <span lang="fr"><span>).</span> <span>L&apos;image renvoyée est dans une résolution de 96 dpi.</span></span></p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/HTMLCanvasElement/toDataURL"><code>canvas.toDataURL(&apos;image/png&apos;)</code></a></dt>
+ <dd>Par défaut. Crée un image PNG.</dd>
+ <dt><a href="/fr/docs/Web/API/HTMLCanvasElement/toDataURL"><code>canvas.toDataURL(&apos;image/jpeg&apos;, quality)</code></a></dt>
+ <dd><span id="result_box" lang="fr"><span>Crée une image JPG.</span> <span>En option, vous pouvez fournir une qualité comprise entre 0 et 1, 1 étant de la meilleure qualité et 0 presque non reconnaissable mais de petite taille.</span></span></dd>
+</dl>
+
+<p><span id="result_box" lang="fr"><span>Une fois que vous avez généré un URI de données à partir de votre canevas, vous pouvez l&apos;utiliser comme source de <a href="/fr/docs/Web/HTML/Element/image" title="L&apos;élément HTML &lt;image&gt; est un élément obsolète, remplacé depuis longtemps par l&apos;élément standard &lt;img&gt;."><code>&lt;image&gt;</code></a> ou le mettre dans un lien hypertexte avec un attribut de téléchargement pour l&apos;enregistrer sur le disque par exemple.</span></span></p>
+
+<p><span id="result_box" lang="fr"><span>Vous pouvez également créer un <a href="/fr/docs/Web/API/Blob"><code>Blob</code></a> à partir du canevas.</span></span></p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/HTMLCanvasElement/toBlob"><code>canvas.toBlob(callback, type, encoderOptions)</code></a></dt>
+ <dd><span id="result_box" lang="fr"><span>Crée un objet <code>Blob</code> représentant l&apos;image contenue dans le canevas.</span></span></dd>
+</dl>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+ <li><a href="https://developer.mozilla.org/fr/docs/HTML/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+ <li><a href="https://codepo8.github.io/canvas-images-and-pixels/">Canevas, images et pixels – par Christian Heilmann (en)</a></li>
+</ul>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Tutoriel_canvas/Advanced_animations" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">Suivant  »</a></p>
+</div>

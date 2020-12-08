@@ -1,0 +1,223 @@
+---
+title: Utiliser le shadow DOM
+slug: Web/Web_Components/Using_shadow_DOM
+tags:
+  - API
+  - DOM
+  - Guide
+  - Web Components
+  - shadow dom
+translation_of: Web/Web_Components/Using_shadow_DOM
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/Web_Components/Using_custom_elements">Utilisation d&apos;éléments personnalisés</a></li><li><a href="/fr/docs/Web/Web_Components/Using_shadow_DOM">Using shadow DOM</a> <a href="/fr/docs/Web/Web_Components/Using_shadow_DOM$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/Web_Components/Utilisation_des_templates_et_des_slots">Utilisation des templates et des slots</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/fr/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/fr/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/fr/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/fr/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/fr/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/fr/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/fr/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/fr/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/fr/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/fr/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/fr/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/fr/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary">Un aspect important des composants web est l&apos;encapsulation — être capable de garder la structure de balisage, le style et le comportement cachés et séparés du reste de code de la page tel que différentes parties n&apos;entrent pas en conflit et que le code puisse rester agréable et propre. L&apos;API Shadow DOM est un moyen d&apos;y parvenir, fournissant une manière d&apos;associer à un élément un DOM séparé et caché. Cet article couvre les bases de l&apos;utilisation du DOM fantôme.</p>
+
+<div class="note">
+<p><strong>Note</strong>: l&apos;API Shadow DOM est supportée par défaut dans Firefox (63 et suivants), Chrome, Opera, et Safari. Le nouveau Edge basé sur Chromium (75 et suivants) le supportent aussi; le vieux Edge ne le supporte.</p>
+</div>
+
+<h2 id="Vue_de_haut_niveau">Vue de haut niveau</h2>
+
+<p>Cet article suppose que vous êtes déjà familier avec le concept de <a href="/en-US/docs/Web/API/Document_Object_Model/Introduction">DOM (Document Object Model)</a> — une structure arborescente de nœuds connectés représentant les différents éléments et chaines de textes apparaissant dans un document balisé (généralement un document HTML dans le cas de documents web). Par exemple, considérez le fragment HTML suivant :</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;Simple exemple de DOM&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+      &lt;section&gt;
+        &lt;img src=&quot;dinosaur.png&quot; alt=&quot;Un tyrannosaurus Rex rouge : un dinosaure bipède se tenant debout comme un humain, avec de petits bras et une large gueule à nombreuses dents tranchantes.&quot;&gt;
+        &lt;p&gt;Nous ajouterons ici un lien vers la &lt;a href=&quot;https://www.mozilla.org/&quot;&gt;page d&apos;accueil de Mozilla&lt;/a&gt;&lt;/p&gt;
+      &lt;/section&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>Ce fragment produit la structure DOM suivante :</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/14559/dom-screenshot.png" style="border-style: solid; border-width: 1px; display: block; margin: 0px auto;"></p>
+
+<p>Le DOM fantôme permet à des arbres DOM cachés d&apos;être associés à des éléments de l&apos;arbre DOM principal — cet arbre DOM fantôme s&apos;ouvre avec une racine fantôme placée sous n&apos;importe quel élément voulu, de la même manière que dans le DOM normal.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/15788/shadow-dom.png" style="height: 543px; width: 1138px;"></p>
+
+<p>Il y a quelques termes de la terminologie du DOM fantôme que vous devez connaitre :</p>
+
+<ul>
+ <li><strong>Hôte fantôme </strong>: le nœud du DOM principal auquel le DOM fantôme est associé.</li>
+ <li><strong>Arbre fantôme</strong>: l&apos;arbre DOM au sein du DOM fantôme.</li>
+ <li><strong>Frontière fantôme</strong>: la limite où le DOM fantôme se termine et où le DOM principal commence.</li>
+ <li><strong>Racine fantôme</strong>: le nœud racine de l&apos;arbre fantôme.</li>
+</ul>
+
+<p>Vous pouvez affecter les nœuds du DOM fantôme exactement de la même manière que pour les nœuds du DOM principal — par exemple en leur ajoutant des éléments enfants ou en leur définissant des atributs, en stylisant des nœuds individuels au moyen de <code>element.style.propriete</code>, ou en ajoutant du style à l&apos;arbre DOM fantôme entier via une balise <a href="/fr/docs/Web/HTML/Element/style" title="L&apos;élément HTML &lt;style&gt; contient des informations de mise en forme pour un document ou une partie d&apos;un document. Par défaut, les instructions de mise en forme écrites dans cet élément sont écrites en CSS."><code>&lt;style&gt;</code></a>. La différence est que le code au sein du DOM fantôme ne peut affecter aucun élément en-dehors de son arbre, permettant de mettre en œuvre une encapsulation très commode.</p>
+
+<p>Notez que le DOM fantôme n&apos;est pas une nouvelle chose du tout — les navigateurs l&apos;ont utilisé depuis longtemps pour encapsuler la structure interne d&apos;un élément. Pensez par exemple à un élément <a href="/fr/docs/Web/HTML/Element/video" title="L&apos;élément HTML &lt;video&gt; intègre un contenu vidéo dans un document."><code>&lt;video&gt;</code></a>, avec les contrôles par défaut du navigateur apparents. Tout ce que vous voyez dans le DOM est l&apos;élément <code>&lt;video&gt;</code>, mais il contient plusieurs boutons et autres contrôles au sein de son DOM fantôme. La spécification du DOM fantôme a été conçue de telle manière que vous êtes autorisés à manipuler le DOM fantôme de vos propres éléments personnalisés.</p>
+
+<h2 id="Usage_basique">Usage basique</h2>
+
+<p>Vous pouvez associer une racine fantôme à tout élément en utilisant la méthode <a href="/fr/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a>. Elle prend en paramètres un objet d&apos;options contenant une option — <code>mode</code> — ayant pour valeur <code>open</code> (ouvert) ou <code>closed</code> (fermé) :</p>
+
+<pre class="brush: js">let fantome = element.attachShadow({mode: &apos;open&apos;});
+let fantome = element.attachShadow({mode: &apos;closed&apos;});</pre>
+
+<p><code>open</code> signifie que vous pouvez accéder au DOM fantôme en utilisant du JavaScript écrit dans le contexte de la page principale, par exemple en utilisant la propriété <a href="/fr/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a> :</p>
+
+<pre class="brush: js">let monDomFantome = monElementPerso.shadowRoot;</pre>
+
+<p>Si vous associez une racine fantôme à un élément personnalisé avec la propriété <code>mode</code> définie à <code>closed</code>, vous ne serez pas autorisé à acéder au DOM fantôme depuis l&apos;extérieur — <code>monElementPerso.shadowRoot</code> retournera <code>null</code>. C&apos;est le casavec les éléments natifs contenant des DOM fantômes tels que <code>&lt;video&gt;</code>.</p>
+
+<div class="note">
+<p><strong>Note</strong>: Comme montre <a href="https://blog.revillweb.com/open-vs-closed-shadow-dom-9f3d7427d1af">cet article de blog</a>, il est actuellement assez simple de pénétrer les DOM fantômes fermés, et les cacher complètement n&apos;en vaut souvent pas la peine.</p>
+</div>
+
+<p>Si vous voulez associer un DOM fantôme à un élément personnalisé en tant que partie de son constructeur (de loin la plus utile application du DOM fantôme), vous devriez utiliser quelque instruction comme :</p>
+
+<pre class="brush: js">let fantome = this.attachShadow({mode: &apos;open&apos;});</pre>
+
+<p>Lorsque vous avez associé un DOM fantôme à un élément, le manipuler consiste seulement à utiliser les API du DOM telles que vous les utilisez pour manipuler le DOM principal :</p>
+
+<pre class="brush: js">let paragraphe = document.createElement(&apos;p&apos;);
+fantome.appendChild(paragraphe);
+// etc.</pre>
+
+<h2 id="Démonstration_au_travers_dun_exemple_simple">Démonstration au travers d&apos;un exemple simple</h2>
+
+<p>Maintenant, visitons un exemple simple pour faire une démonstration du DOM fantôme en action au sein d&apos;un élément personnalisé — <code><a href="https://github.com/mdn/web-components-examples/tree/master/popup-info-box-web-component">&lt;popup-info-box&gt;</a></code> (en voir aussi un <a href="https://mdn.github.io/web-components-examples/popup-info-box-web-component/">exemple dynamique</a>). Il prend un icône et une chaine de caractères et intègre l&apos;image dans la page. Quand l&apos;icône obtient l&apos;attention (<code>:focus</code>), le texte s&apos;affiche dans une fenêtre indépendante pour fournir plus d&apos;informations contextuelles. Pour commencer, nous définissons dans notre fichier JavaScript une classe appelée <code>PopUpInfo</code>, qui étend <code>HTMLElement</code>:</p>
+
+<pre class="brush: js">class PopUpInfo extends HTMLElement {
+  constructor() {
+    // Toujours appeler super en premier dans le constructeur
+    super();
+
+    // Écrire les fonctionnalités de l&apos;élément ici
+
+    ...
+  }
+}</pre>
+
+<p>Au sein de la définition de la classe, nous créons le constructeur de l&apos;élément, qui définit toutes les fonctionnalités que l&apos;élément aura lorsqu&apos;une instance est créée.</p>
+
+<h3 id="Créer_la_racine_fantôme">Créer la racine fantôme</h3>
+
+<p>Nous associns d&apos;abord une racine fantôme à l&apos;élément personnalisé :</p>
+
+<pre class="brush: js">// Créer une racine fantome
+var fantome = this.attachShadow({mode: &apos;open&apos;});</pre>
+
+<h3 class="brush: js" id="Créer_la_structure_du_DOM_fantôme">Créer la structure du DOM fantôme</h3>
+
+<p class="brush: js">Ensuite, nous utilisons des outils de manipulation du DOM pour créer la structure interne du DOM fantôme de notre élément:</p>
+
+<pre class="brush: js">// Créer les &lt;span&gt;
+var wrapper = document.createElement(&apos;span&apos;);
+wrapper.setAttribute(&apos;class&apos;,&apos;wrapper&apos;);
+var icon = document.createElement(&apos;span&apos;);
+icon.setAttribute(&apos;class&apos;,&apos;icon&apos;);
+icon.setAttribute(&apos;tabindex&apos;, 0);
+var info = document.createElement(&apos;span&apos;);
+info.setAttribute(&apos;class&apos;,&apos;info&apos;);
+
+// Take attribute content and put it inside the info span
+var text = this.getAttribute(&apos;text&apos;);
+info.textContent = text;
+
+// Insert icon
+var imgUrl;
+if(this.hasAttribute(&apos;img&apos;)) {
+  imgUrl = this.getAttribute(&apos;img&apos;);
+} else {
+  imgUrl = &apos;img/default.png&apos;;
+}
+var img = document.createElement(&apos;img&apos;);
+img.src = imgUrl;
+icon.appendChild(img);
+</pre>
+
+<h3 class="brush: js" id="Styliser_le_DOM_fantôme">Styliser le DOM fantôme</h3>
+
+<p class="brush: js">Après celà, nous créons un élément <a href="/fr/docs/Web/HTML/Element/style" title="L&apos;élément HTML &lt;style&gt; contient des informations de mise en forme pour un document ou une partie d&apos;un document. Par défaut, les instructions de mise en forme écrites dans cet élément sont écrites en CSS."><code>&lt;style&gt;</code></a> et nous l&apos;emplissons avec du CSS pour personnaliser notre arbre DOM :</p>
+
+<pre class="brush: js">// Créer quelque CSS à appliquer au dom fantôme
+var style = document.createElement(&apos;style&apos;);
+
+style.textContent = `
+.wrapper {
+  position: relative;
+}
+
+.info {
+  font-size: 0.8rem;
+  width: 200px;
+  display: inline-block;
+  border: 1px solid black;
+  padding: 10px;
+  background: white;
+  border-radius: 10px;
+  opacity: 0;
+  transition: 0.6s all;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  z-index: 3;
+}
+
+img {
+  width: 1.2rem;
+}
+
+.icon:hover + .info, .icon:focus + .info {
+  opacity: 1;
+}`;
+
+</pre>
+
+<h3 id="Associer_le_DOM_fantôme_à_la_racine_fantôme">Associer le DOM fantôme à la racine fantôme</h3>
+
+<p>L&apos;étape finale est d&apos;associer tous les éléments créés à la racine fantôme :</p>
+
+<pre class="brush: js">// Associer les éléments créés au dom fantôme
+shadow.appendChild(style);
+shadow.appendChild(wrapper);
+wrapper.appendChild(icon);
+wrapper.appendChild(info);</pre>
+
+<h3 id="Utiliser_notre_élément_personnalisé">Utiliser notre élément personnalisé</h3>
+
+<p>Une fois que la classe est définie, utiliser l&apos;élément est aussi simple que de le définir, et l&apos;ajouter sur la page, comme expliqué dans <a href="/en-US/docs/Web/Web_Components/Using_custom_elements">Utiliser les éléments personnalisés</a> :</p>
+
+<pre class="brush: js">// Définit le nouvel élément
+customElements.define(&apos;popup-info&apos;, PopUpInfo);</pre>
+
+<pre class="brush: html">&lt;<span class="pl-ent">popup-info</span> <span class="pl-e">img</span>=<span class="pl-s"><span class="pl-pds">&quot;</span>img/alt.png<span class="pl-pds">&quot;</span></span> <span class="pl-e">text</span>=<span class="pl-s"><span class="pl-pds">&quot;</span>Your card validation code (CVC) is an extra
+                                    security feature — it is the last 3 or 4
+                                    numbers on the back of your card.<span class="pl-pds">&quot;</span></span>&gt;</pre>
+
+<div>
+<h3 id="Styles_internes_ou_styles_externes">Styles internes ou styles externes</h3>
+
+<p>Dans l&apos;exemple précédent, nous appliquons du style au DOM fantôme en utilisant l&apos;élément <a href="/fr/docs/Web/HTML/Element/style" title="L&apos;élément HTML &lt;style&gt; contient des informations de mise en forme pour un document ou une partie d&apos;un document. Par défaut, les instructions de mise en forme écrites dans cet élément sont écrites en CSS."><code>&lt;style&gt;</code></a>, mais il est parfaitement possible de le faire en référençant une feuille de style externe avec un élément <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style, vers les icônes utilisées en barre de titre ou comme icône d&apos;application sur les appareils mobiles."><code>&lt;link&gt;</code></a> si vous le préférez.</p>
+
+<p>Par exemple, regardez ce code tiré de l&apos;exemple <a href="https://mdn.github.io/web-components-examples/popup-info-box-external-stylesheet/">popup-info-box-external-stylesheet</a> (voir le <a href="https://github.com/mdn/web-components-examples/blob/master/popup-info-box-external-stylesheet/main.js">code source</a>):</p>
+
+<pre class="brush: js">// Appliquer les styles externes au dom fantôme
+const linkElem = document.createElement(&apos;link&apos;);
+linkElem.setAttribute(&apos;rel&apos;, &apos;stylesheet&apos;);
+linkElem.setAttribute(&apos;href&apos;, &apos;style.css&apos;);
+
+// Associer l&apos;élément créé au dom fantôme
+shadow.appendChild(linkElem);</pre>
+
+<p>Notez que les éléments <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style, vers les icônes utilisées en barre de titre ou comme icône d&apos;application sur les appareils mobiles."><code>&lt;link&gt;</code></a> ne bloquent pas les repeinturages de la racine fantôme, donc il pourrait y avoir une latence où le contenu serait sans style (FOUC) pendant que la feuille de style se charge.</p>
+
+<p>De nombreux navigateurs modernes implantent une optimisation pour les balises <a href="/fr/docs/Web/HTML/Element/style" title="L&apos;élément HTML &lt;style&gt; contient des informations de mise en forme pour un document ou une partie d&apos;un document. Par défaut, les instructions de mise en forme écrites dans cet élément sont écrites en CSS."><code>&lt;style&gt;</code></a> clonées depuis un nœud commun ou qui ont des contenus identiques à fin de leur permettre de partager une unique liste de retour. Avec cette optimisation, la performance des styles externes et internes doivent être similaires.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/Web_Components/Using_custom_elements">Utiliser les éléments personnalisés</a></li>
+ <li><a href="/en-US/docs/Web/Web_Components/Using_templates_and_slots">Utiliser les modèles (templates) et les emplacements (slots)</a></li>
+</ul>
+</div>

@@ -1,0 +1,143 @@
+---
+title: Créer une animation colorée
+slug: Web/API/WebGL_API/By_example/Créer_une_animation_colorée
+tags:
+  - Apprendre
+  - Débutant
+  - Exemple
+  - Graphisme
+  - Tutoriel
+  - WebGL
+translation_of: Web/API/WebGL_API/By_example/Simple_color_animation
+---
+<div></div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Appliquer_une_couleur_à_la_souris" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Masque_de_couleur" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p class="summary">Dans cet exemple, on crée une animation avec des couleurs en appliquant chaque seconde une couleur aléatoire dans le contexte de rendu <a href="/fr/docs/Glossaire/WebGL" class="glossaryLink" title="WebGL : WebGL (Web Graphics Library) est une API JavaScript pour produire des graphismes 2D et 3D interactifs.">WebGL</a>.</p>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/API/WebGL_API/By_example/Cr%C3%A9er_une_animation_color%C3%A9e$samples/Cr%C3%A9er_une_animation_avec_clear?revision=1437273" width="660" height="425" frameborder="0" class="live-sample-frame sample-code-frame" id="frame_Créer_une_animation_avec_clear"></iframe></p>
+
+<h3 id="Créer_une_animation_avec_clear">Créer une animation avec <code> clear</code></h3>
+
+<p>Cet exemple illustre comment lancer une animation avec WebGL et gérer les interactions de l&apos;utilisateur. L&apos;utilisateur peut lancer, arrêter et reprendre l&apos;animation en cliquant sur le bouton.</p>
+
+<p>Cette fois, on place les appels à la fonction WebGL à l&apos;intérieur d&apos;un gestionnaire d&apos;événement de <em>timer</em>. Un gestionnaire d&apos;événements pour les clics permet de gérer les interactions simples (lancer et arrêter l&apos;animation). Le <em>timer</em> et la fonction de gestion du <em>timer</em> créent une boucle d&apos;animation qui permet d&apos;exécuter un ensemble de commandes pour le dessin à des intervalles réguliers (généralement, pour chaque <em>frame</em>, dans ce cas, on a une fréquence d&apos;une <em>frame </em>par seconde).</p>
+
+<pre class="brush: html">&lt;p&gt;Un programme WebGL simple qui crée une animation colorée.&lt;/p&gt;
+&lt;p&gt;Vous pouvez sur le bouton pour activer/désactiver l&apos;animation.&lt;/p&gt;
+&lt;canvas id=&quot;canvas-view&quot;&gt;Il semblerait que votre navigateur ne
+    supporte pas l&apos;élément canvas.&lt;/canvas&gt;
+&lt;button id=&quot;animation-onoff&quot;&gt;
+  Cliquez ici pour
+&lt;strong&gt;[le verbe de l&apos;action]&lt;/strong&gt;
+  l&apos;animation
+&lt;/button&gt;
+</pre>
+
+<pre class="brush: css">body {
+  text-align : center;
+}
+button {
+  display : inline-block;
+  font-size : inherit;
+  margin : auto;
+  padding : 0.6em;
+}
+canvas {
+  display : block;
+  width : 280px;
+  height : 210px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+</pre>
+
+<pre class="brush: js" id="livesample-js">window.addEventListener(&quot;load&quot;, function setupAnimation (evt) {
+  &quot;use strict&quot;
+  window.removeEventListener(evt.type, setupAnimation, false);
+
+  // Une variable pour gérer le timer qui contrôle
+  // l&apos;animation.
+  var timer;
+
+  // On ajoute un gestionnaire d&apos;événement pour le clic.
+  var button = document.querySelector(&quot;#animation-onoff&quot;);
+  var verb = document.querySelector(&quot;strong&quot;);
+  function startAnimation(evt) {
+    button.removeEventListener(evt.type, startAnimation, false);
+    button.addEventListener(&quot;click&quot;, stopAnimation, false);
+    verb.innerHTML=&quot;arrêter&quot;;
+
+    // On place une boucle d&apos;animation : on repeint
+    // environ chaque seconde.
+    timer = setInterval(drawAnimation, 1000);
+
+    // On dessine une frame d&apos;animation afin de
+    // fournir un feedback à l&apos;utilisateur.
+    drawAnimation();
+  }
+
+  function stopAnimation(evt) {
+    button.removeEventListener(evt.type, stopAnimation, false);
+    button.addEventListener(&quot;click&quot;, startAnimation, false);
+    verb.innerHTML=&quot;lancer&quot;;
+    // On arrête l&apos;animation en réinitialisant le timer.
+    clearInterval(timer);
+  }
+
+  // On appelle stopAnimation() une fois pour mettre en place
+  // les gestionnaires d&apos;événement pour le canevas et le bouton.
+  stopAnimation({type: &quot;click&quot;});
+
+  var gl;
+  function drawAnimation () {
+    if (!gl) {
+      var canvas = document.getElementById(&quot;canvas-view&quot;);
+      gl = canvas.getContext(&quot;webgl&quot;)
+        ||canvas.getContext(&quot;experimental-webgl&quot;);
+      if (!gl) {
+
+        // On ne veut pas avoir plusieurs messages d&apos;alerte
+        // donc on arrête l&apos;animation en réinitialisant le
+        // timer.
+        clearInterval(timer);
+        alert(&quot;Échec du chargement du contexte WebGL.\n&quot;
+          + &quot;Votre navigateur peut ne pas supporter WebGL.&quot;);
+        return;
+
+      }
+      gl.viewport(0, 0,
+        gl.drawingBufferWidth, gl.drawingBufferHeight);
+    }
+
+    // On génère une couleur aléatoire avec une fonction
+    // auxiliaire.
+    var color = getRandomColor();
+
+    // On applique la couleur obtenue dans le
+    // contexte WebGLRenderingContext
+    gl.clearColor(color[0], color[1], color[2], 1.0);
+
+    // On propage le changement dans le contexte
+    // avec la méthode clear.
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  }
+
+  // Une fonction auxiliaire qui fournit une
+  // couleur aléatoire.
+  function getRandomColor() {
+    return [Math.random(), Math.random(), Math.random()];
+  }
+}, false);
+</pre>
+
+<p>Le code source de cet exemple est également disponible sur <a href="https://github.com/idofilin/webgl-by-example/tree/master/simple-color-animation">GitHub</a>.</p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Appliquer_une_couleur_à_la_souris" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Masque_de_couleur" class="button">Suivant  »</a></p>
+</div><p></p>

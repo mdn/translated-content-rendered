@@ -1,0 +1,156 @@
+---
+title: unload
+slug: Web/Events/unload
+tags:
+  - JavaScript
+  - events
+translation_of: Web/API/Window/unload_event
+---
+<p><br>
+ <span class="seoSummary">L&apos;événement <code>unload</code> est appelé lorsque le document ou une ressource enfant est en train d&apos;être déchargé.</span></p>
+
+<p>Il est lancé après :</p>
+
+<ol>
+ <li><a href="/en-US/docs/Mozilla_event_reference/beforeunload" title="/en-US/docs/Mozilla_event_reference/beforeunload">beforeunload</a> (événement annulable)</li>
+ <li><a href="/en-US/docs/Mozilla_event_reference/pagehide" title="/en-US/docs/Mozilla_event_reference/pagehide">pagehide</a></li>
+</ol>
+
+<p>Le document se trouve alors dans un état particulier :</p>
+
+<ul>
+ <li>Toutes les ressources existent encore (img, iframe etc.)</li>
+ <li>Plus rien n&apos;est encore visible par l&apos;utilisateur final</li>
+ <li>Les intéractions avec l&apos;interface sont désactivées (<code>window.open</code>, <code>alert</code>, <code>confirm</code>, etc.)</li>
+ <li>Aucune erreur ne viendra interrompre le flux de déchargement.</li>
+</ul>
+
+<p>Veuiller noter que l&apos;événement <code>unload</code> suit l&apos;ordre du document : le cadre parent est déchargé <em>avant</em> le <code>unload</code> d&apos;un cadre enfant (voir l&apos;exemple ci-dessous).</p>
+
+<table class="properties">
+ <tbody>
+  <tr>
+   <td>Événement propageable</td>
+   <td>Non</td>
+  </tr>
+  <tr>
+   <td>Annulable</td>
+   <td>Non</td>
+  </tr>
+  <tr>
+   <td>Objets cibles</td>
+   <td>defaultView, Document, Element</td>
+  </tr>
+  <tr>
+   <td>Interface</td>
+   <td><a href="/fr/docs/Web/API/UIEvent" title="L&apos;interface UIEvent représente des évènement d&apos;interface utilisateur simples."><code>UIEvent</code></a> si généré depuis un élément de l&apos;interface utilisateur, <a href="/fr/docs/Web/API/Event" title="L&apos;interface Event représente tout événement qui a lieu dans le DOM ; certains sont générés par l&apos;utilisateur (tels que des événements de souris ou de clavier), tandis que d&apos;autres sont générés par des API (par exemple, des événements indiquant qu&apos;une animation est terminée, qu&apos;une vidéo a été suspendue, etc.). Il existe plusieurs types d&apos;événements, dont certains utilisent d&apos;autres interfaces basées sur l&apos;interface principale Event. Event elle-même contient les propriétés et méthodes communes à tous les événements."><code>Event</code></a></td>
+  </tr>
+  <tr>
+   <td>Action par défaut</td>
+   <td>Aucune</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Propriétés">Propriétés</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Propriété</th>
+   <th scope="col">Type</th>
+   <th scope="col">Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>target</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/en-US/docs/Web/API/EventTarget" title="EventTarget is an interface implemented by objects that can receive events and may have listeners for them."><code>EventTarget</code></a></td>
+   <td>La cible de l&apos;événement (la cible de plus haut niveau dans le DOM).</td>
+  </tr>
+  <tr>
+   <td><code>type</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/en-US/docs/Web/API/DOMString" title="DOMString is a UTF-16 String. As JavaScript already uses such strings, DOMString is mapped directly to a String."><code>DOMString</code></a></td>
+   <td>Le type d&apos;événement.</td>
+  </tr>
+  <tr>
+   <td><code>bubbles</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/en-US/docs/Web/API/Boolean" title="The Boolean object is an object wrapper for a boolean value."><code>Boolean</code></a></td>
+   <td>Si l&apos;événement remonte ou non.</td>
+  </tr>
+  <tr>
+   <td><code>cancelable</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/en-US/docs/Web/API/Boolean" title="The Boolean object is an object wrapper for a boolean value."><code>Boolean</code></a></td>
+   <td>Si l&apos;événement est annulable ou non.</td>
+  </tr>
+  <tr>
+   <td><code>view</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a class="new" href="/en-US/docs/Web/API/WindowProxy" rel="nofollow" title="The documentation about this has not yet been written; please consider contributing!"><code>WindowProxy</code></a></td>
+   <td><a href="/en-US/docs/Web/API/Document/defaultView" title="In browsers, document.defaultView returns the window object associated with a document, or null if none is available."><code>document.defaultView</code></a> (<code>fenêtre</code> du document)</td>
+  </tr>
+  <tr>
+   <td><code>detail</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><code>long</code> (<code>float</code>)</td>
+   <td>0.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Exemple">Exemple</h2>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Cadre parent&lt;/title&gt;
+    &lt;script&gt;
+      window.addEventListener(&apos;beforeunload&apos;, function(event) {
+        console.log(&apos;Je suis le 1er.&apos;);
+      });
+      window.addEventListener(&apos;unload&apos;, function(event) {
+        console.log(&apos;Je suis le 3ème.&apos;);
+      });
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;iframe src=&quot;child-frame.html&quot;&gt;&lt;/iframe&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>Ci-dessous, le contenu de <code>child-frame.html</code>:</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Cadre enfant&lt;/title&gt;
+    &lt;script&gt;
+      window.addEventListener(&apos;beforeunload&apos;, function(event) {
+        console.log(&apos;Je suis le 2nd.&apos;);
+      });
+      window.addEventListener(&apos;unload&apos;, function(event) {
+        console.log(&apos;Je suis le 4ème et dernier…&apos;);
+      });
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+      ☻
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>Quand le cadre parent est déchargé, les événements sont lancés dans l&apos;ordre décrit par les messages <code>console.log</code>.</p>
+
+<h2 id="Événements_liés">Événements liés</h2>
+
+<ul>
+ <li><code><a href="/fr/docs/Web/Reference/Events/DOMContentLoaded" title="/fr/docs/Web/Reference/Events/DOMContentLoaded">DOMContentLoaded</a></code></li>
+ <li><code><a href="/fr/docs/Web/Reference/Events/readystatechange" title="/fr/docs/Web/Reference/Events/readystatechange">readystatechange</a></code></li>
+ <li><code><a href="/fr/docs/Web/Reference/Events/load" title="/fr/docs/Web/Reference/Events/load">load</a></code></li>
+ <li><code><a href="/fr/docs/Web/Reference/Events/beforeunload" title="/fr/docs/Web/Reference/Events/beforeunload">beforeunload</a></code></li>
+ <li><code><a href="/fr/docs/Web/Reference/Events/unload" title="/fr/docs/Web/Reference/Events/unload">unload</a></code></li>
+</ul>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<ul>
+ <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#unloading-documents" title="http://www.whatwg.org/specs/web-apps/current-work/#unload-a-document">Unloading Documents — unload a document</a></li>
+ <li><a href="http://www.w3.org/TR/DOM-Level-3-Events/#event-type-unload" title="http://www.w3.org/TR/DOM-Level-3-Events/#event-type-unload">Event Module Definition — unload</a></li>
+</ul>

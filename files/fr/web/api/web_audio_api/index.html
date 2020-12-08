@@ -1,0 +1,505 @@
+---
+title: Web Audio API
+slug: Web/API/Web_Audio_API
+translation_of: Web/API/Web_Audio_API
+---
+<div>
+<p><span style="line-height: 1.5;">La Web Audio API propose un système puissant et flexible pour contrôler les données audio sur internet. Elle permet notamment de sélectionner des sources audio (microphone, flux media), d&apos;y ajouter des effets, de créer des visualisations, d&apos;appliquer des effets de spatialisation (comme la balance), etc.</span></p>
+</div>
+
+<h2 id="Concepts_et_usages">Concepts et usages</h2>
+
+<p><span style="line-height: 1.5;">La Web Audio API effectue des opérations dans un <strong>contexte audio</strong>; elle a été conçue pour supporter le <strong>routing modulaire</strong>. Les opérations audio basiques sont réalisées via des <strong>noeuds audio</strong> reliés entre eux pour former un <strong>graphe de routage audio</strong>. Plusieurs sources - avec différents types d&apos;agencements de canaux - peuvent être supportées, même dans un seul contexte. Ce design modulaire et flexible permet de créer des fonctions audio complexes avec des effets dynamiques.</span></p>
+
+<p><span style="line-height: 1.5;">Les noeuds audio sont reliés au niveau de leurs entrées et sorties, formant des chaînes ou des réseaux simples. Il peut y avoir une ou plusieurs sources. Les sources fournissent des tableaux d&apos;intensités sonores (échantillons), souvent plusieurs dizaines de milliers par seconde. Ceux-ci peuvent être calculées mathématiquement </span>(avec un <a href="/fr/docs/Web/API/OscillatorNode" title="On crée un OscillatorNode en utilisant la méthode AudioContext.createOscillator. Il a toujours exactement une sortie, et aucune entrée. Ses propriétés par défaut (voir AudioNode pour la définition) sont :"><code>OscillatorNode</code></a>), ou peuvent provenir de fichiers sons ou vidéos (comme <a href="/fr/docs/Web/API/AudioBufferSourceNode" title="L&apos;interface AudioBufferSourceNode est un AudioScheduledSourceNode qui représente une source audio constituée de données audio en mémoire, stockées dans un AudioBuffer. Elle est particulièrement utile pour lire des sons qui requierrent des conditions de lecture particulières, comme la synchronisation sur un certain rythme, et peuvent être stockés en mémoire. Si ce type de son doit être lu depuis le disque ou le réseau, il conviendra d&apos;utiliser un AudioWorkletNode. "><code>AudioBufferSourceNode</code></a> ou <a href="/fr/docs/Web/API/MediaElementAudioSourceNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>MediaElementAudioSourceNode</code></a>) ou de flux audio (<a href="/fr/docs/Web/API/MediaStreamAudioSourceNode" title="Un MediaElementSourceNode n&apos;a pas d&apos;entrée et une seule sortie. On le créé en utilisant la méthode AudioContext.createMediaStreamSource. Le nombre de canaux de sortie est égal au nombre de canaux de AudioMediaStreamTrack. S&apos;il n&apos;y a pas de media stream valide, alors la sortie sera constituée d&apos;un seul canal silencieux."><code>MediaStreamAudioSourceNode</code></a>). En réalité, les fichiers sons sont eux-même des enregistrements d&apos;intensités sonores, qui viennent de microphones ou d&apos;instruments électriques, et sont mixés dans une seule onde complexe.</p>
+
+<p>Les sorties de ces noeuds peuvent être liées aux entrées d&apos;autres noeuds, qui mixent ces flux d&apos;échantillons sonores ou les séparent en différents flux. Une modification courante est la multiplications des échantillons par une valeur afin d&apos;en augmenter ou diminuer le volume sonore (comme c&apos;est le cas pour le <a href="/fr/docs/Web/API/GainNode" title="L&apos;interface GainNode représente une variation de volume. Il s&apos;agit d&apos;un AudioNode, c&apos;est un module de traitement audio, qui provoque un gain donné à appliquer à des données d&apos;entrée avant sa propagation à la sortie. Un GainNode a toujours exactement une entrée et une sortie, avec la même quantité de canaux."><code>GainNode</code></a>). Le son est ensuite lié à une destination (<a href="/fr/docs/Web/API/AudioContext/destination" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioContext.destination</code></a>), qui l&apos;envoie aux enceintes ou au casque audio. Cette dernière connexion n&apos;est utile que si le son doit être entendu.<br>
+ <br>
+ Un processus de développement typique avec web audio ressemble à ceci :</p>
+
+<ol>
+ <li>Création d&apos;un contexte audio</li>
+ <li>Dans ce contexte, création des sources — comme <code>&lt;audio&gt;</code>, oscillator, stream</li>
+ <li>Création de noeuds d&apos;effets, comme la réverbération, les filtres biquad, la balance, le compresseur</li>
+ <li>Choix de la sortie audio (appelée destination), par exemple les enceintes du système</li>
+ <li>Connection des sources aux effets, et des effets à la destination</li>
+</ol>
+
+<p><img src="https://mdn.mozillademos.org/files/12523/webaudioAPI.svg" alt="A simple box diagram with an outer box labeled Audio context, and three inner boxes labeled Sources, Effects and Destination. The three inner boxes have arrow between them pointing from left to right, indicating the flow of audio information." style="display: block; height: 143px; margin: 0px auto; width: 643px;"></p>
+
+<p>Le timing est contrôlé avec une grande précision et une latence faible, ce qui permet aux développeurs d&apos;écrire un code qui réagit précisément aux événements et qui est capable de traiter des échantillons précis, même avec un taux d&apos;échantillonnage élevé. Cela permet d&apos;envisager des applications telles que des boîtes à rythme ou des séquenceurs.</p>
+
+<p>La Web Audio API permet également de contrôler la <em>spatialisation</em> du son. En utilisant un système basé sur le modèle <em>émetteur - récepteur, </em>elle permet le contrôle de la balance ainsi que la gestion de l&apos;atténuation du son en fonction de la distance, ou effet doppler, induite par un déplacement de la source sonore (ou de l&apos;auditeur).</p>
+
+<div class="note">
+<p><strong>Note</strong>: Vous pouvez lire d&apos;avantage de détails sur la Web Audio API en vous rendant sur notre article<a href="/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API"> Concepts de base de la Web Audio API</a>.</p>
+</div>
+
+<h2 id="Interface_de_la_Web_Audio_API">Interface de la Web Audio API</h2>
+
+<p>La Web Audio API expose 28 interfaces avec des événements associés, classés selon leur fonction en 9 catégories.</p>
+
+<h3 id="Définition_du_graphe_audio">Définition du graphe audio</h3>
+
+<p>Conteneurs et définitions qui donnent sa forme au graphe audio</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AudioContext" title="L&apos;interface AudioContext représente un graphe de traitement audio fait de modules audio reliés entre eux, chaque module correspondant à un AudioNode. Un contexte audio contrôle à la fois la création des nœuds qu&apos;il contient et l&apos;exécution du traitement audio, ou du décodage. On commence toujours par créer un contexte audio, et tout ce qui va se passer ensuite se situera dans ce contexte."><code>AudioContext</code></a></dt>
+ <dd>Un objet <strong><code>AudioContext</code></strong> désigne un graphe de traitement audio construit à partir de modules reliés entre eux, chacun représenté par un noeud audio (<a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a>). Le contexte audio contrôle la création des noeuds qu&apos;il contient, ainsi que l&apos;exécution du traitement audio, et du décodage. Il est nécessaire de créer un <code>AudioContext</code> avant de faire quoi que ce soit d&apos;autre, puisque tout se passe dans un contexte.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a></dt>
+ <dd>Un objet <strong><code>AudioNode</code></strong><strong> </strong>est un module de traitement audio, tel qu&apos;une <em>source audio</em> (c&apos;est-à-dire un élément HTML <a href="/fr/docs/Web/HTML/Element/audio" title="L&apos;élément HTML &lt;audio&gt; est utilisé afin d&apos;intégrer un contenu sonore dans un document. Il peut contenir une ou plusieurs sources audio représentées avec l&apos;attribut src ou l&apos;élément &lt;source&gt;. S&apos;il y a plusieurs sources, l&apos;agent utilisateur choisira celle qui convient le mieux."><code>&lt;audio&gt;</code></a> ou <a href="/fr/docs/Web/HTML/Element/video" title="L&apos;élément HTML &lt;video&gt; intègre un contenu vidéo dans un document."><code>&lt;video&gt;</code></a>), une <em>destination audio</em>, un <em>module de traitement intermédiaire</em> (par exemple un filtre <a href="/fr/docs/Web/API/BiquadFilterNode" title="AudioContext.createBiquadFilter()"><code>BiquadFilterNode</code></a>), ou un contrôle du volume <a href="/fr/docs/Web/API/GainNode" title="L&apos;interface GainNode représente une variation de volume. Il s&apos;agit d&apos;un AudioNode, c&apos;est un module de traitement audio, qui provoque un gain donné à appliquer à des données d&apos;entrée avant sa propagation à la sortie. Un GainNode a toujours exactement une entrée et une sortie, avec la même quantité de canaux."><code>GainNode</code></a>).</dd>
+ <dt><a href="/fr/docs/Web/API/AudioParam" title="L&apos;interface AudioParam représente un paramètre audio, en général un paramètre d&apos;un AudioNode tel qu&apos;un GainNode.gain. On peut lui donner une valeur spécifique ou définir une variation de valeur qui intervient à un certain moment et selon un certain fonctionnement."><code>AudioParam</code></a></dt>
+ <dd>Un objet <strong><code>AudioParam</code></strong><strong> </strong>est un paramètre audio, qui est lié à un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a>. On peut lui assigner une valeur ou un changement de valeur, que l&apos;on peut programmer à un moment spécifique et/ou selon un motif particulier.</dd>
+ <dt><code><a href="/fr/docs/Web/Reference/Events/ended_(Web_Audio)" title="/fr/docs/Web/Reference/Events/ended_(Web_Audio)">ended</a></code> (event)</dt>
+ <dd>L&apos;évènement <code>ended</code> est diffusé lorsque la lecture s&apos;arrête en arrivant à la fin d&apos;un media.</dd>
+</dl>
+
+<h3 id="Définition_des_sources_audio">Définition des sources audio</h3>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/OscillatorNode" title="On crée un OscillatorNode en utilisant la méthode AudioContext.createOscillator. Il a toujours exactement une sortie, et aucune entrée. Ses propriétés par défaut (voir AudioNode pour la définition) sont :"><code>OscillatorNode</code></a></dt>
+ <dd>Un objet <strong><code style="font-size: 14px;">OscillatorNode</code></strong><strong> </strong>est un module de traitement audio qui génère la création d&apos;une onde sinusoïdale d&apos;une certaine fréquence.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioBuffer" title="L&apos;interface AudioBuffer représente une ressource audio stockée en mémoire, créée à partir d&apos;un fichier audio avec la méthode AudioContext.decodeAudioData(), ou à partir de données brutes avec AudioContext.createBuffer(). Une fois mises en mémoire dans un AudioBuffer, les données audio sont transférées dans un AudioBufferSourceNode afin d&apos;être lues.
+
+ Ce type d&apos;objet est conçu pour contenir de petit extraits audio, durant généralement moins de 45s. Pour les sons plus longs, les objets implémentant MediaAudioElementSourceNode sont plus adaptés. La mémoire tampon contient des données au format non entrelacé IEEE 32-bit PCM linéaire, avec une portée nominale comprise entre -1 et +1. S&apos;il y a plusieurs canaux, ils sont stockés dans des mémoires-tampon distinctes."><code>AudioBuffer</code></a></dt>
+ <dd>Un objet <strong><code>AudioBuffer</code></strong> est un petit morceau de contenu audio monté en mémoire. Il peut être créé à partir d&apos;un fichier audio avec la méthode <a href="/fr/docs/Web/API/AudioContext/decodeAudioData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioContext.decodeAudioData()</code></a>, ou à partir de données brutes en utilisant <a href="/fr/docs/Web/API/AudioContext/createBuffer" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioContext.createBuffer()</code></a>. Une fois décodé sous cette forme, la source audio peut être placée dans un <a href="/fr/docs/Web/API/AudioBufferSourceNode" title="L&apos;interface AudioBufferSourceNode est un AudioScheduledSourceNode qui représente une source audio constituée de données audio en mémoire, stockées dans un AudioBuffer. Elle est particulièrement utile pour lire des sons qui requierrent des conditions de lecture particulières, comme la synchronisation sur un certain rythme, et peuvent être stockés en mémoire. Si ce type de son doit être lu depuis le disque ou le réseau, il conviendra d&apos;utiliser un AudioWorkletNode. "><code>AudioBufferSourceNode</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioBufferSourceNode" title="L&apos;interface AudioBufferSourceNode est un AudioScheduledSourceNode qui représente une source audio constituée de données audio en mémoire, stockées dans un AudioBuffer. Elle est particulièrement utile pour lire des sons qui requierrent des conditions de lecture particulières, comme la synchronisation sur un certain rythme, et peuvent être stockés en mémoire. Si ce type de son doit être lu depuis le disque ou le réseau, il conviendra d&apos;utiliser un AudioWorkletNode. "><code>AudioBufferSourceNode</code></a></dt>
+ <dd>Un objet <strong><code>AudioBufferSourceNode</code></strong> est une source audio composée de données audio montées en mémoire dans un <a href="/fr/docs/Web/API/AudioBuffer" title="L&apos;interface AudioBuffer représente une ressource audio stockée en mémoire, créée à partir d&apos;un fichier audio avec la méthode AudioContext.decodeAudioData(), ou à partir de données brutes avec AudioContext.createBuffer(). Une fois mises en mémoire dans un AudioBuffer, les données audio sont transférées dans un AudioBufferSourceNode afin d&apos;être lues.
+
+ Ce type d&apos;objet est conçu pour contenir de petit extraits audio, durant généralement moins de 45s. Pour les sons plus longs, les objets implémentant MediaAudioElementSourceNode sont plus adaptés. La mémoire tampon contient des données au format non entrelacé IEEE 32-bit PCM linéaire, avec une portée nominale comprise entre -1 et +1. S&apos;il y a plusieurs canaux, ils sont stockés dans des mémoires-tampon distinctes."><code>AudioBuffer</code></a>. C&apos;est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui se comporte comme une source audio.</dd>
+ <dt><a href="/fr/docs/Web/API/MediaElementAudioSourceNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>MediaElementAudioSourceNode</code></a></dt>
+ <dd>Un objet <code><strong>MediaElementAudio</strong></code><strong><code>SourceNode</code></strong> est une source audio composée d&apos;un élément  HTML5 <a href="/fr/docs/Web/HTML/Element/audio" title="L&apos;élément HTML &lt;audio&gt; est utilisé afin d&apos;intégrer un contenu sonore dans un document. Il peut contenir une ou plusieurs sources audio représentées avec l&apos;attribut src ou l&apos;élément &lt;source&gt;. S&apos;il y a plusieurs sources, l&apos;agent utilisateur choisira celle qui convient le mieux."><code>&lt;audio&gt;</code></a> ou <a href="/fr/docs/Web/HTML/Element/video" title="L&apos;élément HTML &lt;video&gt; intègre un contenu vidéo dans un document."><code>&lt;video&gt;</code></a>. C&apos;est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui se comporte comme une source audio.</dd>
+ <dt><a href="/fr/docs/Web/API/MediaStreamAudioSourceNode" title="Un MediaElementSourceNode n&apos;a pas d&apos;entrée et une seule sortie. On le créé en utilisant la méthode AudioContext.createMediaStreamSource. Le nombre de canaux de sortie est égal au nombre de canaux de AudioMediaStreamTrack. S&apos;il n&apos;y a pas de media stream valide, alors la sortie sera constituée d&apos;un seul canal silencieux."><code>MediaStreamAudioSourceNode</code></a></dt>
+ <dd>Un objet <code><strong>MediaStreamAudio</strong></code><strong><code>SourceNode</code></strong> est une source audio composée d&apos;un <a href="/en-US/docs/WebRTC" title="/en-US/docs/WebRTC">WebRTC</a> <a href="/fr/docs/Web/API/MediaStream" title="L&apos;interface MediaStream représente le contenu d&apos;un flux de média. Un flux est composé de plusieurs pistes, tel que des pistes vidéos ou audio."><code>MediaStream</code></a> (tel qu&apos;une webcam ou un microphone). C&apos;est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui se comporte comme une source audio.</dd>
+</dl>
+
+<h3 id="Définition_des_filtres_d&apos;effets_audio">Définition des filtres d&apos;effets audio</h3>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/BiquadFilterNode" title="AudioContext.createBiquadFilter()"><code>BiquadFilterNode</code></a></dt>
+ <dd>Un objet <strong><code>BiquadFilterNode</code> </strong>est un simple filtre de bas niveau. Il peut s&apos;agir de différents types de filtres, contrôle du volume ou égaliseurs graphiques. Un <code>BiquadFilterNode</code> a toujours exactement une entrée et une sortie.</dd>
+ <dt><a href="/fr/docs/Web/API/ConvolverNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ConvolverNode</code></a></dt>
+ <dd>Un objet <code><strong>Convolver</strong></code><strong><code>Node</code></strong><strong> </strong>est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui exécute une circonvolution linéaire sur un AudioBuffer donné, souvent utilisé pour créer un effet de réverbération.</dd>
+ <dt><a href="/fr/docs/Web/API/DelayNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DelayNode</code></a></dt>
+ <dd>Un objet <strong><code>DelayNode</code></strong><strong> </strong>est une ligne à retard numérique, c&apos;est-à-dire un module de traitement automatique qui provoque un délai entre l&apos;arrivée du son en entrée et sa propagation en sortie.</dd>
+ <dt><a href="/fr/docs/Web/API/DynamicsCompressorNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DynamicsCompressorNode</code></a></dt>
+ <dd>Un objet <strong><code>DynamicsCompressorNode</code></strong> permet un effet de compression, qui réduit le volume des parties les plus fortes du signal de façon à éviter les effets de clipping et la distortion qui peuvent se produire lorsque des sons multiples sont diffusés simultanément.</dd>
+ <dt><a href="/fr/docs/Web/API/GainNode" title="L&apos;interface GainNode représente une variation de volume. Il s&apos;agit d&apos;un AudioNode, c&apos;est un module de traitement audio, qui provoque un gain donné à appliquer à des données d&apos;entrée avant sa propagation à la sortie. Un GainNode a toujours exactement une entrée et une sortie, avec la même quantité de canaux."><code>GainNode</code></a></dt>
+ <dd>Un objet <strong><code>GainNode</code></strong><strong> </strong> représente une modification du volume sonore. C&apos;est un module de traitement audio qui provoque l&apos;application d&apos;un <em>gain</em> aux données récupérées en entrée avant leur propagation vers la sortie.</dd>
+ <dt><a href="/fr/docs/Web/API/WaveShaperNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>WaveShaperNode</code></a></dt>
+ <dd>Un objet <strong><code>WaveShaperNode</code></strong> représente une distortion non linéaire. C&apos;est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui utilise une courbe pour appliquer au signal une distortion de mise en forme des ondes. En dehors de l&apos;effet de distortion évident, il est souvent utilisé pour donner un caractère plus chaleureux au son. </dd>
+ <dt><a href="/fr/docs/Web/API/PeriodicWave" title="PeriodicWave n&apos;a ni entrée ni sortie; elle doit être créée avec AudioContext.createPeriodicWave() et être assignée à un OscillatorNode avec OscillatorNode.setPeriodicWave()."><code>PeriodicWave</code></a></dt>
+ <dd>Un objet <a href="/fr/docs/Web/API/PeriodicWave" title="PeriodicWave n&apos;a ni entrée ni sortie; elle doit être créée avec AudioContext.createPeriodicWave() et être assignée à un OscillatorNode avec OscillatorNode.setPeriodicWave()."><code>PeriodicWave</code></a> est utilisé pour définir une forme d&apos;onde périodique qui peut être utilisée pour façonner la sortie d&apos;un <a href="/fr/docs/Web/API/OscillatorNode" title="On crée un OscillatorNode en utilisant la méthode AudioContext.createOscillator. Il a toujours exactement une sortie, et aucune entrée. Ses propriétés par défaut (voir AudioNode pour la définition) sont :"><code>OscillatorNode</code></a>.</dd>
+</dl>
+
+<h3 id="Définition_des_destinations_audio">Définition des destinations audio</h3>
+
+<p>Une fois que le signal audio a été traité, ces interfaces définissent sa destination.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AudioDestinationNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioDestinationNode</code></a></dt>
+ <dd>Un noeud <strong><code>AudioDestinationNode</code></strong> représente la destination finale d&apos;une source audio source dans un contexte donné — en général les enceintes du matériel.</dd>
+ <dt><a href="/fr/docs/Web/API/MediaStreamAudioDestinationNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>MediaStreamAudioDestinationNode</code></a></dt>
+ <dd>Un noeud <code><strong>MediaStreamAudio</strong></code><strong><code>DestinationNode</code></strong> représente une destination audio constituée d&apos;un <a href="/fr/docs/Web/API/MediaStream" title="L&apos;interface MediaStream représente le contenu d&apos;un flux de média. Un flux est composé de plusieurs pistes, tel que des pistes vidéos ou audio."><code>MediaStream</code></a> <a href="/en-US/docs/WebRTC" title="/en-US/docs/WebRTC">WebRTC</a> à une seule piste <code>AudioMediaStreamTrack</code>; il peut être utilisé de façon similaire à un <a href="/fr/docs/Web/API/MediaStream" title="L&apos;interface MediaStream représente le contenu d&apos;un flux de média. Un flux est composé de plusieurs pistes, tel que des pistes vidéos ou audio."><code>MediaStream</code></a> obtenu avec <a href="/fr/docs/Web/API/Navigator/getUserMedia" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>Navigator.getUserMedia</code></a>. C&apos;est un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui se comporte comme une destination audio.</dd>
+</dl>
+
+<h3 id="Analyse_des_données_et_visualisation">Analyse des données et visualisation</h3>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AnalyserNode" title="L&apos; interface AnalyserNode représente un noeud capable de fournir en temps réel des informations d&apos;analyse de la fréquence et du domaine temporel. C&apos;est un AudioNode qui transmet le flux audio inchangé depuis l&apos;entrée vers la sortie, mais permet de capturer les données générées pour les traiter et/ou les visualiser."><code>AnalyserNode</code></a></dt>
+ <dd>Un objet <strong><code>AnalyserNode</code></strong> fournit en temps réel des informations concernant la fréquence et le temps, afin de les analyser et les visualiser.</dd>
+</dl>
+
+<h3 id="Division_et_fusion_des_pistes_audio">Division et fusion des pistes audio</h3>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/ChannelSplitterNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ChannelSplitterNode</code></a></dt>
+ <dd>Un noeud <code><strong>ChannelSplitterNode</strong></code> prend en entrée une source audio et sépare ses différentes pistes en une série de sorties <em>mono</em>.</dd>
+ <dt><a href="/fr/docs/Web/API/ChannelMergerNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ChannelMergerNode</code></a></dt>
+ <dd>Un noeud <code><strong>ChannelMergerNode</strong></code> réunit différentes entrées mono en une seule sortie. Chaque entrée devient une des pistes de la sortie unique.</dd>
+</dl>
+
+<h3 id="Spatialisation_audio">Spatialisation audio</h3>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AudioListener" title="L&apos;interface AudioListener représente la position et l&apos;orientation de l&apos;unique personne écoutant la scène audio; elle est utilisée dans le cadre d&apos;une spatialisation audio. Tous les PannerNode sont spatialisés par rapport à l&apos;objet AudioListener stocké dans la propriété AudioContext.listener."><code>AudioListener</code></a></dt>
+ <dd>Un objet <strong><code>AudioListener</code></strong><strong> </strong>représente la position et l&apos;orientation de l&apos;unique personne écoutant la scene audio utilisée dans la spatialisation audio.</dd>
+ <dt><a href="/fr/docs/Web/API/PannerNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>PannerNode</code></a></dt>
+ <dd>Un noeud <strong><code>PannerNode</code></strong> représente le comportement d&apos;un signal dans l&apos;espace. C&apos;est un module de traitement audio qui décrit sa position avec des coordonnées cartésiennes fondées sur la règle de la main droite; ses mouvements utilisent un vecteur de vélocité et sa directionnalité un cône de direction.</dd>
+</dl>
+
+<h3 id="Traitement_audio_avec_JavaScript">Traitement audio avec JavaScript</h3>
+
+<div class="note">
+<p><strong>Note</strong>: Au jour de la publication de la spécification Web Audio API le 29 août 2014, ces fonctionnalités sont dépréciées, et seront bientôt remplacées par <a href="#Audio_Workers">Audio_Workers</a>.</p>
+</div>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/ScriptProcessorNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ScriptProcessorNode</code></a></dt>
+ <dd>Un noeud <strong><code>ScriptProcessorNode</code></strong><strong> </strong>permet de générer, traiter ou analyser du son avec JavaScript. C&apos;est un module de traitement audio qui est lié à deux buffers, l&apos;un en entrée, et l&apos;autre en sortie. Un évènement implémentant <a href="/fr/docs/Web/API/AudioProcessingEvent" title="AudioProcessingEvent représente l&apos;évènement qui est passé lorsqu&apos;un tampon ScriptProcessorNode est prêt à être traité."><code>AudioProcessingEvent</code></a> est envoyé à l&apos;objet à chaque fois que le buffer d&apos;entrée reçoit de nouvelles données, et le gestionnaire d&apos;évènement prend fin lorsque les nouvelles données ont été communiquées au buffer de sortie. </dd>
+ <dt><code><a href="/fr/docs/Web/Reference/Events/audioprocess" title="/fr/docs/Web/Reference/Events/audioprocess">audioprocess</a></code> (event)</dt>
+ <dd>L&apos;évènement <code>audioprocess</code> est émis lorsque le buffer d&apos;entrée d&apos;un <a href="/fr/docs/Web/API/ScriptProcessorNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ScriptProcessorNode</code></a> de la Web Audio API est prêt à être traité.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioProcessingEvent" title="AudioProcessingEvent représente l&apos;évènement qui est passé lorsqu&apos;un tampon ScriptProcessorNode est prêt à être traité."><code>AudioProcessingEvent</code></a></dt>
+ <dd>L&apos;objet  <code>AudioProcessingEvent </code>est envoyé aux fonctions de callback qui écoutent l&apos;évènement <code>audioprocess.</code></dd>
+</dl>
+
+<h3 id="Traitement_audio_hors_ligne_ou_en_tâche_de_fond">Traitement audio hors ligne ou en tâche de fond</h3>
+
+<p>Il est possible de traiter et exporter un graphe audio très rapidement en tâche de fond — en l&apos;exportant dans un <a href="/fr/docs/Web/API/AudioBuffer" title="L&apos;interface AudioBuffer représente une ressource audio stockée en mémoire, créée à partir d&apos;un fichier audio avec la méthode AudioContext.decodeAudioData(), ou à partir de données brutes avec AudioContext.createBuffer(). Une fois mises en mémoire dans un AudioBuffer, les données audio sont transférées dans un AudioBufferSourceNode afin d&apos;être lues.
+
+ Ce type d&apos;objet est conçu pour contenir de petit extraits audio, durant généralement moins de 45s. Pour les sons plus longs, les objets implémentant MediaAudioElementSourceNode sont plus adaptés. La mémoire tampon contient des données au format non entrelacé IEEE 32-bit PCM linéaire, avec une portée nominale comprise entre -1 et +1. S&apos;il y a plusieurs canaux, ils sont stockés dans des mémoires-tampon distinctes."><code>AudioBuffer</code></a> plutôt que sur les enceintes du matériel — grâce aux objets suivants.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/OfflineAudioContext" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>OfflineAudioContext</code></a></dt>
+ <dd>Un objet <strong><code>OfflineAudioContext</code></strong> est un <a href="/fr/docs/Web/API/AudioContext" title="L&apos;interface AudioContext représente un graphe de traitement audio fait de modules audio reliés entre eux, chaque module correspondant à un AudioNode. Un contexte audio contrôle à la fois la création des nœuds qu&apos;il contient et l&apos;exécution du traitement audio, ou du décodage. On commence toujours par créer un contexte audio, et tout ce qui va se passer ensuite se situera dans ce contexte."><code>AudioContext</code></a> qui représente un graphe de traitement audio construit à partir de noeuds audio. A la différence du <code>AudioContext </code>standard, un <code>OfflineAudioContext</code> n&apos;exporte pas vraiment le son, mais le génère, aussi vite que possible, dans un buffer.</dd>
+ <dt><code><a href="/fr/docs/Web/Reference/Events/complete" title="/fr/docs/Web/Reference/Events/complete">complete</a></code> (event)</dt>
+ <dd>Un évènement <code>complete</code> est émis lorsque le rendu d&apos;un <a href="/fr/docs/Web/API/OfflineAudioContext" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>OfflineAudioContext</code></a> est terminé.</dd>
+ <dt><a href="/fr/docs/Web/API/OfflineAudioCompletionEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>OfflineAudioCompletionEvent</code></a></dt>
+ <dd>The <code>OfflineAudioCompletionEvent</code> est envoyé aux fonctions de callback qui écoutent l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/complete" title="/fr/docs/Web/Reference/Events/complete">complete</a></code> event implements this interface.</dd>
+</dl>
+
+<h3 id="Audio_Workers" name="Audio_Workers">Audio Workers</h3>
+
+<p>Les Audio workers offrent la possibilité de traiter le son directement dans le contexte d&apos;un <a href="/en-US/docs/Web/Guide/Performance/Using_web_workers">web worker</a>. En date du 29 August 2014, ils ne sont encore implémentés par aucun navigateur. Lorsqu&apos;ils seront implémentés, ils remplaceront <a href="/fr/docs/Web/API/ScriptProcessorNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ScriptProcessorNode</code></a>, et les autres fonctionnalités mentionnées dans la section <a href="#Audio_processing_via_JavaScript">Traitement audio avec JavaScript</a> ci-avant.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AudioWorkerNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioWorkerNode</code></a></dt>
+ <dd>Un objet AudioWorkerNode représente un <a href="/fr/docs/Web/API/AudioNode" title="L&apos;interface AudioNode est une interface générique pour représenter un module de traitement audio tel qu&apos;une source audio &lt;audio&gt;, un élément &lt;video&gt;, un OscillatorNode, une sortie audio, ou un module de traitement intermédiaire  (filtres BiquadFilterNode ou ConvolverNode), un contrôle de volume GainNode."><code>AudioNode</code></a> qui interagit avec le thread d&apos;un worker pour générer, traiter, ou analyse le son directement.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioWorkerGlobalScope" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioWorkerGlobalScope</code></a></dt>
+ <dd>Un objet <code>AudioWorkerGlobalScope</code> est un objet dérivé d&apos;un objet <code>DedicatedWorkerGlobalScope</code>. Il représente le contexte d&apos;un worker dans lequel un script de traitement audio est lancé; il est conçu pour permettre la génération, le traitement, et l&apos;analyse de données audio directement avec JavaScript dans le thread d&apos;un worker.</dd>
+ <dt><a href="/fr/docs/Web/API/AudioProcessEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioProcessEvent</code></a></dt>
+ <dd>UN objet <code>Event</code> est transmis aux objets <a href="/fr/docs/Web/API/AudioWorkerGlobalScope" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>AudioWorkerGlobalScope</code></a> pour effectuer un traitement audio.</dd>
+</dl>
+
+<h2 id="Example" name="Example">Objets obsolètes</h2>
+
+<p>Les objets suivants étaient définis dans les versions précédentes de la spécification, mais sont maintenant obsolètes et ont été remplacés.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/JavaScriptNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>JavaScriptNode</code></a></dt>
+ <dd>Utilisé pour le traitement du son directement en Javascript. Cet objet est obsolète, et a été remplacé par <a href="/fr/docs/Web/API/ScriptProcessorNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ScriptProcessorNode</code></a>.</dd>
+ <dt><a href="/fr/docs/Web/API/WaveTableNode" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>WaveTableNode</code></a></dt>
+ <dd>Utilisé pour définir une forme d&apos;onde périodique. Cet objet est obsolète, et a été remplacé par <a href="/fr/docs/Web/API/PeriodicWave" title="PeriodicWave n&apos;a ni entrée ni sortie; elle doit être créée avec AudioContext.createPeriodicWave() et être assignée à un OscillatorNode avec OscillatorNode.setPeriodicWave()."><code>PeriodicWave</code></a>.</dd>
+</dl>
+
+<h2 id="Example" name="Example">Exemple</h2>
+
+<p>Cet exemple montre l&apos;utilisation d&apos;un grand nombre de fonctions Web Audio. La démo est disponible en ligne sur <a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-o-matic</a> (voir aussi le <a href="https://github.com/mdn/voice-change-o-matic"> code source complet sur Github</a>) —c&apos;est une démo expérimentale d&apos;application pour modifier la voix; baissez le son de vos enceintes pour l&apos;utiliser, au moins au début !</p>
+
+<p>Les lignes qui concernent la Web Audio API sont surlignées; si vous voulez en savoir davantage sur les différentes méthodes, consultez la documentation.</p>
+
+<pre class="brush: js; highlight:[1,2,9,10,11,12,36,37,38,39,40,41,62,63,72,114,115,121,123,124,125,147,151]">var contexteAudio = new (window.AudioContext || window.webkitAudioContext)(); // définition du contexte audio
+// les navigateurs avec un moteur Webkit/blink demandent un préfixe
+
+var voixSelectionnee = document.getElementById(&quot;voice&quot;); // case à cocher pour la sélection d&apos;effets de voix
+var visualisationSelectionnee = document.getElementById(&quot;visual&quot;); // case à cocher pour la sélection d&apos;options de visualisation audio
+var silence = document.querySelector(&apos;.mute&apos;); // bouton pour couper le son
+var renduVisuel; // requestAnimationFrame
+
+var analyseur = contexteAudio.createAnalyser();
+var distorsion = contexteAudio.createWaveShaper();
+var gainVolume = contexteAudio.createGain();
+var filtreAccordable = contexteAudio.createBiquadFilter();
+
+function creerCourbeDistorsion(taille) { // fonction qui crée une forme de courbe qui sera utilisée par le générateur de l&apos;onde de distorsion
+  var k = typeof taille === &apos;number&apos; ? taille : 50,
+    nombre_echantillons = 44100,
+    courbe = new Float32Array(nombre_echantillons),
+    angle = Math.PI / 180,
+    i = 0,
+    x;
+  for ( ; i &lt; nombre_echantillons; ++i ) {
+    x = i * 2 / nombre_echantillons - 1;
+    courbe[i] = ( 3 + k ) * x * 20 * angle / ( Math.PI + k * Math.abs(x) );
+  }
+  return courbe;
+};
+
+navigator.getUserMedia (
+  // contraintes - uniquement audio dans cet exemple
+  {
+    audio: true
+  },
+
+  // callback de succès
+  function(flux) {
+    source = contexteAudio.createMediaStreamSource(flux);
+    source.connect(analyseur);
+    analyseur.connect(distorsion);
+    distorsion.connect(filtreAccordable);
+    filtreAccordable.connect(gainVolume);
+    gainVolume.connect(contexteAudio.destination); // connecte les différents noeuds de graphes audio entre eux
+
+    genererVisualisation(flux);
+    voiceChange();
+
+  },
+
+  // callback d&apos;erreur
+  function(err) {
+    console.log(&quot;L&apos;erreur GUM suivante a eu lieu : &quot; + err);
+  }
+);
+
+function genererVisualisation(flux) {
+  const LARGEUR = canvas.width;
+  const HAUTEUR = canvas.height;
+
+  var parametreVisualisation = visualisationSelectionnee.value;
+  console.log(parametreVisualisation);
+
+  if(parametreVisualisation == &quot;sinewave&quot;) {
+    analyseur.fftSize = 2048;
+    var tailleBuffer = analyseur.frequencyBinCount; // la moitié de la valeur FFT (Transformation de Fourier rapide)
+    var tableauDonnees = new Uint8Array(tailleBuffer); // crée un tableau pour stocker les données
+
+    canvasCtx.clearRect(0, 0, LARGEUR, HAUTEUR);
+
+    function draw() {
+
+      renduVisuel = requestAnimationFrame(draw);
+
+      analyseur.getByteTimeDomainData(tableauDonnees); // récupère les données de l&apos;onde de forme et les met dans le tableau créé
+
+      canvasCtx.fillStyle = &apos;rgb(200, 200, 200)&apos;; // dessine une onde dans le canvas
+      canvasCtx.fillRect(0, 0, LARGEUR, HAUTEUR);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = &apos;rgb(0, 0, 0)&apos;;
+
+      canvasCtx.beginPath();
+
+      var sliceWidth = LARGEUR * 1.0 / tailleBuffer;
+      var x = 0;
+
+      for(var i = 0; i &lt; tailleBuffer; i++) {
+
+        var v = tableauDonnees[i] / 128.0;
+        var y = v * HAUTEUR/2;
+
+        if(i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+
+      canvasCtx.lineTo(canvas.width, canvas.height/2);
+      canvasCtx.stroke();
+    };
+
+    draw();
+
+  } else if(parametreVisualisation == &quot;off&quot;) {
+    canvasCtx.clearRect(0, 0, LARGEUR, HAUTEUR);
+    canvasCtx.fillStyle = &quot;red&quot;;
+    canvasCtx.fillRect(0, 0, LARGEUR, HAUTEUR);
+  }
+
+}
+
+function modifierVoix() {
+  distorsion.curve = new Float32Array;
+  filtreAccordable.gain.value = 0; // reset les effets à chaque fois que la fonction modifierVoix est appelée
+
+  var choixVoix = voixSelectionnee.value;
+  console.log(choixVoix);
+
+  if(choixVoix == &quot;distortion&quot;) {
+    distorsion.curve = creerCourbeDistorsion(400); // applique la distorsion au son en utilisant le noeud d&apos;onde de forme
+  } else if(choixVoix == &quot;biquad&quot;) {
+    filtreAccordable.type = &quot;lowshelf&quot;;
+    filtreAccordable.frequency.value = 1000;
+    filtreAccordable.gain.value = 25; // applique le filtre lowshelf aux sons qui utilisent le filtre accordable
+  } else if(choixVoix == &quot;off&quot;) {
+    console.log(&quot;Choix de la voix désactivé&quot;); // ne fait rien, quand l&apos;option off est sélectionnée
+  }
+
+}
+
+// écouteurs d&apos;évènements pour les changements de visualisation et de voix
+
+visualisationSelectionnee.onchange = function() {
+  window.cancelAnimationFrame(renduVisuel);
+  genererVisualisation(flux);
+}
+
+voixSelectionnee.onchange = function() {
+  modifierVoix();
+}
+
+silence.onclick = muterVoix;
+
+function muterVoix() { // allumer / éteindre le son
+  if(silence.id == &quot;&quot;) {
+    gainVolume.gain.value = 0; // gain à 0 pour éteindre le son
+    silence.id = &quot;activated&quot;;
+    silence.innerHTML = &quot;Unmute&quot;;
+  } else {
+    gainVolume.gain.value = 1; // gain à 1 pour allumer le son
+    silence.id = &quot;&quot;;
+    silence.innerHTML = &quot;Mute&quot;;
+  }
+}
+</pre>
+
+<h2 id="Spécification">Spécification</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La spécificaction &apos;Web Audio API&apos;" href="https://webaudio.github.io/web-audio-api/" class="external" hreflang="en">Web Audio API</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_navigateurs">Compatibilité navigateurs</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td>14 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes" title="Le nom de cette fonctionnalité est préfixé par &apos;webkit&apos; car ce navigateur la considère expérimentale">webkit</a></span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>23</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>15 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes" title="Le nom de cette fonctionnalité est préfixé par &apos;webkit&apos; car ce navigateur la considère expérimentale">webkit</a></span><br>
+    22 (unprefixed)</td>
+   <td>6 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes" title="Le nom de cette fonctionnalité est préfixé par &apos;webkit&apos; car ce navigateur la considère expérimentale">webkit</a></span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>28 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes" title="Le nom de cette fonctionnalité est préfixé par &apos;webkit&apos; car ce navigateur la considère expérimentale">webkit</a></span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>25</td>
+   <td>1.2</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>6 <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes" title="Le nom de cette fonctionnalité est préfixé par &apos;webkit&apos; car ce navigateur la considère expérimentale">webkit</a></span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/Web_Audio_API/Using_Web_Audio_API">Utiliser la Web Audio API</a></li>
+ <li><a href="/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API">Visualizations with Web Audio API</a></li>
+ <li><a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-O-matic example</a></li>
+ <li><a href="http://mdn.github.io/violent-theremin/">Violent Theremin example</a></li>
+ <li><a href="/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialisation_basics">Web audio spatialisation basics</a></li>
+ <li><a href="http://www.html5rocks.com/tutorials/webaudio/positional_audio/" title="http://www.html5rocks.com/tutorials/webaudio/positional_audio/">Mixing Positional Audio and WebGL</a></li>
+ <li><a href="http://www.html5rocks.com/tutorials/webaudio/games/" title="http://www.html5rocks.com/tutorials/webaudio/games/">Developing Game Audio with the Web Audio API</a></li>
+ <li><a href="/en-US/docs/Web/API/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext" title="/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext">Porting webkitAudioContext code to standards based AudioContext</a></li>
+ <li><a href="https://github.com/bit101/tones">Tones</a>: a simple library for playing specific tones/notes using the Web Audio API.</li>
+ <li><a href="https://github.com/goldfire/howler.js/">howler.js</a>: a JS audio library that defaults to <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a> and falls back to <a href="http://www.whatwg.org/specs/web-apps/current-work/#the-audio-element">HTML5 Audio</a>, as well as providing other useful features.</li>
+ <li><a href="https://github.com/mattlima/mooog">Mooog</a>: jQuery-style chaining of AudioNodes, mixer-style sends/returns, and more.</li>
+</ul>
+
+<section id="Quick_Links">
+<h3 id="Quicklinks">Quicklinks</h3>
+
+<ol>
+ <li data-default-state="open"><strong><a href="#">Guides</a></strong>
+
+  <ol>
+   <li><a href="/fr/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API">Les concepts de base de la Web Audio API</a></li>
+   <li><a href="/fr/docs/Web/API/Web_Audio_API/Using_Web_Audio_API">Utiliser la Web Audio API</a></li>
+   <li><a href="/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API">Visualizations with Web Audio API</a></li>
+   <li><a href="/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialisation_basics">Web audio spatialisation basics</a></li>
+   <li><a href="/en-US/docs/Web/API/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext">Porting webkitAudioContext code to standards based AudioContext</a></li>
+  </ol>
+ </li>
+ <li data-default-state="open"><strong><a href="#">Exemples</a></strong>
+  <ol>
+   <li><a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-O-matic</a></li>
+   <li><a href="http://mdn.github.io/violent-theremin/">Violent Theremin</a></li>
+  </ol>
+ </li>
+ <li data-default-state="open"><strong><a href="#">Objets</a></strong>
+  <ol>
+   <li><a href="/fr/docs/Web/API/AnalyserNode"><code>AnalyserNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioBuffer"><code>AudioBuffer</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioBufferSourceNode"><code>AudioBufferSourceNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioContext"><code>AudioContext</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioDestinationNode"><code>AudioDestinationNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioListener"><code>AudioListener</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioNode"><code>AudioNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/AudioParam"><code>AudioParam</code></a></li>
+   <li><code><a href="/fr/docs/Web/Reference/Events/audioprocess">audioprocess</a></code> (event)</li>
+   <li><a href="/fr/docs/Web/API/AudioProcessingEvent"><code>AudioProcessingEvent</code></a></li>
+   <li><a href="/fr/docs/Web/API/BiquadFilterNode"><code>BiquadFilterNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/ChannelMergerNode"><code>ChannelMergerNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/ChannelSplitterNode"><code>ChannelSplitterNode</code></a></li>
+   <li><code><a href="/fr/docs/Web/Reference/Events/complete">complete</a></code> (event)</li>
+   <li><a href="/fr/docs/Web/API/ConvolverNode"><code>ConvolverNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/DelayNode"><code>DelayNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/DynamicsCompressorNode"><code>DynamicsCompressorNode</code></a></li>
+   <li><code><a href="/fr/docs/Web/Reference/Events/ended_(Web_Audio)">ended</a></code> (event)</li>
+   <li><a href="/fr/docs/Web/API/GainNode"><code>GainNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/MediaElementAudioSourceNode"><code>MediaElementAudioSourceNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/MediaStreamAudioDestinationNode"><code>MediaStreamAudioDestinationNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/MediaStreamAudioSourceNode"><code>MediaStreamAudioSourceNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/OfflineAudioCompletionEvent"><code>OfflineAudioCompletionEvent</code></a></li>
+   <li><a href="/fr/docs/Web/API/OfflineAudioContext"><code>OfflineAudioContext</code></a></li>
+   <li><a href="/fr/docs/Web/API/OscillatorNode"><code>OscillatorNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/PannerNode"><code>PannerNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/PeriodicWave"><code>PeriodicWave</code></a></li>
+   <li><a href="/fr/docs/Web/API/ScriptProcessorNode"><code>ScriptProcessorNode</code></a></li>
+   <li><a href="/fr/docs/Web/API/WaveShaperNode"><code>WaveShaperNode</code></a></li>
+  </ol>
+ </li>
+</ol>
+</section>

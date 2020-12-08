@@ -1,0 +1,86 @@
+---
+title: Tailles de canvas et WebGL
+slug: Web/API/WebGL_API/By_example/Tailles_de_canvas_et_WebGL
+tags:
+  - Apprendre
+  - Débutant
+  - Exemple
+  - Tutoriel
+  - WebGL
+translation_of: Web/API/WebGL_API/By_example/Canvas_size_and_WebGL
+---
+<div></div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Appliquer_des_découpes_simples" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Modèle_1" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/API/WebGL_API/By_example/Tailles_de_canvas_et_WebGL$samples/Les_effets_li%C3%A9s_%C3%A0_la_taille_du_canevas_sur_le_rendu_avec_WebGL?revision=1437285" width="660" class="live-sample-frame sample-code-frame" height="180" frameborder="0" id="frame_Les_effets_liés_à_la_taille_du_canevas_sur_le_rendu_avec_WebGL"></iframe></p>
+
+<p class="summary">Dans cet exemple, on observe l&apos;effet obtenu quand on définit (ou non) la taille du canevas HTML avec sa taille <a href="/fr/docs/Glossaire/CSS" class="glossaryLink" title="CSS : CSS (Cascading Style Sheets ou Feuilles de style en cascade en français) est un langage déclaratif utilisé pour décrire la présentation de pages web dans le navigateur. Le navigateur applique les déclarations de style CSS aux éléments concernés pour les mettre en forme. Une déclaration de style contient des propriétés et leurs valeurs et détermine l&apos;apparence d&apos;un ou plusieurs éléments de la page.">CSS</a> (exprimée en pixels CSS), tel qu&apos;il apparaît dans la fenêtre du navigateur.</p>
+
+<h3 id="Les_effets_liés_à_la_taille_du_canevas_sur_le_rendu_avec_WebGL">Les effets liés à la taille du canevas sur le rendu avec WebGL</h3>
+
+<p>Grâce aux méthodes <a href="/fr/docs/Web/API/WebGLRenderingContext/scissor" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>scissor()</code></a> et <a href="/fr/docs/Web/API/WebGLRenderingContext/clear" title="La méthode WebGLRenderingContext.clear() de l&apos;API WebGL efface les tampons avec des valeurs prédéfinies."><code>clear()</code></a> on peut démontrer que le tampon (<em>buffer</em>) de dessin WebGL est affecté par la taille du canevas (l&apos;élément HTML <code>canvas</code>).</p>
+
+<p>La taille du premier canevas est définie avec la taille de l&apos;élément, mis en forme, qui est déterminée par <a href="/fr/docs/Glossaire/CSS" class="glossaryLink" title="CSS : CSS (Cascading Style Sheets ou Feuilles de style en cascade en français) est un langage déclaratif utilisé pour décrire la présentation de pages web dans le navigateur. Le navigateur applique les déclarations de style CSS aux éléments concernés pour les mettre en forme. Une déclaration de style contient des propriétés et leurs valeurs et détermine l&apos;apparence d&apos;un ou plusieurs éléments de la page.">CSS</a>. Pour cela, on affecte respectivement les valeurs <a href="/fr/docs/Web/API/Element/clientWidth" title="clientWidth est une propriété DHTML qui représente la largeur intérieure d&apos;un élément. Celle-ci inclut les espaces intérieurs éventuels (padding), mais pas la barre de défilement vertical (si présente), ni la bordure ou les marges extérieures (margin)."><code>clientWidth</code></a> and <a href="/fr/docs/Web/API/Element/clientHeight" title="Renvoie la hauteur intérieure d&apos;un élément en pixels. Celle-ci comprend les marges intérieures éventuelles (padding), mais ni la barre de défilement horizontale, ni les bordures ,ni les marges extérieures (margin)."><code>clientHeight</code></a> aux propriétés <a href="/fr/docs/Web/API/HTMLCanvasElement/width" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>width</code></a> et <a href="/fr/docs/Web/API/HTMLCanvasElement/height" title="La propriété HTMLCanvasElement.height est un entier positif reflétant l&apos;attribut HTML height de l&apos;élément &lt;canvas&gt; mesuré en pixels CSS. Quand cet attribut n&apos;est pas spécifié, ou si on lui affecte une valeur invalide, telle que négative, la valeur par défaut de 150 is utilisée."><code>height</code></a>.</p>
+
+<p>Pour le deuxième canevas, on n&apos;applique pas ce traitement, c&apos;est donc les dimensions internes du canevas : <a href="/fr/docs/Web/API/HTMLCanvasElement/width" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>width</code></a> et <a href="/fr/docs/Web/API/HTMLCanvasElement/height" title="La propriété HTMLCanvasElement.height est un entier positif reflétant l&apos;attribut HTML height de l&apos;élément &lt;canvas&gt; mesuré en pixels CSS. Quand cet attribut n&apos;est pas spécifié, ou si on lui affecte une valeur invalide, telle que négative, la valeur par défaut de 150 is utilisée."><code>height</code></a> qui sont prises en compte. Celles-ci sont différentes des dimensions de l&apos;élément <code>canvas</code> affiché dans le fenêtre du navigateur.</p>
+
+<p>L&apos;effet devient visible quand on utilise les méthodes <a href="/fr/docs/Web/API/WebGLRenderingContext/scissor" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>scissor()</code></a> et <a href="/fr/docs/Web/API/WebGLRenderingContext/clear" title="La méthode WebGLRenderingContext.clear() de l&apos;API WebGL efface les tampons avec des valeurs prédéfinies."><code>clear()</code></a> pour dessiner un carré au centre du canevas en définissant sa position et sa taille en pixels. Dans le premier canevas, on obtient bien le bon résultat et dans le deuxième, on a la mauvaise forme, la mauvaise taille et la mauvaise position.</p>
+
+<pre class="brush: html">&lt;p&gt;On compare les deux canevas.&lt;/p&gt;
+&lt;canvas&gt;Votre navigateur ne semble pas
+    supporter l&apos;élément HTML5 canvas.&lt;/canvas&gt;
+&lt;canvas&gt;Votre navigateur ne semble pas
+    supporter l&apos;élément HTML5 canvas.&lt;/canvas&gt;
+</pre>
+
+<pre class="brush: css">body {
+  text-align : center;
+}
+canvas {
+  width : 120px;
+  height : 80px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+</pre>
+
+<pre class="brush: js">window.addEventListener(&quot;load&quot;, function() {
+  &quot;use strict&quot;
+  var firstCanvas = document.getElementsByTagName(&quot;canvas&quot;)[0],
+    secondCanvas = document.getElementsByTagName(&quot;canvas&quot;)[1];
+
+  // Ici on applique le traitement spécifique au premier
+  // canevas
+  firstCanvas.width = firstCanvas.clientWidth;
+  firstCanvas.height = firstCanvas.clientHeight;
+
+  // Ensuite on traite les deux canevas de la même façon
+  [firstCanvas, secondCanvas].forEach(function(canvas) {
+    var gl = canvas.getContext(&quot;webgl&quot;)
+      || canvas.getContext(&quot;experimental-webgl&quot;);
+    if (!gl) {
+      document.querySelector(&quot;p&quot;).innerHTML =
+        &quot;Échec de l&apos;obtention du contexte WebGL. &quot;
+        + &quot;Votre navigateur peut ne pas supporter WebGL.&quot;;
+      return;
+    }
+    gl.viewport(0, 0,
+      gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(30, 10, 60, 60);
+    gl.clearColor(1.0, 1.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+  });
+}, false);
+</pre>
+
+<p>Le code source de cet exemple est également disponible sur <a href="https://github.com/idofilin/webgl-by-example/tree/master/canvas-size-and-webgl">GitHub</a>.</p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Appliquer_des_découpes_simples" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Modèle_1" class="button">Suivant  »</a></p>
+</div><p></p>

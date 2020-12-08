@@ -1,0 +1,268 @@
+---
+title: Glisser et déposer
+slug: Web/API/API_HTML_Drag_and_Drop
+tags:
+  - Avancé
+  - Glisser-deposer
+  - Guide
+  - HTML
+  - drag and drop
+translation_of: Web/API/HTML_Drag_and_Drop_API
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API">HTML Drag and Drop API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop">File drag and drop</a> <a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/API_HTML_Drag_and_Drop/Op%C3%A9rations_de_glissement">Opérations de glissement</a></li><li><a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items">Dragging and Dropping Multiple Items</a> <a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types">Recommended Drag Types</a> <a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/DataTransfer"><code>DataTransfer</code></a></li><li><a href="/fr/docs/Web/API/DataTransferItem"><code>DataTransferItem</code></a></li><li><a href="/fr/docs/Web/API/DataTransferItemList"><code>DataTransferItemList</code></a></li><li><a href="/fr/docs/Web/API/DragEvent"><code>DragEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/HTMLElement/drag_event"><code>HTMLElement</code>: <code>drag</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragend_event"><code>HTMLElement</code>: <code>dragend</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragenter_event"><code>HTMLElement</code>: <code>dragenter</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragexit_event"><code>HTMLElement</code>: <code>dragexit</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragleave_event"><code>HTMLElement</code>: <code>dragleave</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragover_event"><code>HTMLElement</code>: <code>dragover</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/dragstart_event"><code>HTMLElement</code>: <code>dragstart</code></a></li><li><a href="/fr/docs/Web/API/HTMLElement/drop_event"><code>HTMLElement</code>: <code>drop</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary"><strong>L&apos;interface HTML <em>Drag and Drop</em></strong> (pour glisser-déposer) permet à des applications d&apos;utiliser des fonctionnalités de glisser-déposer dans le navigateur.</span> L&apos;utilisateur pourra sélectionner des éléments déplaçables à la souris et les déplacer vers un élément où on peut déposer en relâchant le bouton de la souris. Une représentation translucide de l&apos;élément déplacé suit le pointeur lors de l&apos;opération.</p>
+
+<p>Pour les sites web et les extensions, on peut personnaliser les éléments qui peuvent être déplacés, la façon dont ceux-ci sont signalés et les éléments qui peuvent servir de destination.</p>
+
+<p>L&apos;aperçu de cette API inclut une description des interfaces, les étapes à suivre pour prendre en charge ces fonctionnalités dans une application et un aperçu de l&apos;interopérabilité de ces interfaces.</p>
+
+<h2 id="Évènements_de_déplacement">Évènements de déplacement</h2>
+
+<p>L&apos;API HTML <em>Drag and Drop</em> utilise le modèle d&apos;évènements du DOM (<a href="/fr/docs/Web/API/Event" title="L&apos;interface Event représente tout événement qui a lieu dans le DOM ; certains sont générés par l&apos;utilisateur (tels que des événements de souris ou de clavier), tandis que d&apos;autres sont générés par des API (par exemple, des événements indiquant qu&apos;une animation est terminée, qu&apos;une vidéo a été suspendue, etc.). Il existe plusieurs types d&apos;événements, dont certains utilisent d&apos;autres interfaces basées sur l&apos;interface principale Event. Event elle-même contient les propriétés et méthodes communes à tous les événements."><code>Event</code></a>) ainsi que les éléments de déplacements (<em><a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a></em>) hérités des évènements liés à la souris (<a href="/fr/docs/Web/API/MouseEvent" title="L&apos;interface MouseEvent représente les événements qui se produisent lors d&apos;une interaction de l&apos;utilisateur avec un appareil de pointage (tel qu&apos;une souris). Les événements communs utilisant cette interface incluent click, dblclick, mouseup et mousedown."><code>MouseEvent</code></a>). Une opération de déplacement commence généralement lorsqu&apos;un utilisateur sélectionne un élément déplaçable puis qu&apos;il le déplace sur un élément de destination avant de relâcher l&apos;élément déplacé.</p>
+
+<p>Lors des opérations de déplacement, plusieurs évènements sont déclenchés (dont certains qui sont déclenchés à plusieurs reprises comme <code><a href="/fr/docs/Web/Reference/Events/drag" title="/fr/docs/Web/Reference/Events/drag">drag</a></code> et <code><a href="/fr/docs/Web/Reference/Events/dragover" title="/fr/docs/Web/Reference/Events/dragover">dragover</a></code>).</p>
+
+<p>Chaque <a href="/fr/docs/Web/API/DragEvent#Event_types">type d&apos;évènement de déplacement</a> possède un <a href="/fr/docs/Web/API/DragEvent#GlobalEventHandlers">gestionnaire d&apos;évènement global (une méthode <code>on...</code>)</a> :</p>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Évènement</th>
+   <th scope="col">Gestionnaire d&apos;évènement global</th>
+   <th scope="col">Déclenchement</th>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/drag" title="/fr/docs/Web/Reference/Events/drag">drag</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondrag" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondrag</code></a></td>
+   <td>…un objet déplaçable (que ce soit un élément ou une sélection de texte) est déplacée.</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragend" title="/fr/docs/Web/Reference/Events/dragend">dragend</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragend" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragend</code></a></td>
+   <td>…une opération de déplacement se termine (en relâchant le bouton de la souris ou en utilisant la touche Echap, voir <a href="/en-US/docs/DragDrop/Drag_Operations#dragend" title="Finishing a Drag">Terminer un déplacement</a>)</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragenter" title="/fr/docs/Web/Reference/Events/dragenter">dragenter</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragenter" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragenter</code></a></td>
+   <td>…un élément en cours de déplacement arrive sur une zone de dépôt valide (voir <a href="/fr/docs/DragDrop/Drag_Operations#droptargets" title="Specifying Drop Targets">indiquer une cible de destination</a>).</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragexit" title="/fr/docs/Web/Reference/Events/dragexit">dragexit</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragexit" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragexit</code></a></td>
+   <td>…un élément n&apos;est plus la sélection immédiate du déplacement.</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragleave" title="/fr/docs/Web/Reference/Events/dragleave">dragleave</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragleave" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragleave</code></a></td>
+   <td>…un élément en cours de déplacement quitte une zone de dépôt valide.</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragover" title="/fr/docs/Web/Reference/Events/dragover">dragover</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragover" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragover</code></a></td>
+   <td>…un élément en cours de déplacement est en cours de survol d&apos;une zone de dépôt valide (cet évènement est déclenché toutes les quelques centaines de millisecondes).</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/dragstart" title="/fr/docs/Web/Reference/Events/dragstart">dragstart</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondragstart" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragstart</code></a></td>
+   <td>…l&apos;utilisateur commence à déplacer un élément (voir <a href="/fr/docs/DragDrop/Drag_Operations#dragstart" title="Starting a Drag Operation">démarrer une opération de glissement</a>).</td>
+  </tr>
+  <tr>
+   <td><code><a href="/fr/docs/Web/Reference/Events/drop" title="/fr/docs/Web/Reference/Events/drop">drop</a></code></td>
+   <td><a href="/fr/docs/Web/API/GlobalEventHandlers/ondrop" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondrop</code></a></td>
+   <td>…un élément est déposé sur une cible valide (voir <a href="/fr/docs/DragDrop/Drag_Operations#drop" title="Performing a Drop">déposer un élément</a>).</td>
+  </tr>
+ </tbody>
+</table>
+
+<p class="note"><strong>Note :</strong> Les évènements <code>dragstart</code> et <code>dragend</code> ne sont pas déclenchés lors qu&apos;on glisse-dépose un fichier de l&apos;appareil dans le navigateur.</p>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<p>Les interfaces fournies par cette API sont</p>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a>,</li>
+ <li><a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a>,</li>
+ <li><a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a></li>
+ <li><a href="/fr/docs/Web/API/DataTransferItemList" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItemList</code></a>.</li>
+</ul>
+
+<p>L&apos;interface <a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a> possède un constructeur et une propriété <a href="/fr/docs/Web/API/DragEvent/dataTransfer" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>dataTransfer</code></a> qui est un objet <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a>.</p>
+
+<p>Les objets <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> incluent l&apos;état du glisser-déposer, le type de déplacement (<code>copy</code> ou <code>move</code>), les données déplacées (un ou plusieurs objets) et le type MIME de chaque objet déplacé. Les objets <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> possèdent également des méthodes permettant d&apos;ajouter ou de retirer des objets aux données déplacées.</p>
+
+<p>Les interfaces <a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a> et <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> sont standard et suffisent à apporter des fonctionnalités de glisser/déposer. Toutefois, Firefox prend en charge quelques extensions spécifiques à Gecko (cf. ci-après) pour l&apos;objet <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> (bien entendu, ces extensions ne fonctionneront que dans Firefox et pas dans les autres navigateurs).</p>
+
+<p>Chaque objet <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> possède une propriété  <a href="/fr/docs/Web/API/DataTransfer/items" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>items</code></a> qui est une liste (<a href="/fr/docs/Web/API/DataTransferItemList" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>list</code></a>) d&apos;objets <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a>. Un objet <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a> représente un seul objet déplacé, avec une propriété <a href="/fr/docs/Web/API/DataTransferItem/kind" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>kind</code></a> qui indique s&apos;il s&apos;agit d&apos;un texte (<code>string</code>) ou d&apos;un fichier (<code>file</code>) et une propriété <a href="/fr/docs/Web/API/DataTransferItem/type" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>type</code></a> qui correspond au type MIME de la donnée déplacée. L&apos;objet <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a> possède également des méthodes pour consulter les données de l&apos;objet déplacé.</p>
+
+<p>L&apos;objet <a href="/fr/docs/Web/API/DataTransferItemList" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItemList</code></a> est une liste d&apos;objets <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a>. La liste possède des méthodes pour ajouter un objet en déplacement à la liste, pour retirer un objet de la liste ou pour vider la liste de tout ses objets.</p>
+
+<p>La différence principale entre <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> et <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a> est l&apos;utilisation de la méthode synchrone <a href="/fr/docs/Web/API/DataTransfer/getData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>getData()</code></a> pour la première et de la méthode asynchrone <a href="/fr/docs/Web/API/DataTransferItem/getAsString" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>getAsString()</code></a> pour la deuxième.</p>
+
+<p class="note"><strong>Note :</strong> <a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a> et <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> sont largement prises en charge par les navigateurs de bureau tandis que <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a> et <a href="/fr/docs/Web/API/DataTransferItemList" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItemList</code></a> ont une compatibilité plus restreinte. Voir la section ci-après sur l&apos;interopérabilité.</p>
+
+<h3 id="Interfaces_spécifiques_à_Gecko">Interfaces spécifiques à Gecko</h3>
+
+<p>Mozilla / Firefox prend en charge certaines fonctionnalités qui ne font pas partie du modèle standard. Ce sont des fonctions utilitaires pour aider au déplacement de plusieurs objets ou de données qui ne sont pas du texte (des fichiers par exemple). Pour plus d&apos;informations, voir <a href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items" title="Dragging and Dropping Multiple Items">Glisser-déposer plusieurs objets</a>. Voir aussi la page de référence de <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a> pour la liste de l&apos;ensemble <a href="/fr/docs/Web/API/DataTransfer#Gecko_properties">des propriétés spécifique à Gecko</a> et <a href="/fr/docs/Web/API/DataTransfer#Gecko_methods">des méthodes spécifiques à Gecko</a>.</p>
+
+<h2 id="Bases">Bases</h2>
+
+<p>Dans cette section, nous allons voir les premières étapes nécessaires aux fonctionnalités de glisser-déposer dans une application.</p>
+
+<h3 id="Identifier_ce_qui_peut_être_déplacé">Identifier ce qui peut être déplacé</h3>
+
+<p>Pour qu&apos;un élément puisse être déplacé, il faut lui ajouter l&apos;attribut <code><a href="/fr/docs/Web/HTML/Attributs_universels#attr-draggable">draggable</a></code> ainsi que le gestionnaire d&apos;évènement global <a href="/fr/docs/Web/API/GlobalEventHandlers/ondragstart" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragstart</code></a> :</p>
+
+<pre class="brush: html">&lt;script&gt;
+function dragstart_handler(ev) {
+ // On ajoute l&apos;identifiant de l&apos;élément cible à l&apos;objet de transfert
+ ev.dataTransfer.setData(&quot;text/plain&quot;, ev.target.innerText);
+}
+&lt;/script&gt;
+
+&lt;p id=&quot;p1&quot; draggable=&quot;true&quot; ondragstart=&quot;dragstart_handler(event)&quot;&gt;Cet élément est déplaçable.&lt;/p&gt;
+</pre>
+
+<p>Voir <a href="/fr/docs/Web/HTML/Global_attributes/draggable" title="draggable global attribute">la page de référence sur l&apos;attribut <code>draggable</code></a> et <a href="/fr/docs/Web/Guide/HTML/Drag_operations#draggableattribute">le guide sur les opérations de déplacement</a> pour plus d&apos;informations.</p>
+
+<h3 id="Définir_les_données_déplacées">Définir les données déplacées</h3>
+
+<p>Une application peut inclure plusieurs objets dans une opération de glisser/déposer. Chaque objet est une chaîne de caractères (<a href="/fr/docs/Web/API/DOMString" title="Une chaîne de caractères UTF-16. Comme JavaScript utilise déjà ce type de chaîne de caractères, DOMString est directement associé à String."><code>DOMString</code></a>) ayant un type MIME particulier (indiqué par son attribut <code>type</code>) tel que <code>text/html</code>.</p>
+
+<p>Chaque <a href="/fr/docs/Web/API/DragEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DragEvent</code></a> possède une propriété  <a href="/fr/docs/Web/API/DragEvent/dataTransfer" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>dataTransfer</code></a> contenant les données transportées. Cette propriété (un objet <a href="/fr/docs/Web/API/DataTransfer" title="L&apos;objet DataTransfer contient les données glissées au cours d&apos;une opération de glisser-déposer. Il peut contenir un ou plusieurs éléments, du même type ou de types différents. Pour plus d&apos;informations sur le glisser-déposer, voir Glisser et déposer."><code>DataTransfer</code></a>) possède des méthodes pour gérer les données transportées. La méthode <a href="/fr/docs/Web/API/DataTransfer/setData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>setData()</code></a> permet d&apos;ajouter un objet aux données transportées :</p>
+
+<pre class="brush: js">function dragstart_handler(ev) {
+  // On ajoute différents types de données transportées
+  ev.dataTransfer.setData(&quot;text/plain&quot;, ev.target.innerText);
+  ev.dataTransfer.setData(&quot;text/html&quot;, ev.target.outerHTML);
+  ev.dataTransfer.setData(&quot;text/uri-list&quot;, ev.target.ownerDocument.location.href);
+}
+</pre>
+
+<p>Pour connaître la liste des types de donnée communément utilisées lors d&apos;un glisser/déposer (texte, HTML, liens, fichiers, etc.), voir <a href="/fr/docs/DragDrop/Recommended_Drag_Types" title="Recommended Drag Types">les types recommandés</a>. Pour plus d&apos;informations sur les informations transportées, voir <a href="/fr/docs/Web/Guide/HTML/Drag_operations#dragdata" title="Drag Data">Drag Data</a>.</p>
+
+<h3 id="Définir_limage_pour_le_déplacement">Définir l&apos;image pour le déplacement</h3>
+
+<p>Par défaut, le navigateur fournit une image qui apparaît à côté du pointeur lors de l&apos;opération de déplacement. Toutefois, une application peut définir une image personnalisée grâce à la méthode <a href="/fr/docs/Web/API/DataTransfer/setDragImage" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>setDragImage()</code></a> :</p>
+
+<pre class="brush: js">function dragstart_handler(ev) {
+  // On crée une image qu&apos;on utilise pour le déplacement
+  // Note : on changera &quot;example.gif&quot; vers une vraie image
+  // (sinon l&apos;image par défaut sera utilisée)
+  var img = new Image();
+  img.src = &apos;example.gif&apos;;
+  ev.dataTransfer.setDragImage(img, 10, 10);
+}
+</pre>
+
+<p>Pour en savoir plus, voir <a href="/fr/docs/DragDrop/Drag_Operations#dragfeedback" title="Setting the Drag Feedback Image">Définir l&apos;image de <em>feedback</em> pour le glisser-déposer</a>.</p>
+
+<h3 id="Définir_leffet_de_déplacement">Définir l&apos;effet de déplacement</h3>
+
+<p>La propriété <a href="/fr/docs/Web/API/DataTransfer/dropEffect" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>dropEffect</code></a> est utilisée pour fournir un retour à l&apos;utilisateur qui effectue l&apos;opération de glisser/déposer. Généralement, cela se traduit par la modification du curseur affiché par le navigateur lors du déplacement.</p>
+
+<p>Il est possible de définir trois effets :</p>
+
+<ul>
+ <li><code>copy</code> : indique que les données déplacées seront copiées depuis l&apos;emplacement source vers la cible.</li>
+ <li><code>move</code> : indique que les données déplacées seront déplacées depuis l&apos;emplacement source vers la cible.</li>
+ <li><code>link</code> : indique qu&apos;une relation ou une connexion sera créée entre la source et la cible.</li>
+</ul>
+
+<p>Lors de l&apos;opération de déplacement, les effets peuvent être modifiés afin d&apos;indiquer que certains effets sont autorisés à certains emplacements.</p>
+
+<p>Voici un exemple illustrant l&apos;utilisation de cette propriété.</p>
+
+<pre class="brush: js">function dragstart_handler(ev) {
+  ev.dataTransfer.dropEffect = &quot;copy&quot;;
+}
+</pre>
+
+<p>See <a href="/en-US/docs/Web/Guide/HTML/Drag_operations#drageffects" title="Drag Effects">Drag Effects</a> for more details.</p>
+
+<h3 id="Définir_la_zone_où_déposer_lélément_déplacé">Définir la zone où déposer l&apos;élément déplacé</h3>
+
+<p>Par défaut, le navigateur empêche de déposer quoi que ce soit sur la plupart des éléments HTML. Pour modifier ce comportement, il faut qu&apos;un élément devienne une zone cible ou qu&apos;il soit identifié comme &quot;<em>droppable</em>&quot;. L&apos;élément doit avoir les deux gestionnaires d&apos;évènements <a href="/fr/docs/Web/API/GlobalEventHandlers/ondragover" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondragover</code></a> et <a href="/fr/docs/Web/API/GlobalEventHandlers/ondrop" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ondrop</code></a> comme attributs. Dans l&apos;exemple suivant, on montre comment utiliser ces attributs et on fournit des gestionnaires d&apos;évènements simples associés :</p>
+
+<pre class="brush: html">&lt;script&gt;
+function dragover_handler(ev) {
+ ev.preventDefault();
+ ev.dataTransfer.dropEffect = &quot;move&quot;;
+}
+function drop_handler(ev) {
+ ev.preventDefault();
+ // On récupère l&apos;identifiant de la cible et on ajoute l&apos;élément déplacé au DOM de la cible
+ var data = ev.dataTransfer.getData(&quot;text/plain&quot;);
+ ev.target.appendChild(document.getElementById(data));
+}
+&lt;/script&gt;
+
+&lt;p id=&quot;target&quot; ondrop=&quot;drop_handler(event)&quot; ondragover=&quot;dragover_handler(event)&quot;&gt;Zone pour déposer&lt;/p&gt;
+</pre>
+
+<p>On voit ici que chaque gestionnaire invoque <a href="/fr/docs/Web/API/Event/preventDefault" title="La méthode  preventDefault() de l &apos;interface Event indique à l&apos;agent utilisateur que si l&apos;événement n&apos;est pas traité explicitement, son action par défaut ne doit pas être prise en compte comme elle le serait normalement. L&apos;événement continue à se propager comme d&apos;habitude, sauf si l&apos;un de ses écouteurs appelle  stopPropagation()  ou  stopImmediatePropagation() , dont l&apos;un ou l&apos;autre termine la propagation."><code>preventDefault()</code></a> afin d&apos;éviter toute gestion d&apos;évènement ultérieure (comme <a href="/fr/docs/Web/API/Touch_events">les évènements tactiles</a> ou <a href="/fr/docs/Web/API/Pointer_events">les évènements de pointeur</a>).</p>
+
+<p>Pour plus d&apos;information, voir <a href="/fr/docs/Web/Guide/HTML/Drag_operations#droptargets">Indiquer une cible pour un glisser-déposer</a>.</p>
+
+<h3 id="Gérer_le_dépôt_de_lobjet">Gérer le dépôt de l&apos;objet</h3>
+
+<p>Le gestionnaire de l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/drop" title="/fr/docs/Web/Reference/Events/drop">drop</a></code> permet de gérer les données déposées avec la logique de l&apos;application. Généralement, une application utilisera <a href="/fr/docs/Web/API/DataTransfer/getData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>getData()</code></a> afin de récupérer les données déplacées et les traitera. L&apos;application peut choisir d&apos;avoir un comportement différent selon la valeur de <a href="/fr/docs/Web/API/DataTransfer/dropEffect" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>dropEffect</code></a> et/ou celles des autres propriétés.</p>
+
+<p>Dans l&apos;exemple suivant, on montre un gestionnaire pour le dépot de l&apos;objet : on récupère l&apos;identifiant (<code>id</code>) de l&apos;élément déplacé puis on utilise celui-ci afin de le déplacer depuis la source vers la cible :</p>
+
+<pre class="brush: html">&lt;script&gt;
+function dragstart_handler(ev) {
+ // On ajoute l&apos;identifiant de l&apos;élément cible à l&apos;objet de transfert
+ ev.dataTransfer.setData(&quot;application/my-app&quot;, ev.target.id);
+ ev.dataTransfer.dropEffect = &quot;move&quot;;
+}
+function dragover_handler(ev) {
+ ev.preventDefault();
+ ev.dataTransfer.dropEffect = &quot;move&quot;
+}
+function drop_handler(ev) {
+ ev.preventDefault();
+ // On obtient l&apos;identifiant de la cible et on ajoute l&apos;élément déplacé
+ // au DOM de la cible
+ var data = ev.dataTransfer.getData(&quot;application/my-app&quot;);
+ ev.target.appendChild(document.getElementById(data));
+}
+&lt;/script&gt;
+
+&lt;p id=&quot;p1&quot; draggable=&quot;true&quot; ondragstart=&quot;dragstart_handler(event)&quot;&gt;Cet élément peut être déplacé.&lt;/p&gt;
+&lt;div id=&quot;target&quot; ondrop=&quot;drop_handler(event)&quot; ondragover=&quot;dragover_handler(event)&quot;&gt;Zone pour le dépôt&lt;/div&gt;
+</pre>
+
+<p>Pour plus d&apos;information, voir <a href="/fr/docs/Web/Guide/HTML/Drag_operations#drop">Gérer le dépôt lors d&apos;une opération de glisser-déposer</a>.</p>
+
+<h3 id="Terminer_lopération_de_glisserdéposer">Terminer l&apos;opération de glisser/déposer</h3>
+
+<p>À la fin de l&apos;opération, c&apos;est l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/dragend" title="/fr/docs/Web/Reference/Events/dragend">dragend</a></code> qui est déclenché <em>sur l&apos;élément source</em> (celui qui a été &quot;saisi&quot; au début). Cet évènement est déclenché lorsque l&apos;opération est terminée ou qu&apos;elle a été annulée. Le gestionnaire d&apos;évènement pour <code><a href="/fr/docs/Web/Reference/Events/dragend" title="/fr/docs/Web/Reference/Events/dragend">dragend</a></code> peut vérifier la valeur de la propriété <a href="/fr/docs/Web/API/DataTransfer/dropEffect" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>dropEffect</code></a> afin de déterminer si l&apos;opération a réussi ou non.</p>
+
+<p>Pour plus d&apos;informations sur la gestion de la fin d&apos;une opération de glisser-déposer, voir <a href="/fr/docs/DragDrop/Drag_Operations#dragend" title="Finishing a Drag">Terminer un glisser-déposer</a>.</p>
+
+<h2 id="Interopérabilité">Interopérabilité</h2>
+
+<p>Comme on peut le voir <a href="/en-US/docs/Web/API/DataTransferItem#Browser_compatibility">dans le tableau de compatibilité pour l&apos;interface <code>DataTransferItem</code></a>, la prise en charge du <em>drag-and-drop</em> est assez répandue parmi les navigateurs de bureau à l&apos;exception des interfaces <a href="/fr/docs/Web/API/DataTransferItem" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItem</code></a> et <a href="/fr/docs/Web/API/DataTransferItemList" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>DataTransferItemList</code></a>. Ce tableau montre également que la prise en charge sur mobile est assez faible.</p>
+
+<h2 id="Examples_and_demos" name="Examples_and_demos">Exemples et démos</h2>
+
+<ul>
+ <li><a href="https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html">Copier et déplacer des éléments avec l&apos;interface <code>DataTransfer</code></a></li>
+ <li><a href="http://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransferItemList.html">Copier et déplacer des éléments avec l&apos;interface <code>DataTransferListItem</code></a></li>
+ <li><a href="https://jsbin.com/hiqasek/edit?html,js,output">JSBin : Glisser-déposer des fichiers</a></li>
+ <li>
+  <p><a href="https://park.glitch.me/">Un parking réalisé avec l&apos;API Drag and Drop</a> (<a href="https://glitch.com/edit/#!/park">lien pour éditer le code</a>)</p>
+ </li>
+</ul>
+
+<h2 id="See_also" name="See_also">Voir aussi</h2>
+
+<ul>
+ <li><a class="internal" href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations" title="Drag Operations">Les opérations de déplacement</a></li>
+ <li><a class="internal" href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Multiple_items" title="Dragging and Dropping Multiple Items">Glisser-déposer plusieurs objets</a></li>
+ <li><a class="internal" href="/fr/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types" title="Recommended Drag Types">Types de déplacement recommandés</a></li>
+ <li><a href="https://html.spec.whatwg.org/multipage/interaction.html#dnd" title="Drag and Drop Standard">Spécification HTML5 : Drag and Drop</a></li>
+ <li><a href="http://caniuse.com/#search=draganddrop" title="Drag and Drop interoperability data from CanIUse">Données d&apos;interopérabilité pour l&apos;API Drag and Drop sur CanIUse</a></li>
+</ul>

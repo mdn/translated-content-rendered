@@ -1,0 +1,221 @@
+---
+title: CSS Coverage
+slug: Outils/CSS_Coverage
+translation_of: Tools/CSS_Coverage
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li class="toggle">
+      <details>
+        <summary>Outils principaux</summary>
+        <ol>
+          <li><a href="/fr/docs/Tools/Page_Inspector">Inspecteur</a></li>
+          <li><a href="/fr/docs/Tools/Web_Console">Console web</a></li>
+          <li><a href="/fr/docs/Tools/Debugger">Débogueur JavaScript</a></li>
+          <li><a href="/fr/docs/Tools/Network_Monitor">Moniteur réseau</a></li>
+          <li><a href="/fr/docs/Tools/Performance">Performances</a></li>
+          <li><a href="/fr/docs/Tools/Responsive_Design_Mode">Vue adaptative</a></li>
+          <li><a href="/fr/docs/Tools/Accessibility_inspector">Panneau accessibilité</a></li>
+          <li><a href="/fr/docs/Tools/Tips">Astuces</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>Plus d'outils</summary>
+        <ol>
+          <li><a href="/fr/docs/Tools/Memory">Mémoire</a></li>
+          <li><a href="/fr/docs/Tools/Storage_Inspector">Inspecteur de stockage</a></li>
+          <li><a href="/fr/docs/Tools/DOM_Property_Viewer">Inspecteur DOM</a></li>
+          <li><a href="/fr/docs/Tools/GCLI">Barre de développement</a></li>
+          <li><a href="/fr/docs/Tools/Eyedropper">Pipette</a></li>
+          <li><a href="/fr/docs/Tools/Taking_screenshots">Capture d'écran</a></li>
+          <li><a href="/fr/docs/Tools/Scratchpad">Ardoise JavaScript</a></li>
+          <li><a href="/fr/docs/Tools/Style_Editor">Éditeur de style</a></li>
+          <li><a href="/fr/docs/Tools/Shader_Editor">Nuanceur</a></li>
+          <li><a href="/fr/docs/Tools/Web_Audio_Editor">Éditeur Web Audio</a></li>
+          <li><a href="/fr/docs/Tools/Rulers">Règles</a></li>
+          <li><a href="/fr/docs/Tools/Measure_a_portion_of_the_page">Mesurer une portion de la page</a></li>
+          <li><a href="/fr/docs/Tools/View_source">Afficher le code source</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>Connexion aux outils de développement</summary>
+        <ol>
+          <li><a href="/fr/docs/Tools/about:debugging">about:debugging</a></li>
+          <li><a href="https://developer.mozilla.org/fr/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Connexion à Firefox pour Android</a></li>
+          <li><a href="https://developer.mozilla.org/fr/docs/Tools/Working_with_iframes">Connexion aux iframes</a></li>
+          <li><a href="https://developer.mozilla.org/fr/docs/Tools/Valence">Connexion à d'autres navigateurs</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>Débogage du navigateur</summary>
+        <ol>
+          <li><a href="/fr/docs/Tools/Browser_Console">Console du navigateur</a></li>
+          <li><a href="/fr/docs/Tools/Browser_Toolbox">Boite à outils du navigateur</a></li>
+        </ol>
+      </details>
+    </li>
+    <li class="toggle">
+      <details>
+        <summary>Extensions pour les outils de développement</summary>
+        <ol>
+          <li><a href="/fr/docs/Tools/Adding_a_panel_to_the_toolbox">Ajout d'un panneau à la boîte à outils</a></li>
+          <li><a href="/fr/docs/Tools/Example_add-ons">Exemples d'extensions aux outils de développement</a></li>
+          <li><a href="https://wiki.mozilla.org/Remote_Debugging_Protocol">Protocole de déboguage à distance</a></li>
+          <li><a href="https://wiki.mozilla.org/Remote_Debugging_Protocol_Stream_Transport">Transport des flux</a></li>
+          <li><a href="/fr/docs/Tools/Editor">Éditeur du source</a></li>
+          <li><a href="/fr/docs/Tools/Debugger-API">L’API Debugger</a></li>
+          <li><a href="/fr/docs/Tools/Web_Console/Custom_output">Sortie personnalisée dans la console web</a></li>
+        </ol>
+      </details>
+    </li>
+    <li><a href="/fr/docs/Tools/Settings">Paramètres</a></li>
+    <li><a href="/fr/docs/Tools/Release_notes">Notes de version</a></li>
+  </ol>
+</section></div>
+
+<div class="note">
+<p>Cette fonctionnalité est expérimentale et n'est pas encore disponible dans Firefox.</p>
+</div>
+
+<p>Le CSS Coverage est un ensemble de commandes pour les outils de développement de Firefox qui aide à améliorer du CSS désordonné en mettant en évidence le CSS qui n'est pas "utilisé" et en indiquant les parties du fichier CSS nécessaires au rendu initial.</p>
+
+<p>Cet outil est quelque peu expérimental, car la définition "d'utilisation" du CSS est compliquée. Ce guide a pour ambition d'expliquer comment cet outil fonctionne.</p>
+
+<p>Cet outil est généralement utilisé de la façon suivante :</p>
+
+<ul>
+ <li>Lancer le tracker de coverage ("<code>csscoverage start</code>")</li>
+ <li>Visiter un ensemble de pages représentatives du site web à analyser.</li>
+ <li>Arrêter le tracker ("<code>csscoverage stop</code>") et voir les règles non utilisées dans <a href="/fr/docs/Outils/Éditeur_de_style">l'Éditeur de style</a>.</li>
+ <li>Voir le rapport ("<code>csscoverage report</code>") contenant les règles qui pourraient être mis en ligne (in-lined) dans chaque page.</li>
+</ul>
+
+<p>Une autre commande ("<code>csscoverage oneshot</code>") permet de lancer ("<code>csscoverage start; csscoverage stop</code>").</p>
+
+<h2 id="Que_veut_dire_utiliser">Que veut dire "utiliser" ?</h2>
+
+<h3 id="TLDR">TL;DR :</h3>
+
+<p>Le CSS coverage vérifie que le sélecteur <span style="color: #008000;"><code>tag#id.class</code></span> dans l'exemple ci-dessous, existe dans un ensemble de pages web :</p>
+
+<pre class="brush: css">@media thing {
+  tag#id.class:hover {
+    foo: bar;
+  }
+}</pre>
+
+<h3 id="Pourquoi">Pourquoi ?</h3>
+
+<p>Supposons que le CSS possède ce genre de propriété :</p>
+
+<pre class="brush: html">&lt;style&gt;
+  span:hover {
+    color: purple;
+  }
+&lt;/style&gt;
+
+&lt;span&gt;Test&lt;/span&gt;
+</pre>
+
+<p>Si durant ce test, la souris n'est pas entrée dans le &lt;span&gt;, est-ce que la règle a été utilisée ?</p>
+
+<p>Techniquement parlant, la règle <code>span:hover</code> n'a pas été utilisée dans le sens ou le mot "Test" n'a jamais été coloré en violet. Cependant, Le CSS coverage se concentre principalement à voir quelles règles sont pertinentes ou non pour la page. Dans ce cas, <code>span:hover</code> est visiblement pertinent pour la page.</p>
+
+<p>Supposons également que le CSS possède ce genre de propriété :</p>
+
+<pre class="brush: html">&lt;style&gt;
+  @media tv {
+    span {
+      color: purple;
+    }
+  }
+&lt;/style&gt;
+
+&lt;span&gt;Test&lt;/span&gt;
+</pre>
+
+<p>Devrait-il être obligatoire de se connecter depuis une télévision pour mesurer la pertinence de cette règle ?</p>
+
+<p>Mais "l'utilisation" n'est pas seulement une affaire de pertinence...<br>
+ Est-ce que la règle suivante est pertinente ?</p>
+
+<pre class="brush: html">&lt;style&gt;
+  span { }
+&lt;/style&gt;
+
+&lt;span&gt;Test&lt;/span&gt;
+</pre>
+
+<p>Il est possible d'affirmer que cette règle n'est pas pertinente, car elle n'a pas d'effet sur la page et peut donc être retirée sans danger.</p>
+
+<p>Cependant qu'en est-il du code suivant :</p>
+
+<pre class="brush: html">&lt;style&gt;
+  span {
+    -o-text-curl: minor;
+  }
+&lt;/style&gt;
+
+&lt;span&gt;Test&lt;/span&gt;
+</pre>
+
+<p>Savoir si cette règle est utilisée ou non requiert l'utilisation d'un moteur de recherche et des compétences analytiques, et peut être même des connaissances sur les versions des navigateurs supportés par le site. Ceci est donc considéré hors de portée de cet outil, du moins jusqu'à la <a href="https://fr.wikipedia.org/wiki/Singularit%C3%A9_technologique">singularité</a>.</p>
+
+<p>Cela explique également pourquoi la règle appliquée aux div dans l'exemple suivant est considéré comme "utilisée"</p>
+
+<pre class="brush: html">&lt;style&gt;
+  div { color: red; }
+  span { color: blue; }
+&lt;/style&gt;
+
+&lt;div&gt;&lt;span&gt;Test&lt;/span&gt;&lt;/div&gt;
+</pre>
+
+<p>Il est possible d'affirmer que la règle div n'est pas utilisée puisqu'elle n'affecte pas le rendu final de la page. Cependant si l'on considère la définition alternative suivante :</p>
+
+<pre class="brush: html">&lt;style&gt;
+  div { color: red; border: none; }
+  span { color: blue; }
+&lt;/style&gt;
+</pre>
+
+<p>Il est alors difficile de savoir si la règle de bordure est utilisée, et il existe beaucoup d'autres variations. L'opacité, la visibilité et les conversions de couleurs par exemple compliquent encore la définition "d'utilisation". Pour garder une définition simple, "utilisée" signifie que le sélecteur correspond ç au moins un élément.</p>
+
+<p>Si une feuille de style incluse dans un test contient une règle qui ne s'applique que pour une page particulière qui n'a pas été visitée lors du Test, alors bien évidemment cette règle sera marquée comme "non-utilisée" malgré le fait qu'il existe des moments ou cette règle est utilisée. Il est donc recommandé de doubler les vérifications avant d'enlever des règles des fichiers CSS.</p>
+
+<h2 id="Avertissements">Avertissements</h2>
+
+<p>Il est à noter que :</p>
+
+<ul>
+ <li>L'outil présume qu'une URL retourne le même ensemble d'octets chaque fois qu'elle référencée lors de la période de test.</li>
+ <li>Les <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Alternative_style_sheets">feuilles de style alternatives</a> ne sont pas traquées.</li>
+</ul>
+
+<h2 id="Bugs">Bugs</h2>
+
+<p>La résolution de certains bugs importants est actuellement en travail :</p>
+
+<ul>
+ <li>Les changements du CSSOM via JavaScript ne sont actuellement pas traqués. Cela inclu l'ajout de feuilles de styles. Voir le <a href="https://bugzil.la/1007533">bug 1007533</a>.</li>
+ <li>Le markup dans l'Éditeur de style est fait ligne par ligne et, les sources-maps ne sont pas encore supportées. En conséquence, l'analyse devient confuse si le test est réalisé sur du CSS compressé. Voir le <a href="https://bugzil.la/1007073">bug 1007073</a>.</li>
+ <li>Les informations @keyframe ne sont pas incluses dans le résumé de préchargement. Voir le <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1034062">bug 1034062</a>.</li>
+</ul>
+
+<p> </p>
+
+<h2 id="Alternatives">Alternatives</h2>
+
+<p>Il y plusieurs autres outils qui peuvent vous aider à trouver du CSS inutilisé, sans avoir besoin d'utiliser Firefox.</p>
+
+<ul>
+ <li><a href="https://www.jitbit.com/unusedcss/">Unused CSS</a> parcourt <em>récursivement</em> votre site pour détecter les sélecteurs inutilisés. Il s'agit d'un outil en ligne, gratuite et sans publicité.</li>
+ <li><a href="https://github.com/purifycss/purifycss">PurifyCSS </a>est un paquet NPM qui est utilisable comme un outil de console après son installation.</li>
+ <li><a href="https://unused-css.com/">unused-css.com</a>, un autre outil en ligne. Celui-ci n'est pas gratuit.</li>
+</ul>

@@ -1,0 +1,94 @@
+---
+title: Appliquer des découpes simples
+slug: Web/API/WebGL_API/By_example/Appliquer_des_découpes_simples
+tags:
+  - Apprendre
+  - Débutant
+  - Exemple
+  - Graphisme
+  - Tutoriel
+  - WebGL
+translation_of: Web/API/WebGL_API/By_example/Basic_scissoring
+---
+<div></div>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Masque_de_couleur" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Tailles_de_canvas_et_WebGL" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p class="summary">Dans cet article, on illustre comment dessiner des rectangles et des carrés grâce à des opérations de découpe simple (<em>scissoring</em>).</p>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/API/WebGL_API/By_example/Appliquer_des_d%C3%A9coupes_simples$samples/Appliquer_les_changements_sur_le_buffer_lors_de_la_d%C3%A9coupe?revision=1437275" width="660" class="live-sample-frame sample-code-frame" height="330" frameborder="0" id="frame_Appliquer_les_changements_sur_le_buffer_lors_de_la_découpe"></iframe></p>
+
+<h3 id="Appliquer_les_changements_sur_le_buffer_lors_de_la_découpe">Appliquer les changements sur le <em>buffer</em> lors de la découpe</h3>
+
+<p>Voici une démonstration simple des opérations appliquées sur le contexte de rendu avec la méthode <a href="/fr/docs/Web/API/WebGLRenderingContext/scissor" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>scissor</code></a>.</p>
+
+<p>La commande <a href="/fr/docs/Web/API/WebGLRenderingContext/clear" title="La méthode WebGLRenderingContext.clear() de l&apos;API WebGL efface les tampons avec des valeurs prédéfinies."><code>clear()</code></a> permet de dessiner la couleur d&apos;applique (définie à l&apos;aide de <a href="/fr/docs/Web/API/WebGLRenderingContext/clearColor" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>clearColor()</code></a>) sur tous les pixels du tampon (<em>buffer</em>) de dessin. La commande  <a href="/fr/docs/Web/API/WebGLRenderingContext/scissor" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>scissor()</code></a> permet quant à elle de définir un masque qui permet de ne modifier que les pixels contenus dans un rectangle donné.</p>
+
+<p>Cet article représente une excellente occasion pour distinguer les <em>pixels</em> des <em>fragments</em>. Un pixel est un élément d&apos;une image (en pratique c&apos;est un point) sur l&apos;écran ou un élément unique du tampon de dessin (l&apos;espace mémoire qui contient les données relatives aux pixels comme les différentes composantes couleur). Un <em>fragment</em> fait référence au pixel manipulé par les processus <a href="/fr/docs/Glossaire/WebGL" class="glossaryLink" title="WebGL : WebGL (Web Graphics Library) est une API JavaScript pour produire des graphismes 2D et 3D interactifs.">WebGL</a>.</p>
+
+<p>Cette distinction existe car la couleur d&apos;un fragment (et ses autres caractéristiques comme la profondeur) peut être manipulée et modifiée à plusieurs reprises avant d&apos;être écrite à l&apos;écran. On a déjà vu comment la couleur d&apos;un fragment pouvait être modifiée au cours des opérations graphiques en appliquant un <a href="/fr/docs/Web/API/WebGLRenderingContext/colorMask" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !">masque de couleur</a>. Il existe d&apos;autres cas où les fragments sont ignorés (le pixel n&apos;est pass mis à jour) ou d&apos;autres où ils interagissent avec la valeur du pixel existant (afin de fusionner les couleurs pour les éléments transparents qui composent une scène).</p>
+
+<p>Ici, on voit une autre distinction entre les fragments et les pixels. La découpe est une étape distincte du processus graphique de  <a href="/fr/docs/Glossaire/WebGL" class="glossaryLink" title="WebGL : WebGL (Web Graphics Library) est une API JavaScript pour produire des graphismes 2D et 3D interactifs.">WebGL</a>/<a href="/fr/docs/Glossaire/OpenGL" class="glossaryLink" title="OpenGL : OpenGL (Open Graphics Library) est une interface de programmation d&apos;application (API) multi-plateforme et un langage pour le rendu de graphismes vectoriels 2D et 3D. L&apos;API est typiquement utilisée pour interagir avec un processeur graphique (ou GPU, graphics processing unit) pour que le rendu soit accéléré par le matériel.">OpenGL</a> (elle est traitée après l&apos;applique de couleur et avant le masque de couleur). Avant que les pixels réels soient mis à jour, les fragments doivent passer le test de la découpe. S&apos;ils réussissent ce test, ils continuent dans le processus de traitement et les pixels correspondants sont mis à jours. S&apos;ils échouent, le processus rejette les fragments et ils ne sont plus gérés pour les traitements ultérieurs, les pixels correspondants ne seront pas mis à jour. Seuls les fragments appartenant à la zone rectangulaire donnée réussissent le test et seuls les pixels correspondants sont mis à jour. Au final, on obtient un rectangle qui est dessiné à l&apos;écran.</p>
+
+<p>Par défaut, l&apos;étape de découpe est désactivée dans le processus. Ici, on l&apos;active avec la méthode  <a href="/fr/docs/Web/API/WebGLRenderingContext/enable" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>enable()</code></a> (<code>enable()</code> sera utilisée pour activer de nombreuses autres fonctionnalités liées à WebGL) avec la constante <code>SCISSOR_TEST</code>. Là aussi, on voit l&apos;ordre généralement utilisé pour les commandes <a href="/fr/docs/Glossaire/WebGL" class="glossaryLink" title="WebGL : WebGL (Web Graphics Library) est une API JavaScript pour produire des graphismes 2D et 3D interactifs.">WebGL</a>. Tout d&apos;abord, on modifie l&apos;état de WebGL (ici on active le test de découpe et on crée un masque rectangulaire). Une fois que l&apos;état a bien été modifié, on exécute les commandes de dessin (ici <code>clear()</code>) pour commencer le processus de traitement des fragments.</p>
+
+<pre class="brush: html">&lt;p&gt;Le résultat de la découpe.&lt;/p&gt;
+&lt;canvas&gt;Il semblerait que votre navigateur
+    ne supporte pas l&apos;élément canvas.&lt;/canvas&gt;
+</pre>
+
+<pre class="brush: css">body {
+  text-align : center;
+}
+canvas {
+  display : block;
+  width : 280px;
+  height : 210px;
+  margin : auto;
+  padding : 0;
+  border : none;
+  background-color : black;
+}
+</pre>
+
+<pre class="brush: js" id="livesample-js">window.addEventListener(&quot;load&quot;, function setupWebGL (evt) {
+  &quot;use strict&quot;
+  window.removeEventListener(evt.type, setupWebGL, false);
+  var paragraph = document.querySelector(&quot;p&quot;);
+  var canvas = document.querySelector(&quot;canvas&quot;);
+
+  // Les deux lignes suivantes définissent la taille,
+  // en pixels CSS, du buffer de dessin qui est la même
+  // que celle du canevas (définie avec CSS).
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
+  var gl = canvas.getContext(&quot;webgl&quot;)
+    || canvas.getContext(&quot;experimental-webgl&quot;);
+  if (!gl) {
+    paragraph.innerHTML = &quot;Échec de la récupération du &quot;
+      + &quot;contexte WebGL. Votre navigateur pourrait ne pas &quot;
+      + &quot;supporter WebGL.&quot;;
+    return;
+  }
+  gl.viewport(0, 0,
+    gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+  // On applique une découpe et on définit la taille de
+  // la zone de découpe.
+  gl.enable(gl.SCISSOR_TEST);
+  gl.scissor(40, 20, 60, 170);
+
+  // On applique un jaune uni dans le contexte de rendu.
+  gl.clearColor(1.0, 1.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+}, false);
+</pre>
+
+<p>Le code source de cet exemple est également disponible sur <a href="https://github.com/idofilin/webgl-by-example/tree/master/basic-scissoring">GitHub</a>.</p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Apprendre/WebGL/Par_exemple/Masque_de_couleur" class="button">« Précédent</a><a href="/fr/docs/Apprendre/WebGL/Par_exemple/Tailles_de_canvas_et_WebGL" class="button">Suivant  »</a></p>
+</div><p></p>

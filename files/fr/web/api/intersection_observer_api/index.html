@@ -1,0 +1,612 @@
+---
+title: Intersection Observer API
+slug: Web/API/Intersection_Observer_API
+tags:
+  - API
+  - IntersectionObserver
+  - Reference
+  - Web
+translation_of: Web/API/Intersection_Observer_API
+---
+<div><div class="experimental indicator-warning notecard">
+    <p><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>Cette fonction est expérimentale</strong><br>Puisque cette fonction est toujours en développement dans certains navigateurs, veuillez consulter le <a href="#Compatibilité_des_navigateurs">tableau de compatibilité</a> pour les préfixes à utiliser selon les navigateurs.<br>Il convient de noter qu&apos;une fonctionnalité expérimentale peut voir sa syntaxe ou son comportement modifié dans le futur en fonction des évolutions de la spécification.</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/IntersectionObserver"><code>IntersectionObserver</code></a></li><li><a href="/fr/docs/Web/API/IntersectionObserverEntry"><code>IntersectionObserverEntry</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary"><span class="seoSummary">L&apos;API <em>Intersection Observer</em> permet d&apos;observer de manière asynchrone l&apos;évolution de l&apos;intersection d&apos;un élément cible avec un élément ancêtre ou avec la zone d&apos;affichage d&apos;un document de niveau supérieur.</span></p>
+
+<p>Historiquement, détecter la visibilité d&apos;un élément, ou la visibilité relative de deux éléments l&apos;un par rapport à l&apos;autre, a été une tache difficile, résolue de manière peu rigoureuse et pouvant nuire à la fluidité de la page consultée. Malheureusement, avec la maturation de la toile, ce genre d&apos;information se révèle de plus en plus nécessaire. La donnée de l&apos;intersection est requise pour de nombreuses raisons, telles que:</p>
+
+<ul>
+ <li>Le chargement paresseux d&apos;images ou d&apos;autres types de contenus au fur et à mesure que la page défile.</li>
+ <li>L&apos;implantation de « défilement infini », où de plus en plus de contenu est chargé tandis que l&apos;utilisateur défile, afin qu&apos;il n&apos;ait pas à changer de page.</li>
+ <li>Le signalement de la visibilité pour les publicités afin de calculer les revenus publicitaires.</li>
+ <li>La décision d&apos;exécuter ou non une tâche ou une animation selon que l&apos;utilisateur va en voir le résultat ou non.</li>
+</ul>
+
+<p>De par le passé, l&apos;implantation de la détection d&apos;intersection impliquait des gestionnaires d&apos;évènements et des boucles appelant des méthodes telles que <a href="/fr/docs/Web/API/Element/getBoundingClientRect" title="La méthode Element.getBoundingClientRect() renvoie la taille d&apos;un élément et sa position relative par rapport à la zone d&apos;affichage (viewport)."><code>Element.getBoundingClientRect()</code></a> afin de générer les informations nécessaires pour chaque élément concerné. Comme la totalité du code est exécuté dans le <em>thread</em> principal, même une seule de ces boucles peut causer des problèmes de performance. Si un site est rempli de ces tests, les choses peuvent vite devenir très moches.</p>
+
+<p>Prenons une page qui utilise un défilement infini. Mettons qu&apos;elle utilise une bibliothèque fournie par un éditeur afin de gérer les publicités placées périodiquement le long de la page, qu&apos;elle a des graphiques animés ici et là, et qu&apos;elle utilise une bibliothèque personnalisée pour dessiner des cases de notifications et ce genre de choses. Chacune de ces choses a ses propres procédures de détection d&apos;intersection, toutes exécutées dans le <em>thread</em> principal. L&apos;auteur du site ne le réalise peut-être même pas, puisqu&apos;il utilise deux bibliothèques dont il ne connaît pas forcément les détails de fonctionnement. Quand l&apos;utilisateur navigue sur la page, ces procédures de détection d&apos;intersection réagissent constamment pendant l&apos;exécution du code de défilement, rendant l&apos;expérience frustrante pour l&apos;utilisateur vis-à-vis de son navigateur, du site Internet et de son ordinateur.</p>
+
+<p>L&apos;API <em>Intersection Observer</em> permet d&apos;intégrer une fonction <em>callback</em> qui est exécutée quand un élément qu&apos;on souhaite surveiller entre ou sort d&apos;un autre élément (ou du <em>viewport</em> (zone d&apos;affichage)), ou quand la taille de leur intersection varie d&apos;une quantité prédéterminée. Ainsi, les sites n&apos;ont plus besoin de faire quoi que ce soit sur le <em>thread</em> principal pour surveiller ce genre d&apos;intersection d&apos;éléments, et le navigateur est libre de gérer la détection d&apos;intersection comme bon lui semble.</p>
+
+<p>Il y a une chose sur laquelle l&apos;API <em>Intersection Observer</em> ne peut pas vous renseigner : le nombre de pixels qui intersectent, ou bien desquels il s&apos;agit précisément; par contre elle permet d&apos;ordonner des actions souvent utiles telles que « si ils s&apos;intersectent de plus de N%, alors faire ceci ».</p>
+
+<h2 id="Concepts_et_utilisation_de_l&apos;observateur_d&apos;intersections">Concepts et utilisation de l&apos;observateur d&apos;intersections</h2>
+
+<p>L&apos;API <em>Intersection Observer</em> permet de mettre en place une fonction <em>callback</em> qui est appelée quand un élément, appelé la <strong>cible</strong>, intersecte ou bien le <em>viewport</em> (la zone d&apos;affichage) ou bien un élément prédéfini ; dans le cadre de cette API, nous l’appellerons <strong>l&apos;élément racine</strong> ou <strong>la racine</strong>. Typiquement, on voudra observer les variations de l&apos;intersection par rapport à la zone d&apos;affichage du document (ce qui est fait en passant l&apos;argument <code>null</code> au moment de désigner l&apos;élément racine). Que vous utilisiez la zone d&apos;affichage ou un autre élément comme racine, l&apos;API fonctionne de la même façon, en exécutant une fonction <em>callback</em>, fournie au préalable, lorsque la visibilité de l&apos;élément cible change de telle sorte qu&apos;il atteint la quantité voulue d&apos;intersection avec l&apos;élément racine.</p>
+
+<p>Le degré d&apos;intersection entre l&apos;élément cible et sa racine est le <strong>ratio d&apos;intersection</strong>. C&apos;est une représentation du pourcentage de l&apos;élément cible qui est visible, exprimée sous la forme d&apos;un nombre compris entre 0.0 et 1.0.</p>
+
+<h3 id="Création_d&apos;un_observateur_d&apos;intersection">Création d&apos;un observateur d&apos;intersection</h3>
+
+<p>Créez l&apos;observateur d&apos;intersection en appelant son constructeur et en lui passant la référence d&apos;une fonction <em>callback</em>. Cette fonction sera exécutée quand un palier est franchi dans un sens ou dans un autre :</p>
+
+<pre class="brush: js">var options = {
+  root: document.querySelector(&apos;#scrollArea&apos;),
+  rootMargin: &apos;0px&apos;,
+  threshold: 1.0
+}
+
+var observer = new IntersectionObserver(callback, options);</pre>
+
+<p>Un palier de 1.0 signifie que lorsque 100% de la cible est visible dans l&apos;élément désigné par l&apos;option <code>root</code> (l&apos;élément racine), la fonction <em>callback</em> est invoquée.</p>
+
+<h4 id="Options_de_l&apos;observateur_d&apos;intersection">Options de l&apos;observateur d&apos;intersection</h4>
+
+<p>L&apos;objet <code>options</code> qui est passé dans le constructeur  <a href="/fr/docs/Web/API/IntersectionObserver/IntersectionObserver" title="Le constructeur IntersectionObserver() crée et retourne un nouvel objet IntersectionObserver."><code>IntersectionObserver()</code></a> permet de contrôler les circonstances selon lesquelles la fonction <em>callback</em> de l&apos;observateur est invoquée. Il possède les champs suivants :</p>
+
+<dl>
+ <dt><code>root</code></dt>
+ <dd>L&apos;élément qui est utilisé comme zone d&apos;affichage au moment d&apos;évaluer la visibilité de la cible. Il doit être un ancêtre de la cible. S&apos;il n&apos;est pas spécifié ou s&apos;il prend la valeur <code>null</code>, sa valeur par défaut est la zone d&apos;affichage (le <em>viewport</em>) du navigateur.</dd>
+ <dt><code>rootMargin</code></dt>
+ <dd>La marge autour de la racine. Peut prendre des valeurs similaires à la propriété CSS <a href="/fr/docs/Web/CSS/margin" title="La propriété margin définit la taille des marges sur les quatre côtés de l&apos;élément. C&apos;est une propriété raccourcie qui permet de manipuler les autres propriétés de marges : margin-top, margin-right, margin-bottom et margin-left."><code>margin</code></a> par exemple &quot;<code>10px 20px 30px 40px&quot;</code> (top, right, bottom, left). Si l&apos;élément <code>root</code> a été spécifié, les valeurs peuvent être exprimées en pourcentages. Cet ensemble de valeur sert à agrandir ou à réduire chaque coté du cadre délimitant l&apos;élément racine avant d&apos;évaluer les intersections. Par défaut, toutes les valeurs prennent la valeur zéro.</dd>
+ <dt><code>threshold</code></dt>
+ <dd>Soit un nombre, soit un tableau de nombre qui indique à quel pourcentage de la visibilité de la cible la fonction <em>callback</em> de la cible doit être exécuté. Si vous souhaitez seulement détecter quand la visibilité franchit la barre des 50%, vous pouvez entrer la valeur 0.5. Si vous voulez que le <em>callback</em> soit exécuté chaque fois que la visibilité varie de 25% de plus, il faudra spécifier le tableau [0, 0.25, 0.5, 0.75, 1]. La valeur par défaut est 0 (ce qui signifie que dés qu&apos;un seul pixel sera visible, la fonction <em>callback</em> sera exécutée). Une valeur de 1.0 signifie que le palier n&apos;est considéré comme franchi qu&apos;une fois que tous les pixels sont visibles.</dd>
+</dl>
+
+<h4 id="Choisir_un_élément_à_observer">Choisir un élément à observer</h4>
+
+<p>Une fois l&apos;observateur créé, il faut lui donner un élément cible à observer :</p>
+
+<pre class="brush: js">var target = document.querySelector(&apos;#listItem&apos;);
+observer.observe(target);
+</pre>
+
+<p>Lorsque la cible franchit un palier spécifié indiqué dans l&apos;objet <code>IntersectionObserver</code>, la fonction <em>callback</em> est appelée. Le <em>callback</em> reçoit une liste d&apos;objets <a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a> ainsi que l&apos;observateur :</p>
+
+<pre class="brush: js">var callback = function(entries, observer) {
+  entries.forEach(entry =&gt; {
+    // chaque élément de <em>entries</em> correspond à une variation
+    // d&apos;intersection pour un des éléments cible:
+    //   entry.boundingClientRect
+    //   entry.intersectionRatio
+    //   entry.intersectionRect
+    //   entry.isIntersecting
+    //   entry.rootBounds
+    //   entry.target
+    //   entry.time
+  });
+};
+</pre>
+
+<p>Soyez attentif au fait que la fonction <em>callback</em> est exécutée dans le <em>thread</em> principal. Elle devrait être exécutée aussi rapidement que possible ; si une opération prenant du temps a besoin d&apos;être effectuée, utilisez <a href="/fr/docs/Web/API/Window/requestIdleCallback" title="La méthode window.requestIdleCallback() mémorise une fonction qui sera appellée lorsque le navigateur n&apos;aura plus aucune autre tâche en cours. Cela offre au développeur la possibilité de réaliser des tâches à basse priorité en arrière-plan sur le thread principal, sans impacter l&apos;expérience utilisateur (ralentissement des animations, etc). L&apos;ordre des appels aux fonctions est généralement premier entré, premier sorti, sauf si le timeout défini au moment de l&apos;enregistrement est atteint avant que le navigateur n&apos;ait eu le temps d&apos;appeler la fonction en question."><code>Window.requestIdleCallback()</code></a>.</p>
+
+<p>De plus, remarquez que si vous avez spécifié l&apos;option <code>root</code>, la cible doit être un descendant de l&apos;élément <code>root</code>.</p>
+
+<h3 id="Comment_est_calculée_l&apos;intersection">Comment est calculée l&apos;intersection</h3>
+
+<p>Toutes les régions envisagées par l&apos;API <em>Intersection Observer</em> sont des rectangles; les éléments de forme irrégulière sont assimilées au plus petit rectangle qui contient l&apos;élément en question tout entier. De même, si la partie visible d&apos;un élément n&apos;est pas rectangulaire, le rectangle d&apos;intersection de l&apos;élément sera le plus petit rectangle qui contient toute la partie visible de l&apos;élément.</p>
+
+<p>Il est utile de comprendre comment les différentes propriétés fournies par <a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a> décrivent une intersection.</p>
+
+<h4 id="La_racine_de_l&apos;intersection_et_la_marge_de_la_racine">La racine de l&apos;intersection et la marge de la racine</h4>
+
+<p>Avant de pouvoir étudier l&apos;intersection d&apos;un élément avec un conteneur, nous devons savoir quel est ce conteneur. Ce conteneur est <strong>la racine de l&apos;intersection</strong>, ou <strong>élément racine</strong>. Ce peut être soit un élément du document qui est un ancêtre de l&apos;élément à observer, ou <code>null</code> si l&apos;on souhaite utiliser la zone d&apos;affichage (<em>viewport</em>) du document comme conteneur.</p>
+
+<p>Le rectangle utilisé pour délimiter la racine de l&apos;intersection peut être ajusté en ajustant la <strong>marge de la racine</strong>, c&apos;est-à-dire le champ <code>rootMargin</code>, lors de la création de <a href="/fr/docs/Web/API/IntersectionObserver" title="L&apos;interface IntersectionObserver de l&apos;API Intersection Observer fournit un moyen d&apos;observer de manière asynchrone les changements d&apos;intersection d&apos;un élément cible avec un élément ancêtre ou avec la fenêtre du document viewport."><code>IntersectionObserver</code></a>. La valeur de <code>rootMargin</code> définit le décalage ajouté à chaque coté du cadre délimitant la racine de l&apos;intersection pour créer le cadre final de la racine de l&apos;intersection (accessible via <a href="/fr/docs/Web/API/IntersectionObserverEntry/rootBounds" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>IntersectionObserverEntry.rootBounds</code></a> quand la fonction <em>callback</em> est exécutée).</p>
+
+<h4 id="Paliers">Paliers</h4>
+
+<p>Plutôt que de rapporter le moindre changement de variation de la visibilité d&apos;un élément, l&apos;API Intersection Observer utilise des <strong>paliers</strong>. Lors de la création d&apos;un observateur, vous pouvez fournir une ou plusieurs valeurs numériques qui représentent des pourcentages de visibilité de l&apos;élément cible. Dans ce cas, l&apos;API ne rapportent que les changements de visibilité qui franchissent ces paliers.</p>
+
+<p>Par exemple, si vous voulez être informé à chaque fois que la visibilité d&apos;une cible passe au dessus ou en dessous de chaque multiple de 25%, il faudra fournir le tableau [0, 0.25, 0.5, 0.75, 1] comme liste de paliers lors de la création de l&apos;observateur. Vous pouvez préciser dans quelle direction a changé la visibilité (c&apos;est-à-dire, si l&apos;élément est devenu plus ou moins visible) en lisant la valeur de la propriété <a href="/fr/docs/Web/API/IntersectionObserverEntry/isIntersecting" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>isIntersecting</code></a> du  <a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a> passé dans la fonction <code>callback</code> lors du changement de visibilité. Si <code>isIntersecting</code> est <code>true</code>, l&apos;élément cible est devenu au moins aussi visible quand le palier a été franchi. Si elle vaut <code>false</code>, la cible n&apos;est plus aussi visible que le palier spécifié.</p>
+
+<p>Pour mieux comprendre comment fonctionnent les paliers, faites défiler la boîte ci-dessous. A l&apos;intérieur, chacune des boîtes colorées affiche son pourcentage de visibilité sur chacun de ses quatre coins, de telle sorte que l&apos;on peut voir ces ratios changer tandis que le conteneur défile. Chaque boîte a un ensemble différent de paliers :</p>
+
+<ul>
+ <li>La première boîte a un palier pour chaque point de pourcentage de visibilité; c&apos;est à dire que le tableau <a href="/fr/docs/Web/API/IntersectionObserver/thresholds" title="La propriété en lecture seule thresholds de l&apos;interface IntersectionObserver retourne la liste des seuils d&apos;intersection spécifiés lorsque l&apos;observateur a été instancié avec IntersectionObserver(). Si un unique ratio seuil a été donné comme valeur numérique à l&apos;instanciation de l&apos;objet, cette valeur sera un tableau contenant uniquement cette valeur."><code>IntersectionObserver.thresholds</code></a> est <code>[0.00, 0.01, 0.02, ..., 0.99, 1.00]</code>.</li>
+ <li>La deuxième boîte a un unique palier, à 50%.</li>
+ <li>La troisième boîte a des paliers tous les 10% de visibilité (0%, 10%, 20%, etc.).</li>
+ <li>La dernière boîte a des paliers tous les 25%.</li>
+</ul>
+
+<div class="hidden" id="threshold-example">
+<pre class="brush: html">&lt;template id=&quot;boxTemplate&quot;&gt;
+  &lt;div class=&quot;sampleBox&quot;&gt;
+    &lt;div class=&quot;label topLeft&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;label topRight&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;label bottomLeft&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;label bottomRight&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;main&gt;
+  &lt;div class=&quot;contents&quot;&gt;
+    &lt;div class=&quot;wrapper&quot;&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/main&gt;</pre>
+
+<pre class="brush: css">.contents {
+  position: absolute;
+  width: 700px;
+  height: 1725px;
+}
+
+.wrapper {
+  position: relative;
+  top: 600px;
+}
+
+.sampleBox {
+  position: relative;
+  left: 175px;
+  width: 150px;
+  background-color: rgb(245, 170, 140);
+  border: 2px solid rgb(201, 126, 17);
+  padding: 4px;
+  margin-bottom: 6px;
+}
+
+#box1 {
+  height: 200px;
+}
+
+#box2 {
+  height: 75px;
+}
+
+#box3 {
+  height: 150px;
+}
+
+#box4 {
+  height: 100px;
+}
+
+.label {
+  font: 14px &quot;Open Sans&quot;, &quot;Arial&quot;, sans-serif;
+  position: absolute;
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  width: 3em;
+  height: 18px;
+  padding: 2px;
+  text-align: center;
+}
+
+.topLeft {
+  left: 2px;
+  top: 2px;
+}
+
+.topRight {
+  right: 2px;
+  top: 2px;
+}
+
+.bottomLeft {
+  bottom: 2px;
+  left: 2px;
+}
+
+.bottomRight {
+  bottom: 2px;
+  right: 2px;
+}
+</pre>
+
+<pre class="brush: js">let observers = [];
+
+startup();
+
+function startup() {
+  let wrapper = document.querySelector(&quot;.wrapper&quot;);
+
+  // Options for the observers
+
+  let observerOptions = {
+    root: null,
+    rootMargin: &quot;0px&quot;,
+    threshold: []
+  };
+
+  // An array of threshold sets for each of the boxes. The
+  // first box&apos;s thresholds are set programmatically
+  // since there will be so many of them (for each percentage
+  // point).
+
+  let thresholdSets = [
+    [],
+    [0.5],
+    [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    [0, 0.25, 0.5, 0.75, 1.0]
+  ];
+
+  for (let i=0; i&lt;=1.0; i+= 0.1) {
+    thresholdSets[0].push(i);
+  }
+
+  // Add each box, creating a new observer for each
+
+  for (let i=0; i&lt;4; i++) {
+    let template = document.querySelector(&quot;#boxTemplate&quot;).content.cloneNode(true);
+    let boxID = &quot;box&quot; + (i+1);
+    template.querySelector(&quot;.sampleBox&quot;).id = boxID;
+    wrapper.appendChild(document.importNode(template, true));
+
+    // Set up the observer for this box
+
+    observerOptions.threshold = thresholdSets[i];
+    observers[i] = new IntersectionObserver(intersectionCallback, observerOptions);
+    observers[i].observe(document.querySelector(&quot;#&quot; + boxID));
+  }
+
+  // Scroll to the starting position
+
+  //wrapper.scrollIntoView({
+  //  block: &quot;start&quot;,
+  //});
+  document.scrollingElement.scrollTop = wrapper.firstChild.getBoundingClientRect().top + window.scrollY;
+  document.scrollingElement.scrollLeft = 750;
+}
+
+function intersectionCallback(entries) {
+  entries.forEach(function(entry) {
+    let box = entry.target;
+    let visiblePct = (Math.floor(entry.intersectionRatio * 100)) + &quot;%&quot;;
+
+    box.querySelector(&quot;.topLeft&quot;).innerHTML = visiblePct;
+    box.querySelector(&quot;.topRight&quot;).innerHTML = visiblePct;
+    box.querySelector(&quot;.bottomLeft&quot;).innerHTML = visiblePct;
+    box.querySelector(&quot;.bottomRight&quot;).innerHTML = visiblePct;
+  });
+}
+</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="500" id="frame_threshold-example" src="https://mdn.mozillademos.org/fr/docs/Web/API/Intersection_Observer_API$samples/threshold-example?revision=1547762" width="500"></iframe></p>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/IntersectionObserver" title="L&apos;interface IntersectionObserver de l&apos;API Intersection Observer fournit un moyen d&apos;observer de manière asynchrone les changements d&apos;intersection d&apos;un élément cible avec un élément ancêtre ou avec la fenêtre du document viewport."><code>IntersectionObserver</code></a></dt>
+ <dd>L&apos;interface principale pour l&apos;API Intersection Observer. Elle fournit des méthodes pour créer et manipuler un observateur qui peut observer n&apos;importe quel nombre d&apos;éléments cibles pour une même configuration d&apos;intersection. Chaque observateur peut observer de manière asynchrone les évolutions de l&apos;intersection entre un ou plusieurs éléments cibles et un élément ancêtre partagé, ou avec le <a class="glossaryLink" href="/fr/docs/Glossaire/viewport" title="viewport : Une vue représente une zone polygonale (normalement rectangulaire) dans les graphiques d&apos;ordinateur en cours de visualisation. En termes de navigateur web, elle se réfère à la partie du document que vous visualisez, qui est actuellement visible dans la fenêtre (ou à l&apos;écran, si le document est en cours d&apos;affichage en mode plein écran). Le contenu en dehors de la fenêtre d&apos;affichage n&apos;est pas visible à l&apos;écran jusqu&apos;à ce qu&apos;il défile dans la vue.">viewport</a> de leur <a href="/fr/docs/Web/API/Document" title="L&apos;interface Document représente n&apos;importe quelle page Web chargée dans le navigateur et sert de point d&apos;entrée dans le contenu de la page Web, qui est l&apos;arborescence DOM. L&apos;arborescence DOM inclut des éléments tels que &lt;body&gt; (corps) et &lt;table&gt; (tableau), parmi beaucoup d&apos;autres. Il fournit des fonctionnalités globales au document, comme le moyen d&apos;obtenir l&apos;URL de la page et de créer de nouveaux éléments dans le document."><code>Document</code></a> de niveau supérieur. L&apos;ancêtre ou le <em>viewport</em> est désigné par le terme <strong>racine</strong>.</dd>
+ <dt><a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a></dt>
+ <dd>Cette interface décrit l&apos;intersection d&apos;un élément cible spécifique avec la racine de l&apos;observateur à un moment donné. Les objets de ce type ne peuvent être obtenus que de deux façons : comme entrée du callback de votre <code>IntersectionObserver</code>, ou en appelant <a href="/fr/docs/Web/API/IntersectionObserver/takeRecords" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>IntersectionObserver.takeRecords()</code></a>.</dd>
+</dl>
+
+<h2 id="Un_exemple_simple">Un exemple simple</h2>
+
+<p>Cet exemple simple va faire changer la couleur et la transparence d&apos;un élément cible à mesure qu&apos;il devient plus ou moins visible. Sur la page <em><a href="/fr/docs/Web/API/Intersection_Observer_API/Timing_element_visibility">Timing element visibility with the Intersection Observer API</a></em>, vous pourrez trouver un exemple plus développé montrant comment chronométrer le temps durant lequel un élément (par exemple, une publicité) a été visible à l&apos;écran, et comment réagir à cette information en enregistrant des statistiques ou en mettant à jour des éléments.</p>
+
+<h3 id="HTML">HTML</h3>
+
+<p>Le code HTML de cet exemple est très court. L&apos;élément principal est la boîte que nous allons cibler (avec l&apos;ingénieuse dénomination <code>&quot;box&quot;</code>) et certains contenus dans la boîte.</p>
+
+<pre class="brush: html">&lt;div id=&quot;box&quot;&gt;
+  &lt;div class=&quot;vertical&quot;&gt;
+    Bienvenue dans &lt;strong&gt;La Boîte !&lt;/strong&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+<h3 id="CSS">CSS</h3>
+
+<p>Le CSS n&apos;est pas extrêmement important dans le cadre de cet exemple ; il met en place l&apos;élément et établit que les attributs <a href="/fr/docs/Web/CSS/background-color" title="La propriété background-color permet de définir la couleur utilisée pour l&apos;arrière-plan d&apos;un élément (celle-ci peut être une couleur transparente)."><code>background-color</code></a> et <a href="/fr/docs/Web/CSS/border" title="La propriété CSS border est une propriété raccourcie qui permet de définir les propriétés liées à la bordure. border peut être utilisée pour définir les valeurs de border-width, border-style et border-color."><code>border</code></a> peuvent participer à des <a href="/fr/docs/Web/CSS/CSS_Transitions">transitions CSS</a>. Nous utiliserons ces transitions pour faire évoluer l&apos;élément de telle sorte qu&apos;il devienne plus ou moins obscur.</p>
+
+<pre class="brush: css">#box {
+  background-color: rgba(40, 40, 190, 255);
+  border: 4px solid rgb(20, 20, 120);
+  transition: background-color 1s, border 1s;
+  width: 350px;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.vertical {
+  color: white;
+  font: 32px &quot;Arial&quot;;
+}
+
+.extra {
+  width: 350px;
+  height: 350px;
+  margin-top: 10px;
+  border: 4px solid rgb(20, 20, 120);
+  text-align: center;
+  padding: 20px;
+}</pre>
+
+<h3 id="JavaScript">JavaScript</h3>
+
+<p>Enfin, jetons un œil au code JavaScript qui utilise l&apos;API <em>Intersection Observer</em>.</p>
+
+<h4 id="Préparation">Préparation</h4>
+
+<p>Premièrement, nous devons préparer des variables et installer l&apos;observateur.</p>
+
+<pre class="brush: js">var numSteps = 20.0;
+
+var boxElement;
+var prevRatio = 0.0;
+var increasingColor = &quot;rgba(40, 40, 190, ratio)&quot;;
+var decreasingColor = &quot;rgba(190, 40, 40, ratio)&quot;;
+
+// On met l&apos;ensemble en place.
+
+window.addEventListener(&quot;load&quot;, function(event) {
+  boxElement = document.querySelector(&quot;#box&quot;);
+
+  createObserver();
+}, false);</pre>
+
+<p>Les constantes et variables que nous préparons sont :</p>
+
+<dl>
+ <dt><code>numSteps</code></dt>
+ <dd>Une constante qui indique combien de paliers nous voulons avoir entre les ratios de visibilité de 0.0 et de 1.0.</dd>
+ <dt><code>prevRatio</code></dt>
+ <dd>Cette variable sera utilisée pour mémoriser quel était le ratio de visibilité la dernière fois qu&apos;un palier a été franchi ; ce qui nous permettra de savoir si l&apos;élément est en train de devenir plus ou moins visible.</dd>
+ <dt><code>increasingColor</code></dt>
+ <dd>Une chaîne de caractères définissant une couleur que nous appliquerons à l&apos;élément cible quand le ratio de visibilité augmente. Le mot &quot;ratio&quot; dans cette chaîne de caractères sera remplacé par la ratio de visibilité de la cible actuelle, de telle sorte que l&apos;élément, en plus de changer de couleur, deviendra de plus en plus opaque à mesure qu&apos;il deviendra obscur.</dd>
+ <dt><code>decreasingColor</code></dt>
+ <dd>De même, il s&apos;agit d&apos;une chaîne de caractères qui définit une couleur que nous appliquerons lorsque le ratio de visibilité diminue.</dd>
+</dl>
+
+<p>On appelle <a href="/fr/docs/Web/API/EventTarget/addEventListener" title="La méthode addEventListener() d&apos;EventTarget met en place une fonction à appeler chaque fois que l&apos;événement spécifié est remis à la cible. Les cibles courantes sont un Element, le Document lui-même et une Window, mais elle peut être tout objet prenant en charge les évènements (comme XMLHttpRequest)."><code>Window.addEventListener()</code></a> pour commencer à écouter l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/load" title="/fr/docs/Web/Reference/Events/load">load</a></code> ; une fois que la page a finit de charger, on obtient une référence de l&apos;élément avec l&apos;identifiant <code>&quot;box&quot;</code> grâce à <a href="/fr/docs/Web/API/Document/querySelector" title="La méthode querySelector() de l&apos;interface Document retourne le premier Element dans le document correspondant au sélecteur - ou groupe de sélecteurs - spécifié(s), ou null si aucune correspondance n&apos;est trouvée."><code>querySelector()</code></a>, puis on appelle la méthode <code>createObserver()</code> que l&apos;on va définir un peu plus tard pour gérer la création et l&apos;installation de l&apos;observateur d&apos;intersection.</p>
+
+<h4 id="Création_de_l&apos;observateur_d&apos;intersection">Création de l&apos;observateur d&apos;intersection</h4>
+
+<p>La méthode <code>createObserver()</code> est appelée une fois que le chargement de la page est terminé afin de gérer la création du nouveau <a href="/fr/docs/Web/API/IntersectionObserver" title="L&apos;interface IntersectionObserver de l&apos;API Intersection Observer fournit un moyen d&apos;observer de manière asynchrone les changements d&apos;intersection d&apos;un élément cible avec un élément ancêtre ou avec la fenêtre du document viewport."><code>IntersectionObserver</code></a> et de commencer le processus d&apos;observation de l&apos;élément cible.</p>
+
+<pre class="brush: js">function createObserver() {
+  var observer;
+
+  var options = {
+    root: null,
+    rootMargin: &quot;0px&quot;,
+    threshold: buildThresholdList()
+  };
+
+  observer = new IntersectionObserver(handleIntersect, options);
+  observer.observe(boxElement);
+}</pre>
+
+<p>On commence par définir un objet <code>options</code> contenant les paramètres pour l&apos;observateur. On voudra observer les évolutions de la visibilité de l&apos;élément cible relativement au <em>viewport</em>, on initialise donc <code>root</code> avec <code>null</code>. Nous n&apos;avons pas besoin de marge, donc l&apos;espace de marge, <code>rootMargin</code>, est initialisé à <code>&quot;0px&quot;</code>. Ainsi, l&apos;observateur surveillera les variations de l&apos;intersection entre les frontières de l&apos;élément cible et ceux du <em>viewport</em>, sans aucun espace ajouté ou ôté.</p>
+
+<p>La liste de paliers de ratio de visibilité, <code>threshold</code>, est construite par la fonction <code>buildThresholdList()</code>. La liste de paliers est construite mécaniquement dans cet exemple car il y en a un certain nombre, et que ce nombre a vocation à être ajustable.</p>
+
+<p>Une fois que <code>options</code> est prêt, nous pouvons créer le nouvel observateur, en appelant le constructeur <a href="/fr/docs/Web/API/IntersectionObserver/IntersectionObserver" title="Le constructeur IntersectionObserver() crée et retourne un nouvel objet IntersectionObserver."><code>IntersectionObserver()</code></a> , en précisant une fonction <em>callback</em> à appeler quand l&apos;intersection franchit l&apos;un de nos paliers, <code>handleIntersect()</code>, et notre ensemble d&apos;options. On appelle alors <a href="/fr/docs/Web/API/IntersectionObserver/observe" title="La méthode observe() de l&apos;interface IntersectionObserver ajoute un élément à l&apos;ensemble des éléments cibles étant observés par l&apos;IntersectionObserver. Un observateur a un ensemble de seuils d&apos;intersection et une racine, mais peut observer plusieurs éléments cibles en surveillant leurs changements de visibilité indépendamment. Pour cesser d&apos;observer un élément, il faut appeler la méthode IntersectionObserver.unobserve()."><code>observe()</code></a> sur l&apos;observateur retourné, afin de le passer à l&apos;élément qui sera notre cible</p>
+
+<p>On pourrait également choisir de surveiller l&apos;évolution de la visibilité de l&apos;intersection de plusieurs éléments par rapport au <em>viewport</em> en appelant <code>observer.observe()</code>pour chacun de ces éléments.</p>
+
+<h4 id="Construction_du_tableau_de_paliers_de_ratios">Construction du tableau de paliers de ratios</h4>
+
+<p>La fonction<code>buildThresholdList()</code>, qui construit la liste de paliers, ressemble à ceci :</p>
+
+<pre class="brush: js">function buildThresholdList() {
+  var thresholds = [];
+
+  for (var i=1.0; i&lt;=numSteps; i++) {
+    var ratio = i/numSteps;
+    thresholds.push(ratio);
+  }
+
+  thresholds.push(0);
+  return thresholds;
+}</pre>
+
+<p>Cela construit la tableau de paliers (chacun de ces paliers étant un ratio compris entre 0.0 et 1.0, ajouté en poussant la valeur<code>i/numSteps</code>dans le tableau <code>thresholds</code> pour chaque entier <code>i</code> entre 1 et <code>numSteps</code>). On pousse également 0 pour inclure cette valeur. Le résultat, dans le cas où<code>numSteps</code>a sa valeur par défaut, est la liste de paliers suivante :</p>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th>#</th>
+   <th>Ratio</th>
+   <th>#</th>
+   <th>Ratio</th>
+  </tr>
+  <tr>
+   <th>1</th>
+   <td>0.05</td>
+   <th>11</th>
+   <td>0.55</td>
+  </tr>
+  <tr>
+   <th>2</th>
+   <td>0.1</td>
+   <th>12</th>
+   <td>0.6</td>
+  </tr>
+  <tr>
+   <th>3</th>
+   <td>0.15</td>
+   <th>13</th>
+   <td>0.65</td>
+  </tr>
+  <tr>
+   <th>4</th>
+   <td>0.2</td>
+   <th>14</th>
+   <td>0.7</td>
+  </tr>
+  <tr>
+   <th>5</th>
+   <td>0.25</td>
+   <th>15</th>
+   <td>0.75</td>
+  </tr>
+  <tr>
+   <th>6</th>
+   <td>0.3</td>
+   <th>16</th>
+   <td>0.8</td>
+  </tr>
+  <tr>
+   <th>7</th>
+   <td>0.35</td>
+   <th>17</th>
+   <td>0.85</td>
+  </tr>
+  <tr>
+   <th>8</th>
+   <td>0.4</td>
+   <th>18</th>
+   <td>0.9</td>
+  </tr>
+  <tr>
+   <th>9</th>
+   <td>0.45</td>
+   <th>19</th>
+   <td>0.95</td>
+  </tr>
+  <tr>
+   <th>10</th>
+   <td>0.5</td>
+   <th>20</th>
+   <td>1.0</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>Bien sur, on pourrait coder en dur le tableau de paliers dans notre code, et c&apos;est souvent ce que vous ferez. Cependant, cet exemple laisse un peu de place pour plus de configuration afin d&apos;ajuster la granularité, par exemple.</p>
+
+<h4 id="Gérer_les_évolutions_de_l&apos;intersection">Gérer les évolutions de l&apos;intersection</h4>
+
+<p>Quand le navigateur détecte que l&apos;élément cible (dans notre cas, celui avec l&apos;identifiant <code>&quot;box&quot;</code>) a été révélé ou caché de tel sorte que son ratio de visibilité franchit l&apos;un des paliers de notre liste, il appelle la fonction <code>handleIntersect()</code>:</p>
+
+<pre class="brush: js">function handleIntersect(entries, observer) {
+  entries.forEach(function(entry) {
+    if (entry.intersectionRatio &gt; prevRatio) {
+      entry.target.style.backgroundColor = increasingColor.replace(&quot;ratio&quot;, entry.intersectionRatio);
+    } else {
+      entry.target.style.backgroundColor = decreasingColor.replace(&quot;ratio&quot;, entry.intersectionRatio);
+    }
+
+    prevRatio = entry.intersectionRatio;
+  });
+}</pre>
+
+<p>Pour chaque <a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a> dans la liste <code>entries</code>, on cherche si le <a href="/fr/docs/Web/API/IntersectionObserverEntry/intersectionRatio" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>intersectionRatio</code></a> de l&apos;entrée augmente; si c&apos;est le cas, on donne à la propriété CSS <a href="/fr/docs/Web/CSS/background-color" title="La propriété background-color permet de définir la couleur utilisée pour l&apos;arrière-plan d&apos;un élément (celle-ci peut être une couleur transparente)."><code>background-color</code></a> de la cible la valeur <code>increasingColor</code> (pour rappel, c&apos;est la chaîne de caractères <code>&quot;rgba(40, 40, 190, ratio)&quot;</code>), et on remplace le mot &quot;ratio&quot; avec le <code>intersectionRatio</code> de l&apos;entrée. Le résultat : non seulement la couleur change, mais la transparence de l&apos;élément change aussi. Quand le ratio d&apos;intersection diminue, l&apos;alpha de la couleur de fond diminue de même, et l&apos;élément devient plus transparent.</p>
+
+<p>De même, si le <code>intersectionRatio</code> augmente, on utilise la chaîne de caractères <code>decreasingColor</code> et on y remplace le mot &quot;ratio&quot; avec <code>intersectionRatio</code> avant d&apos;assigner le <code>background-color</code> de l&apos;élément cible.</p>
+
+<p>Enfin, afin de surveiller si le ratio d&apos;intersection augmente ou diminue, on garde en mémoire le ratio actuel dans la variable <code>prevRatio</code>.</p>
+
+<h3 id="Résultat">Résultat</h3>
+
+<p>Vous pouvez retrouver le résultat ci-dessous. Déroulez cette page vers le haut ou vers le bas et observez comment l&apos;apparence de la boîte change au fur et à mesure.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="400" id="frame_Un_exemple_simple" src="https://mdn.mozillademos.org/fr/docs/Web/API/Intersection_Observer_API$samples/Un_exemple_simple?revision=1547762" width="400"></iframe></p>
+
+<p>Vous pouvez consulter un exemple encore plus détaillé sur l&apos;article <em><a href="/fr/docs/Web/API/Intersection_Observer_API/Timing_element_visibility">Timing element visibility with the Intersection Observer API</a></em>.</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/IntersectionObserver/" hreflang="en" lang="en" title="La spécificaction &apos;Intersection Observer&apos;">Intersection Observer</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Support simple</td>
+   <td>51</td>
+   <td>15</td>
+   <td><a href="/en-US/Firefox/Releases/55" title="Sorti le 2017-08-08.">55</a> (55)<sup>[1][2]</sup></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>38</td>
+   <td><a class="external" href="https://bugs.webkit.org/show_bug.cgi?id=159475" rel="external" title>WebKit bug 159475</a></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Webview Android</th>
+   <th>Chrome pour Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Support simple</td>
+   <td>51</td>
+   <td>51</td>
+   <td>55.0 (55)<sup>[1][2]</sup></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>38</td>
+   <td><a class="external" href="https://bugs.webkit.org/show_bug.cgi?id=159475" rel="external" title>WebKit bug 159475</a></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Cette fonctionnalité a été implémentée depuis Gecko 53.0 (Firefox 53.0 / Thunderbird 53.0 / SeaMonkey 2.50) derrière la préférence <code>dom.IntersectionObserver.enabled</code>, qui vaut <code>false</code> par défaut. Elle est activée par défaut à partir de Firefox 55, cf <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1243846" title="FIXED: Implement Intersection Observer API">bug 1243846</a>.</p>
+
+<p>[2] Firefox ne prend pas actuellement le <a href="/fr/docs/Web/CSS/clip-path" title="La propriété clip-path empêche une portion d&apos;un élément d&apos;être affichée en définissant une région de rognage. Seule une zone spécifique de l&apos;élément sera affichée. La zone de rognage est un chemin défini avec une URL faisant référence à un SVG externe ou en ligne ou grâce à une fonction de forme comme circle()."><code>clip-path</code></a> d&apos;éléments ancêtres en compte quand il évalue la visibilité d&apos;un élément au sein de sa racine. Voir <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1319140" title="(intersection-observer) Take clip-path into account">bug 1319140</a> pour le statut de ce problème.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="https://github.com/WICG/IntersectionObserver/tree/gh-pages/polyfill">Une prothèse (<em>polyfill</em>) pour l&apos;API <em>Intersection Observer</em></a></li>
+ <li><em><a href="/fr/docs/Web/API/Intersection_Observer_API/Timing_element_visibility">Timing element visibility with the Intersection Observer API</a></em></li>
+ <li><a href="/fr/docs/Web/API/IntersectionObserver" title="L&apos;interface IntersectionObserver de l&apos;API Intersection Observer fournit un moyen d&apos;observer de manière asynchrone les changements d&apos;intersection d&apos;un élément cible avec un élément ancêtre ou avec la fenêtre du document viewport."><code>IntersectionObserver</code></a> et <a href="/fr/docs/Web/API/IntersectionObserverEntry" title="L&apos;interface IntersectionObserverEntry de l&apos;API Intersection Observer décrit l&apos;intersection entre l&apos;élément cible et son conteneur (appelé racine) à un moment spécifique de transition."><code>IntersectionObserverEntry</code></a></li>
+</ul>

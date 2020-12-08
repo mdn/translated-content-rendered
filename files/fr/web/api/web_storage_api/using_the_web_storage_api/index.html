@@ -1,0 +1,223 @@
+---
+title: Utiliser l'API Web Storage
+slug: Web/API/Web_Storage_API/Using_the_Web_Storage_API
+tags:
+  - API
+  - Guide
+  - Stockage
+  - Stockage Web
+  - localStorage
+translation_of: Web/API/Web_Storage_API/Using_the_Web_Storage_API
+---
+<div class="summary">
+<p>L&apos;API &quot;Web Storage&quot; fournit des mécanismes par lesquels les navigateurs web peuvent stocker des paires de clé-valeur, d&apos;une manière plus intuitive qu&apos;en utilisant des cookies. Cet article décrit pas à pas comment se servir de cette technologie facile d&apos;utilisation.</p>
+</div>
+
+<h2 id="Concepts_de_base">Concepts de base</h2>
+
+<p>Les objets de stockages sont de simples magasins clé-valeur, similaires aux objets, mais restant intacts après des chargements de page. La clé peut être une chaîne de caractères ou des entiers, mais la valeur sera toujours une chaîne. Vous pouvez accéder à ces valeurs comme pour un objet ou avec les méthodes getItem() et setItem(). Les trois lignes suivantes vont enregistrer la couleur de la même façon :</p>
+
+<pre class="brush: js notranslate">localStorage.colorSetting = &apos;#a4509b&apos;;
+localStorage[&apos;colorSetting&apos;] = &apos;#a4509b&apos;;
+localStorage.setItem(&apos;colorSetting&apos;, &apos;#a4509b&apos;);
+</pre>
+
+<div class="note notecard">
+<p><strong>Note</strong>: Il est recommandé d&apos;utiliser l&apos;API &quot;Web Storage&quot; (<code>setItem</code>, <code>getItem</code>, <code>removeItem</code>, <code>key</code>, <code>length</code>) pour prévenir les <a href="http://www.2ality.com/2012/01/objects-as-maps.html">embûches</a> associées à l&apos;utilisation d&apos;objets capable de stocker des couples clé-valeur.</p>
+</div>
+
+<p>Les deux principaux mécanismes internes du Stockage Web sont :</p>
+
+<ul>
+ <li><strong><code>sessionStorage</code></strong> qui maintient un espace de stockage, séparé pour chaque origine différente, disponible le temps de la session de la page (tant que le navigateur reste lancé, incluant les rechargements de la page et les restaurations).</li>
+ <li><strong><code>localStorage</code></strong> qui tient le même rôle mais persiste même après le redémarrage du navigateur web.</li>
+</ul>
+
+<p>Ces mécanismes sont disponibles via les propriétés <a href="/fr/docs/Web/API/Window/sessionStorage"><code>Window.sessionStorage</code></a> et <a href="/fr/docs/Web/API/Window/localStorage"><code>Window.localStorage</code></a>  (plus précisément, dans les navigateurs web le supportant, l&apos;objet <code>Window</code>  implémente les objets <code>WindowLocalStorage</code> et <code>WindowSessionStorage</code>, sur lesquels les propriétés <code>localStorage</code> et <code>sessionStorage</code> se basent) — l&apos;appel d&apos;un des deux va créer une instance de l&apos;objet <a href="/fr/docs/Web/API/Storage"><code>Storage</code></a>, dans lequel des données pourront être ajoutées, récupérées et supprimées. Pour <code>sessionStorage</code> et <code>localStorage</code>, un objet de stockage différent est utilisé pour chaque origine — ils fonctionnent et sont contrôlés séparément.</p>
+
+<p>Donc, par exemple, un appel initial de <code>localStorage</code> sur un document va retourner un objet <a href="/fr/docs/Web/API/Storage"><code>Storage</code></a> ; un appel de <code>sessionStorage</code> sur un document va retourner un objet <a href="/fr/docs/Web/API/Storage"><code>Storage</code></a> différent. Les deux peuvent se manipuler de la même façon, mais séparément.</p>
+
+<h2 id="Détection_de_la_fonction_localStorage">Détection de la fonction localStorage</h2>
+
+<p>Pour être capable d&apos;utiliser localStorage, nous devons d&apos;abord vérifier qu&apos;il est supporté et disponible dans la session de navigation actuelle.</p>
+
+<h3 id="Test_du_support_et_disponibilité">Test du support et disponibilité</h3>
+
+<p>Les navigateurs qui supportent localStorage ont sur l&apos;objet windows une propriété nommée localStorage. Cependant, pour différentes raisons, la vérification seule de l&apos;existnce de cette propriété peut provoquer des erreurs. .Son absence n&apos;est pas non plus une garantie de son indisponibilité, certains navigateurs offrent un paramètre pour désactiver localStorage. Donc un navigateur <em>peut</em> supporter localStorage, mais peut ne pas le rendre <em>disponible</em> aux scripts de la page. Un exemple de cela est Safari, qui en mode de navigation privée fournit un objet localStorage vide dont le quota est nul, le rendant inutilisable. Notre fonction de détection doit prendre en compte ces scénarios.</p>
+
+<p>Voici une fonction qui va détecter que localStorage est supporté mais aussi disponible:</p>
+
+<pre class="brush: js notranslate">function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = &apos;__storage_test__&apos;;
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException &amp;&amp; (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === &apos;QuotaExceededError&apos; ||
+            // Firefox
+            e.name === &apos;NS_ERROR_DOM_QUOTA_REACHED&apos;) &amp;&amp;
+            // acknowledge QuotaExceededError only if there&apos;s something already stored
+            storage.length !== 0;
+    }
+}</pre>
+
+<p>Et voici comment l&apos;utiliser :</p>
+
+<pre class="brush: js notranslate">if (storageAvailable(&apos;localStorage&apos;)) {
+	// Nous pouvons utiliser localStorage
+}
+else {
+	// Malheureusement, localStorage n&apos;est pas disponible
+}</pre>
+
+<p>Au lieu de cela, vous pouvez tester la disponibilité de sessionStorage en appelant <code>storageAvailable(&apos;sessionStorage&apos;)</code>. </p>
+
+<p>Vous pouvez retrouver ici <a class="external" href="https://gist.github.com/paulirish/5558557">une brève histoire de la détection de localStorage</a>.</p>
+
+<h2 id="Un_exemple_simple">Un exemple simple</h2>
+
+<p>Pour illustrer certains usages typiques du Stockage Web, nous avons créé un exemple simple ingénieusement appelé <strong>Web Storage Demo</strong>. La <a class="external" href="https://mdn.github.io/dom-examples/web-storage/">page de lancement</a> fournit des contrôles afin de personnaliser la couleur, la police de caractère et l&apos;image de décoration:</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/9685/landing.png" style="display: block; height: 482px; margin: 0px auto; width: 700px;">Quand vous choisissez une option différente, la page est mise à jour instantanément; de plus, vos choix sont stockés avec localStorage, donc quand vous quitterez la page et la rechargerez plus tard, vos choix auront été mémorisés.</p>
+
+<p>Nous avons aussi fournit une <a class="external" href="https://mdn.github.io/dom-examples/web-storage/event.html">page pour l&apos;événement émis</a> - Si vous chargez cette page dans un autre onglet, puis faite les changements de votre choix sur la page de démarrage, vous allez voir une information liée à l&apos;événement <a href="/fr/docs/Web/API/StorageEvent"><code>StorageEvent</code></a> qui a été lancé.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/9687/event-output.png" style="display: block; height: 482px; margin: 0px auto; width: 700px;"></p>
+
+<div class="note">
+<p><strong>Note</strong>: En plus de l&apos;affichage en temps réel des pages en utilisant les liens ci-dessus, vous pouvez aussi <a class="external" href="https://github.com/mdn/dom-examples/tree/master/web-storage">regarder le code-source</a>.</p>
+</div>
+
+<h2 id="Tester_si_le_stockage_a_déjà_été_rempli">Tester si le stockage a déjà été rempli</h2>
+
+<p>Pour démarrer avec <a class="external" href="https://github.com/mdn/dom-examples/blob/master/web-storage/main.js">main.js</a>, nous allons tester que l&apos;objet de stockage a bien été rempli (c-à-d, que l&apos;on a déjà accédé à la page):</p>
+
+<pre class="brush: js notranslate">if(!localStorage.getItem(&apos;bgcolor&apos;)) {
+  populateStorage();
+} else {
+  setStyles();
+}</pre>
+
+<p>La méthode <a href="/fr/docs/Web/API/Storage/getItem"><code>Storage.getItem()</code></a> est utilisée pour obtenir les données de l&apos;élément depuis le stockage ; dans ce cas nous testons l&apos;existence de l&apos;élément <code>bgcolor</code>; si il n&apos;existe pas nous lançons <code>populateStorage()</code> pour ajouter des valeurs personnalisées dans le stockage. Si il y a déjà des valeurs ici, nous lançons <code>setStyles()</code> pour mettre à jour le style de la page avec les valeurs stockées.</p>
+
+<p><strong>Note</strong>: Vous pouvez aussi utiliser <a href="/fr/docs/Web/API/Storage/length"><code>Storage.length</code></a> pour tester si l&apos;objet de stockage est vide ou non.</p>
+
+<h2 id="Obtenir_les_valeurs_du_stockage">Obtenir les valeurs du stockage</h2>
+
+<p>Comme vu ci dessus, les valeurs peuvent être recupérées du stockage en utilisant <a href="/fr/docs/Web/API/Storage/getItem"><code>Storage.getItem()</code></a>. La méthode prend en argument la clé de l&apos;élément, et retourne la valeur. Par exemple:</p>
+
+<pre class="brush: js notranslate">function setStyles() {
+  var currentColor = localStorage.getItem(&apos;bgcolor&apos;);
+  var currentFont = localStorage.getItem(&apos;font&apos;);
+  var currentImage = localStorage.getItem(&apos;image&apos;);
+
+  document.getElementById(&apos;bgcolor&apos;).value = currentColor;
+  document.getElementById(&apos;font&apos;).value = currentFont;
+  document.getElementById(&apos;image&apos;).value = currentImage;
+
+  htmlElem.style.backgroundColor = &apos;#&apos; + currentColor;
+  pElem.style.fontFamily = currentFont;
+  imgElem.setAttribute(&apos;src&apos;, currentImage);
+}</pre>
+
+<p>Ici, les trois premières lignes vont chercher les valeurs dans le stockage local. Puis, nous définissons les valeurs exposées par le formulaire avec ces valeurs, afin qu&apos;elles persistent quand on recharge la page. Enfin, nous mettons à jour le style et l&apos;image de décoration de la page, ainsi nos options de personnalisation reviennent lors du rechargement de la page.</p>
+
+<h2 id="Enregistrer_une_valeur_dans_le_stockage">Enregistrer une valeur dans le stockage</h2>
+
+<p><a href="/fr/docs/Web/API/Storage/setItem"><code>Storage.setItem()</code></a> est aussi bien utilisée pour la création d&apos;une donnée,  que pour la modification d&apos;une donnée existante (si cette donnée existe déja). Elle prend deux arguments — la clé de l&apos;élément à créer/modifier, et la valeur associée à stocker.</p>
+
+<pre class="brush: js notranslate">function populateStorage() {
+  localStorage.setItem(&apos;bgcolor&apos;, document.getElementById(&apos;bgcolor&apos;).value);
+  localStorage.setItem(&apos;font&apos;, document.getElementById(&apos;font&apos;).value);
+  localStorage.setItem(&apos;image&apos;, document.getElementById(&apos;image&apos;).value);
+
+  setStyles();
+}</pre>
+
+<p>La fonction <code>populateStorage()</code> définit trois éléments dans le stockage local — la couleur de fond, la police de caractère et le chemin de l&apos;image. Ensuite elle lance la fonction <code>setStyles()</code> pour mettre à jour le style de la page, etc.</p>
+
+<p>Nous avons aussi inclu un handler <code>onchange</code> sur chaque élément du formulaire, ainsi les données et le style sont mis à jour quelque soit la valeur du formulaire qui a changé:</p>
+
+<pre class="brush: js notranslate">bgcolorForm.onchange = populateStorage;
+fontForm.onchange = populateStorage;
+imageForm.onchange = populateStorage;</pre>
+
+<h2 id="Répondre_aux_changements_du_stockage_avec_StorageEvent">Répondre aux changements du stockage avec StorageEvent</h2>
+
+<p>L&apos;événement <code><a href="/fr/docs/Web/Reference/Events/StorageEvent" title="/fr/docs/Web/Reference/Events/StorageEvent">StorageEvent</a></code> est lancé dès lors qu&apos;un changement est fait sur l&apos;objet <a href="/fr/docs/Web/API/Storage"><code>Storage</code></a>. Cela ne va pas marcher sur la même page qui a provoqué le changement: c&apos;est vraiment un moyen pour que les autres pages du domaine qui utilisent le stockage local puissent se synchroniser avec tous les changements qui ont été fait.</p>
+
+<p>Les pages des autres domaines ne peuvent pas accéder aux mêmes objets de stockage.</p>
+
+<p>Sur la page d&apos;événement (voir <a class="external" href="https://github.com/mdn/web-storage-demo/blob/gh-pages/event.js">events.js</a>) le seul JavaScript est :</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&apos;storage&apos;, function(e) {
+  document.querySelector(&apos;.my-key&apos;).textContent = e.key;
+  document.querySelector(&apos;.my-old&apos;).textContent = e.oldValue;
+  document.querySelector(&apos;.my-new&apos;).textContent = e.newValue;
+  document.querySelector(&apos;.my-url&apos;).textContent = e.url;
+  document.querySelector(&apos;.my-storage&apos;).textContent = e.storageArea;
+});</pre>
+
+<p>Ici nous avons ajouté un event listener à l&apos;objet <code>window </code>qui se lance quand l&apos;objet <a href="/fr/docs/Web/API/Storage"><code>Storage</code></a>, associée à l&apos;origine courante, est modifié. Comme vous pouvez le voir ci-dessus, l&apos;objet événement associé à cet événement a de nombreuses propriétés contenant des informations utiles: la clé de la donnée qui a changé, l&apos;ancienne valeur avant le changement, la nouvelle valeur après le changement, l&apos;URL du document qui a changé le stockage et l&apos;objet stockage lui-même.</p>
+
+<h2 id="Supprimer_des_données">Supprimer des données</h2>
+
+<p>l&apos;API de Stockage Web fournit aussi un couple de méthodes simples pour supprimer des données. Nous ne les utilisons pas dans notre démo, mais elles sont simples à ajouter dans votre projet :</p>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/Storage/removeItem"><code>Storage.removeItem()</code></a> prend un seul argument — la clé de l&apos;élément que vous souhaitez supprimer — et le supprime de l&apos;objet de stockage pour le domaine.</li>
+ <li><a href="/fr/docs/Web/API/Storage/clear"><code>Storage.clear()</code></a> ne prend pas d&apos;argument, et vide l&apos;ensemble des données de l&apos;objet de stockage pour le domaine.</li>
+</ul>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en" title="La spécificaction &apos;Unknown&apos;">Unknown</a></td>
+   <td><span class="spec-">Statut inconnu</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<h3 id="Window.localStorage"><code>Window.localStorage</code></h3>
+
+<div class="hidden">Le tableau de compatibilité de cette page a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à consulter <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> et à nous envoyer une <em>pull request</em>.</div>
+
+<div class="bc-data" id="bcd:api.Window.localStorage"></div>
+
+<h3 id="Window.sessionStorage"><code>Window.sessionStorage</code></h3>
+
+<div class="hidden">Le tableau de compatibilité de cette page a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à consulter <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> et à nous envoyer une <em>pull request</em>.</div>
+
+<div class="bc-data" id="bcd:api.Window.sessionStorage"></div>
+
+<p>Tous les navigateurs ont des niveaux de capacité différents pour localStorage et sessionStorage. Voici un <a class="external" href="http://dev-test.nemikor.com/web-storage/support-test/" title="http://dev-test.nemikor.com/web-storage/support-test/">détail des capacités de stockage pour différents navigateurs</a>.</p>
+
+<div class="note">
+<p><strong>Note: </strong>depuis iOS 5.1, Safari Mobile stocke les données de localStorage dans le repertoire de cache, qui est parfois sujet à des nettoyages, à la demande de l&apos;OS, typiquement quand l&apos;espace restant est faible.</p>
+</div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/Web_Storage_API">Page API du Stockage Web</a></li>
+</ul>

@@ -1,0 +1,120 @@
+---
+title: Web Components
+slug: Web/Web_Components
+tags:
+  - Composants Web
+translation_of: Web/Web_Components
+---
+<section class="Quick_links" id="Quick_Links"><ol><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/Web_Components/Using_custom_elements">Utilisation d&apos;éléments personnalisés</a></li><li><a href="/fr/docs/Web/Web_Components/Using_shadow_DOM">Utiliser le shadow DOM</a></li><li><a href="/fr/docs/Web/Web_Components/Utilisation_des_templates_et_des_slots">Utilisation des templates et des slots</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/CustomElementRegistry"><code>CustomElementRegistry</code></a></li><li><a href="/fr/docs/Web/API/HTMLSlotElement"><code>HTMLSlotElement</code></a></li><li><a href="/fr/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></li><li><a href="/fr/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a></li><li><a href="/fr/docs/Web/API/DocumentOrShadowRoot"><code>DocumentOrShadowRoot</code></a></li><li><a href="/fr/docs/Web/API/Slotable"><code>Slotable</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a></li><li><a href="/fr/docs/Web/API/Element/slot"><code>Element.slot</code></a></li><li><a href="/fr/docs/Web/API/Event/composed"><code>Event.composed</code></a></li><li><a href="/fr/docs/Web/API/Event/composedPath"><code>Event.composedPath</code></a></li><li><a href="/fr/docs/Web/API/Node/isConnected"><code>Node.isConnected</code></a></li><li><a href="/fr/docs/Web/API/Window/customElements"><code>Window.customElements</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a></li><li><a href="/fr/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a></li><li><a href="/fr/docs/Web/API/Node/getRootNode"><code>Node.getRootNode()</code></a></li></ol></details></li></ol></section><div class="draft notecard">
+    <p><strong>Brouillon</strong><br>
+    Cette page n&apos;est pas terminée.</p>
+
+</div>
+
+<div class="summary">
+<p>Les Composants Web sont constitués de plusieurs technologies distinctes permettant de créer des composants d&apos;interface graphique personnalisés et réutilisables, qui ont été créés en utilisant des technologies web libres. Ils font partie du navigateur, et donc ne nécessitent pas de bibliothèque externe comme jQuery ou Dojo. Un Composant Web existant peut être utilisé sans l&apos;écriture de code, en ajoutant simplement une déclaration d&apos;importation à une page HTML. Les Composants Web utilisent les nouvelles capacités standard de navigateur, ou celles en cours de développement.</p>
+
+<h2 id="Concepts_et_utilisation">Concepts et utilisation</h2>
+
+<p>En tant que développeurs, nous savons tous à quel point la réutilisation de code est une bonne chose. Malgré cela, historiquement, il a toujours été difficile de réutiliser les languages balisés. Prenez par exemple tous ces éléments complexes en HTML que vous avez créés et dû répéter dans vos applications avec le risque que votre code devienne incompréhensible.</p>
+
+<p>Les composants Web ont pour but de résoudre ce problème et consistent en 3 technologies qui peuvent être utilisées ensemble pour créer des éléments réutilisables, encapsulés, versatiles et sans risquer une collision avec d&apos;autre morceaux de code.</p>
+
+<ul>
+ <li><a href="/fr/docs/Web/Web_Components/Custom_Elements">Custom Elements: </a> pour créer et enregistrer de nouveaux éléments HTML et les faire reconnaître par le navigateur.</li>
+ <li><a href="/fr/docs/Web/HTML/Element/template">HTML Templates: </a> squelette pour créer des éléments HTML instanciables.</li>
+ <li><a href="/fr/docs/Web/Web_Components/Shadow_DOM">Shadow DOM: </a>permet d&apos;encapsuler le JavaScript et le CSS des éléments.</li>
+</ul>
+
+<p>Au début de la spécification, il y avait aussi la technologie <a href="/fr/docs/Web/Web_Components/HTML_Imports">HTML Imports</a>. Celle-ci servait à packager ses composants (CSS, JavaScript, etc.) et permettre leur intégration dans d&apos;autres pages. Elle a néanmoins été abandonnée au profit des imports javascript qui permettent la même chose en utilisant une syntaxe plus moderne.</p>
+</div>
+
+<p>La description ci-dessus fonctionne assez bien à l&apos;heure actuelle, mais cela laisse de côté plusieurs choses pour lesquelles les Composants Web pourraient être utilisés. Avec un Composant Web, vous pouvez faire presque tout ce qui peut être fait en HTML, CSS et JavaScript, et celui-ci peut devenir un élément réutilisable facilement.</p>
+
+<p>Il y a parfois une certaine confusion concernant les Composants Web et Google Polymer. Polymer est un framework qui repose sur la technologie des Composants Web. Vous pouvez faire et utiliser des Composants Web sans Polymer.</p>
+
+<p>Généralement, l&apos;approche basique pour la création d&apos;un composant Web est la suivante:</p>
+
+<ol>
+ <li>Créer une classe dans laquelle est spécifié la fonctionnalité du composant Web en utilisant la syntaxe de classe ECMAScript 2015 (voir les <a href="https://wiki.developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Classes">Classes</a> pour de plus amples informations).</li>
+ <li>Enregistrer le nouvel élément personnalisé en utilisant la méthode <a href="/fr/docs/Web/API/CustomElementRegistry/define"><code>CustomElementRegistry.define()</code></a>, avec en paramètre le nom de l&apos;élément à définir, la classe ou la fonction dans laquelle la fonctionnalité est spécifiée, et <span id="p3">optionnellement</span>, de quel élément celui-ci hérite-t-il.</li>
+ <li>Si nécessaire, connecter un shadow DOM à l&apos;élément personnalisé en utilisant la méthode <a href="/fr/docs/Web/API/Element/attachShadow"><code>Element.attachShadow()</code></a>. Ajouter les éléments-fils, les écouteurs d&apos;événements, etc., au shadow DOM en utilisant les méthodes DOM usuelles.</li>
+ <li>Si nécessaire, définir un template HTML en utilisant <a href="/fr/docs/Web/HTML/Element/template" title="L&apos;élément HTML &lt;template&gt; (ou Template Content ou modèle de contenu) est un mécanisme utilisé pour stocker du contenu HTML (côté client) qui ne doit pas être affiché lors du chargement de la page mais qui peut être instancié et affiché par la suite grâce à un script JavaScript."><code>&lt;template&gt;</code></a> et <a href="/fr/docs/Web/HTML/Element/slot" title="L&apos;élément HTML &lt;slot&gt; représente un emplacement d&apos;un composant web qu&apos;on peut remplir avec son propre balisage. On peut ainsi obtenir un document construit avec différents arbres DOM. Cet élément fait partie des outils relatifs aux composants web (Web Components)."><code>&lt;slot&gt;</code></a>. Toujours en utilisant les méthodes DOM usuelles pour cloner le template et le connecter au shadow DOM.</li>
+ <li>Utiliser l&apos;élément personnalisé à l&apos;endroit désiré sur la page, comme tous les autres éléments HTML.</li>
+</ol>
+
+<div class="note">
+<p>Les Composants Web ne sont pas encore pleinement mis en œuvre dans tous les navigateurs, et pour les utiliser dès maintenant dans la plupart des navigateurs (janvier 2015), vous devrez probablement utiliser des polyfills (ce sont des bibliothèques JavaScript destinées à émuler des fonctionnalités qui ne sont pas encore implémentées nativement dans les navigateurs). Les polyfills sont disponibles dans le <a href="http://www.polymer-project.org/">projet Google Polymer</a>. Pour savoir quels navigateurs implémentent les Composants Web, voir <a href="http://jonrimmer.github.io/are-we-componentized-yet/">Are We Componentized Yet?</a></p>
+</div>
+
+<ul>
+</ul>
+
+<p>Les spécifications des Composants Web définissent les éléments suivants :</p>
+
+<ul>
+ <li>De nouveaux éléments HTML : <a href="/fr/docs/Web/HTML/Element/template" title="L&apos;élément HTML &lt;template&gt; (ou Template Content ou modèle de contenu) est un mécanisme utilisé pour stocker du contenu HTML (côté client) qui ne doit pas être affiché lors du chargement de la page mais qui peut être instancié et affiché par la suite grâce à un script JavaScript."><code>&lt;template&gt;</code></a>, <a href="/fr/docs/Web/HTML/Element/content" title="L&apos;élément HTML &lt;content&gt; était utilisé au sein d&apos;un shadow DOM comme point d&apos;insertion. Cet élément est désormais obsolète et n&apos;était pas conçu pour être utilisé dans un document HTML simple mais pour être employé dans des composants web. Il est désormais remplacé par l&apos;élément &lt;slot&gt; qui permet de créer un point d&apos;insertion pour un shadow DOM au sein du DOM."><code>&lt;content&gt;</code></a> et <a href="/fr/docs/Web/HTML/Element/shadow" title="L&apos;élément HTML &lt;shadow&gt; était utilisé comme un point d&apos;insertion (insertion point) du shadow DOM. Cet élément a été retiré de la spécification et est désormais obsolète."><code>&lt;shadow&gt;</code></a> (<a href="/fr/docs/Web/HTML/Element/element" title="L&apos;élément HTML &lt;element&gt; était conçu pour être utilisé afin de définir des éléments DOM personnalisés, il a été retiré de la spécification. Il a été retiré en faveur d&apos;outils JavaScript qui permettront de créer de nouveaux éléments personnalisés, par exemple avec les Web Components."><code>&lt;element&gt;</code></a> et <a href="/fr/docs/Web/HTML/Element/decorator" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>&lt;decorator&gt;</code></a> ont été retirés).</li>
+ <li>Les interfaces d&apos;API associées pour les nouveaux éléments: <a href="/fr/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a>, <a href="/fr/docs/Web/API/HTMLContentElement"><code>HTMLContentElement</code></a> et <a href="/fr/docs/Web/API/HTMLShadowElement"><code>HTMLShadowElement</code></a>.</li>
+ <li>Des extensions à l&apos;interface <a href="/fr/docs/Web/API/HTMLLinkElement"><code>HTMLLinkElement</code></a> et l&apos;élément <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style, vers les icônes utilisées en barre de titre ou comme icône d&apos;application sur les appareils mobiles."><code>&lt;link&gt;</code></a>.</li>
+ <li>Une API pour enregistrer les custom elements, <a href="/fr/docs/Web/API/Document/registerElement"><code>Document.registerElement()</code></a>, et des modifications de <a href="/fr/docs/Web/API/Document/createElement"><code>Document.createElement()</code></a> et <a href="/fr/docs/Web/API/Document/createElementNS"><code>Document.createElementNS()</code></a>.</li>
+ <li>De nouvelles fonctions liées au cycle de vie (&quot;<em>lifecycle callbacks</em>&quot;) peuvent être ajoutées à un prototype sur lequel est basé un custom element.</li>
+ <li>Une nouvelle pseudo-classe CSS pour les éléments de style par defaut, <a href="/fr/docs/Web/CSS/:unresolved" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>:unresolved</code></a>.</li>
+ <li>Le Shadow DOM : <a href="/fr/docs/Web/API/ShadowRoot"><code>ShadowRoot</code></a> et <a href="/fr/docs/Web/API/Element/createShadowRoot"><code>Element.createShadowRoot()</code></a>, <a href="/fr/docs/Web/API/Element/getDestinationInsertionPoints"><code>Element.getDestinationInsertionPoints()</code></a>, <a href="/fr/docs/Web/API/Element/shadowRoot"><code>Element.shadowRoot</code></a>.</li>
+ <li>Une extension à l&apos;interface <a href="/fr/docs/Web/API/Event"><code>Event</code></a>, <a href="/fr/docs/Web/API/Event/path"><code>Event.path</code></a>.</li>
+ <li>Une extension à l&apos;interface <a href="/fr/docs/Web/API/Document"><code>Document</code></a>.</li>
+ <li>Pour le style des Composants Web:
+  <ul>
+   <li>de nouvelles pseudo-classes : <a href="/fr/docs/Web/CSS/:host" title="La pseudo-classe :host permet de cibler l&apos;hôte d&apos;un shadow DOM contenant le CSS à utiliser pour cet hôte. Autrement dit, elle permet de sélectionner un élément personnalisé (custom element) depuis l&apos;intérieur du shadow DOM."><code>:host</code></a>, <a href="/fr/docs/Web/CSS/:host()" title="La fonction de pseudo-classe :host() permet de sélectionner l&apos;hôte du shadow DOM contenant le CSS à utiliser, uniquement si le sélecteur passé en argument correspond à l&apos;élément hôte."><code>:host()</code></a>, <a href="/fr/docs/Web/CSS/:host-context()" title="La pseudo-classe :host-context() est une fonction qui sélectionne l&apos;hôte (shadow host) du shadow DOM qui contient le CSS utilisé à l&apos;intérieur, uniquement si le sélecteur fourni en argument correspond à l&apos;ancêtre de l&apos;hôte selon l&apos;arborescence du DOM."><code>:host-context()</code></a>.</li>
+   <li>de nouveaux pseudo-elements : <a href="/fr/docs/Web/CSS/::shadow" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>::shadow</code></a> et <a href="/fr/docs/Web/CSS/::content" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>::content</code></a>.</li>
+   <li>un nouveau combinateur, <code>/deep/</code>.</li>
+  </ul>
+ </li>
+</ul>
+
+<h2 id="Activer_les_Web_Components_dans_Firefox">Activer les Web Components dans Firefox</h2>
+
+<p>Les capacités des Web Components sont désactivées par défaut dans Firefox. Pour les activer, allez sur la page <code>about:config</code> et rejetez toutes les alertes qui apparaissent. Cherchez ensuite la préférence nommée <strong>dom.webcomponents.enabled</strong>, et changez la à <strong>true</strong> par un double clic.</p>
+
+<p><img alt="Firefox enable web components" src="https://mdn.mozillademos.org/files/10145/enable-wc.png"></p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en" title="La spécificaction &apos;Unknown&apos;">Unknown</a></td>
+   <td><span class="spec-">Statut inconnu</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage//scripting-1.html#the-template-element" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;template element&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Pas de changement</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52//scripting-1.html#the-template-element" hreflang="en" lang="en">HTML5<br><small lang="fr">La définition de &apos;template element&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Définition initiale</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/shadow/" hreflang="en" lang="en" title="La spécificaction &apos;Shadow DOM&apos;">Shadow DOM</a></td>
+   <td><span class="spec-Obsolete">Obsolete</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webcomponents/spec/imports/" hreflang="en" lang="en" title="La spécificaction &apos;HTML Imports&apos;">HTML Imports</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-scoping/" hreflang="en" lang="en" title="La spécificaction &apos;CSS Scoping Module Level 1&apos;">CSS Scoping Module Level 1</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>

@@ -1,0 +1,132 @@
+---
+title: Exemple d'allocation de monstres
+slug: Outils/Memory/Monster_example
+translation_of: Tools/Memory/Monster_example
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/fr/docs/Tools/Page_Inspector">Inspecteur</a></li>
+        <li><a href="/fr/docs/Tools/Web_Console">Console web</a></li>
+        <li><a href="/fr/docs/Tools/Debugger">Débogueur JavaScript</a></li>
+        <li><a href="/fr/docs/Tools/Network_Monitor">Moniteur réseau</a></li>
+        <li><a href="/fr/docs/Tools/Performance">Performances</a></li>
+        <li><a href="/fr/docs/Tools/Application">Application</a></li>
+        <li><a href="/fr/docs/Tools/Responsive_Design_Mode">Vue adaptative</a></li>
+        <li><a href="/fr/docs/Tools/Accessibility_inspector">Panneau accessibilité</a></li>
+        <li class="toggle">
+            <details>
+                <summary>Plus d'outils</summary>
+                <ol>
+                    <li><a href="/fr/docs/Tools/Memory">Mémoire</a></li>
+                    <li><a href="/fr/docs/Tools/Storage_Inspector">Inspecteur de stockage</a></li>
+                    <li><a href="/fr/docs/Tools/DOM_Property_Viewer">Inspecteur DOM</a></li>
+                    <li><a href="/fr/docs/Tools/Eyedropper">Pipette</a></li>
+                    <li><a href="/fr/docs/Tools/Taking_screenshots">Capture d'écran</a></li>
+                    <li><a href="/fr/docs/Tools/Style_Editor">Éditeur de style</a></li>
+                    <li><a href="/fr/docs/Tools/Rulers">Règles</a></li>
+                    <li><a href="/fr/docs/Tools/Measure_a_portion_of_the_page">Mesurer une portion de la page</a></li>
+                    <li><a href="/fr/docs/Tools/View_source">Afficher le code source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>Connexion aux outils de développement</summary>
+                <ol>
+                    <li><a href="/fr/docs/Tools/about:debugging">about:debugging</a></li>
+                    <li><a href="/fr/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Connexion à Firefox pour Android</a></li>
+                    <li><a href="/fr/docs/Tools/Working_with_iframes">Connexion aux iframes</a></li>
+                    <li><a href="/fr/docs/Tools/Valence">Connexion à d'autres navigateurs</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>Débogage du navigateur</summary>
+                <ol>
+                    <li><a href="/fr/docs/Tools/Browser_Console">Console du navigateur</a></li>
+                    <li><a href="/fr/docs/Tools/Browser_Toolbox">Boite à outils du navigateur</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/fr/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">Extensions pour les outils de développement</a></li>
+        <li><a href="/fr/docs/Tools/Settings">Paramètres</a></li>
+        <li><a href="/fr/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/fr/docs/Tools/Release_notes">Notes de version</a></li>
+    </ol>
+</section></div><p>Cet article décrit une page web très simple que nous utilisons pour illustrer certaines fonctionnalités de l'outil <a href="/fr/docs/Outils/Memory">Mémoire</a>.</p>
+
+<p>Il est possible de l'essayer sur le site : <a class="external external-icon" href="https://mdn.github.io/performance-scenarios/js-allocs/alloc.html">https://mdn.github.io/performance-scenarios/js-allocs/alloc.html</a>. Voici le code :</p>
+
+<pre class="brush: js notranslate">var MONSTER_COUNT = 5000;
+var MIN_NAME_LENGTH = 2;
+var MAX_NAME_LENGTH = 48;
+
+function Monster() {
+
+  function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+  function randomName() {
+    var chars = "abcdefghijklmnopqrstuvwxyz";
+    var nameLength = randomInt(MIN_NAME_LENGTH, MAX_NAME_LENGTH);
+    var name = "";
+    for (var j = 0; j &amp;lt; nameLength; j++) {
+      name += chars[randomInt(0, chars.length-1)];
+    }
+    return name;
+  }
+
+  this.name = randomName();
+  this.eyeCount = randomInt(0, 25);
+  this.tentacleCount = randomInt(0, 250);
+}
+
+function makeMonsters() {
+  var monsters = {
+    "friendly": [],
+    "fierce": [],
+    "undecided": []
+  };
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.friendly.push(new Monster());
+  }
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.fierce.push(new Monster());
+  }
+
+  for (var i = 0; i &amp;lt; MONSTER_COUNT; i++) {
+    monsters.undecided.push(new Monster());
+  }
+
+  console.log(monsters);
+}
+
+var makeMonstersButton = document.getElementById("make-monsters");
+makeMonstersButton.addEventListener("click", makeMonsters);</pre>
+
+<p>Cette page contient un bouton : Lorsque celui-ci est activé, le code crée des monstres plus précisément :</p>
+
+<ul>
+ <li>Le code crée un objet avec trois propriétés, chacune étant un tableau :
+  <ul>
+   <li>Un pour les monstres "méchants" (fierce).</li>
+   <li>Un pour les monstres "gentils" (friendly).</li>
+   <li>UIn pour les monstres qui n'ont pas encore décidé (undecided).</li>
+  </ul>
+ </li>
+ <li>Pour chaque tableau, le code crée 5000 monstres générés aléatoirement. Chaque monstre a :
+  <ul>
+   <li>Une chaine de caractères, pour le nom du monstre.</li>
+   <li>Un nombre représentant le nombre d'yeux qu'il possède.</li>
+   <li>Un nombre représentant le nombre de tentacules qu'il possède.</li>
+  </ul>
+ </li>
+</ul>
+
+<p>Ainsi, la structure de la mémoire allouée sur la heap JavaScript est un objet contenant trois tableaux contenant chacun 5000 objets (les monstres) chaque objet contient une string et deux int :</p>
+
+<p><a name="allocation-graph"><img alt="" src="https://mdn.mozillademos.org/files/12369/monsters.svg" style="display: block; height: 521px; margin-left: auto; margin-right: auto; width: 500px;"></a></p>

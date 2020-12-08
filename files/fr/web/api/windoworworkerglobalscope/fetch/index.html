@@ -1,0 +1,193 @@
+---
+title: GlobalFetch.fetch()
+slug: Web/API/WindowOrWorkerGlobalScope/fetch
+tags:
+  - API
+  - API Fetch
+  - Experimental
+  - Fetch
+  - GlobalFetch
+  - Méthode
+  - Reference
+  - WindowOrWorkerGlobalScope
+  - requête
+translation_of: Web/API/WindowOrWorkerGlobalScope/fetch
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope"><code>WindowOrWorkerGlobalScope</code></a></strong></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/caches"><code>caches</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/crossOriginIsolated"><code>crossOriginIsolated</code></a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/indexedDB"><code>indexedDB</code></a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/isSecureContext"><code>isSecureContext</code></a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/origin"><code>origin</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/WindowBase64/atob"><code>atob</code></a></li><li><a href="/fr/docs/Web/API/WindowBase64/btoa"><code>btoa()</code></a></li><li><a href="/fr/docs/Web/API/WindowTimers/clearInterval"><code>clearInterval()</code></a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/clearTimeout"><code>clearTimeout()</code></a> <a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/clearTimeout$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap"><code>createImageBitmap()</code></a> <a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap$translate" style="opacity: 0.5;">[Traduire]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><em><code>fetch()</code></em></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/queueMicrotask"><code>queueMicrotask()</code></a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/setInterval"><code>setInterval()</code></a> <a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/setInterval$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout"><code>setTimeout()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Implémenté par :</summary><ol><li><a href="/fr/docs/Web/API/Window"><code>Window</code></a></li><li><a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary">La méthode <code><strong>fetch()</strong></code> du mixin <a href="/fr/docs/Web/API/WindowOrWorkerGlobalScope"><code>WindowOrWorkerGlobalScope</code></a> démarre le chargement d&apos;une ressource sur le réseau et retourne une promesse qui est résolue dès que la réponse est disponible. La promesse résoud l&apos;objet <a href="/fr/docs/Web/API/Response"><code>Response</code></a> représentant la réponse de votre requête. Cette promesse n&apos;échoue pas en cas d&apos;erreur HTTP, elle n&apos;échoue que sur les problèmes de réseau. Vous devez utiliser un gestionnaire <code>then</code> pour identifier les erreurs HTTP.</span></p>
+
+<p><code>WindowOrWorkerGlobalScope</code> est aussi bien implémenté par <a href="/fr/docs/Web/API/Window"><code>Window</code></a> que par <a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a>, ce qui signifie que la méthode <code>fetch()</code> est disponible dans la plupart des cas où vous pourriez en avoir besoin.</p>
+
+<p>Une promesse <a href="/fr/docs/Web/API/GlobalFetch/fetch"><code>fetch()</code></a> n&apos;est rejetée que quand un problème de réseau est rencontré, même si en réalité cela signifie généralement qu&apos;il y a un problème de permissions ou quelque chose de similaire. La promesse ne sera pas rejetée en cas d&apos;erreur HTTP (<code>404</code>, etc.) Pour cela, un gestionnaire <code>then()</code> doit vérifier que la propriété <a href="/fr/docs/Web/API/Response/ok"><code>Response.ok</code></a> ait bien pour valeur <code>true</code> et/ou la valeur de la propriété <a href="/fr/docs/Web/API/Response/status"><code>Response.status</code></a>.</p>
+
+<p>La méthode <code>fetch()</code> est contrôlée par la directive <code>connect-src</code> de l&apos;entête <a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy">Content Security Policy</a> plutôt que par la directive de la ressource qui est récupérée.</p>
+
+<div class="note">
+<p>Les paramètres de la méthode <code>fetch()</code> sont identiques à ceux du contructeur d&apos;une <a href="/fr/docs/Web/API/Request/Request"><code>Request()</code></a>.</p>
+</div>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="syntaxbox notranslate">const <em>fetchResponsePromise</em> = Promise&lt;Response&gt; fetch(<em>entrée</em>[, <em>init</em>]);</pre>
+
+<h3 id="Paramètres">Paramètres</h3>
+
+<dl>
+ <dt><code><em>entrée</em></code></dt>
+ <dd>Définit la ressource que vous voulez obtenir. Cela peut être :
+ <ul>
+  <li>Un <a href="/fr/docs/Web/API/USVString"><code>USVString</code></a> qui contient l&apos;URL de la ressource à obtenir. Certains navigateurs acceptent <code>blob:</code> et <code>data:</code>.</li>
+  <li>Un objet <a href="/fr/docs/Web/API/Request"><code>Request</code></a>.</li>
+ </ul>
+ </dd>
+ <dt><code><em>init</em></code> <span class="optional optionalInline notecard inline">Facultatif</span></dt>
+ <dd>
+  <p>Un objet qui contient les paramètres de votre requête. Les options possibles sont :</p>
+
+  <dl>
+    <dt><code>method</code></dt>
+    <dd>La méthode de la requête, par exemple <code>GET</code> ou <code>POST</code>.</dd>
+
+    <dt><code>headers</code></dt>
+    <dd>Les entêtes à ajouter à votre requête, contenues dans un objet <a href="/fr/docs/Web/API/Headers"><code>Headers</code></a> ou dans un objet avec des <a href="/fr/docs/Web/API/ByteString"><code>ByteString</code></a> pour valeurs.</dd>
+
+    <dt><code>body</code></dt>
+    <dd>Le corps de votre requête. Cela peut être un <a href="/fr/docs/Web/API/Blob"><code>Blob</code></a>, un <a href="/fr/docs/Web/API/BufferSource"><code>BufferSource</code></a>, un <a href="/fr/docs/Web/API/FormData"><code>FormData</code></a>, un <a href="/fr/docs/Web/API/URLSearchParams"><code>URLSearchParams</code></a>, ou un <a href="/fr/docs/Web/API/USVString"><code>USVString</code></a>. Notez cependant qu&apos;une requête avec <code>GET</code> ou <code>HEAD</code> pour méthode ne peut pas avoir de corps.</dd>
+
+    <dt><code>mode</code></dt>
+    <dd>Le mode à utiliser pour cette requête, par exemple <code>cors</code>, <code>no-cors</code>, ou <code>same-origin.</code></dd>
+
+    <dt><code>credentials</code></dt>
+    <dd>Les identifiants à utiliser pour cette requête : <code>omit</code>, <code>same-origin</code>, ou <code>include</code>. Pour envoyer automatiquement les cookies pour le domaine actuel, cette option doit être définie. À partir de Chrome 50, cette propriété peut aussi prendre un objet <a href="/fr/docs/Web/API/FederatedCredential"><code>FederatedCredential</code></a> ou une instance de <a href="/fr/docs/Web/API/PasswordCredential"><code>PasswordCredential</code></a>.</dd>
+
+    <dt><code>cache</code></dt>
+    <dd>Le comportement du cache pour cette requête : <code>default</code>, <code>no-store</code>, <code>reload</code>, <code>no-cache</code>, <code>force-cache</code>, ou <code>only-if-cached</code>.</dd>
+
+    <dt><code>redirect</code></dt>
+    <dd>Le mode de redirection à adopter pour cette requête : <code>follow</code> (suivre les redirections automatiquement), <code>error</code> (abandonner avec une erreur si une redirection a lieu), ou <code>manual</code> (gérer les redirections manuellement). Dans Chrome, la valeur par défaut était <code>follow</code> avant Chrome 47, mais à partir de cette version, c&apos;est <code>manual</code>.</dd>
+
+    <dt><code>referrer</code></dt>
+    <dd>Un USVString qui vaut <code>no-referrer</code>, <code>client</code>, ou qui contient une URL. La valeur par défaut est <code>client</code>.</dd>
+
+    <dt><code>referrerPolicy</code></dt>
+    <dd>Spécifie la valeur de l&apos;entête HTTP referer. Cela peut être <code>no-referrer</code>, <code>no-referrer-when-downgrade</code>, <code>origin</code>, <code>origin-when-cross-origin</code> ou <code>unsafe-url</code>.</dd>
+
+    <dt><code>integrity</code></dt>
+    <dd>Contient la valeur de <a href="https://developer.mozilla.org/fr/docs/Web/Security/Subresource_Integrity">l&apos;intégrité de la sous-ressource</a> de la requête (par exemple, <code>sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=</code>).</dd>
+
+    <dt><code>keepalive</code></dt>
+    <dd>Peut être utilisée pour autoriser la requête à se poursuivre après la fermeture de la page. Une requête avec ce paramètre est équivalente à l&apos;API <a href="/fr/docs/Web/API/Navigator/sendBeacon"><code>Navigator.sendBeacon()</code></a>.</dd>
+
+    <dt><code>signal</code></dt>
+    <dd>Une instance de <a href="/fr/docs/Web/API/AbortSignal"><code>AbortSignal</code></a> vous permettant de communiquer avec une requête et de l&apos;interrompre si vous le souhaitez via un <a href="/fr/docs/Web/API/AbortController"><code>AbortController</code></a>.</dd>
+  </dl>
+</dd>
+</dl>
+
+<h3 id="Valeur_retournée">Valeur retournée</h3>
+
+<p>Une <a href="/fr/docs/Web/API/Promise"><code>Promise</code></a> qui se résoud avec un object <a href="/fr/docs/Web/API/Response"><code>Response</code></a>.</p>
+
+<h3 id="Exceptions">Exceptions</h3>
+
+<dl>
+ <dt><code>AbortError</code></dt>
+ <dd>La requête a été interrompue à cause d&apos;un appel à la méthode <a href="/fr/docs/Web/API/AbortController/abort"><code>abort()</code></a> de <a href="/fr/docs/Web/API/AbortController"><code>AbortController</code></a>.</dd>
+ <dt><code>TypeError</code></dt>
+ <dd>L&apos;URL spécifié inclut des identifiants. Ces informations devraient plutôt être fournises via l&apos;en-tête HTTP <a href="/fr/docs/Web/HTTP/Headers/Authorization" title="L&apos;en-tête de requête HTTP Authorization contient les identifiants permettant l&apos;authentification d&apos;un utilisateur auprès d&apos;un serveur, habituellement après que le serveur ait répondu avec un statut 401 Unauthorized et l&apos;en-tête WWW-Authenticate"><code>Authorization</code></a>.</dd>
+</dl>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>Dans notre <a href="https://github.com/mdn/fetch-examples/tree/gh-pages/fetch-request">exemple de requête avec fetch</a> (voir <a href="http://mdn.github.io/fetch-examples/fetch-request/">cet exemple en direct</a>) nous créons une nouvelle <a href="/fr/docs/Web/API/Request"><code>Request</code></a> avec le constructeur correspondant, puis on l&apos;envoie en appellant <code>fetch()</code>. Comme nous récupérons une image, nous utilisons la méthode <a href="/fr/docs/Web/API/Body/blob"><code>Body.blob()</code></a> sur la réponse pour lui donner le bon type MIME pour qu&apos;elle soit gérée correctement, puis l&apos;on crée l&apos;URL correspondant à cet objet et on l&apos;affiche dans un élément <a href="/fr/docs/Web/HTML/Element/img" title="L&apos;élément HTML &lt;img&gt; permet de représenter une image dans un document. Cet élément est un élément remplacé."><code>&lt;img&gt;</code></a>.</p>
+
+<pre class="brush: js notranslate">const monImage = document.querySelector(&apos;img&apos;);
+
+let maRequete = new Request(&apos;fleurs.jpg&apos;);
+
+fetch(maRequete)
+.then(function(reponse) {
+  if (!response.ok) {
+    throw new Error(`erreur HTTP! statut: ${reponse.status}`);
+  }
+  return reponse.blob();
+})
+.then(function(reponse) {
+  let URLobjet = URL.createObjectURL(reponse);
+  monImage.src = URLobjet;
+});</pre>
+
+<p>Dans notre <a href="https://github.com/mdn/fetch-examples/tree/gh-pages/fetch-with-init-then-request">exemple fetch avec initialisation et requête</a> (voir <a href="http://mdn.github.io/fetch-examples/fetch-with-init-then-request/">cet exemple en direct</a>) nous faisons la même chose à la différence que nous passons aussi un objet d&apos;initalisation à la méthode <code>fetch</code> :</p>
+
+<pre class="brush: js notranslate">const monImage = document.querySelector(&apos;img&apos;);
+
+let mesEntetes = new Headers();
+mesEntetes.append(&apos;Content-Type&apos;, &apos;image/jpeg&apos;);
+
+const monInit = { method: &apos;GET&apos;,
+               headers: myHeaders,
+               mode: &apos;cors&apos;,
+               cache: &apos;default&apos; };
+
+let maRequete = new Request(&apos;fleurs.jpg&apos;);
+
+fetch(maRequete, monInit).then(function(reponse) {
+  ...
+});</pre>
+
+<p>Notez que vous pouvez aussi passer l&apos;objet d&apos;initialisation au constructeur de la requête pour obtenir le même effet, par exemple :</p>
+
+<pre class="brush: js notranslate">let maRequete = new Request(&apos;fleurs.jpg&apos;, monInit);</pre>
+
+<p>Vous pouvez aussi utiliser un objet litéral comme en-têtes dans votre objet d&apos;initalisation.</p>
+
+<pre class="brush: js notranslate">const monInit = { method: &apos;GET&apos;,
+               headers: {
+                   &apos;Content-Type&apos;: &apos;image/jpeg&apos;
+               },
+               mode: &apos;cors&apos;,
+               cache: &apos;default&apos; };
+
+let maRequete = new Request(&apos;fleurs.jpg&apos;, monInit);
+</pre>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#fetch-method" hreflang="en" lang="en">Fetch<br><small lang="fr">La définition de &apos;fetch()&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Définie dans un <code>WindowOrWorkerGlobalScope</code> dans la nouvelle spécification.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#dom-global-fetch" hreflang="en" lang="en">Fetch<br><small lang="fr">La définition de &apos;fetch()&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Définition initiale</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webappsec-credential-management/" hreflang="en" lang="en" title="La spécificaction &apos;Credential Management Level 1&apos;">Credential Management Level 1</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Ajoute la possiblité d&apos;utiliser une instance de <a href="/fr/docs/Web/API/FederatedCredential"><code>FederatedCredential</code></a> ou de <a href="/fr/docs/Web/API/PasswordCredential"><code>PasswordCredential</code></a> comme valeur de <code>init.credentials</code>.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="bc-data" id="bcd:api.WindowOrWorkerGlobalScope.fetch"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/Fetch_API">Fetch API</a></li>
+ <li><a href="/fr/docs/Web/API/Service_Worker_API">ServiceWorker API</a></li>
+ <li><a href="/fr/docs/HTTP/Access_control_CORS">HTTP access control (CORS)</a></li>
+ <li><a href="/fr/docs/HTTP">HTTP</a></li>
+</ul>

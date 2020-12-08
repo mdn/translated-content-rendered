@@ -1,0 +1,79 @@
+---
+title: Tester les requêtes média en JavaScript
+slug: Web/CSS/Requêtes_média/Tester_les_media_queries
+tags:
+  - Avancé
+  - CSS
+  - DOM
+  - Guide
+translation_of: Web/CSS/Media_Queries/Testing_media_queries
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/Reference">Référence CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/Requêtes_média">Requêtes média</a></strong></li></ol></section></div>
+
+<p>Le <a href="/fr/docs/Glossaire/DOM">DOM</a> fournit un certain nombre de fonctionnalités qui permettent de tester les résultats d&apos;une requête média (<em>media query</em>) avec un script. Pour cela, on utilise l&apos;interface <a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> ainsi que ses méthodes et ses propriétés. Une fois qu&apos;on a créé un objet <a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a>, on peut vérifier le résultat de la requête ou également recevoir des notifications automatiques lorsque le résultat de la requête change.</p>
+
+<h2 id="Créer_une_liste_de_requêtes_média">Créer une liste de requêtes média</h2>
+
+<p>Avant d&apos;évaluer les résultats d&apos;une requête, on doit créer un objet <a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> qui représente la requête média. Pour cela, on utilisera la méthode <a href="/fr/docs/Web/API/Window/matchMedia"><code>window.matchMedia</code></a>.</p>
+
+<p>Ainsi, si on veut avoir une liste de requête qui détermine si l&apos;appareil utilisé est orienté en portrait ou en paysage, on pourra écrire :</p>
+
+<pre class="brush: js notranslate">var mql = window.matchMedia(&quot;(orientation: portrait)&quot;);
+</pre>
+
+<h2 id="Vérifier_le_résultat_dune_requête">Vérifier le résultat d&apos;une requête</h2>
+
+<p>Une fois que la liste de requêtes média a été créée, on peut vérifier le résultat de la requête grâce à la propriété <code>matches</code> qui représente les résultat de la requête :</p>
+
+<pre class="brush: js notranslate">if (mql.matches) {
+  /* La zone d&apos;affichage/viewport est en portrait */
+} else {
+  /* La zone d&apos;affichage/viewport est en paysage */
+}
+</pre>
+
+<h2 id="Recevoir_des_notifications_liées_à_la_requête">Recevoir des notifications liées à la requête</h2>
+
+<p>Afin de savoir lorsque l&apos;évaluation d&apos;une requête a changé, il sera plus efficace de déclarer un <em>listener</em> plutôt que d&apos;interroger sans cesse le résultat. Pour cela, on pourra utiliser la méthode <code>addListener()</code> sur l&apos;objet <a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> et définir un observateur qui implémente l&apos;interface <a href="/fr/docs/Web/API/MediaQueryListListener"><code>MediaQueryListListener</code></a> :</p>
+
+<pre class="brush: js notranslate">var mql = window.matchMedia(&quot;(orientation: portrait)&quot;);
+mql.addListener(handleOrientationChange);
+handleOrientationChange(mql);
+</pre>
+
+<p>Ce code crée la liste de requêtes média qui teste l&apos;orientation (l&apos;objet <code>mql</code>) puis ajoute un <em>listener</em>. Une fois qu&apos;on a ajouté le <em>listener</em>, on l&apos;invoque une fois. Cela permet d&apos;ajuster l&apos;état initial du <em>listener</em> selon l&apos;orientation de l&apos;appareil (sinon, le code aurait considéré que l&apos;appareil était en portrait par défaut même si ce dernier était en paysage, ce qui aurait engendré des incohérences).</p>
+
+<p>La méthode <code>handleOrientationChange()</code> qu&apos;on implémente ensuite consulte le résultat de la requête et gère le cas où l&apos;orientation est modifiée :</p>
+
+<pre class="brush: js notranslate">function handleOrientationChange(mql) {
+  if (mql.matches) {
+    /* La zone d&apos;affichage/viewport est en portrait */
+  } else {
+    /* La zone d&apos;affichage/viewport est en paysage */
+  }
+}
+</pre>
+
+<h2 id="Terminer_la_réception_des_notifications">Terminer la réception des notifications</h2>
+
+<p>Lorsqu&apos;on ne souhaite plus recevoir de notifications sur les modifications apportées à la valeur de la requête média, on pourra simplement utiliser <code>removeListener()</code> sur l&apos;objet  <a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> :</p>
+
+<pre class="brush: js notranslate">mql.removeListener(handleOrientationChange);
+</pre>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<h3 id="Interface_MediaQueryList">Interface <code>MediaQueryList</code></h3>
+
+<div class="hidden">Le tableau de compatibilité de cette page a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à consulter <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> et à nous envoyer une <em>pull request</em>.</div>
+
+<div class="bc-data" id="bcd:api.MediaQueryList"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/CSS/Requêtes_média/Utiliser_les_Media_queries" title="CSS/Media queries">Les requêtes média (<em>media queries</em>)</a></li>
+ <li><a href="/fr/docs/Web/API/Window/matchMedia"><code>window.matchMedia()</code></a></li>
+ <li><a href="/fr/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a></li>
+ <li><a href="/fr/docs/Web/API/MediaQueryListEvent"><code>MediaQueryListEvent</code></a></li>
+</ul>

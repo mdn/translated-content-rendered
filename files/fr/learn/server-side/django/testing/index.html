@@ -1,0 +1,1383 @@
+---
+title: 'Django Tutorial Part 10: Testing a Django web application'
+slug: Learn/Server-side/Django/Testing
+tags:
+  - Beginner
+  - CodingScripting
+  - Django Testing
+  - Testing
+  - Tutorial
+  - django
+  - server-side
+  - tests
+  - unit tests
+translation_of: Learn/Server-side/Django/Testing
+---
+<div><section class="Quick_links" id="Quick_Links">
+
+<ol>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/Getting_started_with_the_web"><strong>Bienvenue aux débutants !</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Commencer avec le Web</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web">Vue d&apos;ensemble de Commencer avec le Web</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Installing_basic_software">Installation des outils de base</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/What_will_your_website_look_like">Quel sera l&apos;aspect de votre site web ?</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Dealing_with_files">Gérer les fichiers</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/HTML_basics">Les bases de HTML</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/CSS_basics">Les bases de CSS</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/JavaScript_basics">Les bases de JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/Publishing_your_website">Publier votre site web</a></li>
+            <li><a href="/fr/docs/Learn/Getting_started_with_the_web/How_the_Web_works">Le fonctionnement du Web</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/HTML"><strong>HTML</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>Introduction au HTML</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML">Vue d&apos;ensemble de Introduction au HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Getting_started">Commencer avec le HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML">Qu&apos;y-a-t-il dans l&apos;en-tête ? Métadonnées en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/HTML_text_fundamentals">Fondamentaux du texte en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Creating_hyperlinks">Création d&apos;hyperliens</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Advanced_text_formatting">Formatage avancé du texte</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Document_and_website_structure">Structure de site web et de document</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Debugging_HTML">Déboguer en HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Marking_up_a_letter">Baliser une lettre</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Introduction_to_HTML/Structuring_a_page_of_content">Structurer une page de contenu</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Multimedia and embedding</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding">Multimedia and embedding overview</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Images_in_HTML">Images in HTML</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Video_and_audio_content">Video and audio content</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies">From object to iframe — other embedding technologies</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Adding_vector_graphics_to_the_Web">Adding vector graphics to the Web</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images">Responsive images</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Multimedia_and_embedding/Mozilla_splash_page">Assessment: Mozilla splash page</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>HTML tables</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/HTML/Tables">HTML tables overview</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Basics">HTML table basics</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Advanced">HTML Table advanced features and accessibility</a></li>
+            <li><a href="/fr/docs/Learn/HTML/Tables/Structuring_planet_data">Assessment: Structuring planet data</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/CSS"><strong>CSS — Styling the Web</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>CSS first steps</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/First_steps">CSS first steps overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/What_is_CSS">What is CSS?</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/Getting_started">Getting started with CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/How_CSS_is_structured">How CSS is structured</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/How_CSS_works">How CSS works</a></li>
+            <li><a href="/fr/docs/Learn/CSS/First_steps/Using_your_new_knowledge">Using your new knowledge</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS building blocks</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks">CSS building blocks overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance">Cascade and inheritance</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Selectors">CSS selectors</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/The_box_model">The box model</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Backgrounds_and_borders">Backgrounds and borders</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Handling_different_text_directions">Handling different text directions</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Overflowing_content">Overflowing content</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Values_and_units">Values and units</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS">Sizing items in CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Images_media_form_elements">Images, media, and form elements</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Styling_tables">Styling tables</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Debugging_CSS">Debugging CSS</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Building_blocks/Organizing">Organizing your CSS</a></li>
+      </ol></details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Styling text</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text">Styling text overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Fundamentals">Fundamental text and font styling</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Styling_lists">Styling lists</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Styling_links">Styling links</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Web_fonts">Web fonts</a></li>
+            <li><a href="/fr/docs/Learn/CSS/Styling_text/Typesetting_a_homepage">Assessment: Typesetting a community school homepage</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>CSS layout</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout">CSS layout overview</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Introduction">Introduction</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Normal_Flow">Normal Flow</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Flexbox">Flexbox</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Grids">Grids</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Floats">Floats</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Positioning">Positioning</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Multiple-column_Layout">Multiple-column Layout</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Responsive_Design">Responsive design</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Media_queries">Beginner&apos;s guide to media queries</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Legacy_Layout_Methods">Legacy Layout Methods</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Supporting_Older_Browsers">Supporting Older Browsers</a></li>
+            <li><a href="/fr/docs/Learn/CSS/CSS_layout/Fundamental_Layout_Comprehension">Fundamental Layout Comprehension</a></li>
+          </ol>
+      </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/JavaScript"><strong>JavaScript — Dynamic client-side scripting</strong></a></li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript first steps</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps">JavaScript first steps overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/What_is_JavaScript">What is JavaScript?</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/A_first_splash">A first splash into JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/What_went_wrong">What went wrong? Troubleshooting JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Variables">Storing the information you need — Variables</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Math">Basic math in JavaScript — Numbers and operators</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Strings">Handling text — Strings in JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Useful_string_methods">Useful string methods</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Arrays">Arrays</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/First_steps/Silly_story_generator">Assessment: Silly story generator</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>JavaScript building blocks</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks">JavaScript building blocks overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/conditionals">Making decisions in your code — Conditionals</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Looping_code">Looping code</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Functions">Functions — Reusable blocks of code</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Build_your_own_function">Build your own function</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Return_values">Function return values</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Events">Introduction to events</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Building_blocks/Image_gallery">Assessment: Image gallery</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+      <details>
+          <summary>Introducing JavaScript objects</summary>
+          <ol>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects">Introducing JavaScript objects overview</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Basics">Object basics</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object-oriented_JS">Object-oriented JavaScript for beginners</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object_prototypes">Object prototypes</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Inheritance">Inheritance in JavaScript</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/JSON">Working with JSON data</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Object_building_practice">Object building practice</a></li>
+            <li><a href="/fr/docs/Learn/JavaScript/Objects/Adding_bouncing_balls_features">Assessment: Adding features to our bouncing balls demo</a></li>
+          </ol>
+      </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Asynchronous JavaScript</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous">Asynchronous JavaScript overview</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Concepts">General asynchronous programming concepts</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Introducing">Introducing asynchronous JavaScript</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Timeouts_and_intervals">Cooperative asynchronous Java​Script: Timeouts and intervals</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Promises">Graceful asynchronous programming with Promises</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Async_await">Making asynchronous programming easier with async and await</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Asynchronous/Choosing_the_right_approach">Choosing the right approach</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web APIs</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">Introduction to web APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents">Manipulating documents</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Fetching_data">Fetching data from the server</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Third_party_APIs">Third party APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics">Drawing graphics</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs">Video and audio APIs</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage">Client-side storage</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Forms"><strong>Web forms — Working with user data</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Core forms learning pathway</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Forms">Web forms overview</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Your_first_form">Your first form</a></li>
+          <li><a href="/fr/docs/Learn/Forms/How_to_structure_a_web_form">How to structure a web form</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Basic_native_form_controls">Basic native form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/HTML5_input_types">The HTML5 input types</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Other_form_controls">Other form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Styling_web_forms">Styling web forms</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Advanced_form_styling">Advanced form styling</a></li>
+          <li><a href="/fr/docs/Learn/Forms/UI_pseudo-classes">UI pseudo-classes</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Form_validation">Client-side form validation</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Sending_and_retrieving_form_data">Sending form data</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Advanced forms articles</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Forms/How_to_build_custom_form_controls">How to build custom form controls</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Sending_forms_through_JavaScript">Sending forms through JavaScript</a></li>
+          <li><a href="/fr/docs/Learn/Forms/Property_compatibility_table_for_form_controls">CSS property compatibility table for form controls</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Accessibility"><strong>Accessibility — Make the web usable by everyone</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility guides</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Accessibility">Accessibility overview</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/What_is_accessibility">What is accessibility?</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/HTML">HTML: A good basis for accessibility</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/CSS_and_JavaScript">CSS and JavaScript accessibility best practices</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/WAI-ARIA_basics">WAI-ARIA basics</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/Multimedia">Accessible multimedia</a></li>
+          <li><a href="/fr/docs/Learn/Accessibility/Mobile">Mobile accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Accessibility assessment</summary>
+        <ol>
+            <li><a href="/fr/docs/Learn/Accessibility/Accessibility_troubleshooting">Assessment: Accessibility troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="/fr/docs/Learn/Tools_and_testing"><strong>Tools and testing</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Client-side web development tools</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools">Client-side web development tools index</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Overview">Client-side tooling overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line">Command line crash course</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management">Package management basics</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain">Introducing a complete toolchain</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Deployment">Deploying our app</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Introduction to client-side frameworks</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction">Client-side frameworks overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Main_features">Framework main features</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>React</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started">Getting started with React</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_todo_list_beginning">Beginning our React todo list</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_components">Componentizing our React app</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_events_state">React interactivity: Events and state</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_interactivity_filtering_conditional_rendering">React interactivity: Editing, filtering, conditional rendering</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility">Accessibility in React</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_resources">React resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Ember</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_getting_started">Getting started with Ember</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_structure_componentization">Ember app structure and componentization</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_interactivity_events_state">Ember interactivity: Events, classes and state</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_conditional_footer">Ember Interactivity: Footer functionality, conditional rendering</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_routing">Routing in Ember</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Ember_resources">Ember resources and troubleshooting</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Vue</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started">Getting started with Vue</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component">Creating our first Vue component</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists">Rendering a list of Vue components</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models">Adding a new todo form: Vue events, methods, and models</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_styling">Styling Vue components with CSS</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_computed_properties">Using Vue computed properties</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_conditional_rendering  ">Vue conditional rendering: editing existing todos</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_refs_focus_management">Focus management with Vue refs</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_resources">Vue resources</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Git and GitHub</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/GitHub">Git and GitHub overview</a></li>
+          <li><a href="https://guides.github.com/activities/hello-world/">Hello World</a></li>
+          <li><a href="https://guides.github.com/introduction/git-handbook/">Git Handbook</a></li>
+          <li><a href="https://guides.github.com/activities/forking/">Forking Projects</a></li>
+          <li><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">About pull requests</a></li>
+          <li><a href="https://guides.github.com/features/issues/">Mastering Issues</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Cross browser testing</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing">Cross browser testing overview</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Introduction">Introduction to cross browser testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Testing_strategies">Strategies for carrying out testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/HTML_and_CSS">Handling common HTML and CSS problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/JavaScript">Handling common JavaScript problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Accessibility">Handling common accessibility problems</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection">Implementing feature detection</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing">Introduction to automated testing</a></li>
+          <li><a href="/fr/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Setting up your own test automation environment</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="open"><a href="/fr/docs/Learn/Server-side"><strong>Server-side website programming</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>First steps</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps">First steps overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Introduction">Introduction to the server-side</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-Server overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Web_frameworks">Server-side web frameworks</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/First_steps/Website_security">Website security</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+        <summary>Django web framework (Python)</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/Django">Django web framework (Python) overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Introduction">Introduction</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/development_environment">Setting up a development environment</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Tutorial_local_library_website">Tutorial: The Local Library website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/skeleton_website">Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Models">Tutorial Part 3: Using models</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Admin_site">Tutorial Part 4: Django admin site</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Home_page">Tutorial Part 5: Creating our home page</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Generic_views">Tutorial Part 6: Generic list and detail views</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Sessions">Tutorial Part 7: Sessions framework</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Authentication">Tutorial Part 8: User authentication and permissions</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Forms">Tutorial Part 9: Working with forms</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Testing">Tutorial Part 10: Testing a Django web application</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/Deployment">Tutorial Part 11: Deploying Django to production</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/web_application_security">Web application security</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Django/django_assessment_blog">Assessment: DIY mini blog</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+        <summary>Express Web Framework (node.js/JavaScript)</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs">Express Web Framework (Node.js/JavaScript) overview</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Introduction">Express/Node introduction</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/development_environment">Setting up a Node (Express) development environment</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website">Express tutorial: The Local Library website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/skeleton_website">Express Tutorial Part 2: Creating a skeleton website</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/mongoose">Express Tutorial Part 3: Using a database (with Mongoose)</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/routes">Express Tutorial Part 4: Routes and controllers</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/Displaying_data">Express Tutorial Part 5: Displaying library data</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/forms">Express Tutorial Part 6: Working with forms</a></li>
+          <li><a href="/fr/docs/Learn/Server-side/Express_Nodejs/deployment">Express Tutorial Part 7: Deploying to production</a></li>
+        </ol>
+    </details>
+  </li>
+  <li><a href="#"><strong>Further resources</strong></a></li>
+  <li class="toggle">
+    <details>
+        <summary>Common questions</summary>
+        <ol>
+          <li><a href="/fr/docs/Learn/HTML/Howto">HTML questions</a></li>
+          <li><a href="/fr/docs/Learn/CSS/Howto">CSS questions</a></li>
+          <li><a href="/fr/docs/Learn/JavaScript/Howto">JavaScript questions</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#How_the_Web_works">Le fonctionnement du Web</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#Tools_and_setup">Tools and setup</a></li>
+          <li><a href="/fr/docs/Learn/Common_questions#Design_and_accessibility">Design and accessibility</a></li>
+        </ol>
+    </details>
+  </li>
+  <li data-default-state="closed"><a href="/fr/docs/Learn/How_to_contribute">How to contribute</a></li>
+</ol>
+
+</section></div>
+
+<div><div class="prevnext">
+  <a href="/fr/docs/Learn/Server-side/Django/Forms" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Aperçu : Django</a><a href="/fr/docs/Learn/Server-side/Django/Deployment" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div></div>
+
+<p class="summary">Quant un site web grandit, il devient plus difficile à tester manuellement. Non seulement il y a plus de choses à tester, mais encore, comme les interactions entres ses composants deviennent plus complexes, un léger changement dans une partie de l&apos;application peut affecter les autres parties, si bien qu&apos;il va être nécessaire de faire beaucoup de modifications pour s&apos;assurer que tout continue de fonctionner, et qu&apos;aucune erreur ne sera introduite quand il y aura encore plus de modifications. Une façon de limiter ces problèmes est d&apos;écrire des tests automatiques qui puissent être lancés d&apos;une manière simple et fiable à chaque fois que vous faites une modification. Ce tutoriel montre comment automatiser des <em>tests unitaires</em> sur votre site web en utilisant le framework de tests de Django.</p>
+
+<table class="learn-box standard-table">
+ <tbody>
+  <tr>
+   <th scope="row">Prérequis:</th>
+   <td>Avoir terminé tous les tutoriels précédents, y compris <a href="/en-US/docs/Learn/Server-side/Django/Forms">Django Tutorial Part 9: Working with forms</a>.</td>
+  </tr>
+  <tr>
+   <th scope="row">Objectif:</th>
+   <td>Comprendre comment écrire des tests unitaires pour des sites web basés sur Django.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Vue_densemble">Vue d&apos;ensemble</h2>
+
+<p>Le site <a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">Local Library</a> a actuellement des pages pour afficher des listes de tous les livres et auteurs, des pages de détail pour les éléments de type <code>Book</code> et <code>Author</code>, une page pour renouveler des <code>BookInstance</code>s, et des pages pour créer, mettre à jour et effacer des éléments de type <code>Author</code> (et également des enregistrements de type <code>Book</code>, si vous avez relevé le <em>défi</em> dans le <a href="/en-US/docs/Learn/Server-side/Django/Forms">tutoriel sur les formulaires</a>). Même avec ce site relativement petit, naviguer manuellement vers chaque page et vérifier <em>superficiellement</em> que tout fonctionne comme prévu peut prendre plusieurs minutes. Quand nous allons faire des modifications et agrandir le site, le temps requis pour vérifier manuellement que tout fonctionne &quot;proprement&quot; va grandir. Si nous continuons comme cela, nous allons sûrement passer beaucoup de temps à tester notre code, et peu à l&apos;améliorer.</p>
+
+<p>Les tests automatiques peuvent vraiment nous aider à régler ce problème. Les avantages évidents sont qu&apos;ils peuvent être lancés bien rapidement que des tests manuels, peuvent réaliser des tests à un niveau bien plus bas de détail, et tester exactement les mêmes fonctionnalités à chaque fois (des testeurs humains sont loin d&apos;être aussi fiables !). Parce qu&apos;ils sont rapides, les tests automatisés peuvent être exécutés plus régulièrement, et si un test échoue, ils pointent exactement vers la partie du code qui n&apos;a pas fonctionné comme prévu.</p>
+
+<p>De plus, les tests automatisés peuvent se comporter comme le premier &quot;utilisateur&quot; de votre code dans le monde réel, vous obligeant à être rigoureux quand vous définissez et documentez la manière dont votre site doit se comporter. Souvent ils constituent une base pour vos exemples et votre documentation. Pour ces raisons, il existe des processus de développement de logiciels qui commencent par la définition et l&apos;implémentation de tests, et ce n&apos;est qu&apos;après que le code est écrit pour atteindre le comportement attendu (par ex. le développement <a href="https://en.wikipedia.org/wiki/Test-driven_development">test-driven</a> et le développement <a href="https://en.wikipedia.org/wiki/Behavior-driven_development">behaviour-driven</a>).</p>
+
+<p>Ce tutoriel montre comment écrire des tests automatisés pour Django, en ajoutant un certain nombre de tests au site web <em>LocalLibrary</em>.</p>
+
+<h3 id="Catégories_de_tests">Catégories de tests</h3>
+
+<p>Il y a beaucoup de genres, de niveaux et de classifications de tests, ainsi que de manières de tester. Les tests automatisés les plus importants sont:</p>
+
+<dl>
+ <dt>Les tests unitaires</dt>
+ <dd>Ils vérifient le comportement fonctionnel de composants individuels, souvent au niveau des classes et des fonctions.</dd>
+ <dt>Les tests de régression</dt>
+ <dd>Ce sont des tests qui reproduisent des bugs historiques. Chaque test a été lancé originellement pour vérifier que le bug a été résolu, et on le relance ensuite pour s&apos;assurer qu&apos;il n&apos;a pas été ré-introduit suite aux changements de code.</dd>
+ <dt>Les test d&apos;intégration</dt>
+ <dd>Ils vérifient comment les groupes de composants fonctionnent quand ils sont utilisés ensemble. Les tests d&apos;intégraion sont attentifs aux interactions souhaitées entre composants, mais pas nécessairement aux opérations internes de chaque composant. Ils peuvent couvrir des groupes simples de composants à travers tout le site.</dd>
+</dl>
+
+<div class="note">
+<p><strong>Note : </strong>Les autres genres habituels de tests comprennent : la boîte noire, la boîte blanche, les tests manuels, automatiques, de canari (canary), de fumée (smoke), de conformité (conformance), d&apos;approbation (acceptance), fonctionnels, système, performance, chargement et stress. Consultez pour plus d&apos;information sur chacun d&apos;eux.</p>
+</div>
+
+<h3 id="Que_fournit_Django_pour_tester">Que fournit Django pour tester ?</h3>
+
+<p>Tester un site web est une tâche complexe, car c&apos;est une opération qui comporte plusieurs couches de logique : depuis la couche HTTP, la gestion des requêtes, les modèles d&apos;interrogation de bases de données, jusqu&apos;à la validation des formulaires, leur traitement et le rendu des templates.</p>
+
+<p>Django fournit un framework de test avec une petite hiérarchie de classes construites sur la librairie standard de Python <code><a href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.5)">unittest</a></code>. Malgré son nom, ce framework de test est utilisable pour les tests unitaires aussi bien que pour les tests d&apos;intégration. Le framework Django ajoute les méthodes et les outils d&apos;une API pour aider à tester un site web et les comportements spécifiques à Django. Ces méthodes vous permettent de simuler des requêtes, d&apos;insérer des données de test et d&apos;inspecter la sortie de votre application. Django fournit aussi une API (<a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#liveservertestcase">LiveServerTestCase</a>) et des outils pour <a href="https://docs.djangoproject.com/en/2.1/topics/testing/advanced/#other-testing-frameworks">utiliser d&apos;autres frameworks de test</a>. Par exemple vous pouvez intégrer le célèbre framework <a href="/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Selenium</a> pour simuler l&apos;interaction entre un utilisateur et un vrai navigateur.</p>
+
+<p>Pour écrire un test, vous partez de l&apos;une des classes de test de base fournies par Django (ou par <em>unittest</em>) (<a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#simpletestcase">SimpleTestCase</a>, <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#transactiontestcase">TransactionTestCase</a>, <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#testcase">TestCase</a>, <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#liveservertestcase">LiveServerTestCase</a>), et ensuite vous écrivez des méthodes séparées pour vérifier que telle fonctionnalité se comporte comme prévu (les tests utilisent des méthodes &quot;assert&quot; pour vérifier qu&apos;une expression retourne <code>True</code> ou <code>False</code>, ou que deux valeurs sont égales, etc.). Quant vous commencez à lancer un test, le framework exécute les méthodes de test écrites dans vos classes dérivées. Les méthodes de test sont lancées de manière indépendante, avec en commun un réglage initial (<em>setUp</em>) et/ou un comportement de fin (<em>tearDown</em>) définis dans la classe, comme indiqué ci-dessous.</p>
+
+<pre class="brush: python notranslate">class YourTestClass(TestCase):
+    def setUp(self):
+        # Setup run before every test method.
+        pass
+
+    def tearDown(self):
+        # Clean up run after every test method.
+        pass
+
+    def test_something_that_will_pass(self):
+        self.assertFalse(False)
+
+    def test_something_that_will_fail(self):
+        self.assertTrue(False)
+</pre>
+
+<p>La meilleure classe de base pour la plupart des tests est <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#testcase">django.test.TestCase</a>. Cette classe de test crée une base de données vide avant que ses tests ne soient lancés, et lance toutes les fonctions de test dans sa propre transaction. La classe possède aussi un <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.Client" title="django.test.Client">Client</a> de test, que vous pouvez utiliser pour simuler l&apos;interaction entre un utilisateur et le code au niveau de la vue. Dans les sections suivantes, nous allons nous concentrer sur les tests unitaires, créés en utilisant la classe de base <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#testcase">TestCase</a>.</p>
+
+<div class="note">
+<p><strong>Note :</strong> La classe <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#testcase">django.test.TestCase</a> est très commode, mais peut avoir pour effet de ralentir certains tests plus que nécessaire (tous les tests n&apos;ont pas besoin de créer leur propre base de données ni de simuler une interaction au niveau de la vue). Une fois que vous serez familiarisé avec ce que vous pouvez faire avec cette classe, vous voudrez sans doute remplacer certains de vos tests avec d&apos;autres classes plus simples parmi celles qui sont disponibles.</p>
+</div>
+
+<h3 id="Que_faut-il_tester">Que faut-il tester ?</h3>
+
+<p>Vous pouvez tester tous les aspects de votre code, mais non les librairies ou fonctionnalités faisant partie de Python ou de Django.</p>
+
+<p>Ainsi par exemple, considérez le modèle <code>Author</code> défini ci-dessous. Vous n&apos;avez pas besoin de tester explicitement que <code>first_name</code> et <code>last_name</code> ont été stockés correctement comme <code>CharField</code> dans la base de données, car c&apos;est là quelque chose de défini par Django (cependant, bien sûr, vous allez inévitablement tester cette fonctionnalité pendant le développement). Vous n&apos;avez pas non plus besoin de tester que <code>date_of_birth</code> a été validé comme champ date, car, encore une fois, cela est implémenté par Django.</p>
+
+<p>En revanche, vous pouvez tester que les textes utilisés pour les labels (<em>First name, Last name, Date of birth, Died</em>), ainsi que le respect de la taille allouée au champ texte (100 caractères), car c&apos;est là une partie de votre propre design et quelque chose qui pourrait être cassé/modifié dans le futur.</p>
+
+<pre class="brush: python notranslate">class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField(&apos;Died&apos;, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse(&apos;author-detail&apos;, args=[str(self.id)])
+
+    def __str__(self):
+        return &apos;%s, %s&apos; % (self.last_name, self.first_name)</pre>
+
+<p>De même, vous pouvez tester que les méthodes personnalisées <code style="font-style: normal; font-weight: normal;">get_absolute_url()</code> et <code style="font-style: normal; font-weight: normal;">__str__()</code> se comportent comme prévu, car elles appartiennent à votre logique code/métier. Dans le cas de <code style="font-style: normal; font-weight: normal;">get_absolute_url()</code>, vous pouvez supposer que la méthode Django <code>reverse()</code> a été implémentée correctement, aussi ce que vous allez tester, c&apos;est que la vue associée a été effectivement définie.</p>
+
+<div class="note">
+<p><strong>Note :</strong> Les lecteurs attentifs auront noté que nous pourrions aussi vouloir limiter les dates de naissance et de décès à des valeurs sensibles, et vérifier que le décès intervient après la naissance. En Django, cette contrainte est ajoutée à vos classes de formulaires (bien que vous puissiez définir des validateurs pour les champs du modèle et des validateurs de modèles, ceux-ci ne sont utilisés qu&apos;au niveau du formulaire s&apos;ils sont appelés par la méthode clean() du modèle. Cela requière un ModelForm ou bien la méthode clean() du modèle a besoin d&apos;être appelée explicitement.)</p>
+</div>
+
+<p>Avec cela en tête, commençons à voir comment définir et lancer des tests.</p>
+
+<h2 id="Vue_densemble_de_la_structure_de_test">Vue d&apos;ensemble de la structure de test</h2>
+
+<p>Avant d&apos;entrer dans le détail de &quot;que tester&quot;, voyons d&apos;abord brièvement <em>où</em> et <em>comment</em> les tests sont définis.</p>
+
+<p>Django utilise le <a href="https://docs.python.org/3/library/unittest.html#unittest-test-discovery" title="(in Python v3.5)">built-in test discovery</a> du module unittest, qui va chercher des tests, sous le répertoire de travail actuel, dans tous les fichiers dont le nom contient le pattern<strong> test*.py</strong>. Du moment que vous nommez vos fichiers de manière appropriée, vous pouvez utiliser n&apos;importe quelle structure. Nous vous recommandons de créer un module pour coder vos tests, et d&apos;avoir des fichiers distincts pour les modèles, les vues, les formulaires et tout autre type de code que vous avez besoin de tester. Par exemple :</p>
+
+<pre class="notranslate">catalog/
+  /tests/
+    __init__.py
+    test_models.py
+    test_forms.py
+    test_views.py
+</pre>
+
+<p>Créez une structure de fichier comme montré ci-dessus, dans votre projet <em>LocalLibrary</em>. Le ficheir<strong> __init__.py</strong> doit être vide (il dit simplement à Python que ce répertoire est un package). Vous pouvez créer les trois fichiers de test en copiant et renommant le fichier de test du squelette <strong>/catalog/tests.py</strong>.</p>
+
+<div class="note">
+<p><strong>Note :</strong> le fichier de test du squelette <strong>/catalog/tests.py</strong> a été créé automatiquement quand nous avons <a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">construit le squelette du site web Django</a>. Il est parfaitement &quot;légal&quot; de mettre tous vos tests dedans, mais si vous testez correctement, vous allez rapidement vous retrouver avec un fichier de test énorme et impossible à gérer.</p>
+
+<p>Supprimez le fichier de squelette, car nous n&apos;en aurons plus besoin.</p>
+</div>
+
+<p>Ouvrez le fichier <strong>/catalog/tests/test_models.py</strong>. Ce fichier doit importer <code>django.test.TestCase</code>, comme indiqué ci-après :</p>
+
+<p>Open <strong>/catalog/tests/test_models.py</strong>. The file should import <code>django.test.TestCase</code>, as shown:</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+# Create your tests here.
+</pre>
+
+<p>Souvent vous voudrez ajouter une classe de test pour chaque modèle/vue/form que vous voulez tester, avec des méthodes individuelles pour tester une fonctionnalité spécifique. Dans d&apos;autres cas vous pourriez souhaiter avoir une class séparée pour tester un cas d&apos;utilisation spécifique, avec des fonctions de test individuelles pour tester les aspects de ce cas d&apos;utilisation (par exemple, une classe pour tester que tel champ d&apos;un modèle est validé correctement, avec des fonctions pour tester chaque possibilité d&apos;échec). Encore une fois, c&apos;est à vous de décider de la structure à adopter, mais elle sera meilleure si vous êtes cohérent.</p>
+
+<p>Ajoutez la classe de test ci-dessous à la fin du fichier. La classe montre comment construire une classe de test de cas dérivant de <code>TestCase</code>.</p>
+
+<pre class="brush: python notranslate">class YourTestClass(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        print(&quot;setUpTestData: Run once to set up non-modified data for all class methods.&quot;)
+        pass
+
+    def setUp(self):
+        print(&quot;setUp: Run once for every test method to setup clean data.&quot;)
+        pass
+
+    def test_false_is_false(self):
+        print(&quot;Method: test_false_is_false.&quot;)
+        self.assertFalse(False)
+
+    def test_false_is_true(self):
+        print(&quot;Method: test_false_is_true.&quot;)
+        self.assertTrue(False)
+
+    def test_one_plus_one_equals_two(self):
+        print(&quot;Method: test_one_plus_one_equals_two.&quot;)
+        self.assertEqual(1 + 1, 2)</pre>
+
+<p>La nouvelle classe définit deux méthodes que vous pouvez utiliser pour une configuration pré-test (par exemple, pour créer des modèles ou d&apos;autres objets dont vous aurez besoin pour les tests) :</p>
+
+<ul>
+ <li><code>setUpTestData()</code> est appelée une fois au début du lancement des tests pour un réglage au niveau de la classe. Vous pouvez l&apos;utiliser pour créer des objets qui ne sont pas destinés à être modifiés ou changés dans les méthodes de test.</li>
+ <li><code>setUp()</code> est appelée avant chaque fonction de test pour définir des objets qui peuvent être modifiés par le test (chaque fonction de test obtiendra une version &quot;fraîche&quot; de ces objets).</li>
+</ul>
+
+<div class="note">
+<p>Les classes de test ont aussi une méthode <code>tearDown()</code>, que nous n&apos;avons pas utilisée. Cette méthode n&apos;est pas particulièrement utile pour les tests avec bases de données, dans la mesure où la classe de base <code>TestCase</code> prend soin pour vous de supprimer la base de données utilisées pour les tests.</p>
+</div>
+
+<p>En dessous de ces méthodes, nous avons un certain nombre de méthodes de test, qui utilisent des fonctions <code>Assert</code>, pour tester si certaines conditions sont vraies, fausses ou égales (<code>AssertTrue</code>, <code>AssertFalse</code>, <code>AssertEqual</code>). Si la condition ne renvoie pas le résultat escompté, le test plante et renvoie une erreur à votre console.</p>
+
+<p>Les méthodes <code>AssertTrue</code>, <code>AssertFalse</code> et <code>AssertEqual</code> sont des assertions standard fournies par <strong>unittest</strong>. Il y a d&apos;autres assertions standard dans le framework, et aussi des <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#assertions">assertions spécifiques à Django</a>, pour tester si une vue redirige (<code>assertRedirects</code>), pour tester si tel template a été utilisé (<code>assertTemplateUsed</code>), etc.</p>
+
+<div class="note">
+<p>Normallement vous ne devriez <strong>pas</strong> inclure de fonctions <strong>print()</strong> dans vos tests, comme montré ci-dessus. Nous avons fait cela uniquement pour que vous puissiez voir dans la console (dans la section suivante) l&apos;ordre dans lequel les fonctions de setup sont appelées.</p>
+</div>
+
+<h2 id="Comment_lancer_les_tests">Comment lancer les tests</h2>
+
+<p>La manière la plus facile pour lancer tous les tests est d&apos;utiliser la commande :</p>
+
+<pre class="brush: bash notranslate">python3 manage.py test</pre>
+
+<p>Cette commande va lancer la recherche de tous les fichiers ayant la forme <strong>test*.py</strong> sous le répertoire courant, et lancer tous les tests définis, en utilisant les classes de base appropriées (ici nous avons un certain nombre de fichiers de test, mais pour le moment seul <strong>/catalog/tests/test_models.py</strong> contient des tests). Par défaut, chaque test ne fera de rapport qu&apos;en cas d&apos;échec, avec ensuite un résumé du test.</p>
+
+<div class="note">
+<p>Si vous obtenez des erreurs telles que : <code>ValueError: Missing staticfiles manifest entry ...</code>, cela peut être dû au fait que le test ne lance pas <em>collectstatic</em> par défaut, et que votre application utilise une classe de storage qui le requiert (voyez <a href="https://docs.djangoproject.com/en/2.1/ref/contrib/staticfiles/#django.contrib.staticfiles.storage.ManifestStaticFilesStorage.manifest_strict">manifest_strict</a> pour plus d&apos;information). Il y a plusieurs façons de remédier à ce problème - la plus facile est de lancer tout simplement <em>collectstatic</em> avant de lancer les tests :</p>
+
+<pre class="brush: bash notranslate">python3 manage.py collectstatic
+</pre>
+</div>
+
+<p>Lancez les tests dans le répertoire racine de <em>LocalLibrary</em>. Vous devriez voir une sortie semblable à celle ci-dessous.</p>
+
+<pre class="brush: bash notranslate">&gt; python3 manage.py test
+
+Creating test database for alias &apos;default&apos;...
+<strong>setUpTestData: Run once to set up non-modified data for all class methods.
+setUp: Run once for every test method to setup clean data.
+Method: test_false_is_false.
+setUp: Run once for every test method to setup clean data.
+Method: test_false_is_true.
+setUp: Run once for every test method to setup clean data.
+Method: test_one_plus_one_equals_two.</strong>
+.
+======================================================================
+FAIL: test_false_is_true (catalog.tests.tests_models.YourTestClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;D:\Github\django_tmp\library_w_t_2\locallibrary\catalog\tests\tests_models.py&quot;, line 22, in test_false_is_true
+    self.assertTrue(False)
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.075s
+
+FAILED (failures=1)
+Destroying test database for alias &apos;default&apos;...</pre>
+
+<p>Ici nous voyons que nous avons eu un échec pour un test, et nous pouvons voir exactement quelle fonction a planté et pourquoi (cet échec était prévu, car <code>False</code> n&apos;est pas <code>True</code> !).</p>
+
+<div class="note">
+<p><strong>Truc: </strong>La chose la plus importante à apprendre de la sortie de test ci-dessus est qu&apos;il est bien mieux d&apos;utiliser des noms descriptifs/informatifs pour vos objets et méthodes.</p>
+</div>
+
+<p>Le texte en <strong>gras</strong> ci-dessus n&apos;apparaîtra pas normalement dans la sortie de test (elle est générée par les fonctions <code>print()</code> dans nos tests). Cela montre comment la méthode <code>setUpTestData()</code> est appelée une fois pour l&apos;ensemble de classe, tandis que <code>setUp()</code> est appelée avant chaque méthode.</p>
+
+<p>La section suivante mnotre comment vous pouvez lancer des test spécifiques, et comment contrôler la quantité d&apos;information fournie par les tests.</p>
+
+<h3 id="Montrer_plus_dinformations_à_propos_du_test">Montrer plus d&apos;informations à propos du test</h3>
+
+<p>Si vous souhaitez obtenir plus d&apos;informations à propos du test lancé, vous pouvez changer sa <em>verbosité</em>. Par exemple, pour faire la liste de ce qui a fonctionné dans le test, comme de ce qui a échoué (ainsi que tout un tas d&apos;informations sur la manière dont la base de données à été initialisée), vous pouvez mettre la verbosité à &quot;2&quot;, comme indiqué ci-dessous :</p>
+
+<pre class="brush: bash notranslate">python3 manage.py test --verbosity 2</pre>
+
+<p>Les niveaux de verbosité sont 0, 1, 2 et 3, avec &quot;1&quot; comme valeur par défaut.</p>
+
+<h3 id="Lancer_des_tests_spécifiques">Lancer des tests spécifiques</h3>
+
+<p>Si vous voulez lancer une sous-sélection parmi vos tests, vous pouvez le faire en spécifiant le chemin complet (avec des points) vers le ou les package(s), module, sous-classe de <code>TestCase</code> ou méthode :</p>
+
+<pre class="brush: bash notranslate"># Run the specified module
+python3 manage.py test catalog.tests
+
+# Run the specified module
+python3 manage.py test catalog.tests.test_models
+
+# Run the specified class
+python3 manage.py test catalog.tests.test_models.YourTestClass
+
+# Run the specified method
+python3 manage.py test catalog.tests.test_models.YourTestClass.test_one_plus_one_equals_two
+</pre>
+
+<h2 id="Tests_de_LocalLibrary">Tests de LocalLibrary</h2>
+
+<p>Maintenant que nous savons comment lancer nos tests et quel genre de choses nous avons besoin de tester, regardons quelques exemples pratiques.</p>
+
+<div class="note">
+<p><strong>Note : </strong>Nous n&apos;allons pas écrire tous les tests possibles, mais ce qui suit devrait vous donner une idée sur le fonctionnement des tests, et ce que vous pouvez faire ensuite.</p>
+</div>
+
+<h3 id="Modèles">Modèles</h3>
+
+<p>Comme nous l&apos;avons dit ci-dessus, nous devrions tester tout ce qui relève de notre design, ou tout ce qui est défini par du code que nous avons écrit nous-mêmes, mais pas les bibliothèques ou le code qui est déjà testé par Django ou par l&apos;équipe qui développe Python.</p>
+
+<p>Par exemple, considérez le modèle <code>Author</code> ci-dessous. Ici nous devrions tester les labels de tous les champs, car, bien que nous n&apos;ayons pas explicitement spécifié la plupart d&apos;entre eux, nous avons un design qui dit ce que ces valeurs devraient être. Si nous ne testons pas ces valeurs, nous ne savons pas que les labels des champs ont les valeurs souhaitées. De même, alors que nous sommes tranquilles sur le fait que Django créera un champ de la longueur indiquée, il est intéressant de lancer un test spécifique pour s&apos;assurer qu&apos;il a été implémenté comme prévu.</p>
+
+<pre class="brush: python notranslate">class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField(&apos;Died&apos;, null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse(&apos;author-detail&apos;, args=[str(self.id)])
+
+    def __str__(self):
+        return f&apos;{self.last_name}, {self.first_name}&apos;</pre>
+
+<p>Ouvrez notre <strong>/catalog/tests/test_models.py</strong>, et remplacez tout le code qui s&apos;y trouve par le code de test ci-après pour le modèle <code>Author</code>.</p>
+
+<p>Vous voyez que nous importons d&apos;abord <code>TestCase</code> et faisons dériver d&apos;elle notre classe de test (<code>AuthorModelTest</code>) en utilisant un nom descriptif, de façon à pouvoir identifier aisément dans la sortie tout test qui échoue. Nous appelons ensuite <code>setUpTestData()</code> afin de créer un objet <em>author</em>, que nous utiliserons mais que nous ne modifierons jamais dans aucun de nos tests.</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+
+from catalog.models import Author
+
+class AuthorModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        Author.objects.create(first_name=&apos;Big&apos;, last_name=&apos;Bob&apos;)
+
+    def test_first_name_label(self):
+        author = Author.objects.get(id=1)
+        field_label = author._meta.get_field(&apos;first_name&apos;).verbose_name
+        self.assertEquals(field_label, &apos;first name&apos;)
+
+    def test_date_of_death_label(self):
+        author=Author.objects.get(id=1)
+        field_label = author._meta.get_field(&apos;date_of_death&apos;).verbose_name
+        self.assertEquals(field_label, &apos;died&apos;)
+
+    def test_first_name_max_length(self):
+        author = Author.objects.get(id=1)
+        max_length = author._meta.get_field(&apos;first_name&apos;).max_length
+        self.assertEquals(max_length, 100)
+
+    def test_object_name_is_last_name_comma_first_name(self):
+        author = Author.objects.get(id=1)
+        expected_object_name = f&apos;{author.last_name}, {author.first_name}&apos;
+        self.assertEquals(expected_object_name, str(author))
+
+    def test_get_absolute_url(self):
+        author = Author.objects.get(id=1)
+        # This will also fail if the urlconf is not defined.
+        self.assertEquals(author.get_absolute_url(), &apos;/catalog/author/1&apos;)</pre>
+
+<p>Les tests de champ vérifient que les valeurs des labels de champ (<code>verbose_name</code>) et que la taille des champs de type <em>character</em> sont tels que nous les souhaitons. Ces méthodes ont toutes des noms descriptifs et suivent le même pattern :</p>
+
+<pre class="brush: python notranslate"># Get an author object to test
+author = Author.objects.get(id=1)
+
+# Get the metadata for the required field and use it to query the required field data
+field_label = author._meta.get_field(&apos;first_name&apos;).verbose_name
+
+# Compare the value to the expected result
+self.assertEquals(field_label, &apos;first name&apos;)</pre>
+
+<p>Les choses intéressantes à noter sont :</p>
+
+<ul>
+ <li>Nous ne pouvons obtenir le <code>verbose_name</code> directement en utilisant <code>author.first_name.verbose_name</code>, car <code>author.first_name</code> est une <em>chaîne</em> (non un moyen d&apos;accéder à l&apos;objet <code>first_name</code>, que nous pourrions utiliser pour accéder à ses propriétés). À la place nous devons utiliser l&apos;attribut <code>_meta</code> de author afin d&apos;obtenir une instance de ses champs et utiliser celle-ci pour demander l&apos;information que nous cherchons.</li>
+ <li>Nous avons fait le choix d&apos;utiliser <code>assertEquals(field_label,&apos;first name&apos;)</code> plutôt que <code>assertTrue(field_label == &apos;first name&apos;)</code>. La raison en est que, en cas d&apos;échec du test, la sortie vous dira, dans le premier cas, quel est effectivement le label du champ, ce qui rend un peu plus facile le débogage du problème.</li>
+</ul>
+
+<div class="note">
+<p><strong>Note :</strong> Les tests pour les labels de <code>last_name</code> et <code>date_of_birth</code>, ainsi que le test de la longueur du champ <code>last_name</code>, ont été omis. Ajoutez vos propres versions maintenant, en suivant les conventions de nommage et les approches que nous vous avons montrées ci-dessus.</p>
+</div>
+
+<p>Il nous faut également tester nos méthodes personnalisées. Essentiellement, celles-ci vérifient uniquement que le nom de l&apos;objet a été construit comme prévu, en utilisant le format &quot;Last name&quot;, &quot;First name&quot;, et que l&apos;URL que nous obtenons pour un élément <code>Author</code> est telle que nous l&apos;attendons.</p>
+
+<pre class="brush: python notranslate">def test_object_name_is_last_name_comma_first_name(self):
+    author = Author.objects.get(id=1)
+    expected_object_name = f&apos;{author.last_name}, {author.first_name}&apos;
+    self.assertEquals(expected_object_name, str(author))
+
+def test_get_absolute_url(self):
+    author = Author.objects.get(id=1)
+    # This will also fail if the urlconf is not defined.
+    self.assertEquals(author.get_absolute_url(), &apos;/catalog/author/1&apos;)</pre>
+
+<p>Maintenant lancez les tests. Si vous avez créé le modèle <code>Author</code> comme décrit dans le tutoriel sur les modèles, il est assez probable que vous allez obtenir une erreur pour le label <code>date_of_death</code>, comme montré ci-dessous. Le test plante parce qu&apos;il a été écrit en s&apos;attendant à ce que la définition du label suive cette convention de Django : ne pas mettre en capitale la première lettre du label (Django le fait pour vous).</p>
+
+<pre class="brush: bash notranslate">======================================================================
+FAIL: test_date_of_death_label (catalog.tests.test_models.AuthorModelTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;D:\...\locallibrary\catalog\tests\test_models.py&quot;, line 32, in test_date_of_death_label
+    self.assertEquals(field_label,&apos;died&apos;)
+AssertionError: &apos;Died&apos; != &apos;died&apos;
+- Died
+? ^
++ died
+? ^</pre>
+
+<p>C&apos;est vraiment un bug mineur, mais il met en lumière comment écrire des test peut vérifier de plus près les hypothèses que vous pourriez avoir supposées vraies.</p>
+
+<div class="note">
+<p><strong>Note : </strong>Changez en &quot;died&quot; le label pour le champ date_of_death (/catalog/models.py) et relancez les tests.</p>
+</div>
+
+<p>La configuration pour tester les autres modèles est semblable pour tous, aussi nous n&apos;allons pas discuter chacune plus longuement. Sentez-vous libre de créer vos propres tests pour nos autres modèles.</p>
+
+<h3 id="Les_Formulaires">Les Formulaires</h3>
+
+<p>La philosophie pour tester vos formulaires est la même que pour tester vos modèles: vous avez besoin de tester tout ce que vous avez codé ou les spécificités de votre design, mais non le comportement du framework sous-jacent, ni celui des autres bibliothèques tierces.</p>
+
+<p>Généralement, cela signifie que vous devriez tester que les formulaires ont bien les champs que vous voulez, et qu&apos;ils sont rendus avec les bons labels et textes d&apos;aide. Vous n&apos;avez pas besoin de vérifier que Django valide correctement les champs selon leurs types (à moins que vous n&apos;ayez créé vos propres champs personnalisés et leurs validations) ; c&apos;est-à-dire que vous n&apos;avez pas besoin de tester qu&apos;un champ email n&apos;accepte que des emails. Cependant vous pouvez avoir besoin de tester toute validation complémentaire que vous vous attendez à voir réalisée sur les champs, et tout message d&apos;erreur généré par votre code.</p>
+
+<p>Considérez notre formulaire pour renouveler les livres. Il a seulement 1 champ pour la date de renouvellement, qui va avoir un label et un texte d&apos;aide que nous avons besoin de vérifier.</p>
+
+<pre class="brush: python notranslate">class RenewBookForm(forms.Form):
+    &quot;&quot;&quot;Form for a librarian to renew books.&quot;&quot;&quot;
+    renewal_date = forms.DateField(help_text=&quot;Enter a date between now and 4 weeks (default 3).&quot;)
+
+    def clean_renewal_date(self):
+        data = self.cleaned_data[&apos;renewal_date&apos;]
+
+        # Check if a date is not in the past.
+        if data &lt; datetime.date.today():
+            raise ValidationError(_(&apos;Invalid date - renewal in past&apos;))
+
+        # Check if date is in the allowed range (+4 weeks from today).
+        if data &gt; datetime.date.today() + datetime.timedelta(weeks=4):
+            raise ValidationError(_(&apos;Invalid date - renewal more than 4 weeks ahead&apos;))
+
+        # Remember to always return the cleaned data.
+        return data</pre>
+
+<p>Ouvrez notre fichier <strong>/catalog/tests/test_forms.py</strong>, et remplacez tout le code qui s&apos;y trouve par le code suivant, qui teste le formulaire <code>RenewBookForm</code>. Nous commençons par importer notre formulaire et des bibliothèques Python et Django pour tester les fonctionnalités liées au temps. Ensuite nous déclarons notre classe de test pour formulaire de la même manière que nous l&apos;avons fait pour les modèles, en utilisant un nom descriptif pour notre classe de test dérivée de <code>TestCase</code>.</p>
+
+<pre class="brush: python notranslate">import datetime
+
+from django.test import TestCase
+from django.utils import timezone
+
+from catalog.forms import RenewBookForm
+
+class RenewBookFormTest(TestCase):
+    def test_renew_form_date_field_label(self):
+        form = RenewBookForm()
+        self.assertTrue(form.fields[&apos;renewal_date&apos;].label == None or form.fields[&apos;renewal_date&apos;].label == &apos;renewal date&apos;)
+
+    def test_renew_form_date_field_help_text(self):
+        form = RenewBookForm()
+        self.assertEqual(form.fields[&apos;renewal_date&apos;].help_text, &apos;Enter a date between now and 4 weeks (default 3).&apos;)
+
+    def test_renew_form_date_in_past(self):
+        date = datetime.date.today() - datetime.timedelta(days=1)
+        form = RenewBookForm(data={&apos;renewal_date&apos;: date})
+        self.assertFalse(form.is_valid())
+
+    def test_renew_form_date_too_far_in_future(self):
+        date = datetime.date.today() + datetime.timedelta(weeks=4) + datetime.timedelta(days=1)
+        form = RenewBookForm(data={&apos;renewal_date&apos;: date})
+        self.assertFalse(form.is_valid())
+
+    def test_renew_form_date_today(self):
+        date = datetime.date.today()
+        form = RenewBookForm(data={&apos;renewal_date&apos;: date})
+        self.assertTrue(form.is_valid())
+
+    def test_renew_form_date_max(self):
+        date = timezone.localtime() + datetime.timedelta(weeks=4)
+        form = RenewBookForm(data={&apos;renewal_date&apos;: date})
+        self.assertTrue(form.is_valid())
+</pre>
+
+<p>Les deux premières fonctions testent que le <code>label</code> et le <code>help_text</code> du champ sont tels qu&apos;on les attend. Nous devons accéder au champ en utilisant le dictionnaire du champ (p. ex. <code>form.fields[&apos;renewal_date&apos;]</code>). Notez bien ici que nous devons aussi tester si la valeur du label est <code>None</code>, car même si Django rend le label correct, il retournera <code>None</code> si la valeur n&apos;est pas définie <em>explicitement</em>.</p>
+
+<p>Les autres fonctions testent que le formulaire est valide avec des dates de renouvellement situées à l&apos;intérieur des limites acceptables, et invalide avec des valeurs en dehors de ces limites. Notez comment nous construisons des valeurs de dates de test autour de notre date actuelle (<code>datetime.date.today()</code>) en utilisant <code>datetime.timedelta()</code> (dans ce cas en spécifiant un nombre de jours ou de semaines). Ensuite nous créons juste le formulaire en lui passant nos données, et nous testons s&apos;il est valide.</p>
+
+<div class="note">
+<p><strong>Note :</strong> Ici nous n&apos;utilisons pas réellement la base de données ni le client de test. Envisagez de modifier ces tests pour utiliser <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.SimpleTestCase">SimpleTestCase</a>.</p>
+
+<p>Nous avons aussi besoin de vérifier que les erreurs correctes sont levées si le formulaire est invalide. Cependant cela se fait habituellement dans la partie view, c&apos;est pourquoi nous allons nous y attacher dans la prochaine section.</p>
+</div>
+
+<p>C&apos;est tout pour les formulaires; nous en avons d&apos;autres, mais ils sont automatiquement créés par nos vues génériques pour édition basées sur des classes, et c&apos;est là qu&apos;elles doivent être testées. Lancez les tests et vérifiez que notre code passe toujours !</p>
+
+<h3 id="Vues">Vues</h3>
+
+<p>Pour valider le comportement de notre vue, nous utilisons le <a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/#django.test.Client">client</a> de test de Django. Cette classe se comporte comme un navigateur web fictif que nous pouvons utiliser pour simuler des requêtes <code>GET</code> et <code>POST</code> à une URL donnée, et observer la réponse. Nous pouvons voir à peu près tout au sujet de la réponse, depuis le HTTP bas-niveau (entêtes et codes de statut résultants) jusqu&apos;au template que nous utilisons pour rendre le HTML et aux données de contexte que nous lui passons. Nous pouvons aussi voir la chaîne des redirections (s&apos;il y en a) et vérifier l&apos;URL et le code de statut à chaque étape. Cela nous permet de vérifier que chaque vue se comporte comme prévu.</p>
+
+<p>Commençons avec l&apos;une de nos vues les plus simples, celle qui fournit une liste de tous les auteurs. Elle est affichée à l&apos;URL <strong>/catalog/authors/</strong> (une URL nommée &apos;authors&apos; dans la configuration des URL).</p>
+
+<pre class="brush: python notranslate">class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+</pre>
+
+<p>Comme c&apos;est une vue liste générique, presque tout est fait à notre place par Django. Probablement, si vous faites confiance à Django, la seule chose que vous aurez besoin de tester, c&apos;est que la vue est accessible à l&apos;URL correcte et qu&apos;elle peut être atteinte en utilisant son nom. Cependant, si vous utilisez un processus de développement &apos;test-driven&apos;, vous allez commencer par écrire des tests qui confirmeront que la vue affiche bien tous les auteurs, en les paginant par lots de 10.</p>
+
+<p>Ouvrez le fichier <strong>/catalog/tests/test_views.py</strong>, et remplacez tout texte existant par le code de test suivant, pour la vue <code>AuthorListView</code>. Comme auparavant, nous importons notre modèle et quelques classes utiles. Dans la méthode <code>setUpTestData()</code>, nous définissons un certain nombre d&apos;objets <code>Author</code>, de façon à pouvoir tester notre pagination.</p>
+
+<pre class="brush: python notranslate">from django.test import TestCase
+from django.urls import reverse
+
+from catalog.models import Author
+
+class AuthorListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create 13 authors for pagination tests
+        number_of_authors = 13
+
+        for author_id in range(number_of_authors):
+            Author.objects.create(
+                first_name=f&apos;Christian {author_id}&apos;,
+                last_name=f&apos;Surname {author_id}&apos;,
+            )
+
+    def test_view_url_exists_at_desired_location(self):
+        response = self.client.get(&apos;/catalog/authors/&apos;)
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, &apos;catalog/author_list.html&apos;)
+
+    def test_pagination_is_ten(self):
+        response = self.client.get(reverse(&apos;authors&apos;))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(&apos;is_paginated&apos; in response.context)
+        self.assertTrue(response.context[&apos;is_paginated&apos;] == True)
+        self.assertTrue(len(response.context[&apos;author_list&apos;]) == 10)
+
+    def test_lists_all_authors(self):
+        # Get second page and confirm it has (exactly) remaining 3 items
+        response = self.client.get(reverse(&apos;authors&apos;)+&apos;?page=2&apos;)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(&apos;is_paginated&apos; in response.context)
+        self.assertTrue(response.context[&apos;is_paginated&apos;] == True)
+        self.assertTrue(len(response.context[&apos;author_list&apos;]) == 3)</pre>
+
+<p>Tous les tests utilisent le client (qui appartient à notre classe dérivée de <code>TestCase</code>), afin de simuler une requête <code>GET</code> et d&apos;obtenir une réponse. La première version vérifie une URL spécifique (note : seulement le chemin spécifique, sans le domaine), tandis que la seconde génère une URL à partir de son nom tel qu&apos;il se trouve dans la configuration des URL.</p>
+
+<pre class="brush: python notranslate">response = self.client.get(&apos;/catalog/authors/&apos;)
+response = self.client.get(reverse(&apos;authors&apos;))
+</pre>
+
+<p>Une fois que nous avons la réponse, nous lui demandons son code de statut, le template utilisé, si la réponse est paginée ou non, le nombre d&apos;éléments retournés et le nombre total d&apos;éléments.</p>
+
+<div class="note notecard">
+<p class="brush: python"><strong>Note :</strong> Si, dans votre fichier <strong>/c</strong><strong>atalog/views.py</strong>, vous mettez la variable <code>paginate_by</code> à un nombre autre que 10, assurez-vous de mettre à jour les lignes qui testent le nombre correct d&apos;éléments affichés dans les templates paginés, ci-dessus et dans les sections qui suivent. Par exemple, si vous mettez à 5 la variable pour la liste des auteurs, changez ainsi la ligne ci-dessus :</p>
+
+<pre class="brush: python notranslate">self.assertTrue(len(response.context[&apos;author_list&apos;]) == 5)
+</pre>
+</div>
+
+<p>La variable la plus intéressante que nous montrons ci-dessus est <code>response.context</code>, qui est la variable de contexte passée au template par la vue. C&apos;est incroyablement utile pour tester, parce qu&apos;elle nous autorise à confirmer que notre template reçoit bien toutes les données dont il a besoin. En d&apos;autres termes, nous pouvons vérifier que nous utilisons le template prévu, et quelles données le template utilise, ce qui permet dans une large mesure de vérifier que tous les problèmes de &apos;render&apos; sont seulement dus au template.</p>
+
+<h4 id="Vues_limitées_aux_utilisateurs_connectés">Vues limitées aux utilisateurs connectés</h4>
+
+<p>Dans certains cas, vous voudrez tester une vue qui est limitée aux seuls utilisateurs connectés. Par exemple notre vue <code>LoanedBooksByUserListView</code> est très semblable à notre vue précédente, mais n&apos;est accessible qu&apos;aux utilisateurs connectés, et n&apos;affiche que des enregistrements de type <code>BookInstance</code> qui sont empruntés par l&apos;utilisateur courant, ont le statut &apos;on loan&apos;, et sont triés &apos;le plus ancien en premier&apos;.</p>
+
+<pre class="brush: python notranslate">from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    &quot;&quot;&quot;Generic class-based view listing books on loan to current user.&quot;&quot;&quot;
+    model = BookInstance
+    template_name =&apos;catalog/bookinstance_list_borrowed_user.html&apos;
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact=&apos;o&apos;).order_by(&apos;due_back&apos;)</pre>
+
+<p>Ajoutez le code de test suivant à <strong>/catalog/tests/test_views.py</strong>. Ici nous utilisons d&apos;abord la méthode <code>SetUp()</code> pour créer des logins de comptes d&apos;utilisateurs et des objets de type <code>BookInstance</code> (avec leurs livres et autres enregistrements associés), que nous utiliserons plus tard dans les tests. La moitié des livres sont empruntés par chaque utilisateur-test, mais nous avons initialement mis le statut de tous les livres à &quot;maintenance&quot;. Nous avons utilisé <code>SetUp()</code> plutôt que <code>setUpTestData()</code>, parce que nous allons modifier plus tard certains de ces objets.</p>
+
+<div class="note">
+<p><strong>Note :</strong> Le code de <code>setUp()</code> ci-dessous crée un livre avec un <code>Language</code> spécifique, mais <em>votre</em> code n&apos;inclut peut-être pas le modèle <code>Language</code>, étant donné que celui-ci a été créé lors d&apos;un <em>défi</em>. Si c&apos;est le cas, commentez simplement les bouts de code qui créent ou importent des objets de type Language. Vous devrez aussi le faire dans la section <code>RenewBookInstancesViewTest</code> qui suit.</p>
+</div>
+
+<pre class="brush: python notranslate">import datetime
+
+from django.utils import timezone
+from django.contrib.auth.models import User # Required to assign User as a borrower
+
+from catalog.models import BookInstance, Book, Genre, Language
+
+class LoanedBookInstancesByUserListViewTest(TestCase):
+    def setUp(self):
+        # Create two users
+        test_user1 = User.objects.create_user(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        test_user2 = User.objects.create_user(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+
+        test_user1.save()
+        test_user2.save()
+
+        # Create a book
+        test_author = Author.objects.create(first_name=&apos;John&apos;, last_name=&apos;Smith&apos;)
+        test_genre = Genre.objects.create(name=&apos;Fantasy&apos;)
+        test_language = Language.objects.create(name=&apos;English&apos;)
+        test_book = Book.objects.create(
+            title=&apos;Book Title&apos;,
+            summary=&apos;My book summary&apos;,
+            isbn=&apos;ABCDEFG&apos;,
+            author=test_author,
+            language=test_language,
+        )
+
+        # Create genre as a post-step
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre.set(genre_objects_for_book) # Direct assignment of many-to-many types not allowed.
+        test_book.save()
+
+        # Create 30 BookInstance objects
+        number_of_book_copies = 30
+        for book_copy in range(number_of_book_copies):
+            return_date = timezone.localtime() + datetime.timedelta(days=book_copy%5)
+            the_borrower = test_user1 if book_copy % 2 else test_user2
+            status = &apos;m&apos;
+            BookInstance.objects.create(
+                book=test_book,
+                imprint=&apos;Unlikely Imprint, 2016&apos;,
+                due_back=return_date,
+                borrower=the_borrower,
+                status=status,
+            )
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse(&apos;my-borrowed&apos;))
+        self.assertRedirects(response, &apos;/accounts/login/?next=/catalog/mybooks/&apos;)
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        response = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        # Check our user is logged in
+        self.assertEqual(str(response.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        # Check that we got a response &quot;success&quot;
+        self.assertEqual(response.status_code, 200)
+
+        # Check we used correct template
+        self.assertTemplateUsed(response, &apos;catalog/bookinstance_list_borrowed_user.html&apos;)
+</pre>
+
+<p>Pour vérifier que la vue redirige à une page de login si l&apos;utilisateur n&apos;est pas connecté, nous utilisons <code>assertRedirects</code>, comme montré dans <code>test_redirect_if_not_logged_in()</code>. Pour vérifier que la page est affichée pour un utilisateur connecté, nous connectons d&apos;abord notre utilisateur-test, et ensuite nous accédons de nouveau à la page et vérifions que nous obtenons un <code>status_code</code> de 200 (succès).</p>
+
+<p>Le reste des test vérifie que notre vue ne retourne que les livres qui sont prêtés à notre emprunteur courant. Copiez ce code et collez le à la fin de la classe de test ci-dessus.</p>
+
+<pre class="brush: python notranslate">    def test_only_borrowed_books_in_list(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        response = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        # Check our user is logged in
+        self.assertEqual(str(response.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        # Check that we got a response &quot;success&quot;
+        self.assertEqual(response.status_code, 200)
+
+        # Check that initially we don&apos;t have any books in list (none on loan)
+        self.assertTrue(&apos;bookinstance_list&apos; in response.context)
+        self.assertEqual(len(response.context[&apos;bookinstance_list&apos;]), 0)
+
+        # Now change all books to be on loan
+        books = BookInstance.objects.all()[:10]
+
+        for book in books:
+            book.status = &apos;o&apos;
+            book.save()
+
+        # Check that now we have borrowed books in the list
+        response = self.client.get(reverse(&apos;my-borrowed&apos;))
+        # Check our user is logged in
+        self.assertEqual(str(response.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        # Check that we got a response &quot;success&quot;
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(&apos;bookinstance_list&apos; in response.context)
+
+        # Confirm all books belong to testuser1 and are on loan
+        for bookitem in response.context[&apos;bookinstance_list&apos;]:
+            self.assertEqual(response.context[&apos;user&apos;], bookitem.borrower)
+            self.assertEqual(&apos;o&apos;, bookitem.status)
+
+    def test_pages_ordered_by_due_date(self):
+        # Change all books to be on loan
+        for book in BookInstance.objects.all():
+            book.status=&apos;o&apos;
+            book.save()
+
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        response = self.client.get(reverse(&apos;my-borrowed&apos;))
+
+        # Check our user is logged in
+        self.assertEqual(str(response.context[&apos;user&apos;]), &apos;testuser1&apos;)
+        # Check that we got a response &quot;success&quot;
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm that of the items, only 10 are displayed due to pagination.
+        self.assertEqual(len(response.context[&apos;bookinstance_list&apos;]), 10)
+
+        last_date = 0
+        for book in response.context[&apos;bookinstance_list&apos;]:
+            if last_date == 0:
+                last_date = book.due_back
+            else:
+                self.assertTrue(last_date &lt;= book.due_back)
+                last_date = book.due_back</pre>
+
+<p>Vous pourriez aussi ajouter les tests de pagination, si vous voulez !</p>
+
+<h4 id="Tester_des_vues_avec_formulaires">Tester des vues avec formulaires</h4>
+
+<p>Tester des vues avec formulaires est un peu plus compliqué que dans les cas précédents, car vous devez tester un code qui parcourt plus de chemin : l&apos;affichage initial, l&apos;affichage après que la validation des données a échoué, et l&apos;affichage après que la validation a réussi. La bonne nouvelle, c&apos;est que nous utilisons le client de test presque de la même manière que nous l&apos;avons fait pour des vues qui ne font qu&apos;afficher des données.</p>
+
+<p>Pour voir cela, écrivons des tests pour la vue utilisée pour renouveler des livres (<code>renew_book_librarian()</code>) :</p>
+
+<pre class="brush: python notranslate">from catalog.forms import RenewBookForm
+
+@permission_required(&apos;catalog.can_mark_returned&apos;)
+def renew_book_librarian(request, pk):
+    &quot;&quot;&quot;View function for renewing a specific BookInstance by librarian.&quot;&quot;&quot;
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == &apos;POST&apos;:
+
+        # Create a form instance and populate it with data from the request (binding):
+        book_renewal_form = RenewBookForm(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            book_instance.due_back = form.cleaned_data[&apos;renewal_date&apos;]
+            book_instance.save()
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse(&apos;all-borrowed&apos;))
+
+    # If this is a GET (or any other method) create the default form
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        book_renewal_form = RenewBookForm(initial={&apos;renewal_date&apos;: proposed_renewal_date})
+
+    context = {
+        &apos;book_renewal_form&apos;: book_renewal_form,
+        &apos;book_instance&apos;: book_instance,
+    }
+
+    return render(request, &apos;catalog/book_renew_librarian.html&apos;, context)</pre>
+
+<p>Nous allons devoir tester que la vue n&apos;est disponible qu&apos;aux utilisateurs ayant la permission <code>can_mark_returned</code>, et que les utilisateurs sont bien redirigés vers une page d&apos;erreur HTTP 404 s&apos;ils essaient de renouveler une <code>BookInstance</code> inexistante. Nous devons vérifier que la valeur initiale du formulaire est remplie avec une date de trois semaines dans le futur, et que si la validation réussit, nous sommes redirigés vers la vue &quot;tous les livres empruntés&quot;. Dans le cadre des tests sur l&apos;échec de la validation, nous allons aussi vérifier que notre formulaire envoie les bons messages d&apos;erreur.</p>
+
+<p>Ajoutez la première partie de la classe de test ci-dessous à la fin du fichier <strong>/catalog/tests/test_views.py</strong>. Cela crée deux utilisateurs et deux instances de livres, mais ne donne qu&apos;à un seul utilisateur la permission d&apos;accéder à la vue. Le code pour autoriser les permissions durant les tests est montrée en gras :</p>
+
+<pre class="brush: python notranslate">import uuid
+
+from django.contrib.auth.models import Permission # Required to grant the permission needed to set a book as returned.
+
+class RenewBookInstancesViewTest(TestCase):
+    def setUp(self):
+        # Create a user
+        test_user1 = User.objects.create_user(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        test_user2 = User.objects.create_user(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+
+        test_user1.save()
+        test_user2.save()
+
+<strong>        permission = Permission.objects.get(name=&apos;Set book as returned&apos;)
+        test_user2.user_permissions.add(permission)
+        test_user2.save()</strong>
+
+        # Create a book
+        test_author = Author.objects.create(first_name=&apos;John&apos;, last_name=&apos;Smith&apos;)
+        test_genre = Genre.objects.create(name=&apos;Fantasy&apos;)
+        test_language = Language.objects.create(name=&apos;English&apos;)
+        test_book = Book.objects.create(
+            title=&apos;Book Title&apos;,
+            summary=&apos;My book summary&apos;,
+            isbn=&apos;ABCDEFG&apos;,
+            author=test_author,
+            language=test_language,
+        )
+
+        # Create genre as a post-step
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre.set(genre_objects_for_book) # Direct assignment of many-to-many types not allowed.
+        test_book.save()
+
+        # Create a BookInstance object for test_user1
+        return_date = datetime.date.today() + datetime.timedelta(days=5)
+        self.test_bookinstance1 = BookInstance.objects.create(
+            book=test_book,
+            imprint=&apos;Unlikely Imprint, 2016&apos;,
+            due_back=return_date,
+            borrower=test_user1,
+            status=&apos;o&apos;,
+        )
+
+        # Create a BookInstance object for test_user2
+        return_date = datetime.date.today() + datetime.timedelta(days=5)
+        self.test_bookinstance2 = BookInstance.objects.create(
+            book=test_book,
+            imprint=&apos;Unlikely Imprint, 2016&apos;,
+            due_back=return_date,
+            borrower=test_user2,
+            status=&apos;o&apos;,
+        )</pre>
+
+<p>Ajoutez les tests suivants à la fin de la classe de test. Ils vérifient que seuls les utilisateurs avec les bonnes permissions (<em>testuser2</em>) peuvent accéder à la vue. Nous vérifions tous les cas : quand l&apos;utilisateur n&apos;est pas connecté, quand un utilisateur est connecté mais n&apos;a pas les permissions requises, quand l&apos;utilisateur a les permissions mais n&apos;est pas l&apos;emprunteur (ce test devrait réussir), et ce qui se passe quand ils tentent d&apos;accéder à une <code>BookInstance</code> inexistante. Nous vérifions aussi que le bon template est utilisé.</p>
+
+<pre class="brush: python notranslate">   def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}))
+        # Manually check redirect (Can&apos;t use assertRedirect, because the redirect URL is unpredictable)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(&apos;/accounts/login/&apos;))
+
+    def test_redirect_if_logged_in_but_not_correct_permission(self):
+        login = self.client.login(username=&apos;testuser1&apos;, password=&apos;1X&lt;ISRUkw+tuK&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_logged_in_with_permission_borrowed_book(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance2.pk}))
+
+        # Check that it lets us login - this is our book and we have the right permissions.
+        self.assertEqual(response.status_code, 200)
+
+    def test_logged_in_with_permission_another_users_borrowed_book(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}))
+
+        # Check that it lets us login. We&apos;re a librarian, so we can view any users book
+        self.assertEqual(response.status_code, 200)
+
+    def test_HTTP404_for_invalid_book_if_logged_in(self):
+        # unlikely UID to match our bookinstance!
+        test_uid = uuid.uuid4()
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:test_uid}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_uses_correct_template(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}))
+        self.assertEqual(response.status_code, 200)
+
+        # Check we used correct template
+        self.assertTemplateUsed(response, &apos;catalog/book_renew_librarian.html&apos;)
+</pre>
+
+<p>Ajoutez la méthode de test suivante, comme montré ci-dessous. Elle vérifie que la date initiale pour le formulaire est trois semaines dans le futur. Notez comment nous pouvons accéder à la valeur initiale de ce champ de formulaire (en gras).</p>
+
+<pre class="brush: python notranslate">    def test_form_renewal_date_initially_has_date_three_weeks_in_future(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        response = self.client.get(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}))
+        self.assertEqual(response.status_code, 200)
+
+        date_3_weeks_in_future = datetime.date.today() + datetime.timedelta(weeks=3)
+        self.assertEqual(response<strong>.context[&apos;form&apos;].initial[&apos;renewal_date&apos;]</strong>, date_3_weeks_in_future)
+</pre>
+
+<div class="warning notecard">
+<p>Si vous utilisez la class de formulaire <code>RenewBookModelForm(forms.ModelForm)</code> à la place de la classe <code>RenewBookForm(forms.Form)</code>, le nom du champ est <strong>&apos;due_back&apos;</strong> et non <strong>&apos;renewal_date&apos;</strong>.</p>
+</div>
+
+<p>Le test suivant (ajoutez-le à la classe également) vérifie que la vue redirige vers une liste de tous les livres empruntés si le renouvellement réussit. Ce qui diffère ici est que, pour la première fois, nous montrons comment vous pouvez <code>POST</code>er des données en utilisant le client. Les données postées forment le second argument de la fonction post, et elles sont spécifiées comme un dictionnaire de clés/valeurs.</p>
+
+<pre class="brush: python notranslate">    def test_redirects_to_all_borrowed_book_list_on_success(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        valid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=2)
+        <strong>response = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:valid_date_in_future})</strong>
+        self.assertRedirects(response, reverse(&apos;all-borrowed&apos;))
+</pre>
+
+<div class="warning notecard">
+<p>La vue <em>all-borrowed</em> a été ajoutée comme <em>défi</em>, et votre code peut, à la place, rediriger vers la page d&apos;accueil &apos;/&apos;. Si c&apos;est le cas, modifiez les deux dernières lignes du code de test pour qu&apos;elles ressemblent au code ci-dessous. L&apos;expression <code>follow=True</code> dans la requête s&apos;assure que la requête retourne l&apos;URL de la destination finale (donc vérifie <code>/catalog/</code> plutôt que <code>/</code>).</p>
+
+<pre class="brush: python notranslate"> response = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;:self.test_bookinstance1.pk,}), {&apos;renewal_date&apos;:valid_date_in_future}, <strong>follow=True</strong> )
+ <strong>self.assertRedirects(</strong><strong>response, &apos;/catalog/&apos;)</strong></pre>
+</div>
+
+<p>Copiez les deux dernières fonctions dans la classe, comme indiqué ci-dessous. Elles testent de nouveau des requêtes POST, mais dans ce cas avec des dates de renouvellement invalides. Nous utilisons la méthode assertFormError() pour vérifier que les messages d&apos;erreur sont ceux que nous attendons.</p>
+
+<pre class="brush: python notranslate">    def test_form_invalid_renewal_date_past(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        date_in_past = datetime.date.today() - datetime.timedelta(weeks=1)
+        response = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}), {&apos;renewal_date&apos;: date_in_past})
+        self.assertEqual(response.status_code, 200)
+        <strong>self.assertFormError(</strong><strong>response, &apos;form&apos;, &apos;renewal_date&apos;, &apos;Invalid date - renewal in past&apos;)</strong>
+
+    def test_form_invalid_renewal_date_future(self):
+        login = self.client.login(username=&apos;testuser2&apos;, password=&apos;2HJ1vRV0Z&amp;3iD&apos;)
+        invalid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=5)
+        response = self.client.post(reverse(&apos;renew-book-librarian&apos;, kwargs={&apos;pk&apos;: self.test_bookinstance1.pk}), {&apos;renewal_date&apos;: invalid_date_in_future})
+        self.assertEqual(response.status_code, 200)
+        <strong>self.assertFormError(</strong><strong>response, &apos;form&apos;, &apos;renewal_date&apos;, &apos;Invalid date - renewal more than 4 weeks ahead&apos;)</strong>
+</pre>
+
+<p>Le même genre de technique peut être utilisé pour tester les autres vues.</p>
+
+<h3 id="Templates">Templates</h3>
+
+<p>Django fournit des API de test pour vérifier que le bon template sera appelé par vos vues, et pour vous permettre de vérifier que l&apos;information correcte sera envoyée. Il n&apos;y a cependant pas de support d&apos;API spécifique en Django pour tester que votre sortie HTML a le rendu souhaité.</p>
+
+<h2 id="Autres_outils_de_test_recommandés">Autres outils de test recommandés</h2>
+
+<p>Le framework de test de Django peut vous aider à écrire des tests unitaires et d&apos;intégration efficaces - nous n&apos;avons fait que gratter la surface de ce que peut faire unittest,le framework de test sous-jacent, et plus encore les additions de Django (par exemple, regardez comment vous pouvez utiliser unittest.mock pour patcher les bibliothèques tierces afin de tester plus finement votre propre code).</p>
+
+<p>Comme il y a un grand nombre d&apos;autres outils de test à votre disposition, nous ne mentionnerons que les deux suivants :</p>
+
+<ul>
+ <li><a href="http://coverage.readthedocs.io/en/latest/">Coverage</a>: Cet outil Python fait un rapport sur la proportion de votre code réellement exécutée par vos tests. C&apos;est particulièrement intéressant quand vous commencez, et que vous cherchez à vous représenter exactement ce que vous devez tester.</li>
+ <li><a href="/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Your_own_automation_environment">Selenium</a> est un framework pour automatiser les tests dans un vrai navigateur. Il vous permet de simuler un utilisateur réel en interaction avec le site, et fournit un excellent framework pour les tests système de votre site (l&apos;étape qui suit les tests d&apos;intégration).</li>
+</ul>
+
+<h2 id="Défi">Défi</h2>
+
+<p>Il y a beaucoup d&apos;autres modèles et vues que nous pouvons tester. Comme exercice simple, essayez de créer un cas de test pour la vue <code>AuthorCreate</code>.</p>
+
+<pre class="brush: python notranslate">class AuthorCreate(PermissionRequiredMixin, CreateView):
+    model = Author
+    fields = &apos;__all__&apos;
+    initial = {&apos;date_of_death&apos;:&apos;12/10/2016&apos;}
+    permission_required = &apos;catalog.can_mark_returned&apos;</pre>
+
+<p>Souvenez-vous que vous avez besoin de vérifier tout ce que vous avez spécifié ou ce qui fait partie du design. Cela va inclure qui a accès, la date initiale, le template utilisé, et où la vue redirige en cas de succès.</p>
+
+<h2 id="Résumé">Résumé</h2>
+
+<p>Écrire un code de test n&apos;est ni très excitant ni très fascinant, et par conséquent ce travail est souvent laissé pour la fin (ou complètement délaissé) par les créateurs de sites web. C&apos;est pourtant un élément essentiel pour vous assurer que, malgré les changements apportés, votre code peut passer à une nouvelle version en toute sécurité, et que sa maintenance est rentable.</p>
+
+<p>Dans ce tutoriel, nous vous avons montré comment écrire et lancer des tests pour vos modèles, formulaires et vues. Plus important, nous avons fourni un bref résumé de ce que vous devez tester, ce qui est souvent la chose la plus difficile à comprendre quand on commence. Il y a beaucoup de choses à savoir, mais avec ce que vous avez déjà appris, vous devriez être capable de créer des tests unitaires efficaces pour vos sites web.</p>
+
+<p>Le prochain (et dernier) tutoriel montre comment vous pouvez déployer votre merveilleux (et entièrement testé !) site web Django.</p>
+
+<h2 id="À_voir_également">À voir également</h2>
+
+<ul>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/testing/overview/">Writing and running tests</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/2.1/intro/tutorial05/">Writing your first Django app, part 5 &gt; Introducing automated testing</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/testing/tools/">Testing tools reference</a> (Django docs)</li>
+ <li><a href="https://docs.djangoproject.com/en/2.1/topics/testing/advanced/">Advanced testing topics</a> (Django docs)</li>
+ <li><a href="http://toastdriven.com/blog/2011/apr/10/guide-to-testing-in-django/">A Guide to Testing in Django</a> (Toast Driven Blog, 2011)</li>
+ <li><a href="http://test-driven-django-development.readthedocs.io/en/latest/index.html">Workshop: Test-Driven Web Development with Django</a> (San Diego Python, 2014)</li>
+ <li><a href="https://realpython.com/blog/python/testing-in-django-part-1-best-practices-and-examples/">Testing in Django (Part 1) - Best Practices and Examples</a> (RealPython, 2013)</li>
+</ul>
+
+<div class="prevnext">
+  <a href="/fr/docs/Learn/Server-side/Django/Forms" class="button"><i class="icon-arrow-left"></i><span class="label"> Précédent </span></a><a href="/fr/docs/Learn/Server-side/Django" class="button"><i class="icon-arrow-up"></i> Aperçu : Django</a><a href="/fr/docs/Learn/Server-side/Django/Deployment" class="button"><span class="label"> Suivant  </span><i class="icon-arrow-right"></i></a>
+</div>
+
+<h2 id="Dans_ce_module">Dans ce module</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Introduction">Django introduction</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/development_environment">Setting up a Django development environment</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Tutorial_local_library_website">Django Tutorial: The Local Library website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/skeleton_website">Django Tutorial Part 2: Creating a skeleton website</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Models">Django Tutorial Part 3: Using models</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Admin_site">Django Tutorial Part 4: Django admin site</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Home_page">Django Tutorial Part 5: Creating our home page</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Generic_views">Django Tutorial Part 6: Generic list and detail views</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Sessions">Django Tutorial Part 7: Sessions framework</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Authentication">Django Tutorial Part 8: User authentication and permissions</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Forms">Django Tutorial Part 9: Working with forms</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Testing">Django Tutorial Part 10: Testing a Django web application</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/Deployment">Django Tutorial Part 11: Deploying Django to production</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/web_application_security">Django web application security</a></li>
+ <li><a href="/en-US/docs/Learn/Server-side/Django/django_assessment_blog">DIY Django mini blog</a></li>
+</ul>

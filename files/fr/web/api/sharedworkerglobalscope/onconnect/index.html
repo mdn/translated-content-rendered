@@ -1,0 +1,64 @@
+---
+title: SharedWorkerGlobalScope.onconnect
+slug: Web/API/SharedWorkerGlobalScope/onconnect
+translation_of: Web/API/SharedWorkerGlobalScope/onconnect
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li><strong><a href="/fr/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></strong></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope/applicationCache"><code>applicationCache</code></a></li><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope/name"><code>name</code></a> <a href="/fr/docs/Web/API/SharedWorkerGlobalScope/name$translate" style="opacity: 0.5;">[Traduire]</a></li><li><em><code>onconnect</code></em></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope/close"><code>close()</code></a> <a href="/fr/docs/Web/API/SharedWorkerGlobalScope/close$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope/connect_event"><code>connect</code></a> <a href="/fr/docs/Web/API/SharedWorkerGlobalScope/connect_event$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Héritage :</summary><ol><li><a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Pages liées à Web Workers API</summary><ol><li><a href="/fr/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/fr/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/fr/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/fr/docs/Web/API/Worker"><code>Worker</code></a></li><li><a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/fr/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section>
+
+<p>La proriété <strong><code>onconnect</code></strong> de l&apos;interface <a href="/fr/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a> est un gestionnaire d&apos;évènement pour l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/connect" title="/fr/docs/Web/Reference/Events/connect">connect</a></code>, c&apos;est à dire quand une connexion <a href="/fr/docs/Web/API/MessagePort"><code>MessagePort</code></a> est ouverte entre le <a href="/fr/docs/Web/API/SharedWorker"><code>SharedWorker</code></a> et le <em>thread</em> principale.</p>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="brush: js notranslate">onconnect = function() { ... };</pre>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>Cet exemple montre le gestionnaire d&apos;évènement <code>onconnect</code> quand une connection depuis le thread principal vers un fichier de <em>worker</em> partagé via un <a href="/fr/docs/Web/API/MessagePort"><code>MessagePort</code></a>. L&apos;objet évènement est un <a href="/fr/docs/Web/API/MessageEvent"><code>MessageEvent</code></a>.</p>
+
+<p>Le port de connexion peut-être récupéré avec la propriété <code>ports</code> de l&apos;objet évènement. Le port a un gestionnaire d&apos;évènement <code>onmessage</code> pour gérer les évènement venant de cet port et la méthode <code>postMessage()</code> peut-être utilisée pour répondre au <em>thread</em> principale qui utilise le <em>worker</em>.</p>
+
+<pre class="brush: js notranslate">onconnect = function(e) {
+    var port = e.ports[0];
+
+    port.onmessage = function(e) {
+      var workerResult = &apos;Result: &apos; + (e.data[0] * e.data[1]);
+      port.postMessage(workerResult);
+    }
+
+    port.start();
+}</pre>
+
+<p>Pour l&apos;exemple complet en fonctionnement, voir <a class="external-icon external" href="https://github.com/mdn/simple-shared-worker">Basic shared worker example</a> (<a class="external-icon external" href="http://mdn.github.io/simple-shared-worker/">run shared worker</a>.)</p>
+
+<div class="note notecard">
+<p><strong>Remarque</strong>: La propriété <code>data</code> de l&apos;objet évènement est <code>null</code> dans Firefox. À partir de la version 65, elle est initialisée comme une chaîne vide, selon les spécifications (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1508824">bug 1508824</a>).</p>
+</div>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/#handler-sharedworkerglobalscope-onconnect" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;onconnect&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_Compatibility" name="Browser_Compatibility">Compatibilité des navigateurs</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.SharedWorkerGlobalScope.onconnect"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li>
+</ul>

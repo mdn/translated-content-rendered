@@ -1,0 +1,96 @@
+---
+title: API Web Workers
+slug: Web/API/Web_Workers_API
+tags:
+  - API
+  - DOM
+translation_of: Web/API/Web_Workers_API
+---
+<article class="approved">
+<header><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/Web_Workers_API/Utilisation_des_web_workers">Utilisation des web workers</a></li><li><a href="/fr/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Fonctions et classes disponibles dans les Web Workers</a></li><li><a href="/fr/docs/Web/API/Web_Workers_API/algorithme_clonage_structure">L’algorithme de clonage structuré</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/fr/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/fr/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/Worker"><code>Worker</code></a></li><li><a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/fr/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section></header>
+</article>
+
+<p>Les <strong>Web Workers</strong> sont un mécanisme grâce auquel les instructions d&apos;un script peuvent être exécutés dans un thread en arrière-plan séparé du thread d&apos;exécution principal d&apos;une application web. Cela a pour avantage qu&apos;un traitement laborieux peut être réalisé dans un thread séparé, permettant au thread principal (généralement l&apos;interface utilisateur) de fonctionner sans blocage ni ralentissement.</p>
+
+<h2 id="Concepts_et_utilisation_des_Web_Workers">Concepts et utilisation des Web Workers</h2>
+
+<p>Un worker est un objet créé en utilisant un constructeur (e.g. <a href="/fr/docs/Web/API/Worker/Worker" title="Le constructeur Worker() crée un objet Worker qui exécute le script à l&apos;URL spécifiée. Ce script doit obéir à la same-origin policy."><code>Worker()</code></a>) qui exécute un fichier JavaScript nommé — ce fichier contient le code que doit exécuter le thread du worker; les workers s&apos;exécutent dans un autre contexte global qui est différent du contexte actuel <a href="/fr/docs/Web/API/Window" title="L&apos;objet window représente une fenêtre contenant un document DOM ; la propriété document pointe vers le document DOM chargé dans cette fenêtre."><code>window</code></a>. Ce contexte est représenté par un objet <a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope" title="L&apos;objet DedicatedWorkerGlobalScope (le contexte global du Worker) est accessible au moyen du mot clé self. Certaines fonctions globales additionnelles, des espaces de nom d&apos;objets, et des constructeurs, non associés typiquement au contexte global d&apos;un worker, et néanmoins disponibles, sont listés dans la  Référence JavaScript. Consultez aussi : Fonctions et classes disponibles dans les Web Workers."><code>DedicatedWorkerGlobalScope</code></a> dans le cas des workers dédiés (workers standards utilisés par un script unique; les workers partagés utilisent <a href="/fr/docs/Web/API/SharedWorkerGlobalScope" title="The SharedWorkerGlobalScope object (the SharedWorker global scope) is accessible through the self keyword. Some additional global functions, namespaces objects, and constructors, not typically associated with the worker global scope, but available on it, are listed in the JavaScript Reference. See the complete list of functions available to workers."><code>SharedWorkerGlobalScope</code></a>).</p>
+
+<p>Vous pouvez exécuter quelque code que ce soit à l&apos;intérieur du thread du worker, avec quelques exceptions cependant. Par exemple, vous ne pouvez pas directement manipuler le DOM à partir d&apos;un worker, ou utiliser des méthodes et des propriétés par défaut de l&apos;objet <a href="/fr/docs/Web/API/Window" title="L&apos;objet window représente une fenêtre contenant un document DOM ; la propriété document pointe vers le document DOM chargé dans cette fenêtre."><code>window</code></a>. Mais vous pouvez utiliser un grand nombre des éléments disponibles sous <code>window</code>, comprenant les <a href="/fr/docs/WebSockets">WebSockets</a>, et les mécanismes de stockage de données tels qu&apos;<a href="/fr/docs/IndexedDB">IndexedDB</a> et l&apos;<a href="/en-US/docs/Web/API/Data_Store_API">API Data Store</a> spécifique à Firefox OS. Consultez <a href="/fr/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Les fonctions et classes accessibles aux workers</a> pour plus de détails.</p>
+
+<p>Les données sont envoyées entre les workers et le thread principal au moyen d&apos;un sytème de messages — des deux côtés les messages sont envoyés en utilisant la méthode <code>postMessage()</code>, et la réponse leur parvient au moyen du gestionnaire d&apos;événement <code>onmessage</code> (le message est contenu dans l&apos;attribut <code>data</code> de l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/Message" title="/fr/docs/Web/Reference/Events/Message">Message</a></code>.) Les données sont copiées plutôt que partagées.</p>
+
+<p>Les workers peuvent à leur tour engendrer de nouveaux workers, aussi longtemps que ces workers partagent la même origine que la page parente.  De plus, les workers peuvent utiliser <a class="internal" href="/fr/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> pour les E/S réseau, à l&apos;exception que les attributs <code>responseXML</code> et <code>channel</code> de <code>XMLHttpRequest</code> retournent toujours <code>null</code>.</p>
+
+<p>En plus des workers dédiés, il y a d&apos;autres types de worker :</p>
+
+<ul>
+ <li>Les workers partagés sont des workers qui peuvent être utilisés par de multiples scripts s&apos;exécutant dans différentes fenêtres, IFrames, etc., aussi longtemps qu&apos;ils sont dans le même domaine que le worker. Leur fonctionnement est un petit plus complexe que les workers dédiés — les scripts doivent communiquer via un port actif. Consultez <a href="/fr/docs/Web/API/SharedWorker" title="L&apos;interface SharedWorker représente un type spécifique de worker qui peut être accédé à partir de plusieurs contextes de navigation, tels que plusieurs fenêtres, iframes ou même workers. Ils implémentent une autre interface que les workers dédiés et ont un contexte global différent, SharedWorkerGlobalScope."><code>SharedWorker</code></a> pour plus de détails.</li>
+ <li>Les <a href="/en-US/docs/Web/API/ServiceWorker_API">ServiceWorkers</a> fonctionnent essentiellement comme des serveurs proxy placés entre des applications web, et le navigateur et le réseau (lorsque disponibles). Ils sont destinés (entre autres choses) à permettre la création de véritables expériences déconnectées, interceptant les requêtes du réseau et prenant des décisions appropriées en fonction de la disponibilité du réseau et de la mise à jours des ressources situées sur le serveur. Ils permettront aussi d&apos;accéder à des notifications poussées (push) et à des APIs synchronisées en arrière-plan.</li>
+ <li>Les Workers Chrome sont un type de worker spécifique à Firefox que vous pouvez utiliser si vous développez des extensions et que vous voulez y utiliser des workers et avoir accès aux <a href="/fr/docs/Mozilla/js-ctypes">js-ctypes</a> dans votre worker. Consulter <a href="/fr/docs/Web/API/ChromeWorker" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ChromeWorker</code></a> pour plus de détails. </li>
+ <li>Les <a href="/fr/docs/Web/API/Web_Audio_API#Audio_Workers">Audio Workers</a> donne la possibilité d&apos;effectuer directement dans le contexte d&apos;un worker web un traitement audio scripté.</li>
+</ul>
+
+<div class="note notecard">
+<p>Remarque: Selon les <a href="https://html.spec.whatwg.org/multipage/workers.html#runtime-script-errors-2">Spécifications de Web Worker</a>, les erreurs dans les workers ne devraient pas déborder (voir <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1188141" title="FIXED: Worker error events should not bubble">bug 1188141</a>). Cela a été implémenté dans Firefox 42.</p>
+</div>
+
+<h2 id="Les_interfaces_Web_Worker">Les interfaces Web Worker</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/AbstractWorker" title="L&apos;interface AbstractWorker de l&apos;API Web Worker résume les propriétés et les méthodes communes à tous les types de workers, comme Worker, SharedWorker ou ServiceWorker. Étant une classe abstraite, vous n&apos;interagirez pas directement avec elle."><code>AbstractWorker</code></a></dt>
+ <dd>Propriétés et méthodes abstraites communes à tous les types de workers (i.e. <a href="/fr/docs/Web/API/Worker" title="L&apos;interface Worker de l&apos;API Web Workers représente une tâche de fond qui peut facilement être créée et peut envoyer des messages en retour à son créateur. Créer un Worker est aussi simple que d&apos;appeler le constructeur Worker(), en spécifiant un script qui définira le comportement du thread du worker."><code>Worker</code></a> ou <a href="/fr/docs/Web/API/SharedWorker" title="L&apos;interface SharedWorker représente un type spécifique de worker qui peut être accédé à partir de plusieurs contextes de navigation, tels que plusieurs fenêtres, iframes ou même workers. Ils implémentent une autre interface que les workers dédiés et ont un contexte global différent, SharedWorkerGlobalScope."><code>SharedWorker</code></a>).</dd>
+ <dt><a href="/fr/docs/Web/API/Worker" title="L&apos;interface Worker de l&apos;API Web Workers représente une tâche de fond qui peut facilement être créée et peut envoyer des messages en retour à son créateur. Créer un Worker est aussi simple que d&apos;appeler le constructeur Worker(), en spécifiant un script qui définira le comportement du thread du worker."><code>Worker</code></a></dt>
+ <dd>Représente le thread d&apos;un worker en cours d&apos;exécution, vous permettant de passer des messages au code du worker en cours d&apos;exécution.</dd>
+ <dt><a href="/fr/docs/Web/API/WorkerLocation" title="L&apos;interface WorkerLocation définit l&apos;emplacement complet du script exécuté par le Worker. Un tel objet est initialisé pour chaque worker et est disponible via la propriété WorkerGlobalScope.location récupérée par l&apos;appel à window.self.location."><code>WorkerLocation</code></a></dt>
+ <dd>Défini la localisation du scripte exécuté par le <a href="/fr/docs/Web/API/Worker">Worker</a>.</dd>
+ <dt><a href="/fr/docs/Web/API/SharedWorker" title="L&apos;interface SharedWorker représente un type spécifique de worker qui peut être accédé à partir de plusieurs contextes de navigation, tels que plusieurs fenêtres, iframes ou même workers. Ils implémentent une autre interface que les workers dédiés et ont un contexte global différent, SharedWorkerGlobalScope."><code>SharedWorker</code></a></dt>
+ <dd>Représente un type spécifique de worker qui peut être <em>accédé</em> à partir de plusieurs contextes de navigation, à savoir plusieurs fenêtres, iframes ou même workers.</dd>
+ <dt><a href="/fr/docs/Web/API/WorkerGlobalScope" title="The WorkerGlobalScope interface of the Web Workers API is an interface representing the scope of any worker. Workers have no browsing context; this scope contains the information usually conveyed by Window objects — in this case event handlers, the console or the associated WorkerNavigator object. Each WorkerGlobalScope has its own event loop."><code>WorkerGlobalScope</code></a></dt>
+ <dd>Représente le contexte générique de tout worker (il joue le même rôle que <a href="/fr/docs/Web/API/Window" title="L&apos;objet window représente une fenêtre contenant un document DOM ; la propriété document pointe vers le document DOM chargé dans cette fenêtre."><code>Window</code></a> pour un contenu web normal). Les différents types de worker ont un contexte d&apos;objets qui hérite de cette interface et ajoute des fonctionnalités supplémentaires.</dd>
+ <dt><a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope" title="L&apos;objet DedicatedWorkerGlobalScope (le contexte global du Worker) est accessible au moyen du mot clé self. Certaines fonctions globales additionnelles, des espaces de nom d&apos;objets, et des constructeurs, non associés typiquement au contexte global d&apos;un worker, et néanmoins disponibles, sont listés dans la  Référence JavaScript. Consultez aussi : Fonctions et classes disponibles dans les Web Workers."><code>DedicatedWorkerGlobalScope</code></a></dt>
+ <dd>Représente le contexte d&apos;un worker dédié, héritant de <a href="/fr/docs/Web/API/WorkerGlobalScope" title="The WorkerGlobalScope interface of the Web Workers API is an interface representing the scope of any worker. Workers have no browsing context; this scope contains the information usually conveyed by Window objects — in this case event handlers, the console or the associated WorkerNavigator object. Each WorkerGlobalScope has its own event loop."><code>WorkerGlobalScope</code></a> et ajoutant des fonctionnalités spécifiques.</dd>
+ <dt><a href="/fr/docs/Web/API/SharedWorkerGlobalScope" title="The SharedWorkerGlobalScope object (the SharedWorker global scope) is accessible through the self keyword. Some additional global functions, namespaces objects, and constructors, not typically associated with the worker global scope, but available on it, are listed in the JavaScript Reference. See the complete list of functions available to workers."><code>SharedWorkerGlobalScope</code></a></dt>
+ <dd>Représente le contexte d&apos;un worker partagé, héritant de <a href="/fr/docs/Web/API/WorkerGlobalScope" title="The WorkerGlobalScope interface of the Web Workers API is an interface representing the scope of any worker. Workers have no browsing context; this scope contains the information usually conveyed by Window objects — in this case event handlers, the console or the associated WorkerNavigator object. Each WorkerGlobalScope has its own event loop."><code>WorkerGlobalScope</code></a> et ajoutant des fonctionnalités spécifiques.</dd>
+ <dt><a href="/fr/docs/Web/API/WorkerNavigator" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>WorkerNavigator</code></a></dt>
+ <dd>Représente l&apos;identité et l&apos;état de l&apos;agent utilisateur (le client):</dd>
+</dl>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Nous avons créé deux simples démos pour illustrer des usages basiques :</p>
+
+<ul>
+ <li><a href="https://github.com/mdn/simple-web-worker">Exemple basique d&apos;un worker dédié</a> (<a href="http://mdn.github.io/simple-web-worker/">lancer le worker dédié</a>).</li>
+ <li><a href="https://github.com/mdn/simple-shared-worker">Exemple basique d&apos;un worker partagé</a> (<a href="http://mdn.github.io/simple-shared-worker/">lancer le worker partagé</a>).</li>
+</ul>
+
+<p>Vous pouvez obtenir plus d&apos;informations sur le fonctionnement de ces démos dans notre <a href="/fr/docs/Utilisation_des_web_workers">guide d&apos;utilisation des web workers</a>.</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/workers.html#workers" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;Web Workers&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Utilisation_des_web_workers">Utilisation des web workers</a></li>
+ <li><a href="/fr/docs/Web/API/Worker">L&apos;interface Worker</a></li>
+ <li><a href="/fr/docs/Web/API/SharedWorker">L&apos;interface SharedWorker</a></li>
+ <li><a href="/en-US/docs/Web/API/ServiceWorker_API">L&apos;API ServiceWorker</a></li>
+ <li><a href="/fr/docs/Web/API/Worker/Functions_and_classes_available_to_workers">Les fonctions et classes accessibles aux workers</a></li>
+ <li><a href="/en-US/docs/Web/API/ChromeWorker">ChromeWorker</a> : pour l&apos;utilisation des workers dans un code privilégié (chrome)</li>
+</ul>

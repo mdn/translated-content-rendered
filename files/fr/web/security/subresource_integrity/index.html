@@ -1,0 +1,158 @@
+---
+title: Subresource Integrity
+slug: Web/Security/Subresource_Integrity
+tags:
+  - Intro
+  - Sécurité
+translation_of: Web/Security/Subresource_Integrity
+---
+<p><em><strong>Subresource Integrity</strong></em> (SRI, ou « Intégrité des sous-ressources ») est une fonction de sécurité qui permet aux navigateurs de vérifier que les fichiers qu&apos;ils vont chercher (par exemple, à partir d&apos;un <a href="/fr/docs/Glossaire/CDN">CDN</a>) sont livrés sans manipulation inattendue. Cela fonctionne en permettant de fournir un hachage cryptographique (« <em>hash</em> ») auquel le fichier récupéré doit correspondre.</p>
+
+<h2 id="Comment_fonctionne_le_contrôle_d&apos;intégrité_des_sous-ressources">Comment fonctionne le contrôle d&apos;intégrité des sous-ressources ?</h2>
+
+<p>Utiliser un <a href="/en-US/docs/Glossary/CDN">CDN</a> pour héberger des fichiers tels que les scripts et les feuilles de style qui sont partagés entre plusieurs sites permet d&apos;améliorer les performances du site et d&apos;économiser de la bande passante. Cependant, utiliser des CDN comporte un risque : si un attaquant prend le contrôle du CDN, il pourra injecter du contenu malveillant dans les fichiers (ou les remplacer complètement), et il pourra donc aussi potentiellement attaquer tous les sites qui récupèrent les fichiers sur ce CDN.</p>
+
+<p>Le contrôle d&apos;intégrité des sous-ressources vous permet d&apos;atténuer le risque de ce genre d&apos;attaques, en veillant à ce que les fichiers de votre application ou document Web utilisent (à partir d&apos;un CDN ou ailleurs) aient été livrés sans modification d&apos;un tiers ayant injecté du contenu supplémentaire dans les fichiers - et sans autre changement de toute nature ayant été faits à ces fichiers.</p>
+
+<h2 id="Utiliser_le_SRI">Utiliser le SRI</h2>
+
+<p>Le contrôle d&apos;intégrité des sous-ressources s&apos;active en spécifiant un hachage cryptographique encodé en base64 d&apos;une ressource (fichier) que vous transmettez au navigateur au moment où il va chercher cette ressource, comme valeur de l&apos;attribut <code><strong>integrity</strong></code> de chaque élément <a href="/fr/docs/Web/HTML/Element/script" title="L&apos;élément HTML &lt;script&gt; est utilisé pour intégrer ou faire référence à un script exécutable. Cela fait généralement référence à du code JavaScript mais ce peut également être un autre type de script (par exemple WebGL)."><code>&lt;script&gt;</code></a> ou <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style ou un cadre de navigation (accéder à la même page dans une langue différente par exemple)."><code>&lt;link&gt;</code></a>.</p>
+
+<p>Une valeur de l&apos;attribut <code><strong>integrity</strong></code> commence par au moins une chaîne, chaque chaîne comprenant un préfixe indiquant un algorithme particulier de hachage (actuellement les préfixes autorisés sont <code>sha256</code>, <code>sha384</code> et <code>sha512</code>), suivi d&apos;un tiret, et se terminant par le hachage base64 proprement dit.</p>
+
+<div class="note">
+<p><strong>Note : </strong>Une valeur de l&apos;attribut <code><strong>integrity</strong></code> peut contenir plusieurs hachages séparés par des espaces. Une ressource sera chargée si elle correspond à l&apos;un de ces hachages.</p>
+</div>
+
+<p>Voici un exemple de valeur pour l&apos;attribut <code><strong>integrity</strong></code> avec un hash sha384 encodé en base64 :</p>
+
+<pre>sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC
+</pre>
+
+<div class="note">
+<p><strong>Note :</strong> Le « <em>hash</em> » est à proprement parler une <strong><em>fonction de hachage cryptographique</em></strong> formé en appliquant une fonction de hachage particulière à une certaine entrée (par exemple, un script ou un fichier de feuille de styles). Mais il est plus commun d&apos;utiliser le mot <strong><em>hash</em></strong> pour indiquer <em>fonction de hachage cryptographique</em>, d&apos;où son utilisation dans cet article.</p>
+</div>
+
+<h3 id="Outil_pour_générer_des_hachages_SRI">Outil pour générer des hachages SRI</h3>
+
+<p>Vous pouvez générer des <em>hashes</em> SRI en ligne de commande avec OpenSSL en utilisant une commande de ce genre :</p>
+
+<pre class="brush: bash">cat <strong>FILENAME.js</strong> | openssl dgst -sha384 -binary | openssl enc -base64 -A</pre>
+
+<p>Il existe également, <strong>SRI Hash Generator</strong> : <a href="https://srihash.org/">https://srihash.org/</a> qui est un utilitaire en ligne permettant de générer des <em>hashes</em> SRI. </p>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Dans les exemples suivants, supposons que <code>oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC</code> est la valeur attendue du <em>hash</em> SHA-384 d&apos;un script <code>exemple-framework.js</code>, et qu&apos;il existe une copie de ce script hébergée sur <code>https://exemple.com/exemple-framework.js</code>.</p>
+
+<h3 id="Exemple_utiliser_l&apos;élément_script_pour_le_contrôle_d&apos;intégrité">Exemple : utiliser l&apos;élément <code>script</code> pour le contrôle d&apos;intégrité</h3>
+
+<p>Vous pouvez utiliser l&apos;élément <a href="/fr/docs/Web/HTML/Element/script" title="L&apos;élément HTML &lt;script&gt; est utilisé pour intégrer ou faire référence à un script exécutable. Cela fait généralement référence à du code JavaScript mais ce peut également être un autre type de script (par exemple WebGL)."><code>&lt;script&gt;</code></a> suivant pour dire au navigateur qu&apos;il doit comparer le <em>hash</em> fourni avec celui du fichier et que les deux correspondent avant d&apos;exécuter le script hébergé à <code>https://example.com/exemple-framework.js</code>.</p>
+
+<pre class="brush: html">&lt;script src=&quot;https://exemple.com/exemple-framework.js&quot;
+        integrity=&quot;sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC&quot;
+        crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;</pre>
+
+<div class="note">
+<p><strong>Note :</strong> Pour plus de détails sur l&apos;objectif de l&apos;attribut <code><strong>crossorigin</strong></code>, voir <a href="/fr/docs/Web/HTML/Reglages_des_attributs_CORS">les attributs CORS</a>.</p>
+</div>
+
+<h2 id="La_gestion_du_SRI_par_les_navigateurs">La gestion du SRI par les navigateurs</h2>
+
+<p>Les navigateurs gèrent SRI en effectuant les étapes suivantes :</p>
+
+<ol>
+ <li>Lorsqu&apos;un navigateur rencontre un élément <a href="/fr/docs/Web/HTML/Element/script" title="L&apos;élément HTML &lt;script&gt; est utilisé pour intégrer ou faire référence à un script exécutable. Cela fait généralement référence à du code JavaScript mais ce peut également être un autre type de script (par exemple WebGL)."><code>&lt;script&gt;</code></a> ou <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style ou un cadre de navigation (accéder à la même page dans une langue différente par exemple)."><code>&lt;link&gt;</code></a> avec un attribut <code><strong>integrity</strong></code>, avant d&apos;exécuter le script ou avant d&apos;appliquer les styles spécifiés par l&apos;élément <a href="/fr/docs/Web/HTML/Element/link" title="L&apos;élément HTML &lt;link&gt; définit la relation entre le document courant et une ressource externe. Cet élément peut être utilisé pour définir un lien vers une feuille de style ou un cadre de navigation (accéder à la même page dans une langue différente par exemple)."><code>&lt;link&gt;</code></a>, la navigateur doit comparer le script ou la feuille de style à la valeur donnée dans l&apos;attribut <code><strong>integrity</strong></code>.</li>
+ <li>Si le script ou la feuille de styles ne correspond pas à la valeur de l&apos;attribut <code><strong>integrity</strong></code> qui lui est associée, alors le navigateur doit refuser d&apos;exécuter le script ou d&apos;appliquer la feuille de style et doit retourner une erreur indiquant que le chargement de la ressource a échoué.</li>
+</ol>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La spécificaction &apos;Subresource Integrity&apos;" href="https://w3c.github.io/webappsec/specs/subresourceintegrity/" class="external" hreflang="en">Subresource Integrity</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td><a lang="en" title="La spécificaction &apos;Fetch&apos;" href="https://fetch.spec.whatwg.org/" class="external" hreflang="en">Fetch</a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>L&apos;attribut <code>integrity</code> pour les éléments <code>&lt;script&gt;</code> et <code>&lt;link&gt;</code></td>
+   <td>45.0</td>
+   <td><a href="/en-US/Firefox/Releases/43" title="Sorti le 2015-12-15.">43</a> (43)</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td>32</td>
+   <td><span style="color: #f00;">Pas de support</span>[1]</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Fonctionnalité</th>
+   <th>Chrome pour Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>L&apos;attribut <code>integrity</code> pour les éléments <code>&lt;script&gt;</code> et <code>&lt;link&gt;</code></td>
+   <td>45.0</td>
+   <td>43.0 (43)</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span>[1]</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] <a href="https://bugs.webkit.org/show_bug.cgi?id=148363" class="external" rel="external" title>WebKit bug 148363</a></p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="https://frederik-braun.com/using-subresource-integrity.html" id="page-title">Un CDN sans risque de XSS : utiliser le contrôle d&apos;intégrité des sous-ressources (en anglais)</a></li>
+</ul>

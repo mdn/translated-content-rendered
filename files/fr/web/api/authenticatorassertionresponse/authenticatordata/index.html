@@ -1,0 +1,88 @@
+---
+title: AuthenticatorAssertionResponse.authenticatorData
+slug: Web/API/AuthenticatorAssertionResponse/authenticatorData
+tags:
+  - API
+  - Propriété
+  - Reference
+  - Web Authentication API
+  - WebAuthn
+translation_of: Web/API/AuthenticatorAssertionResponse/authenticatorData
+---
+<div class="draft notecard">
+    <p><strong>Brouillon</strong><br>
+    Cette page n&apos;est pas terminée.</p>
+
+</div><div class="secureContexts notecard"><p><strong>Contexte sécurisé</strong><br>Cette fonctionnalité est uniquement disponible dans des <a href="/fr/docs/Web/Security/Secure_Contexts">contextes sécurisés</a> (HTTPS), pour certains <a href="#Compatibilité_des_navigateurs">navigateurs qui la prennent en charge</a>.</p></div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Web_Authentication_API">Web Authentication API</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/Web_Authentication_API/Attestation_and_Assertion">Attestation and Assertion</a> <a href="/fr/docs/Web/API/Web_Authentication_API/Attestation_and_Assertion$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/CredentialsContainer"><code>CredentialsContainer</code></a></li><li><a href="/fr/docs/Web/API/PublicKeyCredential"><code>PublicKeyCredential</code></a></li><li><a href="/fr/docs/Web/API/AuthenticatorResponse"><code>AuthenticatorResponse</code></a></li><li><a href="/fr/docs/Web/API/AuthenticatorAttestationResponse"><code>AuthenticatorAttestationResponse</code></a></li><li><a href="/fr/docs/Web/API/AuthenticatorAssertionResponse"><code>AuthenticatorAssertionResponse</code></a></li></ol></details></li></ol></section>
+
+<p>La propriété <code><strong>authenticatorData</strong></code> (rattachée à  l&apos;interface <a href="/fr/docs/Web/API/AuthenticatorAssertionResponse"><code>AuthenticatorAssertionResponse</code></a>) fournit un <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/ArrayBuffer"><code>ArrayBuffer</code></a> qui contient les informations relatives à l&apos;authenticateur tels que :</p>
+
+<ul>
+ <li>l&apos;empreinte d&apos;identifiant (rpIdHash pour <em>Relying Party ID Hash</em>)</li>
+ <li>un compteur de signature</li>
+ <li>un test quant à la présence de l&apos;utilisateur</li>
+ <li>des marqueurs (<em>flags</em>) de vérification de l&apos;utilisateur</li>
+ <li>les éventuelles extensions traitées par l&apos;authenticateur</li>
+</ul>
+
+<p>Cette propriété est signée par l&apos;authenticateur (c&apos;est l&apos;un des deux champs qui est signé).</p>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="brush: js notranslate">var authnrData = assertion.response.authnrData;
+</pre>
+
+<h3 id="Valeur">Valeur</h3>
+
+<p>Un objet <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/ArrayBuffer"><code>ArrayBuffer</code></a> dont la propriété <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/ArrayBuffer/byteLength"><code>ArrayBuffer.byteLength</code></a> indique qu&apos;il mesure au moins 37 octets et qui contient les champs suivants :</p>
+
+<ul>
+ <li><code><strong>rpIdHash</strong></code> (32 octets) - Une empreinte SHA256 de l&apos;identifiant de la partie fiable (i.e. - le domaine) tel que vu par le navigateur. Le serveur s&apos;assurera ensuite que cette empreinte correspond à sa propre origine afin d&apos;empêcher les tentatives de hameçonnage (<em>phishing</em>) ou d&apos;autres attaques de l&apos;homme du milieu (<em>man-in-the-middle</em>).</li>
+ <li><code><strong>flags</strong></code> (1 octet) - Une série de bits qui indique les différents attributs validés par l&apos;authenticateur. Les bits sont décrits comme suit (où le bit 0 correspond au bit de poids faible) (tous les bits ne sont pas mentionnés car certains sont réservés pour une utilisation future) :
+  <ul>
+   <li>Bit 0 : Présence de l&apos;utilisateur (<em>User Presence</em> - UP) : si ce bit est actif, cela signifie que l&apos;authenticateur a validé la présence de l&apos;utilisateur par un test de présence (<em>Test of User Presence</em> - TUP). Cela peut notamment correspondre à l&apos;appui sur un bouton de l&apos;authenticateur.</li>
+   <li>Bit 2 : Vérification de l&apos;utilisateur (<em>User Verification</em> - UV) : si ce bit est actif, cela signifie que l&apos;authenticateur a vérifié l&apos;utilisateur en question via une méthode d&apos;authentification (biométrique, code PIN, autre).</li>
+   <li>Bit 6 : Présence des données d&apos;authentification vérifiées (<em>Attested Credential Data </em>- AT) : si ce bit est actif, le champ <code>attestedCredentialData</code> suivra immédiatement après les 37 premiers octets de cet objet.</li>
+   <li>Bit 7 : Présence des données d&apos;extension (<em>Extension data</em> - ED) : si ce bit est actif, les données d&apos;extensions suivront le champ <code>attestedCredentialData</code> s&apos;il est présent ou seront situées après les 37 premiers octets de cet objet sinon.</li>
+  </ul>
+ </li>
+ <li><code><strong>signCount</strong></code> (4 octets) : un compteur de signature provenant de l&apos;authenticateur. Cela permet au serveur de détecter un éventuel clonage de l&apos;authenticateur.</li>
+ <li><code><strong>attestedCredentialData</strong></code> (longueur variable) : les informations d&apos;authentification qui ont été créées. Ce champ est uniquement présent lors d&apos;un appel à <code>navigator.credentials.create()</code>. Ces informations sont représentées par une séquence d&apos;octets au format suivant :
+  <ul>
+   <li><code><strong>AAGUID</strong></code> (16 octets) - <em>Authenticator Attestation Globally Unique Identifier</em>, un identifiant universel unique pour l&apos;attestation de l&apos;authenticateur qui identifie le modèle de l&apos;authenticateur (pas cet exemplaire en particulier) afin qu&apos;une autre partie puisse comprendre les caractéristiques de l&apos;authenticateur en consultant ses méta-données.</li>
+   <li><code><strong>credentialIdLength</strong></code> (2 octets) - la longueur, en octets, de l&apos;identifiant d&apos;authentification qui suit ces octets.</li>
+   <li><code><strong>credentialId</strong></code> (longueur variable) - un identifiant unique pour ces informations d&apos;authentification et qui pourra être demandé pour de futures authentifications. Cette information mesure <code>credentialIdLength</code> octets.</li>
+   <li><code><strong>credentialPublicKey</strong></code> (longueur variable) - une clé publique encodée au format <a href="https://tools.ietf.org/html/rfc8152">COSE</a>. Cette clé publique sera stockée sur le serveur et associée au compte de l&apos;utilisateur afin d&apos;être utilisée pour de futures authentifications.</li>
+  </ul>
+ </li>
+ <li><code><strong>extensions</strong></code> (longueur variable) - Une carte optionnelle, encodée au format <a href="https://tools.ietf.org/html/rfc7049">CBOR</a>, et qui contient les extensions de l&apos;authenticateur.</li>
+</ul>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>TBD</p>
+
+<h2 id="Specifications">Specifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/webauthn/" hreflang="en" lang="en" title="La spécificaction &apos;Web Authentication: An API for accessing Public Key Credentials Level 1&apos;">Web Authentication: An API for accessing Public Key Credentials Level 1</a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="hidden">Le tableau de compatibilité de cette page a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à consulter <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> et à nous envoyer une <em>pull request</em>.</div>
+
+<div class="bc-data" id="bcd:api.AuthenticatorAssertionResponse"></div>

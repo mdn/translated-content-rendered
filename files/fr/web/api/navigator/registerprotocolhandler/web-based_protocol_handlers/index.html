@@ -1,0 +1,113 @@
+---
+title: Gestionnaires de protocoles web
+slug: Web/API/Navigator/registerProtocolHandler/Web-based_protocol_handlers
+translation_of: Web/API/Navigator/registerProtocolHandler/Web-based_protocol_handlers
+---
+<p></p>
+
+<h3 id="Introduction" name="Introduction">Introduction</h3>
+
+<p>Il est relativement courant de voir des pages web lier des ressources utilisant des protocoles non-<code>http</code>. Prenons par exemple le protocole <code>mailto:</code> :</p>
+
+<pre>&lt;a href=&quot;mailto:webmaster@example.com&quot;&gt;Webmestre&lt;/a&gt;
+</pre>
+
+<p>Les auteurs web peuvent utiliser un lien <code>mailto:</code> lorsqu&apos;ils veulent fournir aux utilisateurs une manière pratique d&apos;envoyer un courrier électronique, directement depuis la page web. Lorsque le lien est activé, le navigateur est supposé lancer l&apos;application par défaut du bureau pour le courrier électronique. On pourrait appeler cela un gestionnaire de protocole<em>du bureau</em>.</p>
+
+<p>Les gestionnaires de protocoles web permettent à des applications web de participer également à ce processus. Leur importance va grandissant au fur et à mesure que différents types d&apos;applications migrent vers le web. De fait, un grand nombre d&apos;applications de courrier déjà basées sur le web pourraient traiter un lien <code>mailto</code>.</p>
+
+<h3 id="Enregistrement" name="Enregistrement">Enregistrement</h3>
+
+<p>La définition d&apos;une application web comme gestionnaire de protocole n&apos;est pas un processus difficile. En gros, l&apos;application web utilise <code><a href="/fr/DOM/window.navigator.registerProtocolHandler" title="fr/DOM/window.navigator.registerProtocolHandler">registerProtocolHandler()</a></code> pour s&apos;enregistrer auprès du navigateur comme gestionnaire potentiel pour un protocole donné. Par exemple :</p>
+
+<pre>navigator.registerProtocolHandler(&quot;mailto&quot;,
+                                  &quot;https://www.example.com/?uri=%s&quot;,
+                                  &quot;Example Mail&quot;);
+</pre>
+
+<p>Où les paramètres sont :</p>
+
+<ul>
+ <li>Le protocole.</li>
+ <li>Le modèle d&apos;URL, utilisé comme gestionnaire. Le « %s » sera remplacé par le <code>href</code> du lien et une requête GET sera exécutée sur l&apos;URL résultante.</li>
+ <li>Le nom du gestionnaire de protocole tel que présenté à l&apos;utilisateur.</li>
+</ul>
+
+<p>Lorsqu&apos;un navigateur exécutera ce code, il devra demander à l&apos;utilisateur la permission d&apos;autoriser l&apos;application web à s&apos;enregistrer comme gestionnaire du protocole. Firefox affichera une question dans une barre de notification :</p>
+
+<p><img src="/@api/deki/files/1491/=Wph-notification.png" alt="Image:wph-notification.png" class="internal"></p>
+
+<p></p><div class="note notecard"><strong>Note :</strong> </div><p></p>
+
+<h4 id="Exemple" name="Exemple">Exemple</h4>
+
+<pre>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;&gt;
+&lt;html lang=&quot;fr&quot;&gt;
+&lt;head&gt;
+  &lt;title&gt;Web Protocol Handler Sample - Register&lt;/title&gt;
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    navigator.registerProtocolHandler(&quot;fake&quot;, &quot;http://starkravingfinkle.org/projects/wph/handler.php?value=%s&quot;, &quot;Protocole fake&quot;);
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Exemple de gestionnaire de protocole web&lt;/h1&gt;
+  &lt;p&gt;Cette page va installer un gestionnaire de protocole web pour le protocole &lt;code&gt;fake:&lt;/code&gt;.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h3 id="Activation" name="Activation">Activation</h3>
+
+<p>À présent, chaque fois que l&apos;utilisateur activera un lien utilisant le protocole enregistré, le navigateur dirigera l&apos;action vers l&apos;URL spécifiée lors de l&apos;enregistrement de l&apos;application web. Firefox, par défaut, demandera à l&apos;utilisateur avant d&apos;effectuer cette action.</p>
+
+<p><img alt="Image:wph-launch.png"></p>
+
+<h4 id="Exemple_2" name="Exemple_2">Exemple</h4>
+
+<pre>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;&gt;
+&lt;html lang=&quot;fr&quot;&gt;
+&lt;head&gt;
+  &lt;title&gt;Exemple de gestionnaire de protocole web — test&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;p&gt;Hola, avez-vous déjà vu &lt;a href=&quot;fake:ceci%20est%20un%20faux%20protocole&quot;&gt;ceci&lt;/a&gt; auparavant ?&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h3 id="Traitement" name="Traitement">Traitement</h3>
+
+<p>La phase suivante est le traitement de l&apos;action. Le navigateur extrait le <code>href</code> du lien activé, le combine avec le modèle d&apos;URL fourni lors de l&apos;enregistrement et effectue une requête HTTP GET sur l&apos;URL. Ainsi, avec les exemples précédents, le navigateur effectuerait une requête GET sur cette URL :</p>
+
+<pre>http://starkravingfinkle.org/projects/wph/handler.php?value=fake:ceci%20est%20un%20faux%20protocole
+</pre>
+
+<p>Un code côté serveur peut extraire les paramètres de la chaîne de requête et effectuer l&apos;action désirée.</p>
+
+<p></p><div class="note notecard"><strong>Note :</strong> Le code côté serveur reçoit le contenu <strong>entier</strong> de l&apos;attribut <code>href</code>. Cela signifie qu&apos;il devra traiter la chaîne pour retirer l&apos;indication de protocole des données.</div><p></p>
+
+<h4 id="Exemple_3" name="Exemple_3">Exemple</h4>
+
+<pre>&lt;?php
+$value = &quot;&quot;;
+if ( isset ( $_GET[&quot;value&quot;] ) ) {
+  $value = $_GET[&quot;value&quot;];
+}
+?&gt;
+
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;&gt;
+&lt;html lang=&quot;fr&quot;&gt;
+&lt;head&gt;
+    &lt;title&gt;Exemple de gestionnaire de protocole web&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Exemple de gestionnaire de protocole web — Gestionnaire&lt;/h1&gt;
+  &lt;p&gt;Cette page est appelée lors de la gestion d&apos;une action utilisant le protocole &lt;code&gt;fake:&lt;/code&gt;. Voici les données reçues :&lt;/p&gt;
+  &lt;textarea&gt;
+&lt;?php echo(urldecode($value)) ?&gt;
+  &lt;/textarea&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p> </p>

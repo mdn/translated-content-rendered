@@ -1,0 +1,79 @@
+---
+title: Worker.onmessage
+slug: Web/API/Worker/onmessage
+tags:
+  - API
+  - Property
+  - Reference
+translation_of: Web/API/Worker/onmessage
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Web_Workers_API">Web Workers API</a></strong></li><li><strong><a href="/fr/docs/Web/API/Worker"><code>Worker</code></a></strong></li><li class="toggle"><details open><summary>Constructeur</summary><ol><li><a href="/fr/docs/Web/API/Worker/Worker"><code>Worker()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/AbstractWorker/onerror"><code>onerror</code></a></li><li><em><code>onmessage</code></em></li><li><a href="/fr/docs/Web/API/Worker/onmessageerror"><code>onmessageerror</code></a> <a href="/fr/docs/Web/API/Worker/onmessageerror$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/Worker/postMessage"><code>postMessage()</code></a></li><li><a href="/fr/docs/Web/API/Worker/terminate"><code>terminate()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/Worker/message_event"><code>message</code></a> <a href="/fr/docs/Web/API/Worker/message_event$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/Worker/messageerror_event"><code>messageerror</code></a> <a href="/fr/docs/Web/API/Worker/messageerror_event$translate" style="opacity: 0.5;">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Héritage :</summary><ol><li><a href="/fr/docs/Web/API/EventTarget"><code>EventTarget</code></a></li></ol></details></li><li class="toggle"><details open><summary>Pages liées à Web Workers API</summary><ol><li><a href="/fr/docs/Web/API/AbstractWorker"><code>AbstractWorker</code></a></li><li><a href="/fr/docs/Web/API/ChromeWorker"><code>ChromeWorker</code></a></li><li><a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/ServiceWorker"><code>ServiceWorker</code></a></li><li><a href="/fr/docs/Web/API/SharedWorker"><code>SharedWorker</code></a></li><li><a href="/fr/docs/Web/API/SharedWorkerGlobalScope"><code>SharedWorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/WorkerGlobalScope"><code>WorkerGlobalScope</code></a></li><li><a href="/fr/docs/Web/API/WorkerLocation"><code>WorkerLocation</code></a></li><li><a href="/fr/docs/Web/API/WorkerNavigator"><code>WorkerNavigator</code></a></li></ol></details></li></ol></section>
+
+<p>La propriété <strong><code>onmessage</code></strong> de l&apos;interface <a href="/fr/docs/Web/API/Worker"><code>Worker</code></a> représente un <a href="/fr/docs/Web/API/EventHandler"><code>EventHandler</code></a>, à savoir une fonction qui est appelée lorsque l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/message" title="/fr/docs/Web/Reference/Events/message">message</a></code> survient. Ces événements sont du type <a href="/fr/docs/Web/API/MessageEvent"><code>MessageEvent</code></a> et sont appelés quand le parent du worker reçoit un message (c’est-à-dire à partir de la méthode <a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope/postMessage"><code>DedicatedWorkerGlobalScope.postMessage</code></a>).</p>
+
+<div class="note">
+<p><strong>Remarque </strong>: le contenu du message est fourni par la propriété <code>data</code> de l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/message" title="/fr/docs/Web/Reference/Events/message">message</a></code>.</p>
+</div>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="brush: js notranslate">myWorker.onmessage = function(e) { ... }</pre>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>L&apos;extrait de code suivant illustre la création d&apos;un objet <a href="/fr/docs/Web/API/Worker"><code>Worker</code></a> utilisant le constructeur <a href="/fr/docs/Web/API/Worker/Worker"><code>Worker()</code></a>. Les messages sont passés au worker lorsque la valeur de l&apos;élément de formulaire <code>first</code> change. Un gestionnaire onmessage est également présent pour s&apos;occuper des messages retournés par le worker.</p>
+
+<pre class="brush: js notranslate">var myWorker = new Worker(&quot;worker.js&quot;);
+
+first.onchange = function() {
+  myWorker.postMessage([first.value,second.value]);
+  console.log(&apos;Message envoyé au worker&apos;);
+}
+
+myWorker.onmessage = function(e) {
+  result.textContent = e.data;
+  console.log(&apos;Message reçu du worker&apos;);
+}
+</pre>
+
+<p>Dans le script <code>worker.js</code>, un gestionnaire <code>onmessage</code> se charge des messages en provenance du script principal :</p>
+
+<pre class="brush: js notranslate">onmessage = function(e) {
+  console.log(&apos;Message reçu du script principal&apos;);
+  var workerResult = &apos;Result: &apos; + (e.data[0] * e.data[1]);
+  console.log(&apos;Renvoi d\&apos;un message au script principal&apos;);
+  postMessage(workerResult);
+}</pre>
+
+<p>Remarquez comment dans le script principal, <code>onmessage</code> doit être appelée par <code>myWorker</code>, tandis que dans le script du worker vous avez juste besoin d&apos;appeler <code>onmessage</code> parce que le worker est en réalité le contexte global (<a href="/fr/docs/Web/API/DedicatedWorkerGlobalScope"><code>DedicatedWorkerGlobalScope</code></a>).</p>
+
+<p>Pour un exemple complet, consulter notre <a class="external external-icon" href="https://github.com/mdn/simple-web-worker">Exemple basique de worker dédié</a> (<a class="external external-icon" href="http://mdn.github.io/simple-web-worker/">lancez le worker dédié</a>).</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">Statut</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/#handler-worker-onmessage" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;Worker.onmessage&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div>
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Worker.onmessage"></div>
+</div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<p>L&apos;interface <a href="/fr/docs/Web/API/Worker"><code>Worker</code></a> à laquelle elle appartient.</p>

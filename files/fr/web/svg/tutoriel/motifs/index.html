@@ -1,0 +1,270 @@
+---
+title: Motifs
+slug: Web/SVG/Tutoriel/Motifs
+tags:
+  - SVG
+  - 'SVG:Tutoriel'
+translation_of: Web/SVG/Tutorial/Patterns
+---
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Web/SVG/Tutoriel/Gradients" class="button">« Précédent</a><a href="/fr/docs/Web/SVG/Tutoriel/Texts" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p>Les motifs (<em>patterns</em> en anglais) sont sans aucun doute les types de remplissages les plus complexes à utiliser en SVG. Ce sont également des outils très puissants, ils méritent donc d&apos;être abordés pour que vous en connaissiez les fondamentaux. Comme les dégradés, l&apos;élément <a href="/fr/docs/Web/SVG/Element/pattern" title="Un pattern est utilisé pour remplir un objet ou la bordure d&apos;un objet à l&apos;aide d&apos;un élément graphique prédéfini. Celui-ci peut être répété à des intervalles fixe le long des axes x et y afin de recouvrir la zone à peindre. Les patterns sont définis à l&apos;aide de l&apos;élément pattern et ensuite référencés à l&apos;aide des propriétés fill et stroke sur l&apos;élément graphique afin d&apos;indiquer que celui-ci ou sa bordure doit être paint avec le pattern de référence."><code>&lt;pattern&gt;</code></a> doit être placé dans la section <code>&lt;defs&gt;</code> du fichier SVG.</p>
+
+<h2 id="Exemple">Exemple</h2>
+
+<pre class="brush: html">&lt;svg width=&quot;200&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;white&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;blue&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;red&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;orange&quot;/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;pattern id=&quot;Pattern&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+      &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+
+  &lt;rect fill=&quot;url(#Pattern)&quot; stroke=&quot;black&quot; width=&quot;200&quot; height=&quot;200&quot;/&gt;
+&lt;/svg&gt;</pre>
+
+<p></p><table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img src="/files/725/SVG_Pattern_Example.png" alt class="internal"></td><td><iframe src="https://mdn.mozillademos.org/fr/docs/Web/SVG/Tutoriel/Motifs$samples/Exemple?revision=1427951" width="220" class="live-sample-frame sample-code-frame" height="220" frameborder="0" id="frame_Exemple"></iframe></td></tr></tbody></table><p></p>
+
+<p>À l&apos;intérieur de l&apos;élément <code>pattern</code>, vous pouvez inclure toutes les formes de bases de SVG et les styliser de la même manière que d&apos;habitude (remplissage, contour, dégradés, opacité, etc). Dans notre exemple, on a dessiné un cercle et deux rectangles (qui se chevauchent et dont l&apos;un est deux fois plus grand que l&apos;autre pour remplir le motif en entier).</p>
+
+<p>La partie pouvant apporter le plus de confusion avec les motifs est le système d&apos;unité et la taille des éléments.</p>
+
+<h2 id="Unités_du_motif_objectBoundingBox">Unités du motif: objectBoundingBox</h2>
+
+<p>Les attributs <code>width</code> et <code>height</code> sur l&apos;élément <code>pattern</code> décrivent jusqu&apos;où le motif doit aller avant de se répéter. Les attributs <code>x</code> et <code>y</code> sont également disponibles si vous souhaitez décaler le point de départ du motif à l&apos;intérieur du dessin.</p>
+
+<p>Même principe que l&apos;attribut <code>gradientUnits</code> (que nous avons vu précédemment avec les dégradés), les motifs peuvent prendre un attribut <code>patternUnits</code>, pour spécifier l&apos;unité utilisée par le motif. La valeur par défaut est  &quot;objectBoundingBox&quot;, ainsi une taille de 1 remplira entièrement la hauteur/largeur de l&apos;objet auquel le motif est appliqué. Puisque dans notre cas, on veut que le motif se répète 4 fois horizontalement et verticalement, on a définit <code>height</code> et <code>width</code> à 0.25. Cela signifie que la hauteur et largeur du pattern sera de 25% celle de l&apos;objet.</p>
+
+<p>De même, pour que le motif commence à 10 pixels du bord supérieur-gauche de l&apos;objet, il faudrait définir les valeurs de <code>x</code> et <code>y</code> à 0.05 (10/200 = 0.05).</p>
+
+<h2 id="Unités_du_contenu_userSpaceOnUse">Unités du contenu: userSpaceOnUse</h2>
+
+<p>Contrairement aux dégradés, les motifs ont un deuxième argument, <code>patternContentUnits</code>, qui lui spécifie l&apos;unité utilisée par les formes à l&apos;intérieur du motif. La valeur par défaut est &quot;userSpaceOnUse&quot;, l&apos;opposé de l&apos;attribut <code>patternUnits</code>. Cela signifie qu&apos;à moins de définir ces attributs aurement (<code>patternContentUnits</code> et/ou <code>patternUnits</code>), les formes que vous dessinez à l&apos;intérieur du motif ont un système de coordonnées différent du motif, ce qui peut rendre les choses un peu déroutantes si vous écrivez le code à la main.</p>
+
+<p>Pour que cela fonctionne dans l&apos;exemple ci-dessus, nous avons dû prendre en compte la taille du rectangle sur lequel est appliqué le motif (200px) et le fait que l&apos;on veut répéter le motif 4 fois horizontalement et verticalement, donc que le motif sera un carré de 50x50. Les deux rectangles et le cercle à l&apos;intérieur du motif ont été dimensionnés pour tenir dans un carré de 50x50. Tout ce qui sortirait en dehors ne serait pas affiché.</p>
+
+<p>La chose à retenir est que si l&apos;objet change de taille, le motif lui-même sera mis à l&apos;échelle mais les objets à l&apos;intérieur non. Ainsi, alors qu&apos;on aura toujours 4 motifs qui se répètent horizontalement et verticalement, les objets à l&apos;intérieur du motif garderont la même taille, et une zone vide sera affichée.</p>
+
+<div class="hidden">
+<h6 id="Playable_code" name="Playable_code">Playable code</h6>
+
+<pre class="brush: html">&lt;svg width=&quot;600&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; id=&quot;svg&quot; class=&quot;playable-svg&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;white&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;blue&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;red&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;orange&quot;/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;pattern id=&quot;Pattern&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+      &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+
+  &lt;rect fill=&quot;url(#Pattern)&quot; stroke=&quot;black&quot; width=&quot;200&quot; height=&quot;200&quot;/&gt;
+&lt;/svg&gt;
+
+&lt;div class=&quot;playable-buttons&quot;&gt;
+  &lt;input id=&quot;edit&quot; type=&quot;button&quot; value=&quot;Edit&quot; /&gt;
+  &lt;input id=&quot;reset&quot; type=&quot;button&quot; value=&quot;Reset&quot; /&gt;
+&lt;/div&gt;
+&lt;textarea id=&quot;code&quot; class=&quot;playable-code&quot;&gt;
+rect.setAttribute(&apos;width&apos;, 300);&lt;/textarea&gt;
+</pre>
+
+<pre class="brush: js">var svg      = document.getElementById(&apos;svg&apos;),
+    rect     = svg.lastElementChild;
+
+var textarea = document.getElementById(&apos;code&apos;),
+    reset    = document.getElementById(&apos;reset&apos;),
+    edit     = document.getElementById(&apos;edit&apos;),
+    code     = textarea.value;
+
+function drawSvg() {
+  eval(textarea.value);
+}
+reset.addEventListener(&apos;click&apos;, function() {
+  textarea.value = code;
+  drawSvg();
+});
+edit.addEventListener(&apos;click&apos;, function() {
+  textarea.focus();
+})
+
+textarea.addEventListener(&apos;input&apos;, drawSvg);
+window.addEventListener(&apos;load&apos;, drawSvg);
+</pre>
+</div>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/SVG/Tutoriel/Motifs$samples/Playable_code?revision=1427951" width="220" class="live-sample-frame sample-code-frame" height="350" frameborder="0" id="frame_Playable_code"></iframe></p>
+
+<h2 id="Unités_du_contenu_objectBoundingBox">Unités du contenu: objectBoundingBox</h2>
+
+<p>En changeant l&apos;attribut <code>patternContentUnits</code>, on peut utiliser le même système d&apos;unité pour tous les éléments:</p>
+
+<pre class="brush: xml"> &lt;pattern id=&quot;Pattern&quot; width=&quot;.25&quot; height=&quot;.25&quot; patternContentUnits=&quot;objectBoundingBox&quot;&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot; fill=&quot;skyblue&quot;/&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.125&quot; height=&quot;.125&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+   &lt;circle cx=&quot;.125&quot; cy=&quot;.125&quot; r=&quot;.1&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+ &lt;/pattern&gt;
+</pre>
+
+<p>Maintenant, parce le contenu du motif utilise le même système d&apos;unité que le motif, le motif redimensionne automatiquement son contenu. Cela contraste avec le système &quot;userSpaceOnUse&quot; par défaut, où lorsque le motif change le taille, le contenu garde la même taille.</p>
+
+<div class="hidden">
+<h6 id="Playable_code_2" name="Playable_code_2">Playable code 2</h6>
+
+<pre class="brush: html">&lt;svg width=&quot;600&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; id=&quot;svg&quot; class=&quot;playable-svg&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;white&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;blue&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;red&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;orange&quot;/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;pattern id=&quot;Pattern&quot; width=&quot;.25&quot; height=&quot;.25&quot; patternContentUnits=&quot;objectBoundingBox&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.25&quot; height=&quot;.25&quot; fill=&quot;skyblue&quot;/&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;.125&quot; height=&quot;.125&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+      &lt;circle cx=&quot;.125&quot; cy=&quot;.125&quot; r=&quot;.1&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+
+  &lt;rect fill=&quot;url(#Pattern)&quot; stroke=&quot;black&quot; width=&quot;200&quot; height=&quot;200&quot;/&gt;
+&lt;/svg&gt;
+
+&lt;div class=&quot;playable-buttons&quot;&gt;
+  &lt;input id=&quot;edit&quot; type=&quot;button&quot; value=&quot;Edit&quot; /&gt;
+  &lt;input id=&quot;reset&quot; type=&quot;button&quot; value=&quot;Reset&quot; /&gt;
+&lt;/div&gt;
+&lt;textarea id=&quot;code&quot; class=&quot;playable-code&quot;&gt;
+rect.setAttribute(&apos;width&apos;, 300);&lt;/textarea&gt;
+</pre>
+
+<pre class="brush: js">var svg      = document.getElementById(&apos;svg&apos;),
+    rect     = svg.lastElementChild;
+
+var textarea = document.getElementById(&apos;code&apos;),
+    reset    = document.getElementById(&apos;reset&apos;),
+    edit     = document.getElementById(&apos;edit&apos;),
+    code     = textarea.value;
+
+function drawSvg() {
+  eval(textarea.value);
+}
+reset.addEventListener(&apos;click&apos;, function() {
+  textarea.value = code;
+  drawSvg();
+});
+edit.addEventListener(&apos;click&apos;, function() {
+  textarea.focus();
+})
+
+textarea.addEventListener(&apos;input&apos;, drawSvg);
+window.addEventListener(&apos;load&apos;, drawSvg);
+</pre>
+</div>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/SVG/Tutoriel/Motifs$samples/Playable_code_2?revision=1427951" width="220" class="live-sample-frame sample-code-frame" height="350" frameborder="0" id="frame_Playable_code_2"></iframe></p>
+
+<p class="note"><strong>Note</strong>: Dans Gecko, les cercles semblent avoir du mal à être dessinés si le rayon est inférieur à 0.075 (on ignore s&apos;il s&apos;agit d&apos;un bug de l&apos;élément pattern ou non). Pour contourner ce problème, il est probablement préférable d&apos;éviter de dessiner des cercles dans des unités &quot;objectBoundingBox&quot;.</p>
+
+<h2 id="Unités_du_motif_userSpaceOnUse">Unités du motif: userSpaceOnUse</h2>
+
+<p>Aucune des utilisations vu jusqu&apos;ici ne correspond à l&apos;usage habituel des motifs (tel qu&apos;on le ferait en CSS): les motifs ont généralement une taille définie et se répètent indépendamment de la taille de l&apos;objet sur lequel il est appliqué. Pour créer quelque chose comme ça, le motif et le contenu doivent être dessiné en mode &quot;userSpaceOnUse&quot;:</p>
+
+<pre class="brush: xml"> &lt;pattern id=&quot;Pattern&quot; x=&quot;10&quot; y=&quot;10&quot; width=&quot;50&quot; height=&quot;50&quot; patternUnits=&quot;userSpaceOnUse&quot;&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+   &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+   &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+ &lt;/pattern&gt;
+</pre>
+
+<p>Bien sûr, cela veut dire que le motif ne sera pas mis à l&apos;échelle si vous modifiez la taille de l&apos;objet ultérieurement.</p>
+
+<div class="hidden">
+<h6 id="Playable_code_3" name="Playable_code_3">Playable code</h6>
+
+<pre class="brush: html">&lt;svg width=&quot;600&quot; height=&quot;200&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; id=&quot;svg&quot; class=&quot;playable-svg&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;Gradient1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;white&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;blue&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;Gradient2&quot; x1=&quot;0&quot; x2=&quot;0&quot; y1=&quot;0&quot; y2=&quot;1&quot;&gt;
+      &lt;stop offset=&quot;5%&quot; stop-color=&quot;red&quot;/&gt;
+      &lt;stop offset=&quot;95%&quot; stop-color=&quot;orange&quot;/&gt;
+    &lt;/linearGradient&gt;
+
+    &lt;pattern id=&quot;Pattern&quot; x=&quot;10&quot; y=&quot;10&quot; width=&quot;50&quot; height=&quot;50&quot; patternUnits=&quot;userSpaceOnUse&quot;&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;50&quot; height=&quot;50&quot; fill=&quot;skyblue&quot;/&gt;
+      &lt;rect x=&quot;0&quot; y=&quot;0&quot; width=&quot;25&quot; height=&quot;25&quot; fill=&quot;url(#Gradient2)&quot;/&gt;
+      &lt;circle cx=&quot;25&quot; cy=&quot;25&quot; r=&quot;20&quot; fill=&quot;url(#Gradient1)&quot; fill-opacity=&quot;0.5&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+
+  &lt;rect fill=&quot;url(#Pattern)&quot; stroke=&quot;black&quot; width=&quot;200&quot; height=&quot;200&quot;/&gt;
+&lt;/svg&gt;
+
+&lt;div class=&quot;playable-buttons&quot;&gt;
+  &lt;input id=&quot;edit&quot; type=&quot;button&quot; value=&quot;Edit&quot; /&gt;
+  &lt;input id=&quot;reset&quot; type=&quot;button&quot; value=&quot;Reset&quot; /&gt;
+&lt;/div&gt;
+&lt;textarea id=&quot;code&quot; class=&quot;playable-code&quot;&gt;
+rect.setAttribute(&apos;width&apos;, 300);&lt;/textarea&gt;
+</pre>
+
+<pre class="brush: js">var svg      = document.getElementById(&apos;svg&apos;),
+    rect     = svg.lastElementChild;
+
+var textarea = document.getElementById(&apos;code&apos;),
+    reset    = document.getElementById(&apos;reset&apos;),
+    edit     = document.getElementById(&apos;edit&apos;),
+    code     = textarea.value;
+
+function drawSvg() {
+  eval(textarea.value);
+}
+reset.addEventListener(&apos;click&apos;, function() {
+  textarea.value = code;
+  drawSvg();
+});
+edit.addEventListener(&apos;click&apos;, function() {
+  textarea.focus();
+})
+
+textarea.addEventListener(&apos;input&apos;, drawSvg);
+window.addEventListener(&apos;load&apos;, drawSvg);
+</pre>
+</div>
+
+<p><iframe src="https://mdn.mozillademos.org/fr/docs/Web/SVG/Tutoriel/Motifs$samples/Playable_code_3?revision=1427951" width="220" class="live-sample-frame sample-code-frame" height="350" frameborder="0" id="frame_Playable_code_3"></iframe></p>
+
+<h2 id="Récapitulatif">Récapitulatif</h2>
+
+<p>Les trois exemples sont illustrés ci-dessous sur un rectangle allongé à une hauteur de 300px:</p>
+
+<p><img src="/@api/deki/files/349/=SVG_Pattern_Comparison_of_Units.png" alt="Image:SVG_Pattern_Comparison_of_Units.png" class="internal"></p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Web/SVG/Tutoriel/Gradients" class="button">« Précédent</a><a href="/fr/docs/Web/SVG/Tutoriel/Texts" class="button">Suivant  »</a></p>
+</div><p></p>

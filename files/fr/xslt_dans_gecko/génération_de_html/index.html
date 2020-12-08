@@ -1,0 +1,192 @@
+---
+title: Génération de HTML
+slug: XSLT_dans_Gecko/Génération_de_HTML
+translation_of: Web/API/XSLTProcessor/Generating_HTML
+---
+<p></p><ol>
+<li><a href="/fr/docs/XSLT_dans_Gecko">Introduction</a></li>
+<li><a href="/fr/docs/XSLT_dans_Gecko/Exemple_basique">Exemple basique</a></li>
+<li><a href="/fr/docs/XSLT_dans_Gecko/G%c3%a9n%c3%a9ration_de_HTML">Génération de HTML</a></li>
+<li><a href="/fr/docs/XSLT_dans_Gecko/Diff%c3%a9rences_entre_les_navigateurs">Différences entre les navigateurs</a></li>
+<li><a href="/fr/docs/XSLT_dans_Gecko/Ressources">Ressources</a></li>
+</ol><p></p>
+
+<h2 id="G.C3.A9n.C3.A9ration_de_HTML" name="G.C3.A9n.C3.A9ration_de_HTML">Génération de HTML</h2>
+
+<p>Une application courante de XSLT dans les navigateurs est la transformation de code XML en HTML du coté du client. Le second exemple va transformer un document d&apos;entrée (example2.xml), qui contient des informations à propos d&apos;un article, en un document HTML.</p>
+
+<p>L&apos;élément <code>&lt;body&gt;</code> de l&apos;article contient maintenant des éléments HTML (des balises <code>&lt;strong&gt;</code> et <code>&lt;em&gt;</code>, voir la figure 2). Le document XML contient à la fois des éléments HTML et éléments XML, mais un seul espace de nommage est nécessaire, pour les éléments XML. Comme il n&apos;existe pas d&apos;espace de nommage HTML, et que l&apos;utilisation de l&apos;espace de nommage XHTML forcerait le XSL à créer un document XML qui pourrait ne pas se comporter comme un document HTML, le nœud <code>xsl:output</code> de la feuille de style assure que le document résultant sera bien traité comme du HTML. Pour les éléments XML, nous avons besoin de notre propre espace de nommage, <code><a href="http://devedge.netscape.com/2002/de" class="external" rel="freelink">http://devedge.netscape.com/2002/de</a></code>, à qui nous donnons le préfixe myNS <code>(xmlns:myNS=&quot;<span class="nowiki">http://devedge.netscape.com/2002/de</span>&quot;)</code>.</p>
+
+<p><small><strong>Figure 2 : fichier XML (example2.xml)<span class="comment">voir l&apos;exemple | voir le source</span></strong></small> <span class="comment">Document XML (example2.xml):</span> <span class="comment">&lt;div style=&quot;background: #EEE; font-size: 1.1em; line-height: 1.1em; border: dashed #666 1px; padding: 15px 20px 15px 20px; overflow: auto;&quot;&gt;</span></p>
+
+<pre class="eval">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;example.xsl&quot;?&gt;
+  &lt;myNS:Article xmlns:myNS=&quot;<a href="http://devedge.netscape.com/2002/de" class="external" rel="freelink">http://devedge.netscape.com/2002/de</a>&quot;&gt;
+    &lt;myNS:Title&gt;Mon article&lt;/myNS:Title&gt;
+    &lt;myNS:Authors&gt;
+      &lt;myNS:Author company=&quot;Foopy Corp.&quot;&gt;M. Foo&lt;/myNS:Author&gt;
+      &lt;myNS:Author&gt;M. Bar&lt;/myNS:Author&gt;
+    &lt;/myNS:Authors&gt;
+    &lt;myNS:Body&gt;
+      En &lt;em&gt;Espagne&lt;/em&gt;, les &lt;strong&gt;pluies&lt;/strong&gt; se concentrent
+      principalement dans les plaines.
+    &lt;/myNS:Body&gt;
+  &lt;/myNS:Article&gt;
+</pre>
+
+<p>La feuille de style XSL utilisée aura besoin de deux espaces de nommage - un pour les éléments XSLT et un pour nos propres éléments XML utilisés dans le document XML. La sortie de la feuille de style XSL est définie à <code>HTML</code> à l&apos;aide de l&apos;élément <code>xsl:output</code>. En définissant la sortie comme étant du code HTML et en n&apos;ayant pas d&apos;espace de nommage pour les éléments résultants (coloré en bleu), ces éléments seront traités comme des éléments HTML.</p>
+
+<p><small><strong>Figure 3 : feuille de style XSL avec 2 espaces de nommage</strong> (example2.xsl)</small> <span class="comment">feuille de style XSL (example2.xsl):</span></p>
+
+<pre>  &lt;?xml version=&quot;1.0&quot;?&gt;
+  &lt;xsl:stylesheet version=&quot;1.0&quot;
+                           xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+                           xmlns:myNS=&quot;http://devedge.netscape.com/2002/de&quot;&gt;
+
+    &lt;xsl:output method=&quot;html&quot;/&gt;
+    ...
+  &lt;/xsl:stylesheet&gt;
+</pre>
+
+<p>Un modèle s&apos;appliquant au nœud racine du document XML est créé et utilisé pour créer la structure de base de la page HTML.</p>
+
+<p><small><strong>Figure 4 : Création du document HTML de base</strong></small> <span class="comment">feuille de style XSL (example2.xsl):</span></p>
+
+<pre>  ...
+  &lt;xsl:template match=&quot;/&quot;&gt;
+  &lt;html&gt;
+
+    &lt;head&gt;
+
+      &lt;title&gt;
+        &lt;xsl:value-of select=&quot;/myNS:Article/myNS:Title&quot;/&gt;
+      &lt;/title&gt;
+
+      &lt;style type=&quot;text/css&quot;&gt;
+        .myBox {margin:10px 155px 0 50px; border: 1px dotted #639ACE; padding:0 5px 0 5px;}
+      &lt;/style&gt;
+
+    &lt;/head&gt;
+
+    &lt;body&gt;
+      &lt;p class=&quot;myBox&quot;&gt;
+        &lt;span class=&quot;title&quot;&gt;
+          &lt;xsl:value-of select=&quot;/myNS:Article/myNS:Title&quot;/&gt;
+        &lt;/span&gt; &lt;br /&gt;
+
+        Auteurs :   &lt;br /&gt;
+          &lt;xsl:apply-templates select=&quot;/myNS:Article/myNS:Authors/myNS:Author&quot;/&gt;
+      &lt;/p&gt;
+
+      &lt;p class=&quot;myBox&quot;&gt;
+        &lt;xsl:apply-templates select=&quot;//myNS:Body&quot;/&gt;
+      &lt;/p&gt;
+
+    &lt;/body&gt;
+
+  &lt;/html&gt;
+  &lt;/xsl:template&gt;
+  ...
+</pre>
+
+<p>Nous avons besoin de trois <code>xsl:template</code> supplémentaires pour parachever l&apos;exemple. Le premier <code>xsl:template</code> est utilisé pour les nœuds <code>Author</code>, alors que le deuxième traite le nœud <code>body</code>. Le troisième possède une règle de correspondance générale qui lui permet de s&apos;appliquer à chaque nœud et chaque attribut. Cela est nécessaire afin de préserver les éléments HTML présents dans le document XML : il s&apos;appliquant à tous, et les recopie dans le document HTML créé par la transformation.</p>
+
+<p><strong><small>Figure 5 : Les 3 modèles finaux</small></strong> <span class="comment">feuille de style XSL (example2.xsl):</span></p>
+
+<pre>  ...
+  &lt;xsl:template match=&quot;myNS:Author&quot;&gt;
+     --   &lt;xsl:value-of select=&quot;.&quot; /&gt;
+
+    &lt;xsl:if test=&quot;@company&quot;&gt;
+     ::   &lt;strong&gt;  &lt;xsl:value-of select=&quot;@company&quot; /&gt;  &lt;/strong&gt;
+    &lt;/xsl:if&gt;
+
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match=&quot;myNS:Body&quot;&gt;
+    &lt;xsl:copy&gt;
+      &lt;xsl:apply-templates select=&quot;@*|node()&quot;/&gt;
+    &lt;/xsl:copy&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match=&quot;@*|node()&quot;&gt;
+    &lt;xsl:copy&gt;
+      &lt;xsl:apply-templates select=&quot;@*|node()&quot;/&gt;
+    &lt;/xsl:copy&gt;
+  &lt;/xsl:template&gt;
+  ...
+</pre>
+
+<p>La feuille de style XSLT finale est donc :</p>
+
+<p><small><strong>Figure 6 : feuille de style XSLT finale <span class="comment">voir l&apos;exemple | voir le source</span></strong></small> <span class="comment">feuille de style XSL :</span></p>
+
+<pre>  &lt;?xml version=&quot;1.0&quot;?&gt;
+  &lt;xsl:stylesheet version=&quot;1.0&quot;
+                           xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+                           xmlns:myNS=&quot;http://devedge.netscape.com/2002/de&quot;&gt;
+
+    &lt;xsl:output method=&quot;html&quot; /&gt;
+
+    &lt;xsl:template match=&quot;/&quot;&gt;
+      &lt;html&gt;
+
+        &lt;head&gt;
+
+          &lt;title&gt;
+            &lt;xsl:value-of select=&quot;/myNS:Article/myNS:Title&quot;/&gt;
+          &lt;/title&gt;
+
+          &lt;style type=&quot;text/css&quot;&gt;
+            .myBox {margin:10px 155px 0 50px; border: 1px dotted #639ACE; padding:0 5px 0 5px;}
+          &lt;/style&gt;
+
+        &lt;/head&gt;
+
+        &lt;body&gt;
+          &lt;p class=&quot;myBox&quot;&gt;
+            &lt;span class=&quot;title&quot;&gt;
+              &lt;xsl:value-of select=&quot;/myNS:Article/myNS:Title&quot;/&gt;
+            &lt;/span&gt; &lt;br /&gt;
+
+            Authors:   &lt;br /&gt;
+              &lt;xsl:apply-templates select=&quot;/myNS:Article/myNS:Authors/myNS:Author&quot;/&gt;
+            &lt;/p&gt;
+
+          &lt;p class=&quot;myBox&quot;&gt;
+            &lt;xsl:apply-templates select=&quot;//myNS:Body&quot;/&gt;
+          &lt;/p&gt;
+
+        &lt;/body&gt;
+
+      &lt;/html&gt;
+    &lt;/xsl:template&gt;
+
+    &lt;xsl:template match=&quot;myNS:Author&quot;&gt;
+       --   &lt;xsl:value-of select=&quot;.&quot; /&gt;
+
+      &lt;xsl:if test=&quot;@company&quot;&gt;
+       ::   &lt;b&gt;  &lt;xsl:value-of select=&quot;@company&quot; /&gt;  &lt;/b&gt;
+      &lt;/xsl:if&gt;
+
+      &lt;br /&gt;
+    &lt;/xsl:template&gt;
+
+    &lt;xsl:template match=&quot;myNS:Body&quot;&gt;
+      &lt;xsl:copy&gt;
+        &lt;xsl:apply-templates select=&quot;@*|node()&quot;/&gt;
+      &lt;/xsl:copy&gt;
+    &lt;/xsl:template&gt;
+
+    &lt;xsl:template match=&quot;@*|node()&quot;&gt;
+        &lt;xsl:copy&gt;
+          &lt;xsl:apply-templates select=&quot;@*|node()&quot;/&gt;
+        &lt;/xsl:copy&gt;
+    &lt;/xsl:template&gt;
+  &lt;/xsl:stylesheet&gt;
+</pre>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/XSLT_dans_Gecko:Exemple_basique" class="button">« Précédent</a><a href="/fr/docs/XSLT_dans_Gecko:Différences_entre_les_navigateurs" class="button">Suivant  »</a></p>
+</div><p></p>

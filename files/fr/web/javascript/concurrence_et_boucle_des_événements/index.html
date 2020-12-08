@@ -1,0 +1,272 @@
+---
+title: Gestion de la concurrence et boucle des événements
+slug: Web/JavaScript/Concurrence_et_boucle_des_événements
+tags:
+  - Avancé
+  - Guide
+  - JavaScript
+translation_of: Web/JavaScript/EventLoop
+---
+<div><section class="Quick_links" id="Quick_Links">
+ <ol>
+  <li><a href="/fr/docs/Web/JavaScript"><strong><em>JavaScript</em></strong></a></li>
+  <li><a href="/fr/docs/Web/JavaScript/Tutorials"><strong>Tutoriel :</strong></a></li>
+  <li class="toggle">
+    <details>
+      <summary>Débutant</summary>
+      <ol>
+        <li><a href="/fr/docs/Learn/Getting_started_with_the_web/JavaScript_basics">Les bases en JavaScript</a></li>
+        <li><a href="/fr/docs/Learn/JavaScript/First_steps">Premiers pas en JavaScript</a></li>
+        <li><a href="/fr/docs/Learn/JavaScript/Building_blocks">Les briques JavaScript</a></li>
+        <li><a href="/fr/docs/Learn/JavaScript/Objects">Introducing JavaScript objects</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Guide JavaScript</summary>
+      <ol>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Introduction">Introduction</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Grammar_and_Types">Types et grammaire</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Control_flow_and_error_handling">Contrôle du flux et gestion des erreurs</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Loops_and_iteration">Boucles et itération</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Functions">Fonctions</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Expressions_and_Operators">Expressions et opérateurs</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Numbers_and_dates">Nombres et dates</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Text_formatting">Formatage du texte</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Regular_Expressions">Expressions rationnelles</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Indexed_collections">Collections indexées</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Keyed_collections">Collections avec clés</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Working_with_Objects">Manipuler les objets</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Details_of_the_Object_Model">Détails du modèle objet</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Using_promises">Using promises</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Iterators_and_generators">Itérateurs et générateurs</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Meta_programming">Meta-programmation</a></li>
+          <li><a href="/fr/docs/Web/JavaScript/Guide/Modules">JavaScript modules</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Intermédiaire</summary>
+      <ol>
+        <li><a href="/fr/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks">Client-side JavaScript frameworks</a></li>
+        <li><a href="/fr/docs/Learn/JavaScript/Client-side_web_APIs">Client-side web APIs</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/A_re-introduction_to_JavaScript">Réintroduction à JavaScript</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Data_structures">Structures de données en JavaScript</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Equality_comparisons_and_sameness">Différents tests d&apos;égalité</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Closures">Closures</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Avancé</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">Héritage et la chaîne de prototypes</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Strict_mode">Mode strict</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Typed_arrays">Tableaux typés en JavaScript</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Memory_Management">Gestion de la mémoire</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/EventLoop">Concurrence et boucle des événements</a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/fr/docs/Web/JavaScript/Reference">Références :</a></strong></li>
+  <li class="toggle">
+    <details>
+       <summary>Objets natifs</summary>
+        <ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/AggregateError">AggregateError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array">Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/ArrayBuffer">ArrayBuffer</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/AsyncFunction">AsyncFunction</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Atomics">Atomics</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/BigInt">BigInt</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/BigInt64Array">BigInt64Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/BigUint64Array">BigUint64Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean">Boolean</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/DataView">DataView</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Date">Date</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Error">Error</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/EvalError">EvalError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry">FinalizationRegistry</a> <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Float32Array">Float32Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Float64Array">Float64Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Function">Function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Generator">Generator</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/GeneratorFunction">GeneratorFunction</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Infinity">Infinity</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Int16Array">Int16Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Int32Array">Int32Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Int8Array">Int8Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/InternalError">InternalError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Intl">Intl</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/JSON">JSON</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Map">Map</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Math">Math</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/NaN">NaN</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Number">Number</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Object">Object</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise">Promise</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy">Proxy</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/RangeError">RangeError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/ReferenceError">ReferenceError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Reflect">Reflect</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/RegExp">RegExp</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Set">Set</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/SharedArrayBuffer">SharedArrayBuffer</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/String">String</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Symbol">Symbol</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/SyntaxError">SyntaxError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/TypeError">TypeError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/TypedArray">TypedArray</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/URIError">URIError</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint16Array">Uint16Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint32Array">Uint32Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint8Array">Uint8Array</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Uint8ClampedArray">Uint8ClampedArray</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/WeakMap">WeakMap</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/WeakRef">WeakRef</a> <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/WeakRef$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/WeakSet">WeakSet</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/WebAssembly">WebAssembly</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/decodeURI">decodeURI()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/decodeURIComponent">decodeURIComponent()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/encodeURI">encodeURI()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/encodeURIComponent">encodeURIComponent()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API obsolète ne doit plus être utilisée, mais elle peut continuer à fonctionner."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/escape">escape()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/eval">eval()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/globalThis">globalThis</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/isFinite">isFinite()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/isNaN">isNaN()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/null">null</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/parseFloat">parseFloat()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/parseInt">parseInt()</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/undefined">undefined</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API obsolète ne doit plus être utilisée, mais elle peut continuer à fonctionner."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/unescape">unescape()</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API n&apos;a pas été standardisée."><i class="icon-warning-sign"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/uneval">uneval()</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Expressions &amp; opérateurs</summary>
+      <ol><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Addition">Addition (+)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Addition$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Addition_assignment">Addition assignment (+=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Addition_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Assignment">Assignment (=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">Bitwise AND (&amp;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_AND$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment">Bitwise AND assignment (&amp;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_AND_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">Bitwise NOT (~)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_OR$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment">Bitwise OR assignment (|=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_OR_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment">Bitwise XOR assignment (^=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_virgule">L&apos;opérateur virgule</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_conditionnel">L&apos;opérateur conditionnel</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Decrement">Decrement (--)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Decrement$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Affecter_par_d%C3%A9composition">Affecter par décomposition</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Division">Division (/)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Division$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Division_assignment">Division assignment (/=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Division_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Equality">Equality (==)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Equality$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Exponentiation">Exponentiation (**)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Exponentiation$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment">Exponentiation assignment (**=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Exponentiation_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_function">L&apos;opérateur function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Greater_than">Greater than (&gt;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Greater_than$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal">Greater than or equal (&gt;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Greater_than_or_equal$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Groupement">Opérateur de groupement</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Increment">Increment (++)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Increment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Inequality">Inequality (!=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Inequality$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift">Left shift (&lt;&lt;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment">Left shift assignment (&lt;&lt;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Less_than">Less than (&lt;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Less_than$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal">Less than or equal (&lt;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Less_than_or_equal$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_AND">Logical AND (&amp;&amp;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_AND$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment">Logical AND assignment (&amp;&amp;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_AND_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_NOT">Logical NOT (!)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_NOT$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR (||)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_OR$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment">Logical OR assignment (||=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_OR_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment">Logical nullish assignment (??=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Logical_nullish_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Multiplication">Multiplication (*)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Multiplication$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment">Multiplication assignment (*=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Multiplication_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Nullish_coalescing_operator">Opérateur de coalescence des nuls (Nullish coalescing operator)</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Initialisateur_objet">Initialisateur d&apos;objet</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Pr%C3%A9c%C3%A9dence_des_op%C3%A9rateurs">Précédence des opérateurs</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Optional_chaining">Chaînage optionnel (optional chaining)</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Tube">Tube</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Op%C3%A9rateurs_de_membres">Accesseurs de propriétés</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Remainder">Remainder (%)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Remainder$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Remainder_assignment">Remainder assignment (%=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Remainder_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift">Right shift (&gt;&gt;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment">Right shift assignment (&gt;&gt;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/Syntaxe_d%C3%A9composition">Syntaxe de décomposition</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Strict_equality">Strict equality (===)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Strict_equality$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Strict_inequality">Strict inequality (!==)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Strict_inequality$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Subtraction">Subtraction (-)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Subtraction$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment">Subtraction assignment (-=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Subtraction_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unary_negation">Unary negation (-)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Unary_negation$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unary_plus">Unary plus (+)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Unary_plus$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Unsigned right shift (&gt;&gt;&gt;)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment">Unsigned right shift assignment (&gt;&gt;&gt;=)</a> <a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift_assignment$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/async_function">Expression async function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/await">await</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/class">class</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_delete">L&apos;opérateur delete</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/function*">Expression function*</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_in">L&apos;opérateur in</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/instanceof">instanceof</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_new">L&apos;opérateur new</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/new.target">new.target</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/super">super</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_this">L&apos;opérateur this</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_typeof">L&apos;opérateur typeof</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/L_op%C3%A9rateur_void">L&apos;opérateur void</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/yield">yield</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Op%C3%A9rateurs/yield*">yield*</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Instructions &amp; déclarations</summary>
+      <ol><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/async_function">async function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/bloc">bloc</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/break">break</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/class">class</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/const">const</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/continue">continue</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/debugger">debugger</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/do...while">do...while</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/Vide">vide</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/export">export</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/for">for</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/for-await...of">for await...of</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/for...in">for...in</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/for...of">for...of</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/function">function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/function*">function*</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/if...else">if...else</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/import">import</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/import.meta">import.meta</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/label">label</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/let">let</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/return">return</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/switch">switch</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/throw">throw</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/try...catch">try...catch</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/var">var</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Instructions/while">while</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API obsolète ne doit plus être utilisée, mais elle peut continuer à fonctionner."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/fr/docs/Web/JavaScript/Reference/Instructions/with">with</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Fonctions</summary>
+      <ol><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/Fonctions_fl%C3%A9ch%C3%A9es">Fonctions fléchées</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/Valeurs_par_d%C3%A9faut_des_arguments">Valeurs par défaut des arguments</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/D%C3%A9finition_de_m%C3%A9thode">Définir une méthode</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/param%C3%A8tres_du_reste">Paramètres du reste (Rest parameters)</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/arguments">arguments</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/get">L&apos;opérateur get</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Fonctions/set">L&apos;opérateur set</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Classes</summary>
+      <ol><li><a href="/fr/docs/Web/JavaScript/Reference/Classes/Private_class_fields">Private class fields</a> <a href="/fr/docs/Web/JavaScript/Reference/Classes/Private_class_fields$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Classes/Class_fields">Champs de classe</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Classes/constructor">constructor</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Classes/extends">extends</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Classes/static">static</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Errors</summary>
+      <ol><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Property_access_denied">Error: Permission denied to access property &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Too_much_recursion">InternalError: too much recursion</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Not_a_codepoint">RangeError: argument is not a valid code point</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_array_length">RangeError: invalid array length</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_date">RangeError: invalid date</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Precision_range">RangeError: precision is out of range</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Bad_radix">RangeError: radix must be an integer</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Resulting_string_too_large">RangeError: repeat count must be less than infinity</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Negative_repetition_count">RangeError: repeat count must be non-negative</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Not_defined">ReferenceError: &quot;x&quot; is not defined</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Undeclared_var">ReferenceError: assignment to undeclared variable &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_access_lexical_declaration_before_init">ReferenceError: can&apos;t access lexical declaration`X&apos; before initialization</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_caller_or_arguments_usage">ReferenceError: deprecated caller or arguments usage</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_assignment_left-hand_side">ReferenceError: invalid assignment left-hand side</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Undefined_prop">ReferenceError: reference to undefined property &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_octal">SyntaxError: &quot;0&quot;-prefixed octal literals and octal escape seq. are deprecated</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Strict_Non_Simple_Params">SyntaxError: &quot;use strict&quot; not allowed in function with &quot;x&quot; parameter</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Reserved_identifier">SyntaxError: &quot;x&quot; is a reserved identifier</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/JSON_bad_parse">SyntaxError: JSON.parse: bad parsing</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Malformed_formal_parameter">SyntaxError: Malformed formal parameter</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Unexpected_token">SyntaxError: Unexpected token</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_source_map_pragma">SyntaxError: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_for-of_initializer">SyntaxError: a declaration in the head of a for-of loop can&apos;t have an initializer</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Delete_in_strict_mode">SyntaxError: applying the &apos;delete&apos; operator to an unqualified name is deprecated</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_for-in_initializer">SyntaxError: for-in loop head declarations may not have initializers</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Unnamed_function_statement">SyntaxError: function statement requires a name</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Identifier_after_number">SyntaxError: identifier starts immediately after numeric literal</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Illegal_character">SyntaxError: illegal character</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Bad_regexp_flag">SyntaxError: invalid regular expression flag &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_parenthesis_after_argument_list">SyntaxError: missing ) after argument list</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_parenthesis_after_condition">SyntaxError: missing ) after condition</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_colon_after_property_id">SyntaxError: missing : after property id</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_semicolon_before_statement">SyntaxError: missing ; before statement</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_initializer_in_const">SyntaxError: missing = in const declaration</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_bracket_after_list">SyntaxError: missing ] after element list</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_formal_parameter">SyntaxError: missing formal parameter</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_name_after_dot_operator">SyntaxError: missing name after . operator</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/No_variable_name">SyntaxError: missing variable name</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_curly_after_function_body">SyntaxError: missing } after function body</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Missing_curly_after_property_list">SyntaxError: missing } after property list</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Redeclared_parameter">SyntaxError: redeclaration of formal parameter &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Bad_return_or_yield">SyntaxError: return not in function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Equal_as_assign">SyntaxError: test for equality (==) mistyped as assignment (=)?</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Unterminated_string_literal">SyntaxError: unterminated string literal</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/No_properties">TypeError: &quot;x&quot; has no properties</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Unexpected_type">TypeError: &quot;x&quot; is (not) &quot;y&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Not_a_constructor">TypeError: &quot;x&quot; is not a constructor</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Not_a_function">TypeError: &quot;x&quot; is not a function</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/No_non-null_object">TypeError: &quot;x&quot; is not a non-null object</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Read-only">TypeError: &quot;x&quot; is read-only</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/is_not_iterable">TypeError: &apos;x&apos; is not iterable</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/More_arguments_needed">TypeError: More arguments needed</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Reduce_of_empty_array_with_no_initial_value">TypeError: Reduce of empty array with no initial value</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Called_on_incompatible_type">TypeError: X.prototype.y called on incompatible type</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Dead_object">TypeError: can&apos;t access dead object</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_access_property">TypeError: can&apos;t access property &quot;x&quot; of &quot;y&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_assign_to_property">TypeError: can&apos;t assign to property &quot;x&quot; on &quot;y&quot;: not an object</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_define_property_object_not_extensible">TypeError: can&apos;t define property &quot;x&quot;: &quot;obj&quot; is not extensible</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Non_configurable_array_element">TypeError: can&apos;t delete non-configurable array element</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_redefine_property">TypeError: can&apos;t redefine non-configurable property &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/in_operator_no_object">TypeError: invalid &apos;in&apos; operand &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cyclic_object_value">TypeError: cyclic object value</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/invalid_right_hand_side_instanceof_operand">TypeError: invalid &apos;instanceof&apos; operand &apos;x&apos;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Array_sort_argument">TypeError: invalid Array.prototype.sort argument</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Typed_array_invalid_arguments">TypeError: invalid arguments</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Invalid_const_assignment">TypeError: invalid assignment to const &quot;x&quot;</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Cant_delete">TypeError: property &quot;x&quot; is non-configurable and can&apos;t be deleted</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Getter_only">TypeError: setting a property that has only a getter</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Var_hides_argument">TypeError: variable &quot;x&quot; redeclares argument</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Malformed_URI">URIError: malformed URI sequence</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Already_has_pragma">Warning: -file- is being assigned a //# sourceMappingURL, but already has one</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Bad_octal">SyntaxError: &quot;x&quot; is not a legal ECMA-262 octal constant</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_toLocaleFormat">Warning: Date.prototype.toLocaleFormat is deprecated</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/For-each-in_loops_are_deprecated">Warning: JavaScript 1.6&apos;s for-each-in loops are deprecated</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_String_generics">Warning: String.x is deprecated; use String.prototype.x instead</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Deprecated_expression_closures">Warning: expression closures are deprecated</a></li><li><a href="/fr/docs/Web/JavaScript/Reference/Erreurs/Stmt_after_return">Warning: unreachable code after return statement</a></li></ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Plus</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/JavaScript/JavaScript_technologies_overview">Aperçu des technologies JavaScript</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Lexical_grammar">Grammaire lexicale</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Data_structures">Structures de données en JavaScript</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Enumerability_and_ownership_of_properties">Rattachement des propriétés</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Iteration_protocols">Protocoles d&apos;itération</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Strict_mode">Mode strict</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Strict_mode/Transitioning_to_strict_mode">Passer au mode strict</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Template_literals">Gabarit de chaîne de caractère</a></li>
+        <li><a href="/fr/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">Fonctionnalités dépréciées</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section></div>
+
+<p>JavaScript gère la concurrence grâce à une « boucle d&apos;événements ». Ce modèle est différent de la gestion faite par des langages comme C ou Java.</p>
+
+<h2 id="Notions_liées_à_lexécution">Notions liées à l&apos;exécution</h2>
+
+<p>Les sections qui suivent décrivent un modèle théorique. En réalité, les moteurs JavaScript implémentent et optimisent fortement la sémantique décrite ici.</p>
+
+<h3 id="Représentation_visuelle">Représentation visuelle</h3>
+
+<p style="text-align: center;"><img alt="Stack, heap, queue" src="/files/4617/default.svg" style="height: 270px; width: 294px;"></p>
+
+<h3 id="La_pile_dappels_stack">La pile d&apos;appels (<em>stack</em>)</h3>
+
+<p>Les appels de fonction forment une pile de cadre (<em>frames</em>).</p>
+
+<pre class="brush: js notranslate">function f(b){
+  var a = 12;
+  return a + b + 35;
+}
+
+function g(x){
+  var m = 4;
+  return f(m * x);
+}
+
+console.log(g(21)); // affichera 131
+</pre>
+
+<p>Lors de l&apos;appel à <code>g</code>, on crée un premier cadre contenant les arguments de <code>g</code> ainsi que les variables locales. Quand <code>g</code> appelle <code>f</code>, un deuxième cadre est créé et placé sur le premier et contient les arguments de <code>f</code> ainsi que les variables locales. Lorsque <code>f</code> a fini et renvoyé son résultat, le cadre correspondant (celui qui est sur le dessus) est retiré de la pile (il reste donc le cadre lié à l&apos;appel de <code>g</code>). Quand <code>g</code> a fini grâce aux informations transmises, la pile devient vide.</p>
+
+<h3 id="Le_tas_heap">Le tas (<em>heap</em>)</h3>
+
+<p>Les objets sont alloués en mémoire dans un tas qui désigne une zone de la mémoire sans structure particulière.</p>
+
+<h3 id="La_file_queue">La file (<em>queue</em>)</h3>
+
+<p>Un environnement d&apos;exécution JavaScript (<em>runtime</em>) contient une queue de messages à traiter. Chaque message est associé à une fonction. Lorsque la pile est vide ou a suffisamment d&apos;espace, on retire un message de la queue et on le traite. Le traitement consiste à appeler la fonction associée au message (et donc à créer le cadre dans la pile d&apos;appel). Le traitement d&apos;un message est fini lorsque la pile d&apos;appels redevient vide.</p>
+
+<h2 id="La_boucle_dévénements">La boucle d&apos;événements</h2>
+
+<p>La boucle d&apos;événement tire principalement son nom de son implémentation. Celle-ci ressemble à :</p>
+
+<pre class="brush: js notranslate">while (queue.attendreMessage()){
+  queue.traiterProchainMessage();
+}</pre>
+
+<p><code>queue.attendreMessage</code> est un fonction synchrone qui attend un message même s&apos;il n&apos;y en a aucun à traiter.</p>
+
+<h3 id="Traiter_de_A_à_Z_run-to-completion">Traiter de A à Z (<em>run-to-completion</em>)</h3>
+
+<p>Chaque message sera traité complètement avant tout autre message. Cela permet de savoir que, lorsqu&apos;une fonction s&apos;exécute, on ne peut pas observer l&apos;exécution d&apos;un autre code qui prendrait le pas (modifiant les données de la fonction par exemple). Le modèle de <em>thread</em> utilisé par le langage C, par exemple, que la fonction puisse être interrompue à tout moment pour permettre à un autre <em>thread</em> d&apos;exécuter un autre code.</p>
+
+<p>Ce modèle possède un désavantage : lorsqu&apos;un message prend trop de temps à être traité, l&apos;application ne peut plus gérer les interactions utilisateur comme les clics ou le défilement. Généralement, le navigateur affiche alors « Le script met trop de temps à répondre ». Une bonne pratique consiste à rendre le traîtement de message le plus court possible et à découper le message problématique en plusieurs messages.</p>
+
+<h3 id="Lajout_de_messages">L&apos;ajout de messages</h3>
+
+<p>Dans les navigateurs web, des messages sont ajoutés à chaque fois qu&apos;un événement se produit et qu&apos;un gestionnaire d&apos;événements y est attaché. S&apos;il n&apos;y a pas d&apos;écouteur (<em>listener</em>) pour intercepter l&apos;événement, il est perdu. Ainsi, si on clique un élément qui possède un gestionnaire d&apos;événements pour les clics, un message sera ajouté (il en va de même avec les autres événements).</p>
+
+<p>La fonction <code><a href="/fr/docs/DOM/window.setTimeout">setTimeout</a></code> est appelée avec deux arguments : un message à la suite de la queue et la durée à attendre (optionnelle, par défaut elle vaut 0). La durée représente le temps minimal à attendre avant que le message soit placé dans la queue. S&apos;il n&apos;y a pas d&apos;autre message dans la queue, le message sera traîté directement. En revanche, s&apos;il y a d&apos;autres messages auparavant, le message de <code>setTimeout</code> devra attendre la fin du traîtement des messages précédents déjà présents dans la queue. C&apos;est pourquoi le deuxième argument de cette fonction indique une durée minimum et non une durée garantie.</p>
+
+<div class="warning notecard">
+<p><strong>Attention :</strong> L&apos;argument passé pour le délai à <code>setTimeout</code> ne correspond pas au temps exact. Cela correspond au délai minimum et non à un délai garanti. Par exemple <code>setTimeout(maFonction(),100);</code> indique uniquement que <code>maFonction</code> sera lancé <strong>au moins</strong> après 100 millisecondes.</p>
+</div>
+
+<p>Voici un exemple qui illustre ce concept (<code>setTimeout</code> ne s&apos;exécute pas immédiatement après la fin du <em>timer</em>) :</p>
+
+<pre class="brush: js notranslate">const s = new Date().getSeconds();
+
+setTimeout(function() {
+  // prints
+  console.log(&quot;Exécuté après &quot; + (new Date().getSeconds() - s) + &quot; secondes.&quot;);
+}, 500);
+
+while(true) {
+  if(new Date().getSeconds() - s &gt;= 2) {
+    console.log(&quot;Ouf, on a bouclé pendant 2 secondes&quot;);
+    break;
+  }
+}
+</pre>
+
+<h3 id="Zéro_délai">Zéro délai</h3>
+
+<p>Un délai à zéro ne signifie pas que le callback sera déclenché après zéro milliseconde. Appeler <code><a href="https://developer.mozilla.org/fr/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout" title="The documentation about this has not yet been written; please consider contributing!">setTimeout</a></code> avec un délai de <code>0</code> (zéro) milliseconde n&apos;éxécute pas le callback après l&apos;interval donné.</p>
+
+<p>L&apos;exécution dépend du nombre de taches en attente dans la queue. Dans l&apos;exemple ci-dessous, le message <code>&apos;ceci est juste un message&apos;</code> sera affiché dans la console avant que le message dans le callback soit traité, parce que le délai est le temps <em>minimum</em> requis par l&apos;environnement d&apos;exécution (runtime) pour traiter la demande (pas un temps <em>garanti</em>).</p>
+
+<p>Fondamentalement, <code>setTimeout</code> doit attendre la fin de tout le code pour les messages en file d&apos;attente, même si vous avez spécifié une limite de temps particulière pour votre setTimeout.</p>
+
+<pre class="brush: js notranslate">(function() {
+
+  console.log(&apos;ceci est le début&apos;);
+
+  setTimeout(function cb() {
+    console.log(&apos;Callback 1: ceci est un msg depuis le callback&apos;);
+  }); // has a default time value of 0
+
+  console.log(&apos;ceci est juste un message&apos;);
+
+  setTimeout(function cb1() {
+    console.log(&apos;Callback 2: ceci est un msg depuis le callback&apos;);
+  }, 0);
+
+  console.log(&apos;ceci est la fin&apos;);
+
+})();
+
+// &quot;ceci est le début&quot;
+// &quot;ceci est juste un message&quot;
+// &quot;ceci est la fin&quot;
+// &quot;Callback 1: ceci est un msg depuis le callback&quot;
+// &quot;Callback 2: ceci est un msg depuis le callback&quot;</pre>
+
+<h3 id="La_communication_entre_plusieurs_environnements_dexécution">La communication entre plusieurs environnements d&apos;exécution</h3>
+
+<p>Un web worker ou une <code>iframe</code> d&apos;origine multiple (<em>cross origin</em>) possède sa propre pile, son propre tas et sa propre queue de messages. Deux environnements d&apos;exécution distincts peuvent uniquement communiquer via des messages envoyés par la méthode <a href="/fr/docs/Web/API/window.postMessage"><code>postMessage</code></a>. Cette méthode permet d&apos;ajouter un message à un autre environnement d&apos;exécution si celui-ci « écoute » les événements <code>message</code>.</p>
+
+<h2 id="Non_bloquant">Non bloquant</h2>
+
+<p>Le modèle de la boucle d&apos;événement possède une caractéristique intéressante : JavaScript, à  la différence d&apos;autres langages, ne bloque jamais. La gestion des entrées-sorties (<em>I/O</em>) est généralement traitée par des événements et des callbacks. Ainsi, quand l&apos;application attend le résultat d&apos;une requête <a href="/fr/docs/IndexedDB">IndexedDB</a> ou d&apos;une requête <a href="/fr/docs/XMLHttpRequest">XHR</a>, il reste possible de traiter d&apos;autres éléments comme les saisies utilisateur.</p>
+
+<p>Il existe certaines exceptions historiques comme <code>alert</code> ou des appels XHR synchrones. C&apos;est une bonne pratique que de les éviter. Attention, <a href="https://stackoverflow.com/questions/2734025/is-javascript-guaranteed-to-be-single-threaded/2734311#2734311">certaines exceptions existent</a> (mais relèvent généralement de bugs d&apos;implémentation).</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">É tat</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loops" hreflang="en" lang="en">HTML Living Standard<br><small lang="fr">La définition de &apos;Event loops&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#what-is-the-event-loop">Boucle d&apos;évènements pour Node.js</a></td>
+   <td>Standard évolutif</td>
+   <td></td>
+  </tr>
+ </tbody>
+</table>
