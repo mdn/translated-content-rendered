@@ -41,18 +41,18 @@ public class WebSocket {
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 		ServerSocket server = new ServerSocket(80);
 		try {
-			System.out.println("Server has started on 127.0.0.1:80.\r\nWaiting for a connection...");
+			System.out.println(&quot;Server has started on 127.0.0.1:80.\r\nWaiting for a connection...&quot;);
 			Socket client = server.accept();
-			System.out.println("A client connected.");</code></pre>
+			System.out.println(&quot;A client connected.&quot;);</code></pre>
 
 <h3 id="Socket">Socket</h3>
 
 <p>方法：</p>
 
 <ul>
- <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html" title="class in java.net">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getInputStream--">getInputStream</a></span>()</code><br>
+ <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getInputStream--">getInputStream</a></span>()</code><br>
   返回这个Socket的输入流InputStream</li>
- <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html" title="class in java.net">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getOutputStream--">getOutputStream</a></span>()</code><br>
+ <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getOutputStream--">getOutputStream</a></span>()</code><br>
   返回这个Socket的输出流OutputStream</li>
 </ul>
 
@@ -76,15 +76,15 @@ public class WebSocket {
 
 <pre><code>InputStream in = client.getInputStream();
 			OutputStream out = client.getOutputStream();
-			Scanner s = new Scanner(in, "UTF-8");</code></pre>
+			Scanner s = new Scanner(in, &quot;UTF-8&quot;);</code></pre>
 
 <h2 id="握手">握手</h2>
 
 <p>当客户端连接到服务器时，它会发送GET请求以从简单的HTTP请求升级到WebSocket的连接。这被称为握手。</p>
 
 <pre><code>try {
-				String data = s.useDelimiter("\\r\\n\\r\\n").next();
-				Matcher get = Pattern.compile("^GET").matcher(data);</code></pre>
+				String data = s.useDelimiter(&quot;\\r\\n\\r\\n&quot;).next();
+				Matcher get = Pattern.compile(&quot;^GET&quot;).matcher(data);</code></pre>
 
 <p>创建响应比理解为什么必须以这种方式来创建响应更容易。</p>
 
@@ -92,27 +92,27 @@ public class WebSocket {
 
 <ol>
  <li>获取Sec-WebSocket-Key请求标头的值，去除头部和尾部的所有空格</li>
- <li>追加字符串"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"</li>
+ <li>追加字符串&quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;</li>
  <li>使用SHA-1计算拿到结果值并进行Base64编码</li>
  <li>将其作为HTTP响应的一部分写回Sec-WebSocket-Accept响应头的值</li>
 </ol>
 
 <pre><code>if (get.find()) {
-					Matcher match = Pattern.compile("Sec-WebSocket-Key: (.*)").matcher(data);
+					Matcher match = Pattern.compile(&quot;Sec-WebSocket-Key: (.*)&quot;).matcher(data);
 					match.find();
-					byte[] response = ("HTTP/1.1 101 Switching Protocols\r\n"
-						+ "Connection: Upgrade\r\n"
-						+ "Upgrade: websocket\r\n"
-						+ "Sec-WebSocket-Accept: "
-						+ Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest((match.group(1) + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes("UTF-8")))
-						+ "\r\n\r\n").getBytes("UTF-8");
+					byte[] response = (&quot;HTTP/1.1 101 Switching Protocols\r\n&quot;
+						+ &quot;Connection: Upgrade\r\n&quot;
+						+ &quot;Upgrade: websocket\r\n&quot;
+						+ &quot;Sec-WebSocket-Accept: &quot;
+						+ Base64.getEncoder().encodeToString(MessageDigest.getInstance(&quot;SHA-1&quot;).digest((match.group(1) + &quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;).getBytes(&quot;UTF-8&quot;)))
+						+ &quot;\r\n\r\n&quot;).getBytes(&quot;UTF-8&quot;);
 					out.write(response, 0, response.length);</code></pre>
 
 <h2 id="解码消息">解码消息</h2>
 
 <p>握手成功后，客户端可以向服务器发送消息，但现在这些已经过编码的消息需要解码。</p>
 
-<p>如果客户端发送 "abcdef"，我们会拿到这些字节数据：</p>
+<p>如果客户端发送 &quot;abcdef&quot;，我们会拿到这些字节数据：</p>
 
 <table>
  <tbody>

@@ -62,7 +62,7 @@ translation_of: Mozilla/Firefox/Releases/3.5/Updating_extensions
 <h2 id="Atualizações_básicas">Atualizações básicas</h2>
 <p>Esta seção cobre o básico do que você necessita fazer sempre que você atualiza uma extensão para uma nova versão do Firefox.</p>
 <h3 id="Teste_sua_extensão">Teste sua extensão</h3>
-<p>Começe editando o arquivo <code>install.rdf</code> da sua extensão, atualizando maxVersion para 3.5b4 (if you're testing on Firefox 3.5 beta 4), e aumente a versão da sua extensão.<br>
+<p>Começe editando o arquivo <code>install.rdf</code> da sua extensão, atualizando maxVersion para 3.5b4 (if you&apos;re testing on Firefox 3.5 beta 4), e aumente a versão da sua extensão.<br>
  <br>
  Crie então um novo perfil no Firefox, para que os testes não coloquem em risco seu perfil usual. Navegue até o diretório contendo Firefox, e então digite o comando:</p>
 <pre>firefox -createProfile testBeta4
@@ -89,43 +89,43 @@ firefox -createProfile testBeta4
  Veja <a href="/en/Submitting_an_add-on_to_AMO" class="internal" title="En/Submitting an add-on to AMO">Submitting an add-on to AMO</a> (EN) para informações adicionais.</p>
 <h2 id="Acessando_o_banco_de_dados_do_Places">Acessando o banco de dados do Places</h2>
 <p>Antes do Firefox 3.5, acessar o banco de dados do Places diretamente usando a API de Armazenamento (<a href="/en/Storage" class="internal" title="En/Storage">Storage API</a> (EN)) requeria alguns truques:</p>
-<pre class="brush: js">var places = Components.classes["@mozilla.org/file/directory_service;1"].
+<pre class="brush: js">var places = Components.classes[&quot;@mozilla.org/file/directory_service;1&quot;].
                         getService(Components.interfaces.nsIProperties).
-                        get("ProfD", Components.interfaces.nsIFile);
-places.append("places.sqlite");
-var db = Components.classes["@mozilla.org/storage/service;1"].
+                        get(&quot;ProfD&quot;, Components.interfaces.nsIFile);
+places.append(&quot;places.sqlite&quot;);
+var db = Components.classes[&quot;@mozilla.org/storage/service;1&quot;].
                     getService(Components.interfaces.mozIStorageService).openDatabase(places);
 </pre>
 <p>Isto constrói um caminho manual para o arquivo do banco de dados <code>places.sqlite</code> database, então abre o arquivo para o acesso ao armazenamento.</p>
 <p>O Firefox 3.5 adiciona um serviço dedicado que oferece uma maneira mais conveniente para acessar o banco de dados do Places; a técnica a seguir não funciona no Firefox 3.5 ou anteriores.</p>
-<pre class="brush: js">var db = Components.classes["@mozilla.org/browser/nav-history-service;1"].
+<pre class="brush: js">var db = Components.classes[&quot;@mozilla.org/browser/nav-history-service;1&quot;].
                     getService(Components.interfaces.nsPIPlacesDatabase).DBConnection;
 </pre>
 <h2 id="Caixas_de_texto_de_Pesquisa">Caixas de texto de Pesquisa</h2>
 <p>O tipo de caixa de texto (<a href="/en/XUL/textbox" class="internal" title="En/XUL/Textbox"><code>textbox</code></a> (EN)) <code>timed</code> está depreciado; ao invés disso, você deve usar <code>search</code>.</p>
 <p>No Firefox 3, você pode ter usado:</p>
-<pre>&lt;textbox type="timed" timeout="1000" oncommand="alert(this.value);"/&gt;
+<pre>&lt;textbox type=&quot;timed&quot; timeout=&quot;1000&quot; oncommand=&quot;alert(this.value);&quot;/&gt;
 </pre>
 <p>No Firefox 3.5, você deve mudar para:</p>
-<pre>&lt;textbox type="search" timeout="1000" oncommand="alert(this.value);"/&gt;
+<pre>&lt;textbox type=&quot;search&quot; timeout=&quot;1000&quot; oncommand=&quot;alert(this.value);&quot;/&gt;
 </pre>
 <h2 id="JSON">JSON</h2>
 <p>O módulo JavaScript JSON.jsm foi removido no Firefox 3.5 em favor do suporte nativo ao objeto JSON. Para detalhes, veja <a href="/En/Using_native_JSON" class="internal" title="/en/Using JSON in Firefox">Using JSON in Firefox</a> (EN) e o artigo em <a href="/en/JSON" class="internal" title="En/JSON">JSON</a> (EN) para uma introdução mais geral sobre o JSON e como usá-lo em várias versões do Firefox.</p>
 <p>Para assegurar a compatibilidade com o Firefox 3 e Firefox 3.5, você pode fazer o que segue:</p>
-<pre class="brush: js">if (typeof(JSON) == "undefined") {
-  Components.utils.import("resource://gre/modules/JSON.jsm");
+<pre class="brush: js">if (typeof(JSON) == &quot;undefined&quot;) {
+  Components.utils.import(&quot;resource://gre/modules/JSON.jsm&quot;);
   JSON.parse = JSON.fromString;
   JSON.stringify = JSON.toString;
 }
 </pre>
 <p>Isto funciona importando o módulo JavaScript JSON.jsm se o JSON não for suportado nativamente, mapeando então os métodos proporcionados por este módulo aos usados nativamente no JSON, então as mesmas chamadas funcinam.</p>
-<p>Você pode também contornar este problema usando a interface <code><a href="/pt-PT/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIJSON" title="">nsIJSON</a></code> diretamente.</p>
+<p>Você pode também contornar este problema usando a interface <code><a href="/pt-PT/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIJSON" title>nsIJSON</a></code> diretamente.</p>
 <h2 id="Mudanças_nos_menus_de_contexto">Mudanças nos menus de contexto</h2>
 <p>Com o objetivo de suportar as novas características de áudio e vídeo adicionadas ao Gecko 1.9.1, a classe de <code>nsContextMenu</code> foi renomeada de <code>imageURL</code> para <code>mediaURL</code>; entretanto, <code>imageURL</code> foi adicionado novamente em 9 de junho de, 2009.</p>
 <h2 id="Mudanças_no_registro_chrome">Mudanças no registro chrome</h2>
 <p>O Firefox 3.5 corrige falhas de segurança que tornam possível o uso remoto do chrome. Isto afetará qualquer complemento que inclua recursos em seu arquivo <code>chrome.manifest</code> que referencie a um web site, dados ou urls de recursos. Veja <a href="/En/Security_changes_in_Firefox_3.5" class="internal" title="En/Security changes in Firefox 3.5">Security changes in Firefox 3.5</a> (EN) para detalhes.</p>
 <h2 id="Conseguindo_um_contexto_carregado_através_de_requisição">Conseguindo um contexto carregado através de requisição</h2>
-<p>Anteriormente, era possível conseguir um contexto carregado a partir de uma requisição por consulta a várias APIs docShell. Uma maneira correta e confiável de fazer isso é usar um <code><a href="/pt-PT/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsILoadContext" title="">nsILoadContext</a></code>.</p>
+<p>Anteriormente, era possível conseguir um contexto carregado a partir de uma requisição por consulta a várias APIs docShell. Uma maneira correta e confiável de fazer isso é usar um <code><a href="/pt-PT/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsILoadContext" title>nsILoadContext</a></code>.</p>
 <p>Com o C++, você pode fazer como mostrado abaixo:</p>
 <pre class="brush: cpp">nsCOMPtr&lt;nsILoadContext&gt; loadContext;
 nsCOMPtr&lt;nsIChannel&gt; channel = do_QueryInterface(aRequest);
@@ -155,11 +155,11 @@ try {
 <p>Documentos XUL agora tem o tratamento <code>XPCNativeWrapper</code>, então você agora precisa usar o método <code>getAttribute()</code> para buscar valores de atributo ao invés de simplesmente lê-los diretamente.</p>
 <p>Se a sua extensão está usando <code>xpcnativewrappers=no</code> (o que não deveria ser feito em primeiro lugar, uma vez que não é seguro fazê-lo), o XBL desta extensão não será aplicado a documentos que estejam usando automatização <code>XPCNativeWrapper</code>, começando no Firefox 3.5.</p>
 <h2 id="Novas_características_interessantes">Novas características interessantes</h2>
-<h3 id="Listening_eventos_em_todas_as_abas">"Listening" eventos em todas as abas</h3>
+<h3 id="Listening_eventos_em_todas_as_abas">&quot;Listening&quot; eventos em todas as abas</h3>
 <p>O Firefox 3.5 adicionou suporte para a adição e remoção de <em>listeners</em> que <em>listen</em> em todas as abas. Veja <a href="/En/Listening_to_events_on_all_tabs" class="internal" title="en/Listening to events on all tabs">Listening to events on all tabs</a> (EN) para detalhes.</p>
 <h2 id="Para_desenvolvedores_de_temas">Para desenvolvedores de temas:</h2>
 <ul>
  <li>Cheque <a href="../../../../En/Theme_changes_in_Firefox_3.1" class="internal" rel="internal">Theme changes in Firefox 3.1</a> (EN).</li>
- <li>Acesse o fórum Mozillazine <a href="http://forums.mozillazine.org/viewtopic.php?f=18&amp;t=665138" class="topictitle external" title="http://forums.mozillazine.org/viewtopic.php?f=18&amp;t=665138">Theme changes for FF3.1</a> (EN) para uma introdução/listagem de todas as mudanças entre o Firefox 3.0 e 3.5 que trazem impactos para os desenvolvedores. Isto diz respeito às novas características do CSS (como nth-child, -moz-box-shadow, etc), mudanças para <em>widgets</em> existentes, todas as melhorias da UI (<em>User Interface</em> - Interface do Usuário) e novas características do FF3.5 (suporte de áudio/vídeo, navegação privada, restauração de sessão extendida, sombras de caixas/janelas/textos).</li>
+ <li>Acesse o fórum Mozillazine <a href="http://forums.mozillazine.org/viewtopic.php?f=18&amp;t=665138" class="topictitle external">Theme changes for FF3.1</a> (EN) para uma introdução/listagem de todas as mudanças entre o Firefox 3.0 e 3.5 que trazem impactos para os desenvolvedores. Isto diz respeito às novas características do CSS (como nth-child, -moz-box-shadow, etc), mudanças para <em>widgets</em> existentes, todas as melhorias da UI (<em>User Interface</em> - Interface do Usuário) e novas características do FF3.5 (suporte de áudio/vídeo, navegação privada, restauração de sessão extendida, sombras de caixas/janelas/textos).</li>
 </ul>
 <p> </p>

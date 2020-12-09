@@ -18,7 +18,7 @@ translation_of: Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB
 <ul>
  <li>Общего понимания дизайна и страуктуры IndexedDB, смотри <a href="#concepts">Big Concepts</a>.</li>
  <li>Изучения большего о терминах в IndexedDB, смотри секцию <a href="#definitions">Definitions</a>.</li>
- <li>Детального руководства как использовать API, смотри <a href="/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB" title="en/IndexedDB/IndexedDB primer">Using IndexedDB</a>.</li>
+ <li>Детального руководства как использовать API, смотри <a href="/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB">Using IndexedDB</a>.</li>
  <li>Рекомендованной документации по IndexedDB API, ссылаясь на основные статьи по <a href="/en-US/docs/Web/API/IndexedDB_API">IndexedDB API</a> и его подстраницы, описывающие, какие типы объектов используются в IndexedDB.</li>
  <li>Получения больше информации о том, как браузер управляет сохранением данных в бекграунде, читай <a href="/en-US/docs/Web/API/IndexedDB_API/Browser_storage_limits_and_eviction_criteria">Browser storage limits and eviction criteria</a>.</li>
 </ul>
@@ -42,10 +42,10 @@ translation_of: Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB
  <li>
   <p><strong>IndexedDB is built on a transactional database model</strong>. Everything you do in IndexedDB always happens in the context of a <a href="#gloss_transaction">transaction</a>. The IndexedDB API provides lots of objects that represent indexes, tables, cursors, and so on, but each of these is tied to a particular transaction. Thus, you cannot execute commands or open cursors outside of a transaction. Transactions have a well-defined lifetime, so attempting to use a transaction after it has completed throws exceptions. Also, transactions auto-commit and cannot be committed manually.</p>
 
-  <p>This transaction model is really useful when you consider what might happen if a user opened two instances of your web app in two different tabs simultaneously. Without transactional operations, the two instances could interfere with each other&apos;s modifications. If you are not familiar with transactions in a database, read the <a class="link-https" href="https://en.wikipedia.org/wiki/Database_transaction" title="https://secure.wikimedia.org/wikipedia/en/wiki/Database_transaction">Wikipedia article on transactions</a>. Also see <a href="#gloss_transaction">transaction</a> under the Definitions section.</p>
+  <p>This transaction model is really useful when you consider what might happen if a user opened two instances of your web app in two different tabs simultaneously. Without transactional operations, the two instances could interfere with each other&apos;s modifications. If you are not familiar with transactions in a database, read the <a class="link-https" href="https://en.wikipedia.org/wiki/Database_transaction">Wikipedia article on transactions</a>. Also see <a href="#gloss_transaction">transaction</a> under the Definitions section.</p>
  </li>
  <li>
-  <p><strong>The IndexedDB API is mostly asynchronous.</strong> The API doesn&apos;t give you data by returning values; instead, you have to pass a callback function. You don&apos;t &quot;store&quot; a value into the database, or &quot;retrieve&quot; a value out of the database through synchronous means. Instead, you &quot;request&quot; that a database operation happens. You get notified by a DOM event when the operation finishes, and the type of event you get lets you know if the operation succeeded or failed. This sounds a little complicated at first, but there are sanity measures baked in. It&apos;s not that different from the way that <a href="/en/DOM/XMLHttpRequest" title="https://developer.mozilla.org/en/xmlhttprequest">XMLHttpRequest</a> works.</p>
+  <p><strong>The IndexedDB API is mostly asynchronous.</strong> The API doesn&apos;t give you data by returning values; instead, you have to pass a callback function. You don&apos;t &quot;store&quot; a value into the database, or &quot;retrieve&quot; a value out of the database through synchronous means. Instead, you &quot;request&quot; that a database operation happens. You get notified by a DOM event when the operation finishes, and the type of event you get lets you know if the operation succeeded or failed. This sounds a little complicated at first, but there are sanity measures baked in. It&apos;s not that different from the way that <a href="/en/DOM/XMLHttpRequest">XMLHttpRequest</a> works.</p>
  </li>
  <li>
   <p><strong>IndexedDB uses a lot of requests. </strong>Requests are objects that receive the success or failure DOM events that were mentioned previously. They have <code style="font-size: 14px;">onsuccess</code> and <code style="font-size: 14px;">onerror</code> properties, and you can call <code style="font-size: 14px;">addEventListener()</code> and <code style="font-size: 14px;">removeEventListener()</code> on them. They also have <code style="font-size: 14px;">readyState</code>, <code style="font-size: 14px;">result</code>, and <code style="font-size: 14px;">errorCode</code> properties that tell you the status of the request. The <code style="font-size: 14px;">result</code> property is particularly magical, as it can be many different things, depending on how the request was generated (for example, an <code style="font-size: 14px;">IDBCursor</code> instance, or the key for a value that you just inserted into the database).</p>
@@ -56,17 +56,17 @@ translation_of: Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB
  <li>
   <p><strong>IndexedDB is object-oriented.</strong> IndexedDB is not a relational database with tables representing collections of rows and columns. This important and fundamental difference affects the way you design and build your applications.</p>
 
-  <p>In a traditional relational data store, you would have a table that stores a collection of rows of data and columns of named types of data. IndexedDB, on the other hand, requires you to create an object store for a type of data and simply persist JavaScript objects to that store. Each object store can have a collection of indexes that makes it efficient to query and iterate across. If you are not familiar with object-oriented database management systems, read the <a class="external" href="https://en.wikipedia.org/wiki/Object_database" title="http://en.wikipedia.org/wiki/Object_database">Wikipedia article on object database</a>.</p>
+  <p>In a traditional relational data store, you would have a table that stores a collection of rows of data and columns of named types of data. IndexedDB, on the other hand, requires you to create an object store for a type of data and simply persist JavaScript objects to that store. Each object store can have a collection of indexes that makes it efficient to query and iterate across. If you are not familiar with object-oriented database management systems, read the <a class="external" href="https://en.wikipedia.org/wiki/Object_database">Wikipedia article on object database</a>.</p>
  </li>
  <li>
-  <p><strong>IndexedDB does not use </strong><strong>Structured Query Language (<abbr>SQL</abbr>).</strong> It uses queries on an index that produces a cursor, which you use to iterate across the result set. If you are not familiar with NoSQL systems, read the <a class="external" href="https://en.wikipedia.org/wiki/NoSQL" title="http://en.wikipedia.org/wiki/NoSQL">Wikipedia article on NoSQL</a>.</p>
+  <p><strong>IndexedDB does not use </strong><strong>Structured Query Language (<abbr>SQL</abbr>).</strong> It uses queries on an index that produces a cursor, which you use to iterate across the result set. If you are not familiar with NoSQL systems, read the <a class="external" href="https://en.wikipedia.org/wiki/NoSQL">Wikipedia article on NoSQL</a>.</p>
  </li>
  <li>
   <p><a name="origin"><strong>IndexedDB adheres to a same-origin policy</strong></a>. An origin is the domain, application layer protocol, and port of a URL of the document where the script is being executed. Each origin has its own associated set of databases. Every database has a name that identifies it within an origin.</p>
 
   <p>The security boundary imposed on IndexedDB prevents applications from accessing data with a different origin. For example, while an app or a page in <a class="external" href="http://www.example.com/app/" rel="freelink">http://www.example.com/app/</a> can retrieve data from <a class="external" href="http://www.example.com/dir/" rel="freelink">http://www.example.com/dir/</a>, because they have the same origin, it cannot retrieve data from <a class="external" href="http://www.example.com:8080/dir/" rel="freelink">http://www.example.com:8080/dir/</a> (different port) or <a class="link-https" href="https://www.example.com/dir/" rel="freelink">https://www.example.com/dir/</a> (different protocol), because they have different origins.</p>
 
-  <div class="note"><strong>Note</strong>: Third party window content (e.g. <a href="/ru/docs/Web/HTML/Element/iframe" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;iframe&gt;</code></a> content) can access the IndexedDB store for the origin it is embedded into, unless the browser is set to <a href="https://support.mozilla.org/en-US/kb/disable-third-party-cookies">never accept third party cookies</a> (see <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1147821">баг 1147821</a>.)</div>
+  <div class="note"><strong>Note</strong>: Third party window content (e.g. <a href="/ru/docs/Web/HTML/Element/iframe"><code>&lt;iframe&gt;</code></a> content) can access the IndexedDB store for the origin it is embedded into, unless the browser is set to <a href="https://support.mozilla.org/en-US/kb/disable-third-party-cookies">never accept third party cookies</a> (see <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1147821">баг 1147821</a>.)</div>
  </li>
 </ul>
 
@@ -206,8 +206,8 @@ translation_of: Web/API/IndexedDB_API/Basic_Concepts_Behind_IndexedDB
 <h2 id="See_also">See also</h2>
 
 <ul>
- <li><a href="http://www.w3.org/TR/IndexedDB/" title="http://www.w3.org/TR/IndexedDB/"><span style="direction: ltr;">Indexed Database API Specification</span></a></li>
- <li><a href="/en/IndexedDB" title="https://developer.mozilla.org/en/IndexedDB">IndexedDB API Reference</a></li>
- <li><a href="/en/IndexedDB/Using_IndexedDB" title="en/IndexedDB/IndexedDB primer">Using IndexedDB</a></li>
- <li><a class="external" href="http://msdn.microsoft.com/en-us/scriptjunkie/gg679063.aspx" title="http://msdn.microsoft.com/en-us/scriptjunkie/gg679063.aspx">IndexedDB — The Store in Your Browser</a></li>
+ <li><a href="http://www.w3.org/TR/IndexedDB/"><span style="direction: ltr;">Indexed Database API Specification</span></a></li>
+ <li><a href="/en/IndexedDB">IndexedDB API Reference</a></li>
+ <li><a href="/en/IndexedDB/Using_IndexedDB">Using IndexedDB</a></li>
+ <li><a class="external" href="http://msdn.microsoft.com/en-us/scriptjunkie/gg679063.aspx">IndexedDB — The Store in Your Browser</a></li>
 </ul>

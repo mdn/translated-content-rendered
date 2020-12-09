@@ -38,7 +38,7 @@ translation_of: Web/API/WebSockets_API/Writing_WebSocket_server
 
 <ul>
  <li><code><span style="line-height: 1.572;">Start()</span></code></li>
- <li><span style="line-height: 1.572;"><code>System.Net.Sockets.<a href="http://msdn.microsoft.com/en-us/library/system.net.sockets.tcpclient.aspx" title="http://msdn.microsoft.com/en-us/library/system.net.sockets.tcpclient.aspx">TcpClient</a> AcceptTcpClient()</code><br>
+ <li><span style="line-height: 1.572;"><code>System.Net.Sockets.<a href="http://msdn.microsoft.com/en-us/library/system.net.sockets.tcpclient.aspx">TcpClient</a> AcceptTcpClient()</code><br>
   等一个Tcp 连接， 并接受一个返回的TcpClient对象。</span></li>
 </ul>
 
@@ -50,14 +50,14 @@ using System;
 
 class Server {
     public static void Main() {
-        TcpListener server = new TcpListener(IPAddress.Parse("127.0.0.1"), 80);
+        TcpListener server = new TcpListener(IPAddress.Parse(&quot;127.0.0.1&quot;), 80);
 
         server.Start();
-        Console.WriteLine("Server has started on 127.0.0.1:80.{0}Waiting for a connection...", Environment.NewLine);
+        Console.WriteLine(&quot;Server has started on 127.0.0.1:80.{0}Waiting for a connection...&quot;, Environment.NewLine);
 
         TcpClient client = server.AcceptTcpClient();
 
-        Console.WriteLine("A client connected.");
+        Console.WriteLine(&quot;A client connected.&quot;);
     }
 }
 </pre>
@@ -67,7 +67,7 @@ class Server {
 <p>方法:</p>
 
 <ul>
- <li><code>System.Net.Sockets.<a href="http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.aspx" title="http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.aspx">NetworkStream</a> GetStream()</code><br>
+ <li><code>System.Net.Sockets.<a href="http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.aspx">NetworkStream</a> GetStream()</code><br>
   获取一个通信通道的流，通道两边都具有读写能力。</li>
 </ul>
 
@@ -93,7 +93,7 @@ class Server {
 
 <pre class="brush: cpp">TcpClient client = server.AcceptTcpClient();
 
-Console.WriteLine("A client connected.");
+Console.WriteLine(&quot;A client connected.&quot;);
 
 NetworkStream stream = client.GetStream();
 
@@ -127,7 +127,7 @@ stream.Read(bytes, 0, bytes.Length);
 //translate bytes of request to string
 String data = Encoding.UTF8.GetString(bytes);
 
-if (Regex.IsMatch(data, "^GET")) {
+if (Regex.IsMatch(data, &quot;^GET&quot;)) {
 
 } else {
 
@@ -138,24 +138,24 @@ if (Regex.IsMatch(data, "^GET")) {
 <p>你必须：</p>
 
 <ol>
- <li>获取请求头中"Sec-WebSocket-Key"字段的值，这个字段值不能有任何的前导和后继空格字符</li>
- <li>将它与"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"(一个 RFC 6455 中规定的特殊的 GUID )拼接起来</li>
+ <li>获取请求头中&quot;Sec-WebSocket-Key&quot;字段的值，这个字段值不能有任何的前导和后继空格字符</li>
+ <li>将它与&quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;(一个 RFC 6455 中规定的特殊的 GUID )拼接起来</li>
  <li>计算新的值的 SHA-1 和 Base64 哈希值</li>
- <li>将哈希值写回到一个HTTP响应头，作为"Sec-WebSocket-Accept"字段的值</li>
+ <li>将哈希值写回到一个HTTP响应头，作为&quot;Sec-WebSocket-Accept&quot;字段的值</li>
 </ol>
 
 <pre class="brush: cpp"><em>
-</em>if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(data))
+</em>if (new System.Text.RegularExpressions.Regex(&quot;^GET&quot;).IsMatch(data))
 {
-    const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
+    const string eol = &quot;\r\n&quot;; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
 
-    Byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
-        + "Connection: Upgrade" + eol
-        + "Upgrade: websocket" + eol
-        + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
+    Byte[] response = Encoding.UTF8.GetBytes(&quot;HTTP/1.1 101 Switching Protocols&quot; + eol
+        + &quot;Connection: Upgrade&quot; + eol
+        + &quot;Upgrade: websocket&quot; + eol
+        + &quot;Sec-WebSocket-Accept: &quot; + Convert.ToBase64String(
             System.Security.Cryptography.SHA1.Create().ComputeHash(
                 Encoding.UTF8.GetBytes(
-                    new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(data).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+                    new System.Text.RegularExpressions.Regex(&quot;Sec-WebSocket-Key: (.*)&quot;).Match(data).Groups[1].Value.Trim() + &quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;
                 )
             )
         ) + eol
@@ -169,7 +169,7 @@ if (Regex.IsMatch(data, "^GET")) {
 
 <p>在一次成功的握手之后，客户端将向服务器发送加密后的消息</p>
 
-<p>如果我们发送了 "MDN"，那么我们会得到下面这些字节：</p>
+<p>如果我们发送了 &quot;MDN&quot;，那么我们会得到下面这些字节：</p>
 
 <table>
  <tbody>
@@ -215,7 +215,7 @@ if (Regex.IsMatch(data, "^GET")) {
 <ul>
  <li>FIN 位：这个位表明是否整个消息都已经从客户端被发送出去。消息可能以多个帧的形式发送，但现在我们将情景考虑得简单一些。</li>
  <li>RSV1, RSV2, RSV3：除非规定的扩展协议支持将它们赋为非0值，否则这些位必须为0。</li>
- <li><span style="line-height: 1.572;">Opcode：</span><span style="line-height: 1.572;">这些位描述了接收的消息的类型。Opcode 0x1 意味着这是一条文本消息。</span><a href="http://tools.ietf.org/html/rfc6455#section-5.2" style="line-height: 1.572;" title="http://tools.ietf.org/html/rfc6455#section-5.2">Opcodes值的完整罗列</a></li>
+ <li><span style="line-height: 1.572;">Opcode：</span><span style="line-height: 1.572;">这些位描述了接收的消息的类型。Opcode 0x1 意味着这是一条文本消息。</span><a href="http://tools.ietf.org/html/rfc6455#section-5.2" style="line-height: 1.572;">Opcodes值的完整罗列</a></li>
 </ul>
 
 <p>第二个字节，当前值是131，是另一个按位组成的部分，分解如下：</p>
@@ -236,7 +236,7 @@ if (Regex.IsMatch(data, "^GET")) {
 </table>
 
 <ul>
- <li>MASK 位：定义了是否"Payload data"进行了掩码计算。如果值设置为1，那么在Masking-Key字段中会有一个掩码密钥，并且它可以用来进行"Payload data"的去掩码计算。所有从客户端发到服务器的消息中此位都会被置1。</li>
+ <li>MASK 位：定义了是否&quot;Payload data&quot;进行了掩码计算。如果值设置为1，那么在Masking-Key字段中会有一个掩码密钥，并且它可以用来进行&quot;Payload data&quot;的去掩码计算。所有从客户端发到服务器的消息中此位都会被置1。</li>
  <li>Payload Length：如果这个值在0与125之间，那么这个值就是消息的长度。如果这个值是126，那么接下来的2个字节（16位无符号整数）是消息长度。如果这个值是127，那么接下来的8个字节（64位无符号整数）是消息长度。</li>
 </ul>
 

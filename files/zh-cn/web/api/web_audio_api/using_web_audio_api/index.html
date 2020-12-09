@@ -60,9 +60,9 @@ const audioContext = new AudioContext();</code>
 
 <h2 id="加载声音">加载声音</h2>
 
-<p>现在，需要通过我们创建的音频上下文播放一些声音。Web Audio API中有几种方法可以实现这一点。让我们通过一个简单的方法开始 — 因为我们有一个音箱，我们可能想播放一首完整的歌曲。 此外，为了便于访问，我们可以在在DOM中暴露该音轨。我们将使用 <a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio> 元素用于在文档中表示音频内容。 &lt;audio> 元素可以包含多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source> 元素来进行描述； 浏览器将会选择最合适的一个来使用。对于不支持&lt;audio>元素的浏览器，&lt;audio>元素也可以作为浏览器不识别的内容加入到文档中。"><code>&lt;audio&gt;</code></a> 元素在页面上暴露这首歌曲。</p>
+<p>现在，需要通过我们创建的音频上下文播放一些声音。Web Audio API中有几种方法可以实现这一点。让我们通过一个简单的方法开始 — 因为我们有一个音箱，我们可能想播放一首完整的歌曲。 此外，为了便于访问，我们可以在在DOM中暴露该音轨。我们将使用 <a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio&gt; 元素用于在文档中表示音频内容。 &lt;audio&gt; 元素可以包含多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source&gt; 元素来进行描述； 浏览器将会选择最合适的一个来使用。对于不支持&lt;audio&gt;元素的浏览器，&lt;audio&gt;元素也可以作为浏览器不识别的内容加入到文档中。"><code>&lt;audio&gt;</code></a> 元素在页面上暴露这首歌曲。</p>
 
-<pre class="brush: js"><code>&lt;audio src="myCoolTrack.mp3" type="audio/mpeg"&gt;&lt;/audio&gt;</code>
+<pre class="brush: js"><code>&lt;audio src=&quot;myCoolTrack.mp3&quot; type=&quot;audio/mpeg&quot;&gt;&lt;/audio&gt;</code>
 </pre>
 
 <div class="note">
@@ -72,7 +72,7 @@ const audioContext = new AudioContext();</code>
 <p>为了使用 Web Audio API的优秀特性，我们需要从该元素中获取源并将其传入我们创建的上下文中。幸运的是，有一个方法可以让我们做到这一点 — <a href="/zh-CN/docs/Web/API/AudioContext/createMediaElementSource"><code>AudioContext.createMediaElementSource</code></a>:</p>
 
 <pre class="brush: js"><code>// get the audio element
-const audioElement = document.querySelector('audio');
+const audioElement = document.querySelector(&apos;audio&apos;);
 
 // pass it into the audio context
 const track = audioContext.createMediaElementSource(audioElement);</code>
@@ -92,7 +92,7 @@ const track = audioContext.createMediaElementSource(audioElement);</code>
 
 <p>因为我们的脚本正响应用户输入（例如，点击播放按钮）进行播放音频，我们状态良好且应该没有自动播放阻止的问题。所以，让我们看看我们的播放和暂停功能。我们有一个当音频播放时变为暂停按钮的播放按钮：</p>
 
-<pre class="brush: html"><code>&lt;button data-playing="false" role="switch" aria-checked="false"&gt;
+<pre class="brush: html"><code>&lt;button data-playing=&quot;false&quot; role=&quot;switch&quot; aria-checked=&quot;false&quot;&gt;
     &lt;span&gt;Play/Pause&lt;/span&gt;
 &lt;/button&gt;</code>
 </pre>
@@ -111,22 +111,22 @@ const track = audioContext.createMediaElementSource(audioElement);</code>
 <p>现在我们可以添加播放和暂停功能。</p>
 
 <pre class="brush: js"><code>// select our play button
-const playButton = document.querySelector('button');
+const playButton = document.querySelector(&apos;button&apos;);
 
-playButton.addEventListener('click', function() {
+playButton.addEventListener(&apos;click&apos;, function() {
 
     // check if context is in suspended state (autoplay policy)
-    if (audioContext.state === 'suspended') {
+    if (audioContext.state === &apos;suspended&apos;) {
         audioContext.resume();
     }
 
     // play or pause track depending on state
-    if (this.dataset.playing === 'false') {
+    if (this.dataset.playing === &apos;false&apos;) {
         audioElement.play();
-        this.dataset.playing = 'true';
-    } else if (this.dataset.playing === 'true') {
+        this.dataset.playing = &apos;true&apos;;
+    } else if (this.dataset.playing === &apos;true&apos;) {
         audioElement.pause();
-        this.dataset.playing = 'false';
+        this.dataset.playing = &apos;false&apos;;
     }
 
 }, false);</code>
@@ -134,8 +134,8 @@ playButton.addEventListener('click', function() {
 
 <p>我们也需要考虑到当音频播放完毕后做什么。我们的 <code>HTMLMediaElement</code> 一旦播放完毕会触发一个 <code>ended</code> 事件，所以我们可以监听它并运行相应代码：</p>
 
-<pre class="brush: js"><code>audioElement.addEventListener('ended', () =&gt; {
-    playButton.dataset.playing = 'false';
+<pre class="brush: js"><code>audioElement.addEventListener(&apos;ended&apos;, () =&gt; {
+    playButton.dataset.playing = &apos;false&apos;;
 }, false);</code>
 </pre>
 
@@ -171,7 +171,7 @@ playButton.addEventListener('click', function() {
 
 <p>让我们给用户这样的控制 — 我们将会使用 <a href="/en-US/docs/Web/HTML/Element/input/range">range input</a> ：</p>
 
-<pre class="brush: js"><code>&lt;input type="range" id="volume" min="0" max="2" value="1" step="0.01"&gt;</code>
+<pre class="brush: js"><code>&lt;input type=&quot;range&quot; id=&quot;volume&quot; min=&quot;0&quot; max=&quot;2&quot; value=&quot;1&quot; step=&quot;0.01&quot;&gt;</code>
 </pre>
 
 <div class="note">
@@ -180,9 +180,9 @@ playButton.addEventListener('click', function() {
 
 <p>所以当用户更改输入节点值时，获取此输入值并更新增益值：</p>
 
-<pre class="brush: js"><code>const volumeControl = document.querySelector('#volume');
+<pre class="brush: js"><code>const volumeControl = document.querySelector(&apos;#volume&apos;);
 
-volumeControl.addEventListener('input', function() {
+volumeControl.addEventListener(&apos;input&apos;, function() {
     gainNode.gain.value = this.value;
 }, false);</code>
 </pre>
@@ -219,14 +219,14 @@ const panner = new StereoPannerNode(audioContext, pannerOptions);</code>
 
 <p>这里我们的范围从-1（最左边）和1（最右边）。再次让我们使用范围类型的input来改变这个参数:</p>
 
-<pre class="brush: js"><code>&lt;input type="range" id="panner" min="-1" max="1" value="0" step="0.01"&gt;</code>
+<pre class="brush: js"><code>&lt;input type=&quot;range&quot; id=&quot;panner&quot; min=&quot;-1&quot; max=&quot;1&quot; value=&quot;0&quot; step=&quot;0.01&quot;&gt;</code>
 </pre>
 
 <p>与我们之前一样，我们使用来自这个input的值来调整我们的panner的值：</p>
 
-<pre class="brush: js"><code>const pannerControl = document.querySelector('#panner');
+<pre class="brush: js"><code>const pannerControl = document.querySelector(&apos;#panner&apos;);
 
-pannerControl.addEventListener('input', function() {
+pannerControl.addEventListener(&apos;input&apos;, function() {
     panner.pan.value = this.value;
 }, false);</code>
 </pre>
@@ -307,8 +307,8 @@ pannerControl.addEventListener('input', function() {
 <ul>
  <li>通过JavaScript直接生成一个音频节点比如oscillator. 一个 <a href="/zh-CN/docs/Web/API/OscillatorNode"><code>OscillatorNode</code></a>是利用<a href="/zh-CN/docs/Web/API/AudioContext/createOscillator"><code>AudioContext.createOscillator</code></a> 方法来构建。</li>
  <li>从原PCM数据构建: AudioContext有解密被支持的音频格式的多种方法。 看 <a href="/zh-CN/docs/Web/API/AudioContext/createBuffer"><code>AudioContext.createBuffer()</code></a>, <a href="/zh-CN/docs/Web/API/AudioContext/createBufferSource"><code>AudioContext.createBufferSource()</code></a>, 以及 <a href="/zh-CN/docs/Web/API/AudioContext/decodeAudioData"><code>AudioContext.decodeAudioData()</code></a>.</li>
- <li>来自于HTML音频元素例如 <a href="/zh-CN/docs/Web/HTML/Element/video" title="HTML &lt;video> 元素 用于在HTML或者XHTML文档中嵌入媒体播放器，用于支持文档内的视频播放。"><code>&lt;video&gt;</code></a> 或者<a href="/zh-CN/docs/Web/HTML/Element/audio" title="HTML &lt;audio> 元素用于在文档中表示音频内容。 &lt;audio> 元素可以包含多个音频资源， 这些音频资源可以使用 src 属性或者&lt;source> 元素来进行描述； 浏览器将会选择最合适的一个来使用。对于不支持&lt;audio>元素的浏览器，&lt;audio>元素也可以作为浏览器不识别的内容加入到文档中。"><code>&lt;audio&gt;</code></a>: 可以看 <a href="/zh-CN/docs/Web/API/AudioContext/createMediaElementSource"><code>AudioContext.createMediaElementSource()</code></a>.</li>
- <li>直接来自于 <a href="https://developer.mozilla.org/en-US/docs/WebRTC" title="/en-US/docs/WebRTC">WebRTC</a>，<a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a> 例如来自于摄像头或麦克风. 可以看<a href="/zh-CN/docs/Web/API/AudioContext/createMediaStreamSource"><code>AudioContext.createMediaStreamSource()</code></a>.</li>
+ <li>来自于HTML音频元素例如 <a href="/zh-CN/docs/Web/HTML/Element/video"><code>&lt;video&gt;</code></a> 或者<a href="/zh-CN/docs/Web/HTML/Element/audio"><code>&lt;audio&gt;</code></a>: 可以看 <a href="/zh-CN/docs/Web/API/AudioContext/createMediaElementSource"><code>AudioContext.createMediaElementSource()</code></a>.</li>
+ <li>直接来自于 <a href="https://developer.mozilla.org/en-US/docs/WebRTC">WebRTC</a>，<a href="/zh-CN/docs/Web/API/MediaStream"><code>MediaStream</code></a> 例如来自于摄像头或麦克风. 可以看<a href="/zh-CN/docs/Web/API/AudioContext/createMediaStreamSource"><code>AudioContext.createMediaStreamSource()</code></a>.</li>
 </ul>
 
 <p>对于这些特殊的例子，我们将会为我们的源构建一个 oscillator来提供简单的音调，以及gain node来控制音频音量：</p>
@@ -348,7 +348,7 @@ gainNode.connect(audioCtx.destination);
 
 <p>这个将会创造一个如下音频节点图：</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/7949/voice-change-o-matic-graph.png" style="display: block; height: 563px; margin: 0px auto; width: 232px;">你也可以链接多个节点到一个节点，比如说你想要混合多个音频源在一起，就让它们都通过一个效果节点，比如gain node。</p>
+<p><img alt src="https://mdn.mozillademos.org/files/7949/voice-change-o-matic-graph.png" style="display: block; height: 563px; margin: 0px auto; width: 232px;">你也可以链接多个节点到一个节点，比如说你想要混合多个音频源在一起，就让它们都通过一个效果节点，比如gain node。</p>
 
 <div class="note">
 <p><strong>注释</strong>:Firefox32以上版本已有完整的firefox开发者工具包括 <a href="/en-US/docs/Tools/Web_Audio_Editor">Web Audio Editor</a>, 一个对测试web audio 表的bug非常有用的东西.</p>
@@ -358,7 +358,7 @@ gainNode.connect(audioCtx.destination);
 
 <p>现在audio节点图已经建立，我们可以设置属性值及调用音频节点的方法来调节想要的音效。在这个简单的例子，我们可以设置特殊的音调，以赫兹为单位，设置为特殊类型，以及指示音乐播放：</p>
 
-<pre class="brush: js">oscillator.type = 'sine'; // sine wave — other values are 'square', 'sawtooth', 'triangle' and 'custom'
+<pre class="brush: js">oscillator.type = &apos;sine&apos;; // sine wave — other values are &apos;square&apos;, &apos;sawtooth&apos;, &apos;triangle&apos; and &apos;custom&apos;
 oscillator.frequency.value = 2500; // value in hertz
 oscillator.start();
 </pre>
@@ -376,7 +376,7 @@ var initialVol = 0.5;
 
 // set options for the oscillator
 
-oscillator.type = 'sine'; // sine wave — other values are 'square', 'sawtooth', 'triangle' and 'custom'
+oscillator.type = &apos;sine&apos;; // sine wave — other values are &apos;square&apos;, &apos;sawtooth&apos;, &apos;triangle&apos; and &apos;custom&apos;
 oscillator.frequency.value = initialFreq; // value in hertz
 oscillator.start();
 
@@ -415,11 +415,11 @@ function updatePage(e) {
   return randomNo;
 }
 
-var canvas = document.querySelector('.canvas');
+var canvas = document.querySelector(&apos;.canvas&apos;);
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
-var canvasCtx = canvas.getContext('2d');
+var canvasCtx = canvas.getContext(&apos;2d&apos;);
 
 function canvasDraw() {
   rX = CurX;
@@ -430,7 +430,7 @@ function canvasDraw() {
 
   for(i=1;i&lt;=15;i=i+2) {
     canvasCtx.beginPath();
-    canvasCtx.fillStyle = 'rgb(' + 100+(i*10) + ',' + Math.floor((gainNode.gain.value/maxVol)*255) + ',' + Math.floor((oscillator.frequency.value/maxFreq)*255) + ')';
+    canvasCtx.fillStyle = &apos;rgb(&apos; + 100+(i*10) + &apos;,&apos; + Math.floor((gainNode.gain.value/maxVol)*255) + &apos;,&apos; + Math.floor((oscillator.frequency.value/maxFreq)*255) + &apos;)&apos;;
     canvasCtx.arc(rX+random(0,50),rY+random(0,50),rC/2+i,(Math.PI/180)*0,(Math.PI/180)*360,false);
     canvasCtx.fill();
     canvasCtx.closePath();
@@ -441,17 +441,17 @@ function canvasDraw() {
 
 <p>当静音按钮点击，以下方法会被调用，disconnect方法，将切断gain node与destination节点的链接，有效阻止了节点图的链接，所以没有声音会被产生。再次点击效果相反。</p>
 
-<pre class="brush: js">var mute = document.querySelector('.mute');
+<pre class="brush: js">var mute = document.querySelector(&apos;.mute&apos;);
 
 mute.onclick = function() {
-  if(mute.id == "") {
+  if(mute.id == &quot;&quot;) {
     gainNode.disconnect(audioCtx.destination);
-    mute.id = "activated";
-    mute.innerHTML = "Unmute";
+    mute.id = &quot;activated&quot;;
+    mute.innerHTML = &quot;Unmute&quot;;
   } else {
     gainNode.connect(audioCtx.destination);
-    mute.id = "";
-    mute.innerHTML = "Mute";
+    mute.id = &quot;&quot;;
+    mute.innerHTML = &quot;Mute&quot;;
   }
 }
 </pre>
@@ -472,7 +472,7 @@ mute.onclick = function() {
 <p>这个对象一定会数学化的定义wave shape，一个被应用于基础声音波来创造扭曲的效果。这些波并不好被计算，最好的开始方法是搜索web算法。比如，我们可以从 <a href="http://stackoverflow.com/questions/22312841/waveshaper-node-in-webaudio-how-to-emulate-distortion">Stack Overflow</a> 找到：</p>
 
 <pre class="brush: js">function makeDistortionCurve(amount) {
-  var k = typeof amount === 'number' ? amount : 50,
+  var k = typeof amount === &apos;number&apos; ? amount : 50,
     n_samples = 44100,
     curve = new Float32Array(n_samples),
     deg = Math.PI / 180,
@@ -506,7 +506,7 @@ distortion.curve = makeDistortionCurve(400);
 
 <p>在Voice-change-o-matic的演示中，运用的制定选项是“lowshelf”过滤器，它提供了低音的基本增幅方法：</p>
 
-<pre class="brush: js">biquadFilter.type = "lowshelf";
+<pre class="brush: js">biquadFilter.type = &quot;lowshelf&quot;;
 biquadFilter.frequency.value = 1000;
 biquadFilter.gain.value = 25;
 </pre>

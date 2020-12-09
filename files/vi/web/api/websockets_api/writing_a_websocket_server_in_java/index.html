@@ -15,7 +15,7 @@ translation_of: Web/API/WebSockets_API/Writing_a_WebSocket_server_in_Java
 
 <h2 id="Bước_1">Bước 1:</h2>
 
-<p>WebSockets truyền đạt về một <a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol" title="http://en.wikipedia.org/wiki/Transmission_Control_Protocol">TCP (Transmission Control Protocol)</a>  kết nối. Lớp Java's <a href="http://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html">ServerSocket</a> là nằm ở trong gói  <em>java.net</em>.</p>
+<p>WebSockets truyền đạt về một <a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol" title="http://en.wikipedia.org/wiki/Transmission_Control_Protocol">TCP (Transmission Control Protocol)</a>  kết nối. Lớp Java&apos;s <a href="http://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html">ServerSocket</a> là nằm ở trong gói  <em>java.net</em>.</p>
 
 <h3 id="ServerSocket">ServerSocket</h3>
 
@@ -25,7 +25,7 @@ translation_of: Web/API/WebSockets_API/Writing_a_WebSocket_server_in_Java
 
 <p>Khi bạn thuyết trình về ServerSocket class, it is bound to the port number you specified by the <em>port</em> argument.</p>
 
-<p><span style="line-height: 1.572;">Here's how to implement what we have learnt:</span></p>
+<p><span style="line-height: 1.572;">Here&apos;s how to implement what we have learnt:</span></p>
 
 <pre class="brush: java">import java.net.ServerSocket;
 import java.net.Socket;
@@ -34,11 +34,11 @@ public class Server{
     public static void main(String[] args){
         ServerSocket server = new ServerSocket(80);
 
-        System.out.println("Server has started on 127.0.0.1:80.\r\nWaiting for a connection...");
+        System.out.println(&quot;Server has started on 127.0.0.1:80.\r\nWaiting for a connection...&quot;);
 
         Socket client = server.accept();
 
-        System.out.println("A client connected.");
+        System.out.println(&quot;A client connected.&quot;);
     }
 }</pre>
 
@@ -47,9 +47,9 @@ public class Server{
 <p>Methods:</p>
 
 <ul>
- <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html" title="class in java.net">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getInputStream--">getInputStream</a></span>()</code><br>
+ <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getInputStream--">getInputStream</a></span>()</code><br>
   Returns an input stream for this socket.</li>
- <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html" title="class in java.net">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getOutputStream--">getOutputStream</a></span>()</code><br>
+ <li><code>java.net.</code><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html">Socket</a><code> <span class="memberNameLink"><a href="http://docs.oracle.com/javase/8/docs/api/java/net/Socket.html#getOutputStream--">getOutputStream</a></span>()</code><br>
   Returns an output stream for this socket.</li>
 </ul>
 
@@ -73,13 +73,13 @@ public class Server{
 
 <pre class="brush: java">Socket client = server.accept();
 
-System.out.println("A client connected.");
+System.out.println(&quot;A client connected.&quot;);
 
 InputStream in = client.getInputStream();
 
 OutputStream out = client.getOutputStream();
 
-new Scanner(in, "UTF-8").useDelimiter("\\r\\n\\r\\n").next();</pre>
+new Scanner(in, &quot;UTF-8&quot;).useDelimiter(&quot;\\r\\n\\r\\n&quot;).next();</pre>
 
 <h2 id="Handshaking">Handshaking</h2>
 
@@ -90,9 +90,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //translate bytes of request to string
-String data = new Scanner(in,"UTF-8").useDelimiter("\\r\\n\\r\\n").next();
+String data = new Scanner(in,&quot;UTF-8&quot;).useDelimiter(&quot;\\r\\n\\r\\n&quot;).next();
 
-Matcher get = Pattern.compile("^GET").matcher(data);
+Matcher get = Pattern.compile(&quot;^GET&quot;).matcher(data);
 
 if (get.find()) {
 
@@ -106,26 +106,26 @@ if (get.find()) {
 
 <ol>
  <li>Obtain the value of <em>Sec-WebSocket-Key</em> request header without any leading and trailing whitespace</li>
- <li>Link it with "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"</li>
+ <li>Link it with &quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;</li>
  <li>Compute SHA-1 and Base64 code of it</li>
  <li>Write it back as value of <em>Sec-WebSocket-Accept</em> response header as part of a HTTP response.</li>
 </ol>
 
 <pre class="brush: java">if (get.find()) {
-    Matcher match = Pattern.compile("Sec-WebSocket-Key: (.*)").matcher(data);
+    Matcher match = Pattern.compile(&quot;Sec-WebSocket-Key: (.*)&quot;).matcher(data);
     match.find();
-    byte[] response = ("HTTP/1.1 101 Switching Protocols\r\n"
-            + "Connection: Upgrade\r\n"
-            + "Upgrade: websocket\r\n"
-            + "Sec-WebSocket-Accept: "
+    byte[] response = (&quot;HTTP/1.1 101 Switching Protocols\r\n&quot;
+            + &quot;Connection: Upgrade\r\n&quot;
+            + &quot;Upgrade: websocket\r\n&quot;
+            + &quot;Sec-WebSocket-Accept: &quot;
             + DatatypeConverter
             .printBase64Binary(
                     MessageDigest
-                    .getInstance("SHA-1")
-                    .digest((match.group(1) + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
-                            .getBytes("UTF-8")))
-            + "\r\n\r\n")
-            .getBytes("UTF-8");
+                    .getInstance(&quot;SHA-1&quot;)
+                    .digest((match.group(1) + &quot;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&quot;)
+                            .getBytes(&quot;UTF-8&quot;)))
+            + &quot;\r\n\r\n&quot;)
+            .getBytes(&quot;UTF-8&quot;);
 
     out.write(response, 0, response.length);
 }
@@ -135,7 +135,7 @@ if (get.find()) {
 
 <p>After a successful handshake, client can send messages to the server, but now these are encoded.</p>
 
-<p>If we send "abcdef", we get these bytes:</p>
+<p>If we send &quot;abcdef&quot;, we get these bytes:</p>
 
 <table>
  <tbody>

@@ -119,7 +119,7 @@ translation_of: Games/Anatomy
 
 <p>Los detalles dependen del juego.</p>
 
-<p>Algunos juegos dirigen este ciclo con la entrada del usuario. Imagina que estás desarrollando un juego del tipo <em>"encuentra las diferencias entre estas dos imágenes similares"</em>. Estos juegos <strong>presentan</strong> dos imágenes al usuario; <strong>aceptan</strong> sus clics (o toques); <strong>interpretan</strong> la entrada como éxito, fallo, pausa, interacción del menú, etc; y finalmente, calculan una escena actualizada resultante de esa entrada. El bucle del juego avanza con la entrada del usuario, y se queda en espera hasta que ésta se produce. Esto es más bien un enfoque basado por turnos que no requiere una actualización constante cada frame, sólo cuando el jugador reacciona.</p>
+<p>Algunos juegos dirigen este ciclo con la entrada del usuario. Imagina que estás desarrollando un juego del tipo <em>&quot;encuentra las diferencias entre estas dos imágenes similares&quot;</em>. Estos juegos <strong>presentan</strong> dos imágenes al usuario; <strong>aceptan</strong> sus clics (o toques); <strong>interpretan</strong> la entrada como éxito, fallo, pausa, interacción del menú, etc; y finalmente, calculan una escena actualizada resultante de esa entrada. El bucle del juego avanza con la entrada del usuario, y se queda en espera hasta que ésta se produce. Esto es más bien un enfoque basado por turnos que no requiere una actualización constante cada frame, sólo cuando el jugador reacciona.</p>
 
 <p>Otros juegos requieren control sobre cada uno de los más pequeños aspectos posibles. Se aplican los mismos principios de antes, con una ligera variación: cada frame de la animación hace progresar el ciclo, y cualquier cambio en la entrada del usuario se captura en el primer turno disponible. Este modelo de <em>una-vez-por-frame</em> se implementa en algo llamado <strong>bucle principal</strong>. Si el bucle de tu juego está basado en tiempo, éste será una ley a la que se tendrán que atener tus simulaciones.</p>
 
@@ -176,7 +176,7 @@ main(); // Empezar el ciclo</pre>
 
 <p>Note: In practice, it is more common to prevent the next requestAnimationFrame() with an if-statement, rather than calling cancelAnimationFrame().</p>
 
-<p>For the second issue, stopping the main loop, you will need to cancel the call to <code>main()</code> with <code><a href="/es/docs/Web/API/Window/cancelAnimationFrame" title="Cancela la petición de animación previamente programada a través de window.requestAnimationFrame()."><code>window.cancelAnimationFrame()</code></a></code>. You will need to pass <code>cancelAnimationFrame()</code> the ID token given by <code>requestAnimationFrame()</code> when it was last called. Let us assume that your game's functions and variables are built on a namespace that you called <code>MyGame</code>. Expanding our last example, the main loop would now look like:</p>
+<p>For the second issue, stopping the main loop, you will need to cancel the call to <code>main()</code> with <code><a href="/es/docs/Web/API/Window/cancelAnimationFrame" title="Cancela la petición de animación previamente programada a través de window.requestAnimationFrame()."><code>window.cancelAnimationFrame()</code></a></code>. You will need to pass <code>cancelAnimationFrame()</code> the ID token given by <code>requestAnimationFrame()</code> when it was last called. Let us assume that your game&apos;s functions and variables are built on a namespace that you called <code>MyGame</code>. Expanding our last example, the main loop would now look like:</p>
 
 <pre>/*
 * Starting with the semicolon is in case whatever line of code above this example
@@ -197,23 +197,23 @@ main(); // Empezar el ciclo</pre>
   main(); // Start the cycle
 })();</pre>
 
-<p>We now have a variable declared in our <code>MyGame</code> namespace, which we call <code>stopMain</code>, that contains the ID returned from our main loop's most recent call to <code>requestAnimationFrame()</code>. At any point, we can stop the main loop by telling the browser to cancel the request that corresponds to our token.</p>
+<p>We now have a variable declared in our <code>MyGame</code> namespace, which we call <code>stopMain</code>, that contains the ID returned from our main loop&apos;s most recent call to <code>requestAnimationFrame()</code>. At any point, we can stop the main loop by telling the browser to cancel the request that corresponds to our token.</p>
 
 <pre>window.cancelAnimationFrame( MyGame.stopMain );</pre>
 
-<p>The key to programming a main loop, in JavaScript, is to it attach to whatever event should be driving your action and pay attention to how the different systems involved interplay. You may have multiple components driven by multiple different types of events. This feels like unnecessary complexity but it might just be good optimization (not necessarily, of course). The problem is that you are not programming a typical main loop. In Javascript, you are using the browser's main loop and you are trying to do so effectively.</p>
+<p>The key to programming a main loop, in JavaScript, is to it attach to whatever event should be driving your action and pay attention to how the different systems involved interplay. You may have multiple components driven by multiple different types of events. This feels like unnecessary complexity but it might just be good optimization (not necessarily, of course). The problem is that you are not programming a typical main loop. In Javascript, you are using the browser&apos;s main loop and you are trying to do so effectively.</p>
 
 <h2 id="Building_a_more_optimized_main_loop_in_JavaScript">Building a <em>more</em> <em>optimized</em> main loop in JavaScript</h2>
 
 <p>Ultimately, in JavaScript, the browser is running its own main loop and your code exists in some of its stages. The above sections describe main loops which try not to wrestle away control from the browser. These main methods attach themselves to <code>window.requestAnimationFrame()</code>, which asks the browser for control over the upcoming frame. It is up to the browser how to relate these requests to their main loop. The <a href="http://www.w3.org/TR/animation-timing/">W3C spec for requestAnimationFrame</a> does not really define exactly when the browsers must perform the requestAnimationFrame callbacks. This can be a benefit because it leaves browser vendors free to experiment with the solutions that they feel are best and tweak it over time.</p>
 
-<p>Modern versions of Firefox and Google Chrome (and probably others) <em>attempt</em> to connect <code>requestAnimationFrame</code> callbacks to their main thread at the very beginning of a frame's timeslice. The browser's main thread thus <em>tries</em> to look like the following:</p>
+<p>Modern versions of Firefox and Google Chrome (and probably others) <em>attempt</em> to connect <code>requestAnimationFrame</code> callbacks to their main thread at the very beginning of a frame&apos;s timeslice. The browser&apos;s main thread thus <em>tries</em> to look like the following:</p>
 
 <ol>
  <li>Start a new frame (while the previous frame is handled by the display).</li>
  <li>Go through the list of <code>requestAnimationFrame</code> callbacks and invoke them.</li>
  <li>Perform garbage collection and other per-frame tasks when the above callbacks stop controlling the main thread.</li>
- <li>Sleep (unless an event interrupts the browser's nap) until the monitor is ready for your image (<a href="http://www.techopedia.com/definition/92/vertical-sync-vsync">VSync</a>) and repeat.</li>
+ <li>Sleep (unless an event interrupts the browser&apos;s nap) until the monitor is ready for your image (<a href="http://www.techopedia.com/definition/92/vertical-sync-vsync">VSync</a>) and repeat.</li>
 </ol>
 
 <p>You can think about developing realtime applications as having a budget of time to do work. All of the above steps must take place every 16-and-a-half milliseconds to keep up with a 60 Hz display. Browsers invoke your code as early as possible to give it maximum computation time. Your main thread will often start workloads that are not even on the main thread (such as rasterization or shaders in WebGL). Long calculations can be performed on a Web Worker or a GPU at the same time as the browser uses its main thread to manage garbage collection, its other tasks, or handle asynchronous events.</p>
@@ -243,7 +243,7 @@ main(); // Empezar el ciclo</pre>
     MyGame.stopMain = window.requestAnimationFrame( main );
 
     // Your main loop contents.
-    // tFrame, from "function main ( tFrame )", is now a DOMHighResTimeStamp provided by rAF.
+    // tFrame, from &quot;function main ( tFrame )&quot;, is now a DOMHighResTimeStamp provided by rAF.
   }
 
   main(); // Start the cycle
@@ -253,7 +253,7 @@ main(); // Empezar el ciclo</pre>
 
 <h2 id="It_is_decision..._time">It is decision... time</h2>
 
-<p>You will need to make hard decisions about your main loop: how to simulate the accurate progress of time. If you demand per-frame control then you will need to determine how frequently your game will update and draw. You might even want update and draw to occur at different rates. You will also need to consider how gracefully your game will fail if the user's system cannot keep up with the workload. Let us start by assuming that you will handle user input and update the game state every time you draw. We will branch out later.</p>
+<p>You will need to make hard decisions about your main loop: how to simulate the accurate progress of time. If you demand per-frame control then you will need to determine how frequently your game will update and draw. You might even want update and draw to occur at different rates. You will also need to consider how gracefully your game will fail if the user&apos;s system cannot keep up with the workload. Let us start by assuming that you will handle user input and update the game state every time you draw. We will branch out later.</p>
 
 <p><em><strong>Note</strong>: </em>Changing how your main loop deals with time is a debugging nightmare, everywhere. Think about your needs, carefully, before working on your main loop.</p>
 
@@ -274,7 +274,7 @@ main(); // Empezar el ciclo</pre>
   function main( tFrame ) {
     MyGame.stopMain = window.requestAnimationFrame( main );
 
-    update( tFrame ); //Call your update method. In our case, we give it rAF's timestamp.
+    update( tFrame ); //Call your update method. In our case, we give it rAF&apos;s timestamp.
     render();
   }
 
@@ -299,7 +299,7 @@ main(); // Empezar el ciclo</pre>
 <p>One common technique is to update the simulation at a constant frequency and then draw as much (or as little) of the actual frames as possible. The update method can continue looping without care about what the user sees. The draw method can view the last update and when it happened. Since draw knows when it represents, and the simulation time for the last update, it can predict a plausible frame to draw for the user. It does not matter whether this is more frequent than the official update loop (or even less frequent). The update method sets checkpoints and, as frequently as the system allows, the render method draws instants of time around them. There are many ways to separate the update method in web standards:</p>
 
 <ul>
- <li>Draw on <code>requestAnimationFrame</code> and update on a <a href="/es/docs/Web/API/Window/setInterval" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.setInterval</code></a> or <a href="/es/docs/Web/API/Window/setTimeout" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.setTimeout</code></a>.
+ <li>Draw on <code>requestAnimationFrame</code> and update on a <a href="/es/docs/Web/API/Window/setInterval"><code>window.setInterval</code></a> or <a href="/es/docs/Web/API/Window/setTimeout"><code>window.setTimeout</code></a>.
 
   <ul>
    <li>This uses processor time even when unfocused or minimized, hogs the main thread, and is probably an artifact of traditional game loops (but it is simple.)</li>
@@ -327,7 +327,7 @@ main(); // Empezar el ciclo</pre>
  <li>The mandatory interpolation has a performance penalty.</li>
 </ul>
 
-<p>A separate update and draw method could look like the following example. For the sake of demonstration, the example is based on the third bullet point, just without using Web Workers for readability (and, let's be honest, writeability).</p>
+<p>A separate update and draw method could look like the following example. For the sake of demonstration, the example is based on the third bullet point, just without using Web Workers for readability (and, let&apos;s be honest, writeability).</p>
 
 <p><em>Note: This example, specifically, is in need of technical review.</em></p>
 
@@ -405,7 +405,7 @@ main(); // Empezar el ciclo</pre>
 <p>An important thing to remember for managed platforms, like the web, is that your loop may stop execution for significant periods of time. This could occur when the user unselects your tab and the browser sleeps (or slows) its <code>requestAnimationFrame</code> callback interval. You have many ways to deal with this situation and this could depend on whether your game is single player or multiplayer. Some choices are:</p>
 
 <ul>
- <li>Consider the gap "a pause" and skip the time.
+ <li>Consider the gap &quot;a pause&quot; and skip the time.
   <ul>
    <li>You can probably see how this is problematic for most multiplayer games.</li>
   </ul>
@@ -417,7 +417,7 @@ main(); // Empezar el ciclo</pre>
  </li>
  <li>You can recover the game state from a peer or the server.
   <ul>
-   <li>This is ineffective if your peers or server are out-of-date too, or they don't exist because the game is single player and doesn't have a server.</li>
+   <li>This is ineffective if your peers or server are out-of-date too, or they don&apos;t exist because the game is single player and doesn&apos;t have a server.</li>
   </ul>
  </li>
 </ul>

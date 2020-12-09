@@ -17,7 +17,7 @@ tags:
 <ul>
  <li>La necesidad de un alto rendimiento más allá de lo que te ofrece el código JavaScript.</li>
  <li>El uso de bibliotecas de terceras partes escritas en C o en C++.</li>
- <li>El uso de interfaces de Mozilla que no están disponibles vía <a href="/es/XPCOM" title="es/XPCOM">XPCOM</a> (p.e, <a href="/es/NSPR" title="es/NSPR">NSPR</a>).</li>
+ <li>El uso de interfaces de Mozilla que no están disponibles vía <a href="/es/XPCOM">XPCOM</a> (p.e, <a href="/es/NSPR">NSPR</a>).</li>
 </ul>
 
 <p>Este artículo describe cómo configurar el entorno de desarrollo para una extensión de Firefox grande y compleja utilizando parcial o totalmente los requerimientos ya mencionados. El proceso de reunir esta información ha sido de algún modo un calvario debido a la falta de información publicada sobre este tema, aunque varios miembros de la comunidad de desarrolladores de Mozilla han colaborado en su creación. Ellos han mostrado una paciencia extraordinaria respondiendo preguntas típicas de novatos ignorantes. Me quedo corto si digo que estoy lejos de ser un experto de Mozilla, aunque voy mejorando. Puede que muchas partes de este documento sean imprecisas, confusas o simplemente incorrectas. De hecho, una de mis metas al escribir esto es afinar dichas instrucciones hasta que constituyan una guía definitiva para los hackers del núcleo que quieran ampliar la plataforma Firefox. Si tú eres uno de los muchos que saben más que yo sobre esto, tu ayuda mejorando este artículo será gratamente recibida.</p>
@@ -78,11 +78,11 @@ include $(topsrcdir)/config/rules.mk
 
 <p>Toda extensión debe incluir un fichero <code>install.rdf</code> que le diga a Firefox cómo instalarla. Este fichero debería estar ubicado en el directorio principal de la extensión y tener este aspecto:</p>
 
-<pre>&lt;?xml version="1.0"?&gt;
+<pre>&lt;?xml version=&quot;1.0&quot;?&gt;
 
-&lt;RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#"&gt;
-  &lt;Description about="urn:mozilla:install-manifest"&gt;
+&lt;RDF xmlns=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+     xmlns:em=&quot;http://www.mozilla.org/2004/em-rdf#&quot;&gt;
+  &lt;Description about=&quot;urn:mozilla:install-manifest&quot;&gt;
     &lt;em:id&gt;myextension@mycompany.com&lt;/em:id&gt;
     &lt;em:version&gt;0.1&lt;/em:version&gt;
 
@@ -203,23 +203,23 @@ EXTRA_DSO_LDOPTS += \
 	{ 0x00000000, 0x0000, 0x0000, \
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 
-#define MYFIRSTCOMPONENT_CONTRACTID	"@mycompany.com/myfirst;1"
-#define MYFIRSTCOMPONENT_CLASSNAME	"My First Component"
+#define MYFIRSTCOMPONENT_CONTRACTID	&quot;@mycompany.com/myfirst;1&quot;
+#define MYFIRSTCOMPONENT_CLASSNAME	&quot;My First Component&quot;
 </pre>
 
 <p>Obviamente necesitas completar el CID con un GUID real. Bajo Windows puede ser generado utilizando <a class="external" href="http://www.microsoft.com/downloads/details.aspx?familyid=94551F58-484F-4A8C-BB39-ADB270833AFC">guidgen.exe</a>. Los Unixeros pueden utilizar uuidgen (viene de modo predeterminado en la mayoría de distribuciones de Unix y Linux).</p>
 
 <p>Ahora crea el fichero <code>myExtension.cpp</code> así:</p>
 
-<pre>#include "nsXPCOM.h"
+<pre>#include &quot;nsXPCOM.h&quot;
 
-#include "nsIGenericFactory.h"
+#include &quot;nsIGenericFactory.h&quot;
 
 /**
  * Components to be registered
  */
-#include "myFirstComponent.h"
-#include "mySecondComponent.h"
+#include &quot;myFirstComponent.h&quot;
+#include &quot;mySecondComponent.h&quot;
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(myFirstComponent)
 NS_GENERIC_FACTORY_CONSTRUCTOR(mySecondComponent)
@@ -285,9 +285,9 @@ NS_IMPL_NSGETMODULE(MyExtension, components)
 
 <p>para que el script sepa dónde están tus fuentes (usará la ruta de la extensión que des relativa al directorio actual para resolver dónde quieres que vayan tus makefiles).</p>
 
-<p>Esto generará el makefile apropiado para tu extensión. Tanto si quieres compilar el árbol completo de Mozilla como si tomas este atajo, puedes compilar de ahora en adelante yendo a <code>/mozilla/$(MOZ_OBJDIR)/extensions/myextension/</code> y escribiendo "make" en la línea de órdenes. Esto debería compilar tu componente sin distraerse con el resto de Mozilla. Si todo va bien, verás tu fichero XPI en el área de pruebas de XPI. También verás la versión descomprimida (es decir, la estructura de directorios descomprimida) bajo <code>/mozilla/$(MOZ_OBJDIR)/dist/bin/extensions</code> (si algo va mal, averigua qué es, corrígelo y luego vuelve aquí y añádelo a este artículo).</p>
+<p>Esto generará el makefile apropiado para tu extensión. Tanto si quieres compilar el árbol completo de Mozilla como si tomas este atajo, puedes compilar de ahora en adelante yendo a <code>/mozilla/$(MOZ_OBJDIR)/extensions/myextension/</code> y escribiendo &quot;make&quot; en la línea de órdenes. Esto debería compilar tu componente sin distraerse con el resto de Mozilla. Si todo va bien, verás tu fichero XPI en el área de pruebas de XPI. También verás la versión descomprimida (es decir, la estructura de directorios descomprimida) bajo <code>/mozilla/$(MOZ_OBJDIR)/dist/bin/extensions</code> (si algo va mal, averigua qué es, corrígelo y luego vuelve aquí y añádelo a este artículo).</p>
 
-<p>Para asegurarte de que la compilación ha finalizado realmente, lanza Firefox y comprueba que tu extensión aparece en la lista cuando selecciones Herramientas / Complementos. Si estás usando Firefox como tu navegador habitual (y si no, ¿por qué no?), puede que te moleste el hecho que de que tendrás que cerrar tu Firefox normal antes de ejecutar tu versión personalizada. Si es así, prueba a establecer la variable de entorno <strong>MOZ_NO_REMOTE</strong> a "1" antes de ejecutar la versión de desarrollo de Firefox. También necesitarás usar un perfil diferente para tu versión de desarrollo:</p>
+<p>Para asegurarte de que la compilación ha finalizado realmente, lanza Firefox y comprueba que tu extensión aparece en la lista cuando selecciones Herramientas / Complementos. Si estás usando Firefox como tu navegador habitual (y si no, ¿por qué no?), puede que te moleste el hecho que de que tendrás que cerrar tu Firefox normal antes de ejecutar tu versión personalizada. Si es así, prueba a establecer la variable de entorno <strong>MOZ_NO_REMOTE</strong> a &quot;1&quot; antes de ejecutar la versión de desarrollo de Firefox. También necesitarás usar un perfil diferente para tu versión de desarrollo:</p>
 
 <pre class="eval">firefox -P <em>desarrollo</em>
 </pre>
@@ -296,7 +296,7 @@ NS_IMPL_NSGETMODULE(MyExtension, components)
 
 <h4 id="No_hay_nada_como_estar_en_chrome" name="No_hay_nada_como_estar_en_chrome">No hay nada como estar en chrome</h4>
 
-<p>¡Yuhuuuu! Ahora ya tienes una extensión que no hace absolutamente nada. Es hora de hacer algo con esos geniales componentes que implementaste y registraste. La forma más fácil de hacer esto es escribiendo algo de código <a href="/es/JavaScript" title="es/JavaScript">JavaScript</a> y <a href="/es/XUL" title="es/XUL">XUL</a>. En este punto sería de mucha utilidad tener algo de experiencia <a href="/es/Extensiones" title="es/Extensiones">escribiendo extensiones "normales"</a> (p.e., sin utilizar componentes de C++ personalizadas). Si nunca has hecho esto, te recomiendo encarecidamente que pienses una idea guay para algo simple que siempre hayas querido hacer para Firefox y lo escribas. Mostrar sólo un nuevo elemento de menú que abra un cuadro de diálogo "¡Hola mundo!" sería ya un gran ejercicio de precalentamiento.</p>
+<p>¡Yuhuuuu! Ahora ya tienes una extensión que no hace absolutamente nada. Es hora de hacer algo con esos geniales componentes que implementaste y registraste. La forma más fácil de hacer esto es escribiendo algo de código <a href="/es/JavaScript" title="es/JavaScript">JavaScript</a> y <a href="/es/XUL" title="es/XUL">XUL</a>. En este punto sería de mucha utilidad tener algo de experiencia <a href="/es/Extensiones" title="es/Extensiones">escribiendo extensiones &quot;normales&quot;</a> (p.e., sin utilizar componentes de C++ personalizadas). Si nunca has hecho esto, te recomiendo encarecidamente que pienses una idea guay para algo simple que siempre hayas querido hacer para Firefox y lo escribas. Mostrar sólo un nuevo elemento de menú que abra un cuadro de diálogo &quot;¡Hola mundo!&quot; sería ya un gran ejercicio de precalentamiento.</p>
 
 <p>Suponiendo que sabes cómo escribir extensiones en XUL/JavaScript, estarás al corriente de que la parte más importante va en el directorio <code>chrome/</code> de tu extensión. Bueno, el hecho de que estés utilizando también componentes C++ no cambia eso ni una pizca. Por tanto, ahora necesitas crear los directorios normales <code>content/</code>, <code>locale/</code> y <code>skin/</code> en los que has de poner tus ficheros chrome. Personalmente me gusta ubicar dichos directorios directamente bajo el directorio raíz de mi módulo pero supongo que no habrá diferencia si prefieres ponerlos bajo el subdirectorio <code>chrome/</code> o el que sea. ¡Viva la libertad!</p>
 
@@ -365,7 +365,7 @@ NS_IMPL_NSGETMODULE(MyExtension, components)
 
 <p>Más allá de eso, nada cambia. Los makefiles en los directorios <code>base/</code> y <code>advanced/</code> deberían tener más o menos el mismo aspecto que el makefile original del directorio raíz, sin olvidar cambiar la variable <strong>DEPTH</strong> para reflejar el hecho de que se han movido a un nivel más de profundidad respecto de la raíz de mozilla. También debes quitar la variable <strong>DIST_FILES</strong> porque va a estar en el makefile de nivel superior. Cada makefile que genere algo debería definir la variable <strong>XPI_NAME</strong> para asegurarse que los archivos generados van dentro de tu extensión y no dentro del directorio global <code>components/</code>. Define esto en cada makefile para asegurarte. Puedes usar el mismo <strong>MODULE</strong> para ambos casos, <code>base/</code> y <code>advanced/</code>, y así todos los archivos include generados irán al mismo directorio, pero asegúrate de no usar el mismo <strong>XPIDL_MODULE</strong> en los dos directorios <code>public/</code> o una de las bibliotecas de componentes (es decir, archivos XPT) sobrescribirá al otro y todo se echará a perder.</p>
 
-<p>Cada módulo debe tener también un valor diferente para la variable <strong>LIBRARY_NAME</strong>. Éste es el nombre de la biblioteca dinámica generada, así que si llamamos a las bibliotecas "myBase" y "myAdvance" entonces tendremos los archivos <code>myBase.dll</code> y <code>myAdvance.dll</code> (por lo menos así es en Windows). Y cada uno de estos módulos va a tener un archivo C++ separado para registrar componentes, así que va a haber dos archivos que lucirán como <code>myExtension.cpp</code> en el ejemplo original, digamos Base.cpp y Advanced.cpp. Por último, cada módulo tendrá, obviamente, su propio jar.mn, aunque pueden referenciar al mismo nombre de archivo JAR y nombre de paquete si quieres que todos los archivos chrome estén organizados en un mismo paquete y archivo JAR. El único que realmente permanece es install.rdf, que existe una vez y sólo una vez en el directorio raíz de la extensión.</p>
+<p>Cada módulo debe tener también un valor diferente para la variable <strong>LIBRARY_NAME</strong>. Éste es el nombre de la biblioteca dinámica generada, así que si llamamos a las bibliotecas &quot;myBase&quot; y &quot;myAdvance&quot; entonces tendremos los archivos <code>myBase.dll</code> y <code>myAdvance.dll</code> (por lo menos así es en Windows). Y cada uno de estos módulos va a tener un archivo C++ separado para registrar componentes, así que va a haber dos archivos que lucirán como <code>myExtension.cpp</code> en el ejemplo original, digamos Base.cpp y Advanced.cpp. Por último, cada módulo tendrá, obviamente, su propio jar.mn, aunque pueden referenciar al mismo nombre de archivo JAR y nombre de paquete si quieres que todos los archivos chrome estén organizados en un mismo paquete y archivo JAR. El único que realmente permanece es install.rdf, que existe una vez y sólo una vez en el directorio raíz de la extensión.</p>
 
 <p>En cuanto al makefile de nivel superior, ahora tendrá este aspecto:</p>
 
@@ -430,7 +430,7 @@ include $(topsrcdir)/config/rules.mk
 
 <p>Como puedes ver, hemos dividido <code>advanced/</code> dentro de dos submódulos: <code>intrincate/</code> y <code>multifarious/</code> y hemos añadido un directorio <code>build/</code> adicional. Hemos dejado los directorios chrome directamente bajo <code>advanced/</code>, los cuales no están enlazados a ningún submódulo específico. Esto significa que jar.mn estará en el mismo lugar.</p>
 
-<p>Los makefiles <code>intricate/</code> y <code>multifarious/</code> lucirán casi igual al makefile original <code>advanced/</code>, pero necesitamos modificarlos un poquito. Como siempre, debemos ajustar la variable <strong>DEPTH</strong> porque el makefile está más profundo en la estructura de directorios. Y deberíamos cambiar <strong>LIBRARY_NAME</strong> para indicar que estamos generando una biblioteca estática para cada submódulo. Por convenio, se usa el sufijo "_s" para este propósito. Así que las llamaremos "myIntricate_s" y "myMultifarious_s". Finalmente definimos la variable <strong>FORCE_STATIC_LIB</strong> para que quede un makefile que comience más o menos así:</p>
+<p>Los makefiles <code>intricate/</code> y <code>multifarious/</code> lucirán casi igual al makefile original <code>advanced/</code>, pero necesitamos modificarlos un poquito. Como siempre, debemos ajustar la variable <strong>DEPTH</strong> porque el makefile está más profundo en la estructura de directorios. Y deberíamos cambiar <strong>LIBRARY_NAME</strong> para indicar que estamos generando una biblioteca estática para cada submódulo. Por convenio, se usa el sufijo &quot;_s&quot; para este propósito. Así que las llamaremos &quot;myIntricate_s&quot; y &quot;myMultifarious_s&quot;. Finalmente definimos la variable <strong>FORCE_STATIC_LIB</strong> para que quede un makefile que comience más o menos así:</p>
 
 <pre>DEPTH		= ../../../../..
 topsrcdir	= @top_srcdir@
