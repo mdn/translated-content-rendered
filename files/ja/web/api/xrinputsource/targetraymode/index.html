@@ -1,0 +1,105 @@
+---
+title: XRInputSource.targetRayMode
+slug: Web/API/XRInputSource/targetRayMode
+tags:
+  - API
+  - AR
+  - Pointing
+  - Property
+  - Ray
+  - Read-only
+  - Reference
+  - VR
+  - WebXR
+  - WebXR API
+  - WebXR Device API
+  - XR
+  - XRInputSource
+  - direction
+  - pointer
+  - target
+  - targetRayMode
+translation_of: Web/API/XRInputSource/targetRayMode
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/XRInputSource"><code>XRInputSource</code></a></strong></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/API/XRInputSource/gripSpace"><code>gripSpace</code></a></li><li><a href="/ja/docs/Web/API/XRInputSource/handedness"><code>handedness</code></a></li><li><a href="/ja/docs/Web/API/XRInputSource/profiles"><code>profiles</code></a></li><li><em><code>targetRayMode</code></em></li><li><a href="/ja/docs/Web/API/XRInputSource/targetRaySpace"><code>targetRaySpace</code></a> <a href="/ja/docs/Web/API/XRInputSource/targetRaySpace$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol></details></li></ol></section><div class="secureContexts notecard"><p><strong>安全なコンテキスト用</strong><br>この機能は一部またはすべての<a href="#Browser_compatibility">対応しているブラウザー</a>において、<a href="/ja/docs/Web/Security/Secure_Contexts">安全なコンテキスト</a> (HTTPS) でのみ利用できます。</p></div>
+
+<p><a href="/ja/docs/Web/API/XRInputSource"><code>XRInputSource</code></a> の <strong><code>targetRayMode</code></strong> 読み取り専用プロパティは、入力ソースのターゲット光線を生成する方法と、それをユーザーに提示する方法を示します。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">let <em>rayMode</em> = <em>xrInputSource</em>.targetRayMode;</pre>
+
+<h3 id="Value" name="Value">値</h3>
+
+<p><a href="/ja/docs/Web/API/XRTargetRayMode"><code>XRTargetRayMode</code></a> 列挙型から取得した <a href="/ja/docs/Web/API/DOMString"><code>DOMString</code></a>。 ターゲット光線を生成してユーザーに提示するときに使用する方法を示します。 可能な値は次のとおりです。</p>
+
+<dl>
+ <dt><code>gaze</code>（視線）</dt>
+ <dd>ユーザーは、ユーザーが見ている方向を検出する視線追跡システム（または<strong>視線入力</strong>）を使用しています。 ターゲット光線は、ビューアーの目を起点として描画され、ビューアーが見ている方向に追従します。</dd>
+ <dt><code>screen</code>（画面）</dt>
+ <dd>ターゲット光線の方向は、タッチスクリーン、マウス、またはその他の触覚入力デバイスをタップして示します。</dd>
+ <dt><code>tracked-pointer</code>（追跡ポインター）</dt>
+ <dd>ターゲティングは、ユーザーがターゲットの方向に向けるハンドヘルドデバイスまたはハンドトラッキングシステムを使用して行われます。 ターゲット光線は、手（または手の中のオブジェクト）からターゲット方向に伸びます。 方向はプラットフォーム固有のルールを使用して決定されますが、そのようなルールが存在しない場合は、ユーザーが人差し指を手からまっすぐに向けていると仮定して方向が選択されます。</dd>
+</dl>
+
+<h2 id="Usage_notes" name="Usage_notes">使用上の注意</h2>
+
+<p>入力ソースの <a href="/ja/docs/Web/API/XRInputSource/targetRaySpace"><code>targetRaySpace</code></a> は、ターゲット光線の位置と向きを示し、光線をレンダリングする場所を決定するために使用できます。</p>
+
+<h2 id="Example" name="Example">例</h2>
+
+<p>このコードの断片は、フレームごとに1回呼び出される関数の一部を示しています。 <code>null</code> 以外の <a href="/ja/docs/Web/API/XRInputSource/targetRaySpace"><code>targetRaySpace</code></a> を持つ入力を探します。 このプロパティの値を持つ入力は、ターゲット光線をユーザーから外側に投影する入力を表します。</p>
+
+<p>このような入力ごとに、この例では、<a href="/ja/docs/Web/API/XRInputSource/targetRayMode"><code>targetRayMode</code></a> が <code>tracked-pointer</code> である入力を探します。 これは、入力が実際には、視線入力デバイス、画面タップ、またはマウスクリックではなく、ターゲティングデバイスを表すことを目的としていることを示しています。 追跡ポインターの場合、関数 <code>myRenderTargetRayAsBeam()</code> が呼び出され、入力コントローラーの仮想位置から、それが指している方向に外側にビームをレンダリングします。</p>
+
+<p>コードは、仮想空間でのユーザーの手の位置を表すコントローラーや任意のオブジェクトの描画、その他の入力関連のタスクなどを引き続き実行する必要があります。</p>
+
+<pre class="brush: js notranslate">function updateInputSources(session, frame, refSpace) {
+  for (let source of session.getInputSources()) {
+    let targetRayPose = frame.getPose(inputSource.targetRaySpace, refSpace);
+
+    if (targetRayPose) {
+      if (source.targetRayMode == &quot;tracked-pointer&quot;) {
+        myRenderTargetRayAsBeam(targetRayPose);
+      }
+    }
+
+    /* ... */
+  }
+}
+</pre>
+
+<p>詳細とより完全な例については、<a href="/ja/docs/Web/API/WebXR_Device_API/Inputs">入力と入力ソース</a>の記事を参照してください。</p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://immersive-web.github.io/webxr/#dom-xrinputsource-targetraymode" hreflang="en" lang="en">WebXR Device API<br><small lang="ja">XRInputSource.handedness の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<div class="bc-data" id="bcd:api.XRInputSource.handedness"></div>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="/ja/docs/Web/API/WebXR_Device_API">WebXR Device API</a></li>
+ <li><a href="/ja/docs/Web/API/WebXR_Device_API/Inputs">入力と入力ソース</a></li>
+ <li><a href="/ja/docs/Web/WebXR%20Device%20API/Gamepads">WebXR アプリケーションでのゲームパッドの使用</a></li>
+</ul>

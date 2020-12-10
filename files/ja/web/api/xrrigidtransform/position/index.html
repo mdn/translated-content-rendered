@@ -1,0 +1,102 @@
+---
+title: XRRigidTransform.position
+slug: Web/API/XRRigidTransform/position
+tags:
+  - 3D
+  - API
+  - AR
+  - Coordinates
+  - Location
+  - Point
+  - Position
+  - Property
+  - Reference
+  - VR
+  - WebXR
+  - WebXR API
+  - XR
+  - XRRigidTransform
+  - transform
+translation_of: Web/API/XRRigidTransform/position
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/WebXR_Device_API">WebXR Device API</a></strong></li><li><strong><a href="/ja/docs/Web/API/XRRigidTransform"><code>XRRigidTransform</code></a></strong></li><li class="toggle"><details open><summary>コンストラクター</summary><ol><li><a href="/ja/docs/Web/API/XRRigidTransform/XRRigidTransform"><code>XRRigidTransform()</code></a></li></ol></details></li><li class="toggle"><details open><summary>プロパティ</summary><ol><li><a href="/ja/docs/Web/API/XRRigidTransform/inverse"><code>inverse</code></a></li><li><a href="/ja/docs/Web/API/XRRigidTransform/matrix"><code>matrix</code></a></li><li><a href="/ja/docs/Web/API/XRRigidTransform/orientation"><code>orientation</code></a></li><li><em><code>position</code></em></li></ol></details></li><li class="toggle"><details open><summary>WebXR Device API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Navigator/xr"><code>Navigator.xr</code></a></li><li><a href="/ja/docs/Web/API/WebGLRenderingContext/makeXRCompatible"><code>WebGLRenderingContext.makeXRCompatible()</code></a></li><li><a href="/ja/docs/Web/API/XR"><code>XR</code></a></li><li><a href="/ja/docs/Web/API/XRBoundedReferenceSpace"><code>XRBoundedReferenceSpace</code></a></li><li><a href="/ja/docs/Web/API/XRFrame"><code>XRFrame</code></a></li><li><a href="/ja/docs/Web/API/XRInputSource"><code>XRInputSource</code></a></li><li><a href="/ja/docs/Web/API/XRInputSourceArray"><code>XRInputSourceArray</code></a></li><li><a href="/ja/docs/Web/API/XRInputSourceEvent"><code>XRInputSourceEvent</code></a></li><li><a href="/ja/docs/Web/API/XRInputSourcesChangeEvent"><code>XRInputSourcesChangeEvent</code></a></li><li><a href="/ja/docs/Web/API/XRPose"><code>XRPose</code></a></li><li><a href="/ja/docs/Web/API/XRReferenceSpace"><code>XRReferenceSpace</code></a></li><li><a href="/ja/docs/Web/API/XRReferenceSpaceEvent"><code>XRReferenceSpaceEvent</code></a></li><li><a href="/ja/docs/Web/API/XRRenderState"><code>XRRenderState</code></a></li><li><a href="/ja/docs/Web/API/XRSession"><code>XRSession</code></a></li><li><a href="/ja/docs/Web/API/XRSessionEvent"><code>XRSessionEvent</code></a></li><li><a href="/ja/docs/Web/API/XRSpace"><code>XRSpace</code></a></li><li><a href="/ja/docs/Web/API/XRView"><code>XRView</code></a></li><li><a href="/ja/docs/Web/API/XRViewerPose"><code>XRViewerPose</code></a></li><li><a href="/ja/docs/Web/API/XRViewport"><code>XRViewport</code></a></li><li><a href="/ja/docs/Web/API/XRWebGLLayer"><code>XRWebGLLayer</code></a></li></ol></details></li></ol></section>
+
+<p><a href="/ja/docs/Web/API/XRRigidTransform"><code>XRRigidTransform</code></a> の <strong><code>position</code></strong> 読み取り専用プロパティは、変換の平行移動成分を記述する、メートルで指定された 3D 点を提供する <a href="/ja/docs/Web/API/DOMPointReadOnly"><code>DOMPointReadOnly</code></a> オブジェクトです。</p>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">let <em>pos</em> = <em>xrRigidTransform</em>.position;</pre>
+
+<h3 id="Value" name="Value">値</h3>
+
+<p>変換行列の 3D 位置成分を示す読み取り専用の <a href="/ja/docs/Web/API/DOMPointReadOnly"><code>DOMPointReadOnly</code></a>。 単位はメートルです。</p>
+
+<div class="note notecard">
+<p><strong>注</strong>: 点の <code>w</code> 成分は常に 1.0 です。</p>
+</div>
+
+<h2 id="Example" name="Example">例</h2>
+
+<p>オブジェクトを目の高さに配置するために使用できる参照空間を作成するには、次のようにします（目の高さが 1.5 メートルであると想定）。</p>
+
+<pre class="brush: js notranslate">function onSessionStarted(xrSession) {
+  xrSession.addEventListener(&quot;end&quot;, onSessionEnded);
+
+  gl = initGraphics(xrSession);
+
+  let glLayer = new XRWebGLLayer(xrSession, gl);
+  xrSession.updateRenderState({ baseLayer: glLayer });
+
+  if (immersiveSession) {
+    xrSession.requestReferenceSpace(&quot;bounded-floor&quot;).then((refSpace) =&gt; {
+      refSpaceCreated(refSpace);
+    }).catch(() =&gt; {
+      session.requestReferenceSpace(&quot;local-floor&quot;).then(refSpaceCreated);
+    });
+  } else {
+    session.requestReferenceSpace(&quot;viewer&quot;).then(refSpaceCreated);
+  }
+}
+
+function refSpaceCreated(refSpace) {
+  if (immersiveSession) {
+    xrReferenceSpace = refSpace;
+  } else {
+    xrReferenceSpace = refSpace.getOffsetReferenceSpace(
+      new XRRigidTransform({y: -1.5});
+    );
+  }
+  xrSession.requestAnimationFrame(onFrame);
+}
+</pre>
+
+<p>WebXR で使用するグラフィックスコンテキストを設定した後、これは変数 <code>immersiveSession</code> が <code>true</code> であるかどうかを確認することから始まります。 その場合、最初に <code>bounded-floor</code> 参照空間を要求します。 それが失敗した場合（おそらく <code>bounded-floor</code> がサポートされていないため）、<code>local-floor</code> 参照空間を要求しようとします。</p>
+
+<p>没入型セッションでない場合は、代わりに <code>viewer</code> 参照空間を要求します。</p>
+
+<p>いずれの場合も、空間が取得されたら、<code>refSpaceCreated()</code> 関数に渡します。 没入型空間の場合、指定された空間は将来の使用のために単に保存します。 ただし、インラインセッションの場合、床レベルが自動的に調整されない空間にいることがわかっているので、オフセット参照空間を要求して、ビューアーの高さを推定床レベルの 0 メートルより 1.5 メートル上にシフトします。 その新しい参照空間は、最初に受け取ったものの代わりに使用します。</p>
+
+<p>最後に、アニメーションフレームの要求が送信されます。</p>
+
+<h2 id="Specifications" name="Specifications">仕様</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">仕様</th>
+   <th scope="col">状態</th>
+   <th scope="col">コメント</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://immersive-web.github.io/webxr/#dom-xrrigidtransform-position" hreflang="en" lang="en">WebXR Device API<br><small lang="ja">XRRigidTransform.position の定義</small></a></td>
+   <td><span class="spec-WD">草案</span></td>
+   <td>初期定義</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">ブラウザーの互換性</h2>
+
+<div><div class="bc-data" id="bcd:api.XRRigidTransform.position"></div></div>
