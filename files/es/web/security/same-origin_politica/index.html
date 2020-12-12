@@ -9,11 +9,11 @@ tags:
   - Seguridad
 translation_of: Web/Security/Same-origin_policy
 ---
-<p>La política same-origin (mismo-origen) restringe cómo un documento o script cargado desde un origen puede interactuar con un rescurso de otro origen. Es un mecanismo de seguridad crítico para aislar documentos potencialmente maliciosos.</p>
+<p>La política same-origin (mismo-origen) restringe cómo un documento o script cargado desde un origen puede interactuar con un recurso de otro origen. Es un mecanismo de seguridad crítico para aislar documentos potencialmente maliciosos.</p>
 
 <h2 id="Definición_de_origen">Definición de origen</h2>
 
-<p>Dos páginas tienen el mismo origen si el protocolo, puerto (si es especificado) y host son los mismo para ambas páginas. Verá esto a veces referido como la tupla esquema/host/puerto&quot; (donde una &quot;tupla&quot; es un conjunto de componentes que juntos forman un todo).</p>
+<p>Dos páginas tienen el <em>mismo origen</em> si el <a href="/es/docs/Glossary/Protocol">protocolo</a>, <a href="/es/docs/Glossary/Port">puerto</a> (si es especificado) y <a href="/es/docs/Glossary/Host">anfitrión</a> son los mismos para ambas páginas. Verá esto a veces referido como la &quot;tupla esquema/anfitrión/puerto&quot; (donde una &quot;tupla&quot; es un conjunto de componentes que juntos forman un todo).</p>
 
 <p>La siguiente tabla muestra ejemplos de comparaciones de origenes para la URL <code>http://store.company.com/dir/page.html</code>:</p>
 
@@ -59,10 +59,8 @@ translation_of: Web/Security/Same-origin_policy
 <p>Los scripts ejecutados desde páginas con una URL <code>about:blank</code> o <code>javascript:</code> heredan el origen del documento que contiene esa URL, puesto que esos tipos de URLs no contienen información sobre un servidor de origen.</p>
 
 <div class="note notecard">
-<p>Por ejemplo, <code>about:blank</code> a menudo se usa como URL de nuevas ventanas popup en las que el script padre escribe contenido (por ejemplo mediante el mecanismo <a href="/es/docs/Web/API/Window/open" title="Carga un recurso en el contexto de un nuevo navegador (como una ventana) o uno que ya existe, dependiendo de los parametros."><code>Window.open()</code></a>). Si este popup además contiene JavaScript, ese escript heredará el mismo origen que el script que lo ha creado.</p>
+<p>Por ejemplo, <code>about:blank</code> a menudo se usa como URL de nuevas ventanas popup en las que el script padre escribe contenido (por ejemplo mediante el mecanismo <a href="/es/docs/Web/API/Window/open"><code>Window.open()</code></a>). Si este popup además contiene JavaScript, ese escript heredará el mismo origen que el script que lo ha creado.</p>
 </div>
-
-<p> </p>
 
 <div class="warning notecard">
 <p><code>data:</code> URLs obtienen un nuevo, vacío, contexto de seguridad.</p>
@@ -81,22 +79,22 @@ translation_of: Web/Security/Same-origin_policy
 
 <h2 id="Cambiando_el_origen">Cambiando el origen</h2>
 
-<p>Una página puede cambiar su propio origen con algunas limitaciones. Un script puede asignar el valor de <a href="/es/docs/Web/API/Document/domain" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>document.domain</code></a> al dominio actual o a un superdominio del dominio actual. Si se asigna a un superdominio del dominio actual, el dominio más corto es usado para las posteriores comprobaciones de origen. Por ejemplo, sea un script en <code>http://store.company.com/dir/other.html</code> que ejecuta lo siguiente:</p>
+<p>Una página puede cambiar su propio origen con algunas limitaciones. Un script puede asignar el valor de <a href="/es/docs/Web/API/Document/domain"><code>document.domain</code></a> al dominio actual o a un superdominio del dominio actual. Si se asigna a un superdominio del dominio actual, el dominio más corto es usado para las posteriores comprobaciones de origen. Por ejemplo, sea un script en <code>http://store.company.com/dir/other.html</code> que ejecuta lo siguiente:</p>
 
-<pre>document.domain = &quot;company.com&quot;;
+<pre class="notranslate">document.domain = &quot;company.com&quot;;
 </pre>
 
-<p>Tras su ejecución, la página puede pasar la comprobación de origen con <code>http://company.com/dir/page.html</code> (asumiendo que <code>http://company.com/dir/page.html</code> asigna su <code>document.domain</code> a &quot;<code>company.com</code>&quot; para indicar que desea hacerlo - ver <a href="/es/docs/Web/API/Document/domain" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>document.domain</code></a> para más información). Sin embargo, <code>company.com</code> <strong>no</strong> podría asignar <code>document.domain</code> a <code>othercompany.com</code> ya que no es un superdominio de <code>company.com</code>.</p>
+<p>Tras su ejecución, la página puede pasar la comprobación de origen con <code>http://company.com/dir/page.html</code> (asumiendo que <code>http://company.com/dir/page.html</code> asigna su <code>document.domain</code> a &quot;<code>company.com</code>&quot; para indicar que desea hacerlo - ver <a href="/es/docs/Web/API/Document/domain"><code>document.domain</code></a> para más información). Sin embargo, <code>company.com</code> <strong>no</strong> podría asignar <code>document.domain</code> a <code>othercompany.com</code> ya que no es un superdominio de <code>company.com</code>.</p>
 
 <p>El número de puerto es guardado de forma separada por el navegador. Cualquier llamada al setter, incluyendo <code>document.domain = document.domain</code> causa que el número del puerto sea sobrescrito con <code>null</code>. Por lo tanto <strong>no se puede</strong> hacer que<code> company.com:8080</code> hable con  <code>company.com</code> solo asignando <code>document.domain = &quot;company.com&quot;</code> en el primero. Tiene que ser asignado en ambos para que los números de puerto sean <code>null</code>.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Nota:</strong> Cuando se use <code>document.domain</code> para permitir a un subdominio acceder a su padre de forma segura, necesitas asignar <code>document.domain</code> al mismo valor tanto en el padre como en el subdominio. Esto es necesario incluso si solo se asigna el dominio padre a su valor original. Un fallo al hacer esto puede resultar en errores de permisos.</p>
 </div>
 
 <h2 id="Acceso_de_red_de_origen_cruzado">Acceso de red de origen cruzado</h2>
 
-<p>La política de mismo origen controla las interacciones entre dos orígenes diferentes, como cuando se usa <a href="/es/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest es un objeto JavaScript que fue diseñado por Microsoft y adoptado por Mozilla, Apple y Google. Actualmente es un estándar de la W3C. Proporciona una forma fácil de obtener información de una URL sin tener que recargar la página completa. Una página web puede actualizar sólo una parte de la página sin interrumpir lo que el usuario está haciendo. XMLHttpRequest es ampliamente usado en la programación AJAX."><code>XMLHttpRequest</code></a> o un elemento <a href="/es/docs/Web/HTML/Elemento/img" title="&lt;img&gt;"><code>&lt;img&gt;</code></a>. Estas interacciones habitualmente se ubican en tres categorías:</p>
+<p>La política de mismo origen controla las interacciones entre dos orígenes diferentes, como cuando se usa <a href="/es/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> o un elemento <a href="/es/docs/Web/HTML/Elemento/img" title="&lt;img&gt;"><code>&lt;img&gt;</code></a>. Estas interacciones habitualmente se ubican en tres categorías:</p>
 
 <ul>
  <li>Las escrituras Cross-origin<em> </em>normalmente se permiten. Como ejemplo tenemos los enlaces, redirecciones y envíos de formulario. Algunas peticiones HTTP raramente usadas requieren <a href="/en-US/docs/HTTP/Access_control_CORS#Preflighted_requests">preflight</a>.</li>
@@ -130,9 +128,9 @@ translation_of: Web/Security/Same-origin_policy
 
 <h2 id="Acceso_script_API_de_Origen_Cruzado">Acceso script API de Origen Cruzado</h2>
 
-<p>Las APIs de JavaScript APIs tales como <a href="/en-US/docs/DOM/HTMLIFrameElement" title="DOM/HTMLIFrameElement"><code>iframe.contentWindow</code></a>, <a href="/es/docs/Web/API/Window/parent" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.parent</code></a>, <a href="/es/docs/Web/API/Window/open" title="Carga un recurso en el contexto de un nuevo navegador (como una ventana) o uno que ya existe, dependiendo de los parametros."><code>window.open</code></a> y <a href="/es/docs/Web/API/Window/opener" title="Devuelve una referencia de, la ventana que abrió la ventana actuál."><code>window.opener</code></a> permiten a los documentos referenciarse directamente entre ellos. Cuando dos documentos no tienen el mismo origen, estas referencias proveen un acceso muy limitado a los objetos <a href="/en-US/docs/Web/API/Window"><code>Window</code></a> y <a href="/en-US/docs/Web/API/Location"><code>Location</code></a>, como se describe en las siguientes dos secciones.</p>
+<p>Las APIs de JavaScript APIs tales como <a href="/en-US/docs/DOM/HTMLIFrameElement" title="DOM/HTMLIFrameElement"><code>iframe.contentWindow</code></a>, <a href="/es/docs/Web/API/Window/parent"><code>window.parent</code></a>, <a href="/es/docs/Web/API/Window/open"><code>window.open</code></a> y <a href="/es/docs/Web/API/Window/opener"><code>window.opener</code></a> permiten a los documentos referenciarse directamente entre ellos. Cuando dos documentos no tienen el mismo origen, estas referencias proveen un acceso muy limitado a los objetos <a href="/en-US/docs/Web/API/Window"><code>Window</code></a> y <a href="/en-US/docs/Web/API/Location"><code>Location</code></a>, como se describe en las siguientes dos secciones.</p>
 
-<p>Para una mayor comunicación entre documentos de origenes diferentes, usar <a href="/es/docs/Web/API/Window/postMessage" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.postMessage</code></a>.</p>
+<p>Para una mayor comunicación entre documentos de origenes diferentes, usar <a href="/es/docs/Web/API/Window/postMessage"><code>window.postMessage</code></a>.</p>
 
 <h3 id="Window">Window</h3>
 

@@ -528,7 +528,7 @@ translation_of: Learn/Server-side/Django/Forms
 
 <p>Django 提供了许多工具和方法，来帮助您完成上述任务。最基本的是 <code>Form</code> 类，它简化了表单 HTML 和数据清理/验证的生成。在下一节中，我们将描述表单如何使用页面的实际示例，来允许图书馆员更新书本籍。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 在我们讨论 Django 更“高级”的表单框架类时，了解 <code>Form</code> 的使用方式，将对您有所帮助。</p>
 </div>
 
@@ -608,7 +608,7 @@ class RenewBookForm(forms.Form):
 
 <p>第二点是，如果某个值超出了我们的范围，我们会引发<code>ValidationError</code>，指定在输入无效值时，我们要在表单中显示的错误文本。上面的例子，也将这个文本包含在 <a href="https://docs.djangoproject.com/zh-hans/2.0/topics/i18n/translation/">Django 的翻译函数</a><code>ugettext_lazy()</code>中（导入为 <code>_()</code>），如果你想在稍后翻译你的网站，这是一个很好的做法。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong>  在<a href="https://docs.djangoproject.com/zh-hans/2.0/ref/forms/validation/">表单和字段验证</a>（Django docs）中验证表单还有其他很多方法和示例。例如，如果您有多个相互依赖的字段，则可以覆盖<a href="https://docs.djangoproject.com/en/2.0/ref/forms/api/#django.forms.Form.clean">Form.clean()</a> 函数并再次引发<code>ValidationError</code>。</p>
 </div>
 
@@ -628,7 +628,7 @@ class RenewBookForm(forms.Form):
 
 <p>URL 配置会将格式为 <strong>/catalog/book/<em>&lt;bookinstance id&gt;</em>/renew/</strong>的URL，重定向到 <strong>views.py </strong>中，名为<code>renew_book_librarian()</code> 的函数，并将<code>BookInstance</code> id作为名为 <code>pk</code>的参数发送。只有 <code>pk</code>是正确格式化的 <code>uuid</code>，该模式才会匹配。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意</strong>:  我们可以将捕获的 URL 数据，命名为“<code>pk</code>”，因为我们可以完全控制视图函数（我们不使用需要具有特定名称的参数的通用详细视图类）。然而，<code>pk</code>，“主键” primary key 的缩写，是一个合理的惯例！</p>
 </div>
 
@@ -793,7 +793,7 @@ def renew_book_librarian(request, pk):
 
 <p>表单代码相对简单。首先，我们声明表单标签，指定表单的提交位置（<code>action</code>）和提交数据的方法（在本例中为 “HTTP POST”） - 如果您回想一下页面顶部的 HTML 表单概述，如图所示的空<code>action</code> ，意味着表单数据将被发布回页面的当前 URL（这是我们想要的！）。在标签内部，我们定义了<code>submit</code> 提交输入，用户可以按这个输入来提交数据。在表单标签内添加的<code>{% csrf_token %}</code> ，是 Django 跨站点伪造保护的一部分。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong>  将<code>{% csrf_token %}</code> 添加到您创建的每个使用 <code>POST</code> 提交数据的 Django 模板中。这将减少恶意用户劫持表单的可能性。</p>
 </div>
 
@@ -809,7 +809,7 @@ def renew_book_librarian(request, pk):
 &lt;/tr&gt;
 </pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong>   它可能并不明显，因为我们只有一个字段，但默认情况下，每个字段都在其自己的表格行中定义（这就是变量在上面的<code>table </code>表格标记内部的原因）。如果您引用模板变量<code>{{ form.as_table }}</code>，会提供相同的渲染。</p>
 </div>
 
@@ -849,7 +849,7 @@ def renew_book_librarian(request, pk):
 
 <pre class="brush: html notranslate">{% if perms.catalog.can_mark_returned %}- &lt;a href=&quot;{% url &apos;renew-book-librarian&apos; bookinst.id %}&quot;&gt;Renew&lt;/a&gt;  {% endif %}</pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意</strong>:  请记住，您的测试登录需要具有“<code>catalog.can_mark_returned</code>”权限，才能访问续借书本页面（可能使用您的超级用户帐户）。</p>
 </div>
 
@@ -886,7 +886,7 @@ class RenewBookModelForm(ModelForm):
         fields = [&apos;due_back&apos;,]</strong>
 </pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意</strong>:  这可能看起来不像使用<code>Form</code> 那么简单（在这种情况下不是这样，因为我们只有一个字段）。但是，如果你有很多字段，它可以显着减少代码量！</p>
 </div>
 
@@ -932,7 +932,7 @@ class RenewBookModelForm(ModelForm):
 
 <p>我们在上面的函数视图示例中，使用的表单处理算法，表示表单编辑视图中非常常见的模式。 Django 通过创建基于模型创建、编辑和删除视图的<a href="https://docs.djangoproject.com/zh-hans/2.0/ref/class-based-views/generic-editing/">通用编辑视图</a>，为您抽象出大部分“样板”。这些不仅处理“视图”行为，而且它们会自动从模型中为您创建表单类（<code>ModelForm</code>）。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:  </strong>除了这里描述的编辑视图之外，还有一个 <a href="https://docs.djangoproject.com/zh-hans/2.0/ref/class-based-views/generic-editing/#formview">FormView </a>类，它位于我们的函数视图，和其他通用视图之间的 “灵活性” 与 “编码工作” 之间。使用 <code>FormView</code> ，您仍然需要创建表单，但不必实现所有标准表单处理模式。相反，您只需提供一个函数的实现，一旦知道提交有效，就会调用该函数。</p>
 </div>
 
@@ -1019,7 +1019,7 @@ class AuthorDelete(DeleteView):
 
 <p>作者的创建，更新和删除页面，现在已准备好进行测试（在这种情况下，我们不会将它们连接到站点侧栏，尽管如果您愿意，也可以这样做）。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意</strong>:   敏锐的用户会注意到，我们没有采取任何措施，来防止未经授权的用户访问这些页面！我们将其作为练习留给您（提示：您可以使用<code>PermissionRequiredMixin</code> ，并创建新权限，或重用我们的<code>can_mark_returned</code>权限）。</p>
 </div>
 

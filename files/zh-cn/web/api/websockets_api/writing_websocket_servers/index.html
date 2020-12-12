@@ -14,7 +14,7 @@ translation_of: Web/API/WebSockets_API/Writing_WebSocket_servers
 
 <p>您需要知道HTTP的工作原理，并具有中级编程经验。 根据语言帮助（Depending on language support），可能需要TCP套接字的知识。 本指南的范围是介绍编写WebSocket服务器所需的最低知识。</p>
 
-<div class="note">
+<div class="note notecard">
 <p>阅读最新的官方WebSockets规范， <a href="http://datatracker.ietf.org/doc/rfc6455/?include_text=1">RFC 6455</a>. 第1节和第4-7节对服务器实现者特别有意思。第10节讨论安全性，你应该在暴露你的服务器之前仔细阅读它。</p>
 </div>
 
@@ -45,15 +45,15 @@ Sec-WebSocket-Version: 13</code></pre>
 
 <p>如果任何请求头信息不被理解或者具有不正确的值，则服务器应该发送“<a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes#400">400 Bad Request</a>”并立即关闭套接字。 像往常一样，它也可能会给出HTTP响应正文中握手失败的原因，但可能永远不会显示消息（浏览器不显示它）。 如果服务器不理解该版本的WebSocket，则应该发送一个<code>Sec-WebSocket-Version</code>头，其中包含它理解的版本。 （本指南解释了最新的v13）。 下面我们来看看奇妙的请求头<code>Sec-WebSocket-Key</code>。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>提示:</strong> 所有浏览器将会发送一个 <code><a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS#Origin">Origin</a></code>请求头。 你可以将这个请求头用于安全方面（检查是否是同一个域，白名单/ 黑名单等），如果你不喜欢这个请求发起源，你可以发送一个<a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes#403">403 Forbidden</a>。需要注意的是非浏览器只能发送一个模拟的 <code>Origin</code>。大多数应用会拒绝不含这个请求头的请求.。</p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>提示:</strong> 请求URI（这里的是<code>/chat</code>）在规范里没有定义。很多开发者聪明地把这点用于控制多功能WebSocket应用。例如<code>example.com/chat</code>会请求一个多方会话应用，而在相同服务器上<code>example.com/game</code>则会请求一个多玩家游戏应用。</p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> <a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes">常规HTTP状态码</a>只能在握手之前使用。 握手成功后，你必须使用一组不同的代码（在规范的第7.4节中定义）。</p>
 </div>
 
@@ -70,13 +70,13 @@ Connection: Upgrade
 
 <p>另外，服务器可以在这时候决定插件或子协议，详情参见<a href="/zh-CN/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#Miscellaneous">杂项</a>。  <code>Sec-WebSocket-Accept</code> 参数很有趣，它需要服务器通过客户端发送的<code>Sec-WebSocket-Key</code> 计算出来。 怎样计算呢， 把客户发送的<span style="line-height: 1.5em;"> </span><code style="font-size: 14px;">Sec-WebSocket-Key</code><span style="line-height: 1.5em;"> 和 &quot;</span><code style="font-size: 14px;">258EAFA5-E914-47DA-95CA-C5AB0DC85B11</code><span style="line-height: 1.5em;">&quot; (这个叫做 &quot;</span><a href="https://en.wikipedia.org/wiki/Magic_string" style="line-height: 1.5em;">魔法值</a><span style="line-height: 1.5em;">&quot;)连接起来，把结果用<a href="https://zh.wikipedia.org/wiki/SHA-1">SHA-1</a>编码，再用<a href="https://zh.wikipedia.org/wiki/Base64">base64</a>编码一次，就可以了。 </span></p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>参考：</strong>这看起来繁复的处理使得客户端明确服务端是否支持WebSocket。这是十分重要的，如果服务端接收到一个WebSocket连接但是把数据作为HTTP请求理解可能会导致安全问题。</p>
 </div>
 
 <p>所以如果Sec-WebSocket-Key是“<code>dGhlIHNhbXBsZSBub25jZQ==</code>”，Sec-WebSocket-Accept将是“<code>s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</code>”。 一旦服务器发送这个请求头，握手就完成了，你可以开始交换数据！</p>
 
-<div class="note">
+<div class="note notecard">
 <p>服务端可以在发送握手回复前发送其他请求头，诸如Set-Cookie，请求认证或通过状态码重定向。</p>
 </div>
 
@@ -165,7 +165,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <p>一个ping 或者 pong 都只是一个常规的帧， 只是这个帧是一个<strong>控制帧</strong>。Ping消息的opcode字段值为 <code>0x9</code>，pong消息的opcode值为  <code>0xA</code> 。当你获取到一个ping消息的时候，回复一个跟ping消息有相同载荷数据的pong消息 (对于ping和pong，最大载荷长度位125)。 你也有可能在没有发送ping消息的情况下，获取一个pong消息，当这种情况发生的时候忽略它。</p>
 
-<div class="note">
+<div class="note notecard">
 <p>如果在你有机会发送一个pong消息之前，你已经获取了超过一个的ping消息，那么你只发送一个pong消息。</p>
 </div>
 
@@ -175,7 +175,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <h2 id="杂项"><a name="Miscellaneous">杂项</a></h2>
 
-<div class="note">
+<div class="note notecard">
 <p>WebSocket代码、扩展、子协议等在 <a href="http://www.iana.org/assignments/websocket/websocket.xml">IANA WebSocket Protocol Registry</a>.注册。</p>
 </div>
 
@@ -183,13 +183,13 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <h3 id="扩展">扩展</h3>
 
-<div class="note">
+<div class="note notecard">
 <p>本节需要扩张。请编辑如果你有这样做的准备。</p>
 </div>
 
 <p>Think of an extension as compressing a file before e-mailing it to someone. Whatever you do, you&apos;re sending the <em>same</em> data in different forms. The recipient will eventually be able to get the same data as your local copy, but it is sent differently. That&apos;s what an extension does. WebSockets defines a protocol and a simple way to send data, but an extension such as compression could allow sending the same data but in a shorter format.</p>
 
-<div class="note">
+<div class="note notecard">
 <p>扩展在规范的 5.8, 9, 11.3.2, and 11.4 进行了解释</p>
 </div>
 
@@ -201,7 +201,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <p>WebSocket子协议就是像这样的东西。它们不作任何假设实现，只是确立框架。就像一个文件类型或概要。与文件类型或概要类似，通信双方都需要同意子协议；于文件类型或概要不同的是，子协议在服务端实现，而不能由客户端参考第三方。</p>
 
-<div class="note">
+<div class="note notecard">
 <p>子协议在规范的章节1.9，4.2，11.3.4和11.5有做解释。</p>
 </div>
 
@@ -230,7 +230,7 @@ Sec-WebSocket-Protocol: wamp
 
 <p>如果您希望您的服务器遵守某些子协议，那么很自然地，您需要服务器上的额外代码。假设我们使用的是子协议JSON。在这个子协议中，所有数据都以JSON的形式传递。如果客户端请求这个协议，而服务器想要使用它，服务器将需要一个JSON解析器。实际上，这是库的一部分，但是服务器需要传递数据。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>提示：</strong>为了避免命名冲突，建议将你的子协议名称加上域名字符串。如果您正在构建一个自定义聊天应用程序，该应用程序使用的是Example Inc.独有的专有格式，那么您可以使用这个:<code>Sec-WebSocket-Protocol: chat.example.com</code>.注意，这不是必需的，它只是一个可选的约定，您可以使用任何字符串。</p>
 </div>
 

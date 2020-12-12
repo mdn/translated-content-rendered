@@ -9,25 +9,25 @@ translation_of: Learn/Server-side/Express_Nodejs/forms/Create_BookInstance_form
 
 <p>打開 <strong>/controllers/bookinstanceController.js</strong>，並在檔案最上方，加入以下幾行:</p>
 
-<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">const</span> <span class="punctuation token">{</span> body<span class="punctuation token">,</span>validationResult <span class="punctuation token">}</span> <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">'express-validator/check'</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
-<span class="keyword token">const</span> <span class="punctuation token">{</span> sanitizeBody <span class="punctuation token">}</span> <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">'express-validator/filter'</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">const</span> <span class="punctuation token">{</span> body<span class="punctuation token">,</span>validationResult <span class="punctuation token">}</span> <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">&apos;express-validator/check&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+<span class="keyword token">const</span> <span class="punctuation token">{</span> sanitizeBody <span class="punctuation token">}</span> <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">&apos;express-validator/filter&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 
 <h2 class="highlight-spanned" id="Controller—get_route"><span class="highlight-span">Controller—get route</span></h2>
 
 <p>At the top of the file, require the <em>Book</em> module (needed because each <code>BookInstance</code> is associated with a particular <code>Book</code>).</p>
 
-<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">var</span> Book <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">'../models/book'</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
+<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">var</span> Book <span class="operator token">=</span> <span class="function token">require</span><span class="punctuation token">(</span><span class="string token">&apos;../models/book&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 
 <p>Find the exported <code>bookinstance_create_get()</code> controller method and replace it with the following code.</p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="comment token">// Display BookInstance create form on GET.</span>
 exports<span class="punctuation token">.</span>bookinstance_create_get <span class="operator token">=</span> <span class="keyword token">function</span><span class="punctuation token">(</span>req<span class="punctuation token">,</span> res<span class="punctuation token">,</span> next<span class="punctuation token">)</span> <span class="punctuation token">{</span>
 
-    Book<span class="punctuation token">.</span><span class="function token">find</span><span class="punctuation token">(</span><span class="punctuation token">{</span><span class="punctuation token">}</span><span class="punctuation token">,</span><span class="string token">'title'</span><span class="punctuation token">)</span>
+    Book<span class="punctuation token">.</span><span class="function token">find</span><span class="punctuation token">(</span><span class="punctuation token">{</span><span class="punctuation token">}</span><span class="punctuation token">,</span><span class="string token">&apos;title&apos;</span><span class="punctuation token">)</span>
     <span class="punctuation token">.</span><span class="function token">exec</span><span class="punctuation token">(</span><span class="keyword token">function</span> <span class="punctuation token">(</span>err<span class="punctuation token">,</span> books<span class="punctuation token">)</span> <span class="punctuation token">{</span>
       <span class="keyword token">if</span> <span class="punctuation token">(</span>err<span class="punctuation token">)</span> <span class="punctuation token">{</span> <span class="keyword token">return</span> <span class="function token">next</span><span class="punctuation token">(</span>err<span class="punctuation token">)</span><span class="punctuation token">;</span> <span class="punctuation token">}</span>
       <span class="comment token">// Successful, so render.</span>
-      res<span class="punctuation token">.</span><span class="function token">render</span><span class="punctuation token">(</span><span class="string token">'bookinstance_form'</span><span class="punctuation token">,</span> <span class="punctuation token">{</span>title<span class="punctuation token">:</span> <span class="string token">'Create BookInstance'</span><span class="punctuation token">,</span> book_list<span class="punctuation token">:</span>books<span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+      res<span class="punctuation token">.</span><span class="function token">render</span><span class="punctuation token">(</span><span class="string token">&apos;bookinstance_form&apos;</span><span class="punctuation token">,</span> <span class="punctuation token">{</span>title<span class="punctuation token">:</span> <span class="string token">&apos;Create BookInstance&apos;</span><span class="punctuation token">,</span> book_list<span class="punctuation token">:</span>books<span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
     <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
 
 <span class="punctuation token">}</span><span class="punctuation token">;</span></code></pre>
@@ -42,15 +42,15 @@ exports<span class="punctuation token">.</span>bookinstance_create_get <span cla
 exports<span class="punctuation token">.</span>bookinstance_create_post <span class="operator token">=</span> <span class="punctuation token">[</span>
 
     <span class="comment token">// Validate fields.</span>
-    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">'book'</span><span class="punctuation token">,</span> <span class="string token">'Book must be specified'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isLength</span><span class="punctuation token">(</span><span class="punctuation token">{</span> min<span class="punctuation token">:</span> <span class="number token">1</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
-    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">'imprint'</span><span class="punctuation token">,</span> <span class="string token">'Imprint must be specified'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isLength</span><span class="punctuation token">(</span><span class="punctuation token">{</span> min<span class="punctuation token">:</span> <span class="number token">1</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
-    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">'due_back'</span><span class="punctuation token">,</span> <span class="string token">'Invalid date'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">optional</span><span class="punctuation token">(</span><span class="punctuation token">{</span> checkFalsy<span class="punctuation token">:</span> <span class="keyword token">true</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isISO8601</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">&apos;book&apos;</span><span class="punctuation token">,</span> <span class="string token">&apos;Book must be specified&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isLength</span><span class="punctuation token">(</span><span class="punctuation token">{</span> min<span class="punctuation token">:</span> <span class="number token">1</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">&apos;imprint&apos;</span><span class="punctuation token">,</span> <span class="string token">&apos;Imprint must be specified&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isLength</span><span class="punctuation token">(</span><span class="punctuation token">{</span> min<span class="punctuation token">:</span> <span class="number token">1</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">body</span><span class="punctuation token">(</span><span class="string token">&apos;due_back&apos;</span><span class="punctuation token">,</span> <span class="string token">&apos;Invalid date&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">optional</span><span class="punctuation token">(</span><span class="punctuation token">{</span> checkFalsy<span class="punctuation token">:</span> <span class="keyword token">true</span> <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">isISO8601</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
 
     <span class="comment token">// Sanitize fields.</span>
-    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">'book'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
-    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">'imprint'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
-    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">'status'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
-    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">'due_back'</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">toDate</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">&apos;book&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">&apos;imprint&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">&apos;status&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">trim</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">escape</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
+    <span class="function token">sanitizeBody</span><span class="punctuation token">(</span><span class="string token">&apos;due_back&apos;</span><span class="punctuation token">)</span><span class="punctuation token">.</span><span class="function token">toDate</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span>
 
     <span class="comment token">// Process request after validation and sanitization.</span>
     <span class="punctuation token">(</span>req<span class="punctuation token">,</span> res<span class="punctuation token">,</span> next<span class="punctuation token">)</span> <span class="operator token">=</span><span class="operator token">&gt;</span> <span class="punctuation token">{</span>
@@ -68,11 +68,11 @@ exports<span class="punctuation token">.</span>bookinstance_create_post <span cl
 
         <span class="keyword token">if</span> <span class="punctuation token">(</span><span class="operator token">!</span>errors<span class="punctuation token">.</span><span class="function token">isEmpty</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">)</span> <span class="punctuation token">{</span>
             <span class="comment token">// There are errors. Render form again with sanitized values and error messages.</span>
-            Book<span class="punctuation token">.</span><span class="function token">find</span><span class="punctuation token">(</span><span class="punctuation token">{</span><span class="punctuation token">}</span><span class="punctuation token">,</span><span class="string token">'title'</span><span class="punctuation token">)</span>
+            Book<span class="punctuation token">.</span><span class="function token">find</span><span class="punctuation token">(</span><span class="punctuation token">{</span><span class="punctuation token">}</span><span class="punctuation token">,</span><span class="string token">&apos;title&apos;</span><span class="punctuation token">)</span>
                 <span class="punctuation token">.</span><span class="function token">exec</span><span class="punctuation token">(</span><span class="keyword token">function</span> <span class="punctuation token">(</span>err<span class="punctuation token">,</span> books<span class="punctuation token">)</span> <span class="punctuation token">{</span>
                     <span class="keyword token">if</span> <span class="punctuation token">(</span>err<span class="punctuation token">)</span> <span class="punctuation token">{</span> <span class="keyword token">return</span> <span class="function token">next</span><span class="punctuation token">(</span>err<span class="punctuation token">)</span><span class="punctuation token">;</span> <span class="punctuation token">}</span>
                     <span class="comment token">// Successful, so render.</span>
-                    res<span class="punctuation token">.</span><span class="function token">render</span><span class="punctuation token">(</span><span class="string token">'bookinstance_form'</span><span class="punctuation token">,</span> <span class="punctuation token">{</span> title<span class="punctuation token">:</span> <span class="string token">'Create BookInstance'</span><span class="punctuation token">,</span> book_list <span class="punctuation token">:</span> books<span class="punctuation token">,</span> selected_book <span class="punctuation token">:</span> bookinstance<span class="punctuation token">.</span>book<span class="punctuation token">.</span>_id <span class="punctuation token">,</span> errors<span class="punctuation token">:</span> errors<span class="punctuation token">.</span><span class="function token">array</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span> bookinstance<span class="punctuation token">:</span>bookinstance <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+                    res<span class="punctuation token">.</span><span class="function token">render</span><span class="punctuation token">(</span><span class="string token">&apos;bookinstance_form&apos;</span><span class="punctuation token">,</span> <span class="punctuation token">{</span> title<span class="punctuation token">:</span> <span class="string token">&apos;Create BookInstance&apos;</span><span class="punctuation token">,</span> book_list <span class="punctuation token">:</span> books<span class="punctuation token">,</span> selected_book <span class="punctuation token">:</span> bookinstance<span class="punctuation token">.</span>book<span class="punctuation token">.</span>_id <span class="punctuation token">,</span> errors<span class="punctuation token">:</span> errors<span class="punctuation token">.</span><span class="function token">array</span><span class="punctuation token">(</span><span class="punctuation token">)</span><span class="punctuation token">,</span> bookinstance<span class="punctuation token">:</span>bookinstance <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
             <span class="punctuation token">}</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
             <span class="keyword token">return</span><span class="punctuation token">;</span>
         <span class="punctuation token">}</span>
@@ -98,49 +98,49 @@ exports<span class="punctuation token">.</span>bookinstance_create_post <span cl
 block content
   h1=title
 
-  form(method='POST' action='')
+  form(method=&apos;POST&apos; action=&apos;&apos;)
     div.form-group
-      label(for='book') Book:
-      select#book.form-control(type='select' placeholder='Select book' name='book' required='true')
+      label(for=&apos;book&apos;) Book:
+      select#book.form-control(type=&apos;select&apos; placeholder=&apos;Select book&apos; name=&apos;book&apos; required=&apos;true&apos;)
         for book in book_list
           if bookinstance
-            option(value=book._id selected=(bookinstance.book.toString()==book._id.toString() ? 'selected' : false)) #{book.title}
+            option(value=book._id selected=(bookinstance.book.toString()==book._id.toString() ? &apos;selected&apos; : false)) #{book.title}
           else
             option(value=book._id) #{book.title}
 
     div.form-group
-      label(for='imprint') Imprint:
-      input#imprint.form-control(type='text' placeholder='Publisher and date information' name='imprint' required='true' value=(undefined===bookinstance ? '' : bookinstance.imprint))
+      label(for=&apos;imprint&apos;) Imprint:
+      input#imprint.form-control(type=&apos;text&apos; placeholder=&apos;Publisher and date information&apos; name=&apos;imprint&apos; required=&apos;true&apos; value=(undefined===bookinstance ? &apos;&apos; : bookinstance.imprint))
     div.form-group
-      label(for='due_back') Date when book available:
-      input#due_back.form-control(type='date' name='due_back' value=(undefined===bookinstance ? '' : bookinstance.due_back))
+      label(for=&apos;due_back&apos;) Date when book available:
+      input#due_back.form-control(type=&apos;date&apos; name=&apos;due_back&apos; value=(undefined===bookinstance ? &apos;&apos; : bookinstance.due_back))
 
     div.form-group
-      label(for='status') Status:
-      select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
-        option(value='Maintenance') Maintenance
-        option(value='Available') Available
-        option(value='Loaned') Loaned
-        option(value='Reserved') Reserved
+      label(for=&apos;status&apos;) Status:
+      select#status.form-control(type=&apos;select&apos; placeholder=&apos;Select status&apos; name=&apos;status&apos; required=&apos;true&apos;)
+        option(value=&apos;Maintenance&apos;) Maintenance
+        option(value=&apos;Available&apos;) Available
+        option(value=&apos;Loaned&apos;) Loaned
+        option(value=&apos;Reserved&apos;) Reserved
 
-    button.btn.btn-primary(type='submit') Submit
+    button.btn.btn-primary(type=&apos;submit&apos;) Submit
 
   if errors
     ul
       for error in errors
         li!= error.msg</code></pre>
 
-<p>The view structure and behaviour is almost the same as for the <strong>book_form.pug</strong> template, so we won't go over it again.</p>
+<p>The view structure and behaviour is almost the same as for the <strong>book_form.pug</strong> template, so we won&apos;t go over it again.</p>
 
-<div class="note">
-<p><strong>Note:</strong> The above template hard-codes the <em>Status</em> values (Maintenance, Available, etc.) and does not "remember" the user's entered values. Should you so wish, consider reimplementing the list, passing in option data from the controller and setting the selected value when the form is re-displayed.</p>
+<div class="note notecard">
+<p><strong>Note:</strong> The above template hard-codes the <em>Status</em> values (Maintenance, Available, etc.) and does not &quot;remember&quot; the user&apos;s entered values. Should you so wish, consider reimplementing the list, passing in option data from the controller and setting the selected value when the form is re-displayed.</p>
 </div>
 
 <h2 class="highlight-spanned" id="What_does_it_look_like"><span class="highlight-span">What does it look like?</span></h2>
 
-<p>Run the application and open your browser to <a class="external external-icon" href="http://localhost:3000/" rel="noopener">http://localhost:3000/</a>. Then select the <em>Create new book instance (copy) </em>link. If everything is set up correctly, your site should look something like the following screenshot. After you submit a valid <code>BookInstance</code>, it should be saved and you'll be taken to the detail page.</p>
+<p>Run the application and open your browser to <a class="external external-icon" href="http://localhost:3000/" rel="noopener">http://localhost:3000/</a>. Then select the <em>Create new book instance (copy) </em>link. If everything is set up correctly, your site should look something like the following screenshot. After you submit a valid <code>BookInstance</code>, it should be saved and you&apos;ll be taken to the detail page.</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14490/LocalLibary_Express_BookInstance_Create_Empty.png" style="display: block; height: 554px; margin: 0px auto; width: 1000px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14490/LocalLibary_Express_BookInstance_Create_Empty.png" style="display: block; height: 554px; margin: 0px auto; width: 1000px;"></p>
 
 <h2 id="Next_steps">Next steps</h2>
 

@@ -13,7 +13,7 @@ tags:
 <p><strong>Storage</strong> es una API para la  base de datos <a href="http://www.sqlite.org/" class="external">SQLite</a>. Responde a las llamadas entidades de confianza, es decir, componentes internos de Firefox y extensiones. hace referencia completa a todos los métodos y propiedades de las conexiones de la interfaz de la  base de datos, lee <a href="/es/mozIStorageConnection" title="es/mozIStorageConnection">mozIStorageConnection</a>.</p>
 <p>El API está actualmente &quot;unfrozen,&quot; lo que significa que está sujeto a cambios en cualquier momento. Es muy probable que el API cambie en la transición entre Firefox 2 y Firefox 3.</p>
 <p> </p>
-<div class="note"><strong>Nota:</strong> Storage no es lo mismo que la característica <a href="/es/DOM/Storage" title="es/DOM/Storage">DOM:Storage</a> que puede ser usada por páginas web para almacenar datos persistentes o la <a href="/es/Session_store_API" title="es/Session_store_API">Session store API</a> (una utilidad <a href="/es/XPCOM" title="es/XPCOM">XPCOM</a> de almacenaje para usar con las extensiones).</div>
+<div class="note notecard"><strong>Nota:</strong> Storage no es lo mismo que la característica <a href="/es/DOM/Storage" title="es/DOM/Storage">DOM:Storage</a> que puede ser usada por páginas web para almacenar datos persistentes o la <a href="/es/Session_store_API" title="es/Session_store_API">Session store API</a> (una utilidad <a href="/es/XPCOM" title="es/XPCOM">XPCOM</a> de almacenaje para usar con las extensiones).</div>
 <p> </p>
 <h2 id="Empezando" name="Empezando">Empezando</h2>
 <p>Este documento cubre el API mozStorage y algunas peculiaridades de sqlite. <em>No</em> cubre SQL o el sqlite. Sin embargo, puedes encontrar varios enlaces útiles en la sección <a href="#Ver_tambi.C3.A9n"> Ver también</a>. Para obtener ayuda sobre el API mozStorage, puedes escribir a mozilla.dev.apps.firefox en el servidor de noticias news.mozilla.org. Para reportar errores, usa <a href="https://bugzilla.mozilla.org/enter_bug.cgi?product=Toolkit&amp;component=Storage" class="link-https">Bugzilla</a> (producto &quot;Toolkit&quot;, componente &quot;Storage&quot;).</p>
@@ -46,7 +46,7 @@ var storageService = Components.classes[&quot;@mozilla.org/storage/service;1&quo
                         .getService(Components.interfaces.mozIStorageService);
 var mDBConn = storageService.openDatabase(file);
 </pre>
-<dl> <dd> <div class="note">Nota: La función OpenDatabase está sujeta a cambios. Seguramente será simplificada y ampliada para que sea más difícil meterse en problemas.</div> </dd>
+<dl> <dd> <div class="note notecard">Nota: La función OpenDatabase está sujeta a cambios. Seguramente será simplificada y ampliada para que sea más difícil meterse en problemas.</div> </dd>
 </dl>
 <p>Sería tentador nombrar a tu base de datos con un nombre terminado en &quot;.sdb&quot; por <strong>s</strong>qlite <strong>d</strong>ata<strong>b</strong>ase, pero esto <em>no es recomendable</em>. Esta extensión es tratada de forma especial por Windows como una extensión para &quot;Application Compatibility Database&quot; y sus cambios están respaldados por el sistema automáticamente como parte del sistema de recuperación del sistema. Esto puede dar lugar a un tratamiento desmesurado de las operaciones del archivo.</p>
 <h2 id="Sentencias" name="Sentencias">Sentencias</h2>
@@ -75,7 +75,7 @@ var statement = mDBConn.createStatement(&quot;SELECT * FROM foo WHERE a = ?1&qu
 <h3 id="Agregar_los_par.C3.A1metros" name="Agregar_los_par.C3.A1metros">Agregar los parámetros</h3>
 <p>Generalmente es mucho mejor agregar los parámetros separadamente, en lugar de intentar construir una sentencia SQL en una cadena conteniendo los parámetros. Entre otras cosas, esto evita el ataque de inyección de SQL, ya que un parámetro suelto nunca podrá ser ejecutado como una sentencia SQL.</p>
 <p>Se agregan los parámetros a una sentencia SQL reemplazando los comodines. Los comodines son llamados por orden, empezando con el &quot;?1&quot;, luego el &quot;?2&quot;, etcétera. Usa la función BindXXXParameter(0) BindXXXParameter(1)... para cambiar esos comodines.</p>
-<dl> <dd> <div class="note">Presta atención: Los indices en los comodines van a partir de 1. Los indices de las funciones de cambio, empiezan en 0. Esto es: el &quot;?1&quot; corresponde al parámetro 0, &quot;?1&quot; corresponde al parámetro 1, etcétera.</div> </dd>
+<dl> <dd> <div class="note notecard">Presta atención: Los indices en los comodines van a partir de 1. Los indices de las funciones de cambio, empiezan en 0. Esto es: el &quot;?1&quot; corresponde al parámetro 0, &quot;?1&quot; corresponde al parámetro 1, etcétera.</div> </dd>
 </dl>
 <p>Tambien puedes usar parámetros con nombre como: &quot;:ejemplo&quot; en lugar de &quot;?xx&quot;.</p>
 <p>Un comodín puede aparecer varias veces en una cadena SQL y todas las veces será reemplazado por el correspondiente valos. Los parámetros que no han sido agragados (unbound) serán interpretados como <code>NULL</code></p>

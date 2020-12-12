@@ -7,11 +7,11 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 
 <p class="summary">作为一个js开发者，一块一块的读取和操作一个从网上获取的数据流是非常实用的功能！但是如何使用Streams API操作数据流呢? 可以在这里看到基本的介绍.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>提示</strong>: 本文要求您已了解流文件相关知识，如果还不了解，建议您先查看 <a href="/en-US/docs/Web/API/Streams_API#Concepts_and_usage">文件流概念及简介</a>  以及 dedicated <a href="/en-US/docs/Web/API/Streams_API/Concepts">文件流API</a> 然后再阅读此文.</p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>提示</strong>: 如果你正在查询关于可读写的文件流， 请查看<a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">使用可写文件流</a> .</p>
 </div>
 
@@ -32,7 +32,7 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 <p>As our <a href="https://github.com/mdn/dom-examples/tree/master/streams/simple-pump">Simple stream pump</a> example shows (<a href="https://mdn.github.io/dom-examples/streams/simple-pump/">see it live also</a>), exposing it is a matter of just accessing the <code>body</code> property of the response:</p>
 
 <pre class="brush: js">// Fetch the original image
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // Retrieve its body as ReadableStream
 .then(response =&gt; response.body)</pre>
 
@@ -43,7 +43,7 @@ fetch('./tortoise.png')
 <p>Now we’ve got our streaming body, reading the stream requires attaching a reader to it. This is done using the <a href="/zh-CN/docs/Web/API/ReadableStream/getReader" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStream.getReader()</code></a> method:</p>
 
 <pre class="brush: js">// Fetch the original image
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // Retrieve its body as ReadableStream
 .then(response =&gt; response.body)
 .then(body =&gt; {
@@ -51,17 +51,17 @@ fetch('./tortoise.png')
 
 <p>Invoking this method creates a reader and locks it to the stream — no other reader may read this stream until this reader is released, e.g. by invoking <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader/releaseLock" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultReader.releaseLock()</code></a>.</p>
 
-<p>Also note that the previous example can be reduced by one step, as <code>response.body</code> is synchronous and so doesn't need the promise:</p>
+<p>Also note that the previous example can be reduced by one step, as <code>response.body</code> is synchronous and so doesn&apos;t need the promise:</p>
 
 <pre class="brush: js">// Fetch the original image
-  fetch('./tortoise.png')
+  fetch(&apos;./tortoise.png&apos;)
   // Retrieve its body as ReadableStream
   .then(response =&gt; {
     const reader = response.body.getReader();</pre>
 
 <h3 id="Reading_the_stream">Reading the stream</h3>
 
-<p>Now you’ve got your reader attached, you can read data chunks out of the stream using the <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader/read" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultReader.read()</code></a> method. This reads one chunk out of the stream, which you can then do anything you like with. For example, our Simple stream pump example goes on to enqueue each chunk in a new, custom <code>ReadableStream</code> (we will find more about this in the next section), then create a new <a href="/zh-CN/docs/Web/API/Response" title="Fetch API 的 Response 接口呈现了对一次请求的响应数据"><code>Response</code></a> out of it, consume it as a <a href="/zh-CN/docs/Web/API/Blob" title="Blob 对象表示一个不可变、原始数据的类文件对象。Blob 表示的不一定是JavaScript原生格式的数据。File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。"><code>Blob</code></a>, create an object URL out of that blob using <a href="/zh-CN/docs/Web/API/URL/createObjectURL" title="URL.createObjectURL() 静态方法会创建一个 DOMString，其中包含一个表示参数中给出的对象的URL。这个 URL 的生命周期和创建它的窗口中的 document 绑定。这个新的URL 对象表示指定的 File 对象或 Blob 对象。"><code>URL.createObjectURL()</code></a>, and then display it on screen in an <a href="/zh-CN/docs/Web/HTML/Element/img" title=""><code>&lt;img&gt;</code></a> element, effectively creating a copy of the image we originally fetched.</p>
+<p>Now you’ve got your reader attached, you can read data chunks out of the stream using the <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader/read" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultReader.read()</code></a> method. This reads one chunk out of the stream, which you can then do anything you like with. For example, our Simple stream pump example goes on to enqueue each chunk in a new, custom <code>ReadableStream</code> (we will find more about this in the next section), then create a new <a href="/zh-CN/docs/Web/API/Response" title="Fetch API 的 Response 接口呈现了对一次请求的响应数据"><code>Response</code></a> out of it, consume it as a <a href="/zh-CN/docs/Web/API/Blob" title="Blob 对象表示一个不可变、原始数据的类文件对象。Blob 表示的不一定是JavaScript原生格式的数据。File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。"><code>Blob</code></a>, create an object URL out of that blob using <a href="/zh-CN/docs/Web/API/URL/createObjectURL" title="URL.createObjectURL() 静态方法会创建一个 DOMString，其中包含一个表示参数中给出的对象的URL。这个 URL 的生命周期和创建它的窗口中的 document 绑定。这个新的URL 对象表示指定的 File 对象或 Blob 对象。"><code>URL.createObjectURL()</code></a>, and then display it on screen in an <a href="/zh-CN/docs/Web/HTML/Element/img" title><code>&lt;img&gt;</code></a> element, effectively creating a copy of the image we originally fetched.</p>
 
 <pre class="brush: js">  return new ReadableStream({
     start(controller) {
@@ -106,7 +106,7 @@ fetch('./tortoise.png')
   return;
 }</pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note</strong>: <code>close()</code> is part of the new custom stream, not the original stream we are discussing here. We’ll explain more about the custom stream in the next section.</p>
 </div>
 
@@ -214,18 +214,18 @@ return pump();</pre>
       // Add the string to the stream
       controller.enqueue(string);
       // show it on the screen
-      let listItem = document.createElement('li');
+      let listItem = document.createElement(&apos;li&apos;);
       listItem.textContent = string;
       list1.appendChild(listItem);
     }, 1000);
-    button.addEventListener('click', function() {
+    button.addEventListener(&apos;click&apos;, function() {
       clearInterval(interval);
       readStream();
       controller.close();
     })
   },
   pull(controller) {
-    // We don't really need a pull in this example
+    // We don&apos;t really need a pull in this example
   },
   cancel() {
     // This is called if the reader cancels,
@@ -247,15 +247,15 @@ return pump();</pre>
     // done  - true if the stream has already given you all its data.
     // value - some data. Always undefined when done is true.
     if (done) {
-      console.log("Stream complete");
+      console.log(&quot;Stream complete&quot;);
       para.textContent = result;
       return;
     }
 
     charsReceived += value.length;
     const chunk = value;
-    let listItem = document.createElement('li');
-    listItem.textContent = 'Read ' + charsReceived + ' characters so far. Current chunk = ' + chunk;
+    let listItem = document.createElement(&apos;li&apos;);
+    listItem.textContent = &apos;Read &apos; + charsReceived + &apos; characters so far. Current chunk = &apos; + chunk;
     list2.appendChild(listItem);
 
     result += chunk;
@@ -269,13 +269,13 @@ return pump();</pre>
 
 <p>We’ve already shown examples of using <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultController/close" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultController.close()</code></a> to close a reader. As we said before, any previously enqueued chunks will still be read, but no more can be enqueued because it is closed.</p>
 
-<p>If you wanted to completely get rid of the stream and discard any enqueued chunks, you'd use <a href="/zh-CN/docs/Web/API/ReadableStream/cancel" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStream.cancel()</code></a> or <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader/cancel" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultReader.cancel()</code></a>.</p>
+<p>If you wanted to completely get rid of the stream and discard any enqueued chunks, you&apos;d use <a href="/zh-CN/docs/Web/API/ReadableStream/cancel" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStream.cancel()</code></a> or <a href="/zh-CN/docs/Web/API/ReadableStreamDefaultReader/cancel" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStreamDefaultReader.cancel()</code></a>.</p>
 
 <h2 id="Teeing_a_stream">Teeing a stream</h2>
 
 <p>Sometimes you might want to read a stream twice, simultaneously. This is achieved via the <a href="/zh-CN/docs/Web/API/ReadableStream/tee" title="此页面仍未被本地化, 期待您的翻译!"><code>ReadableStream.tee()</code></a> method — it outputs an array containing two identical copies of the original readable stream, which can then be read independently by two separate readers.</p>
 
-<p>You might do this for example in a <a href="/en-US/docs/Web/API/Service_Worker_API">ServiceWorker</a> if you want to fetch a response from the server and stream it to the browser, but also stream it to the Service Worker cache. Since a response body cannot be consumed more than once, and a stream can't be read by more than one reader at once, you’d need two copies to do this.</p>
+<p>You might do this for example in a <a href="/en-US/docs/Web/API/Service_Worker_API">ServiceWorker</a> if you want to fetch a response from the server and stream it to the browser, but also stream it to the Service Worker cache. Since a response body cannot be consumed more than once, and a stream can&apos;t be read by more than one reader at once, you’d need two copies to do this.</p>
 
 <p>We provide an example of this in our <a href="https://github.com/mdn/dom-examples/blob/master/streams/simple-tee-example/index.html">Simple tee example</a> (<a href="https://mdn.github.io/dom-examples/streams/simple-tee-example/">see it live also</a>). This example works much the same way as our Simple random stream, except that when the button is pressed to stop generating random strings, the custom stream is taken and teed, and both resulting streams are then read:</p>
 
@@ -294,13 +294,13 @@ return pump();</pre>
 <p>We have created an example called <a href="https://github.com/mdn/dom-examples/tree/master/streams/png-transform-stream">Unpack Chunks of a PNG</a> (<a href="https://mdn.github.io/dom-examples/streams/png-transform-stream/">see it live also</a>) that fetches an image as a stream, then pipes it through to a custom PNG transform stream <span class="pl-c">that retrieves PNG chunks out of a binary data stream.</span></p>
 
 <pre class="brush: js">// Fetch the original image
-fetch('png-logo.png')
+fetch(&apos;png-logo.png&apos;)
 // Retrieve its body as ReadableStream
 .then(response =&gt; response.body)
 // Create a gray-scaled PNG stream out of the original
-.then(rs =&gt; logReadableStream('Fetch Response Stream', rs))
+.then(rs =&gt; logReadableStream(&apos;Fetch Response Stream&apos;, rs))
 .then(body =&gt; body.pipeThrough(new PNGTransformStream()))
-.then(rs =&gt; logReadableStream('PNG Chunk Stream', rs))</pre>
+.then(rs =&gt; logReadableStream(&apos;PNG Chunk Stream&apos;, rs))</pre>
 
 <h2 id="Summary">Summary</h2>
 

@@ -19,28 +19,28 @@ exports.author_delete_get = function(req, res, next) {
             Author.findById(req.params.id).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.params.id }).exec(callback)
+          Book.find({ &apos;author&apos;: req.params.id }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         if (results.author==null) { // No results.
-            res.redirect('/catalog/authors');
+            res.redirect(&apos;/catalog/authors&apos;);
         }
         // Successful, so render.
-        res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+        res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
     });
 
 };</code></pre>
 
 <p>控制器从URL参数（<code>req.params.id</code>）中，获取要删除的<code>Author</code>实例的 id。它使用<code>async.parallel()</code> 方法，并行获取作者记录和所有相关书本。当两个操作都完成后，它将呈现<code><strong>author_delete</strong></code><strong>.pug</strong>视图，为<code>title</code>、<code>author</code>、和 <code>author_books</code>传递变量。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 如果<code>findById()</code>返回“没有结果”，则作者不在数据库中。在这种情况下，没有什么可以删除，所以我们立即呈现所有作者的列表。</p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">}, function(err, results) {
     if (err) { return next(err); }
     if (results.author==null) { // No results.
-        res.redirect('/catalog/authors')
+        res.redirect(&apos;/catalog/authors&apos;)
     }</code></pre>
 </div>
 
@@ -56,14 +56,14 @@ exports.author_delete_post = function(req, res, next) {
           Author.findById(req.body.authorid).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.body.authorid }).exec(callback)
+          Book.find({ &apos;author&apos;: req.body.authorid }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         // Success
         if (results.authors_books.length &gt; 0) {
             // Author has books. Render in same way as for GET route.
-            res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+            res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
             return;
         }
         else {
@@ -71,7 +71,7 @@ exports.author_delete_post = function(req, res, next) {
             Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
                 if (err) { return next(err); }
                 // Success - go to author list
-                res.redirect('/catalog/authors')
+                res.redirect(&apos;/catalog/authors&apos;)
             })
         }
     });
@@ -79,7 +79,7 @@ exports.author_delete_post = function(req, res, next) {
 
 <p>首先，我们验证是否已提供id（这是通过表单主体参数发送的，而不是使用URL中的版本）。然后我们以与<code>GET</code>路由相同的方式，获得作者及其相关书本。如果没有书本，那么我们删除作者对象，并重定向到所有作者的列表。如果还有书本，那么我们只需重新呈现表格，传递作者和要删除的书本列表。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 我们可以检查对<code>findById()</code>的调用，是否返回任何结果，如果没有，则立即呈现所有作者的列表。为简洁起见，我们将代码保留在上面（如果找不到id，它仍会返回作者列表，但这将在<code>findByIdAndRemove()</code>之后发生）。</p>
 </div>
 
@@ -97,7 +97,7 @@ block content
 
     p #[strong Delete the following books before attempting to delete this author.]
 
-    div(style='margin-left:20px;margin-top:20px')
+    div(style=&apos;margin-left:20px;margin-top:20px&apos;)
 
       h4 Books
 
@@ -110,11 +110,11 @@ block content
   else
     p Do you really want to delete this Author?
 
-    form(method='POST' action='')
+    form(method=&apos;POST&apos; action=&apos;&apos;)
       div.form-group
-        input#authorid.form-control(type='hidden',name='authorid', required='true', value=author._id )
+        input#authorid.form-control(type=&apos;hidden&apos;,name=&apos;authorid&apos;, required=&apos;true&apos;, value=author._id )
 
-      button.btn.btn-primary(type='submit') Delete</code></pre>
+      button.btn.btn-primary(type=&apos;submit&apos;) Delete</code></pre>
 
 <p>视图扩展了布局模板，覆盖了名为<code>content</code>的区块。在顶部显示作者详细信息。然后它包含一个，基于<code><strong>author_books</strong></code>（<code>if</code>和<code>else</code>子句）数量的条件语句。</p>
 
@@ -127,7 +127,7 @@ block content
 
 <p>接下来，我们将向 Author 详细视图添加 <strong>Delete </strong>控件（详细信息页面是删除记录的好地方）。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 在完整实现中，控件将仅对授权用户可见。但是在这个时间点上，我们还没有一个授权系统！</p>
 </div>
 
@@ -135,11 +135,11 @@ block content
 
 <pre class="brush: html line-numbers  language-html notranslate"><code class="language-html">hr
 p
-  a(href=author.url+'/delete') Delete author</code></pre>
+  a(href=author.url+&apos;/delete&apos;) Delete author</code></pre>
 
 <p>控件现在应显示为链接，如下面的作者详细信息页面所示。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
 
 <h2 class="highlight-spanned" id="它看起來像是">它看起來像是?</h2>
 
@@ -147,13 +147,13 @@ p
 
 <p>如果作者没有书本，您将看到这样的页面。按删除后，服务器将删除作者并重定向到作者列表。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
 
 <p>如果作者确实有书本，那么您将看到如下视图。然后，您可以从其详细信息页面中，删除这些书本（一旦该代码被实现！）。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 其他删除对象的页面，可以用相同的方式实现。我们把它留下，作为挑战。</p>
 </div>
 

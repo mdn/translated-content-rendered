@@ -9,8 +9,8 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/Genre_detail_pa
 
 <p>打开 <strong>/controllers/genreController.js</strong> ，并在档案最上方引用 async 和 Book 模组。</p>
 
-<pre class="brush: js notranslate">var Book = require('../models/book');
-var async = require('async');
+<pre class="brush: js notranslate">var Book = require(&apos;../models/book&apos;);
+var async = require(&apos;async&apos;);
 </pre>
 
 <p>找到导出的<code>genre_detail</code><code>()</code>控制器方法，并将其替换为以下代码。</p>
@@ -25,19 +25,19 @@ exports.genre_detail = function(req, res, next) {
         },
 
         genre_books: function(callback) {
-          Book.find({ 'genre': req.params.id })
+          Book.find({ &apos;genre&apos;: req.params.id })
           .exec(callback);
         },
 
     }, function(err, results) {
         if (err) { return next(err); }
         if (results.genre==null) { // No results.
-            var err = new Error('Genre not found');
+            var err = new Error(&apos;Genre not found&apos;);
             err.status = 404;
             return next(err);
         }
         // Successful, so render
-        res.render('genre_detail', { title: 'Genre Detail', genre: results.genre, genre_books: results.genre_books } );
+        res.render(&apos;genre_detail&apos;, { title: &apos;Genre Detail&apos;, genre: results.genre, genre_books: results.genre_books } );
     });</strong>
 
 };
@@ -45,13 +45,13 @@ exports.genre_detail = function(req, res, next) {
 
 <p>该方法使用<code>async.parallel()</code>，并行查询类型名称及其相关联的书本，并在（如果）两个请求成功完成时，回调呈现页面。</p>
 
-<p>所需种类记录的 ID ，在 URL 的末尾编码，并根据路由定义（<strong>/genre/:id</strong>）自动提取。通过请求参数（<code style="font-style: normal; font-weight: normal;">req.params.id</code><code style="font-style: normal; font-weight: normal;">）</code>在控制器内访问 ID。它在<code style="font-style: normal; font-weight: normal;">Genre.findById()</code>中用于获取当前种类。它还用于获取符合当前种类的所有<code>Book</code>对象，就是在种类字段中具有种类ID的那些 <code>Book.find({ 'genre': req.params.id })</code>。</p>
+<p>所需种类记录的 ID ，在 URL 的末尾编码，并根据路由定义（<strong>/genre/:id</strong>）自动提取。通过请求参数（<code style="font-style: normal; font-weight: normal;">req.params.id</code><code style="font-style: normal; font-weight: normal;">）</code>在控制器内访问 ID。它在<code style="font-style: normal; font-weight: normal;">Genre.findById()</code>中用于获取当前种类。它还用于获取符合当前种类的所有<code>Book</code>对象，就是在种类字段中具有种类ID的那些 <code>Book.find({ &apos;genre&apos;: req.params.id })</code>。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注意:</strong> 如果数据库中不存在该类型（即它可能已被删除），则<code>findById()</code>将成功返回，但没有结果。在这种情况下，我们想要显示一个“未找到”页面，因此我们创建一个<code>Error</code>对象，并将其传递给链中的下一个中间件函数<code>next</code>。</p>
 
 <pre class="brush: js notranslate"><strong>if (results.genre==null) { // No results.
-    var err = new Error('Genre not found');
+    var err = new Error(&apos;Genre not found&apos;);
     err.status = 404;
     return next(err);
 }</strong>
@@ -72,7 +72,7 @@ block content
 
   <strong>h1 Genre: #{genre.name}</strong>
 
-  div(style='margin-left:20px;margin-top:20px')
+  div(style=&apos;margin-left:20px;margin-top:20px&apos;)
 
     h4 Books
 
@@ -90,19 +90,19 @@ block content
 
 <h2 id="它看起來像是">它看起來像是?</h2>
 
-<p>运行本应用，并打开浏览器访问 <a href="http://localhost:3000/">http://localhost:3000/</a>。选择 All genres 连结，然后选择其中一个种类 (例如，"Fantasy")。如果每样东西都设定正确了，你的页面看起来应该像底下的截图。</p>
+<p>运行本应用，并打开浏览器访问 <a href="http://localhost:3000/">http://localhost:3000/</a>。选择 All genres 连结，然后选择其中一个种类 (例如，&quot;Fantasy&quot;)。如果每样东西都设定正确了，你的页面看起来应该像底下的截图。</p>
 
 <p><img alt="Genre Detail Page - Express Local Library site" src="https://mdn.mozillademos.org/files/14462/LocalLibary_Express_Genre_Detail.png" style="border-style: solid; border-width: 1px; display: block; height: 523px; margin: 0px auto; width: 1000px;"></p>
 
-<div class="note">
+<div class="note notecard">
 <p>您可能会收到与此类似的错误：</p>
 
-<pre class="brush: bash notranslate">Cast to ObjectId failed for value " 59347139895ea23f9430ecbb" at path "_id" for model "Genre"
+<pre class="brush: bash notranslate">Cast to ObjectId failed for value &quot; 59347139895ea23f9430ecbb&quot; at path &quot;_id&quot; for model &quot;Genre&quot;
 </pre>
 
 <p>这是来自 <strong>req.params.id</strong> 的 mongoose 错误。要解决这个问题，首先需要在<strong> genreController.js</strong> 页面上要求mongoose，如下所示：</p>
 
-<pre class="brush: js notranslate"> var mongoose = require('mongoose');
+<pre class="brush: js notranslate"> var mongoose = require(&apos;mongoose&apos;);
 </pre>
 然后使用 <strong>mongoose.Types.ObjectId()</strong>将 id 转换为可以使用的。例如：
 

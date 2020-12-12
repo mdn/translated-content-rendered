@@ -18,11 +18,11 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 
 <p class="summary"><span class="seoSummary">JavaScript 開発者として、ネットワークを介して受信したデータのストリームをチャンクごとにプログラムで読み取り、操作することは非常に便利です！ しかし、Streams API の読み取り可能なストリームの機能はどのように使用するのでしょうか？ この記事では、その基本について説明します。</span></p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注</strong>: この記事は、読者が読み取り可能なストリームのユースケースを理解し、高レベルの概念を理解していることを前提としています。 そうでない場合は、まず <a href="/ja/docs/Web/API/Streams_API#Concepts_and_usage">Streams の概念と使用方法の概要</a>と専用の <a href="/ja/docs/Web/API/Streams_API/Concepts">Streams API の概念</a>の記事を読んでから、戻ってくることをお勧めします。</p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注</strong>: 書き込み可能なストリームに関する情報を探している場合は、代わりに<a href="/ja/docs/Web/API/Streams_API/Using_writable_streams">書き込み可能なストリームの使用</a>を試してください。</p>
 </div>
 
@@ -43,7 +43,7 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 <p>単純なストリームポンプ（<a href="https://github.com/mdn/dom-examples/tree/master/streams/simple-pump">Simple stream pump</a>）の例が示しているように（<a href="https://mdn.github.io/dom-examples/streams/simple-pump/">ライブも参照</a>）、それを公開することは、次のように応答の <code>body</code> プロパティにアクセスするだけのことです。</p>
 
 <pre class="brush: js">// 元の画像をフェッチ
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // その body を ReadableStream として取得
 .then(response =&gt; response.body)</pre>
 
@@ -54,7 +54,7 @@ fetch('./tortoise.png')
 <p>ストリームするボディができました。 ストリームを読むには、リーダーを取り付ける必要があります。 これは、<a href="/ja/docs/Web/API/ReadableStream/getReader" title="ReadableStream インターフェイスの getReader() メソッドはリーダーを作成し、それでストリームをロックします。 ストリームがロックされている間は、このリーダーが開放されるまで他のリーダーを取得できません。"><code>ReadableStream.getReader()</code></a> メソッドを使用して行われます。</p>
 
 <pre class="brush: js">// 元の画像をフェッチ
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // その body を ReadableStream として取得
 .then(response =&gt; response.body)
 .then(body =&gt; {
@@ -65,14 +65,14 @@ fetch('./tortoise.png')
 <p>また、<code>response.body</code> は同期的であり、promise を必要としないため、前の例を1ステップ減らすことができることに注意してください。</p>
 
 <pre class="brush: js">// 元の画像をフェッチ
-  fetch('./tortoise.png')
+  fetch(&apos;./tortoise.png&apos;)
   // その body を ReadableStream として取得
   .then(response =&gt; {
     const reader = response.body.getReader();</pre>
 
 <h3 id="Reading_the_stream" name="Reading_the_stream">ストリームを読む</h3>
 
-<p>リーダーを取り付けたら、<a href="/ja/docs/Web/API/ReadableStreamDefaultReader/read" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>ReadableStreamDefaultReader.read()</code></a> メソッドを使用してストリームからデータチャンクを読み取ることができます。 これにより、ストリームから1つチャンクを読み取って、好きなことを実行できます。 例えば、単純なストリームポンプの例では、新しいカスタム <code>ReadableStream</code> で各チャンクをキューに入れ（これについては次のセクションで詳しく説明します）、そこから新しい <a href="/ja/docs/Web/API/Response" title="Fetch API の Response インターフェイスは、リクエストのレスポンスを表します。"><code>Response</code></a> を作成し、<a href="/ja/docs/Web/API/Blob" title="Blob オブジェクトはファイルに似たオブジェクトで、immutable な生データです。データを表す blob は必ずしも JavaScript ネイティブなフォーマットではありません。File インターフェイスは Blob を基礎にしており、その機能を継承する一方で、ユーザーのシステム上のファイルをサポートするための機能を拡張しています。"><code>Blob</code></a> として使用し、 <a href="/ja/docs/Web/API/URL/createObjectURL" title="URL.createObjectURL() 静的メソッドは、引数で指定されたオブジェクトを表す URL を含む DOMString を生成します。 URL の寿命は、それを作成したウィンドウ内の document と結び付けられています。 新しいオブジェクト URL は、指定された File オブジェクトか Blob オブジェクトを表します。"><code>URL.createObjectURL()</code></a> を使用してその blob からオブジェクト URL を取得し、それを <a href="/ja/docs/Web/HTML/Element/img" title="HTML の &lt;img> 要素は、文書に画像を埋め込みます。"><code>&lt;img&gt;</code></a> 要素で画面に表示して、元のフェッチした画像のコピーを効果的に作成します。</p>
+<p>リーダーを取り付けたら、<a href="/ja/docs/Web/API/ReadableStreamDefaultReader/read" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>ReadableStreamDefaultReader.read()</code></a> メソッドを使用してストリームからデータチャンクを読み取ることができます。 これにより、ストリームから1つチャンクを読み取って、好きなことを実行できます。 例えば、単純なストリームポンプの例では、新しいカスタム <code>ReadableStream</code> で各チャンクをキューに入れ（これについては次のセクションで詳しく説明します）、そこから新しい <a href="/ja/docs/Web/API/Response" title="Fetch API の Response インターフェイスは、リクエストのレスポンスを表します。"><code>Response</code></a> を作成し、<a href="/ja/docs/Web/API/Blob" title="Blob オブジェクトはファイルに似たオブジェクトで、immutable な生データです。データを表す blob は必ずしも JavaScript ネイティブなフォーマットではありません。File インターフェイスは Blob を基礎にしており、その機能を継承する一方で、ユーザーのシステム上のファイルをサポートするための機能を拡張しています。"><code>Blob</code></a> として使用し、 <a href="/ja/docs/Web/API/URL/createObjectURL" title="URL.createObjectURL() 静的メソッドは、引数で指定されたオブジェクトを表す URL を含む DOMString を生成します。 URL の寿命は、それを作成したウィンドウ内の document と結び付けられています。 新しいオブジェクト URL は、指定された File オブジェクトか Blob オブジェクトを表します。"><code>URL.createObjectURL()</code></a> を使用してその blob からオブジェクト URL を取得し、それを <a href="/ja/docs/Web/HTML/Element/img" title="HTML の &lt;img&gt; 要素は、文書に画像を埋め込みます。"><code>&lt;img&gt;</code></a> 要素で画面に表示して、元のフェッチした画像のコピーを効果的に作成します。</p>
 
 <pre class="brush: js">  return new ReadableStream({
     start(controller) {
@@ -117,7 +117,7 @@ fetch('./tortoise.png')
   return;
 }</pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注</strong>: <code>close()</code> は、ここで説明している元のストリームではなく、新しいカスタムストリームの一部です。 次のセクションでカスタムストリームについて詳しく説明します。</p>
 </div>
 
@@ -225,11 +225,11 @@ return pump();</pre>
       // ストリームに文字列を追加
       controller.enqueue(string);
       // それを画面に表示
-      let listItem = document.createElement('li');
+      let listItem = document.createElement(&apos;li&apos;);
       listItem.textContent = string;
       list1.appendChild(listItem);
     }, 1000);
-    button.addEventListener('click', function() {
+    button.addEventListener(&apos;click&apos;, function() {
       clearInterval(interval);
       readStream();
       controller.close();
@@ -257,15 +257,15 @@ return pump();</pre>
     // done  - ストリームがすべてのデータを既に提供している場合は true。
     // value - 一部のデータ。 done が true の場合、常に undefined。
     if (done) {
-      console.log("Stream complete");
+      console.log(&quot;Stream complete&quot;);
       para.textContent = result;
       return;
     }
 
     charsReceived += value.length;
     const chunk = value;
-    let listItem = document.createElement('li');
-    listItem.textContent = 'Read ' + charsReceived + ' characters so far. Current chunk = ' + chunk;
+    let listItem = document.createElement(&apos;li&apos;);
+    listItem.textContent = &apos;Read &apos; + charsReceived + &apos; characters so far. Current chunk = &apos; + chunk;
     list2.appendChild(listItem);
 
     result += chunk;
@@ -304,13 +304,13 @@ return pump();</pre>
 <p>画像をストリームとしてフェッチし、それをバイナリデータストリームから PNG チャンクを取得するカスタム PNG 変換ストリームにパイプする PNG のチャンクをアンパック（<a href="https://github.com/mdn/dom-examples/tree/master/streams/png-transform-stream">Unpack Chunks of a PNG</a>）という例を作成しました（<a href="https://mdn.github.io/dom-examples/streams/png-transform-stream/">ライブも参照</a>）。</p>
 
 <pre class="brush: js">// 元の画像をフェッチ
-fetch('png-logo.png')
+fetch(&apos;png-logo.png&apos;)
 // その body を ReadableStream として取得
 .then(response =&gt; response.body)
 // 元の画像からグレースケール PNG ストリームを作成
-.then(rs =&gt; logReadableStream('Fetch Response Stream', rs))
+.then(rs =&gt; logReadableStream(&apos;Fetch Response Stream&apos;, rs))
 .then(body =&gt; body.pipeThrough(new PNGTransformStream()))
-.then(rs =&gt; logReadableStream('PNG Chunk Stream', rs))</pre>
+.then(rs =&gt; logReadableStream(&apos;PNG Chunk Stream&apos;, rs))</pre>
 
 <h2 id="Summary" name="Summary">まとめ</h2>
 

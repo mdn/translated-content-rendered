@@ -145,7 +145,7 @@ translation_of: Games/Techniques/Controls_Gamepad_API
 
 <p>以下讨论的代码来自于完整的 Hungry Fridge 游戏中，除了原代码需要 <code>turbo</code> 变量来决定是否启动“超级涡轮模式”以外几乎一模一样。此代码可以独立运行，就算不连接控制器也可以。</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注：</strong>一个彩蛋：点击界面右上角的控制器图标有个隐藏选项——不连接控制器也能启动“超级涡轮模式” 。你可以使用键盘上的 A 和 D 控制左右旋转，W 射击，方向键移动。</p>
 </div>
 
@@ -169,15 +169,15 @@ translation_of: Games/Techniques/Controls_Gamepad_API
 <p>数组 <code>buttons</code> 存储着 XBox 360 控制器的按键布局button layout:</p>
 
 <pre class="brush: js"><code>buttons: [
-  'DPad-Up','DPad-Down','DPad-Left','DPad-Right',
-  'Start','Back','Axis-Left','Axis-Right',
-  'LB','RB','Power','A','B','X','Y',
+  &apos;DPad-Up&apos;,&apos;DPad-Down&apos;,&apos;DPad-Left&apos;,&apos;DPad-Right&apos;,
+  &apos;Start&apos;,&apos;Back&apos;,&apos;Axis-Left&apos;,&apos;Axis-Right&apos;,
+  &apos;LB&apos;,&apos;RB&apos;,&apos;Power&apos;,&apos;A&apos;,&apos;B&apos;,&apos;X&apos;,&apos;Y&apos;,
 ],</code></pre>
 
 <p>这可能和例如 PS3 控制器 (或者其他没名字的通用控制器) 等其他控制器有所不同，所以你需要注意并不要假设你期望的布局和你真正使用的控制器布局是一样。接下来我们设置两个事件侦听器来获取数据：</p>
 
-<pre class="brush: js"><code>window.addEventListener("gamepadconnected", gamepadAPI.connect);
-window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);</code></pre>
+<pre class="brush: js"><code>window.addEventListener(&quot;gamepadconnected&quot;, gamepadAPI.connect);
+window.addEventListener(&quot;gamepaddisconnected&quot;, gamepadAPI.disconnect);</code></pre>
 
 <p>由于安全策略，你必须先与控制器产生交互才能触发当前显示页面的事件。如果 API 在没有接收到用户交互的时候工作，那它可能会在不知情的情况下被用来识别指纹。</p>
 
@@ -186,7 +186,7 @@ window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);</code></p
 <pre class="brush: js"><code>connect: function(evt) {
   gamepadAPI.controller = evt.gamepad;
   gamepadAPI.turbo = true;
-  console.log('控制器已连接。');
+  console.log(&apos;控制器已连接。&apos;);
 },</code></pre>
 
 <p>函数 <code>connect()</code> 接受一个事件作为参数，并将其中的 <code>gamepad</code> 对象分配给 <code>gamepadAPI.controller</code> 变量。我们在这个游戏中只使用一个控制器，所以这个变量是一个单独的对象而不是控制器的数组。然后我们设置  <code>turbo</code> 属性为 <code>true</code>。 (这个可以直接用 <code>gamepad.connected</code> 实现，但我们想单独设置一个变量来控制“涡轮模式”而不需要连接控制器，原因已在前面说明过了。)</p>
@@ -194,7 +194,7 @@ window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);</code></p
 <pre class="brush: js"><code>disconnect: function(evt) {
   gamepadAPI.turbo = false;
   delete gamepadAPI.controller;
-  console.log('控制器已断开。');
+  console.log(&apos;控制器已断开。&apos;);
 },</code></pre>
 
 <p>函数 <code>disconnect</code> 设置 <code>gamepad.turbo</code> 属性为 <code>false</code> 并移除存储着 <code>gamepad</code> 对象的变量。</p>
@@ -285,10 +285,10 @@ window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);</code></p
 <p>在一个按钮中有两种动作：单次按下和按住。变量 <code>newPress</code> 布尔变量将会指出这个是不是一个按钮新的按下操作。下次我们再轮询已按下按钮的数组——如果有按钮是我们正在找的，那么设 <code>newPress</code> 变量为 <code>true</code> 。通过检查本次按下是不是新按下的，就能得出玩家是不是按住按钮了。我们从游戏循环中的上一帧轮询按钮的缓存状态，如果我们找到了，就说明按钮被按住了，所以就不是新的按下。最后 <code>newPress</code> 变量被返回。函数 <code>buttonPressed</code> 通常这样来更新游戏循环：</p>
 
 <pre class="brush: js"><code>if(gamepadAPI.turbo) {
-  if(gamepadAPI.buttonPressed('A','hold')) {
+  if(gamepadAPI.buttonPressed(&apos;A&apos;,&apos;hold&apos;)) {
     this.turbo_fire();
   }
-  if(gamepadAPI.buttonPressed('B')) {
+  if(gamepadAPI.buttonPressed(&apos;B&apos;)) {
     this.managePause();
   }
 }</code></pre>
@@ -323,8 +323,8 @@ window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);</code></p
 <p>布局类型现在是一个可枚举的对象而不是字符串：</p>
 
 <pre>enum GamepadMappingType {
-    "",
-    "standard"
+    &quot;&quot;,
+    &quot;standard&quot;
 };</pre>
 
 <p>此枚举中定义了已知的控制器映射集。目前只有 <code>standard</code> 布局可用，但是未来可能会有新的布局。如果布局未知，那么将会是空字符串。</p>

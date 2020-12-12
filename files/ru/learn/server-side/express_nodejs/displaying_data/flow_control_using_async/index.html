@@ -8,7 +8,7 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_us
 ---
 <p>Код контроллера для некоторых страниц библиотеки будет зависеть от результатов многих асинхронных запросов, которые должны выполняться в определенном порядке или параллельно. Для того, чтобы управлять потоком выполнения, и выводить страницы, когда получена вся необходимая информация, будет использован <a class="external external-icon" href="https://www.npmjs.com/package/async" rel="noopener">async</a> - известный модуль node.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note:</strong>  В JavaScript существует много других способов управления аснхронным поведением и потоком выполнения, включая такой относительно  новый элемент языка JacaScript как <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/Techniques/Promises">Promises</a> (обещания, промисы).</p>
 </div>
 
@@ -28,16 +28,16 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_us
 
 <pre class="brush: js notranslate"><code>exports.some_model_count = function(req, res, next) {
 
-</code>  SomeModel.count({ a_model_field: 'match_value' }, function (err, count) {
+</code>  SomeModel.count({ a_model_field: &apos;match_value&apos; }, function (err, count) {
     // ... сделать что-то, если ошибка
 
-    // При успехе представить результат, передав count в render-функцию (здесь - как переменную 'data').
-    res.render('the_template', { data: count } );
+    // При успехе представить результат, передав count в render-функцию (здесь - как переменную &apos;data&apos;).
+    res.render(&apos;the_template&apos;, { data: count } );
   });
 <code>}</code>
 </pre>
 
-<p>Однако что, если требуется сделать <strong>множественные</strong> асинхронные запросы, и результат нельзя представить, пока не завершились все операции? Наивная реализация могла бы использовать "венок" запросов, запуская последующие запросы в колбэках предыдущих, и представляя ответ в последнем колбэке. Проблема такого подхода состоит в том, что запросы должны вапольняться последовательно, хотя, вероятно, было бы более эффективно выполнять их параллельно. Это также может привести к усложненному вложенному коду, что обычно называют адом обратных вызовов ( <a class="external external-icon" href="http://callbackhell.com/" rel="noopener">callback hell</a> ).</p>
+<p>Однако что, если требуется сделать <strong>множественные</strong> асинхронные запросы, и результат нельзя представить, пока не завершились все операции? Наивная реализация могла бы использовать &quot;венок&quot; запросов, запуская последующие запросы в колбэках предыдущих, и представляя ответ в последнем колбэке. Проблема такого подхода состоит в том, что запросы должны вапольняться последовательно, хотя, вероятно, было бы более эффективно выполнять их параллельно. Это также может привести к усложненному вложенному коду, что обычно называют адом обратных вызовов ( <a class="external external-icon" href="http://callbackhell.com/" rel="noopener">callback hell</a> ).</p>
 
 <p>Намного лучше было бы выполнять все запросы параллельно, и иметь единственную callback-функцию, которая будет вызвана после того как все запросы выполнены. Именно такое выполнение операций модуль <em>Async</em> делает легким и простым!</p>
 
@@ -59,7 +59,7 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_us
   <span class="punctuation token">}</span><span class="punctuation token">,</span>
   <span class="comment token">// optional callback</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>err<span class="punctuation token">,</span> results<span class="punctuation token">)</span> <span class="punctuation token">{</span>
-    <span class="comment token">// 'results' равны: {one: 1, two: 2, ..., something_else: some_value}</span>
+    <span class="comment token">// &apos;results&apos; равны: {one: 1, two: 2, ..., something_else: some_value}</span>
   <span class="punctuation token">}</span>
 <span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 
@@ -77,27 +77,27 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_us
   <span class="punctuation token">}</span><span class="punctuation token">,</span>
   <span class="comment token">// optional callback after the last asynchronous function completes.</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>err<span class="punctuation token">,</span> results<span class="punctuation token">)</span> <span class="punctuation token">{</span>
-    <span class="comment token">// 'results' is now equals to: {one: 1, two: 2, ..., something_else: some_value} </span>
+    <span class="comment token">// &apos;results&apos; is now equals to: {one: 1, two: 2, ..., something_else: some_value} </span>
   <span class="punctuation token">}</span>
 <span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Заметка:</strong> Спецификация языка ECMAScript (JavaScript) устанавливает, что порядок  в перечислении объектов не определен, поэтому возможно, что функции не будут вызываться в том порядке, в котором вы их задали на всех платформах. Если порядок вызова действительно важен, вместо объекта следует передавать массив, как показано ниже.</p>
 </div>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">async</span><span class="punctuation token">.</span><span class="function token">series</span><span class="punctuation token">(</span><span class="punctuation token">[</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>callback<span class="punctuation token">)</span> <span class="punctuation token">{</span>
     <span class="comment token">// do some stuff ...</span>
-    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">'one'</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">&apos;one&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
   <span class="punctuation token">}</span><span class="punctuation token">,</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>callback<span class="punctuation token">)</span> <span class="punctuation token">{</span>
     <span class="comment token">// do some more stuff ... </span>
-    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">'two'</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
+    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">&apos;two&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span>
   <span class="punctuation token">}</span>
  <span class="punctuation token">]</span><span class="punctuation token">,</span>
   <span class="comment token">// optional callback</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>err<span class="punctuation token">,</span> results<span class="punctuation token">)</span> <span class="punctuation token">{</span>
-  <span class="comment token">// results is now equal to ['one', 'two'] </span>
+  <span class="comment token">// results is now equal to [&apos;one&apos;, &apos;two&apos;] </span>
   <span class="punctuation token">}</span>
 <span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 
@@ -109,18 +109,18 @@ translation_of: Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_us
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js"><span class="keyword token">async</span><span class="punctuation token">.</span><span class="function token">waterfall</span><span class="punctuation token">(</span><span class="punctuation token">[</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>callback<span class="punctuation token">)</span> <span class="punctuation token">{//первая функция в цепочке</span>
-    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">'one'</span><span class="punctuation token">,</span> <span class="string token">'two'</span><span class="punctuation token">)</span><span class="punctuation token">;//результаты 'one' и 'two'</span>
+    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">&apos;one&apos;</span><span class="punctuation token">,</span> <span class="string token">&apos;two&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;//результаты &apos;one&apos; и &apos;two&apos;</span>
   <span class="punctuation token">}</span><span class="punctuation token">,</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>arg1<span class="punctuation token">,</span> arg2<span class="punctuation token">,</span> callback<span class="punctuation token">)</span> <span class="punctuation token">{//вторая функция в цепочке</span>
-    <span class="comment token">// arg1 равен 'one' , arg2 равен  'two' </span>
-    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">'three'</span><span class="punctuation token">)</span><span class="punctuation token">;</span> //результат 'three'
+    <span class="comment token">// arg1 равен &apos;one&apos; , arg2 равен  &apos;two&apos; </span>
+    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">&apos;three&apos;</span><span class="punctuation token">)</span><span class="punctuation token">;</span> //результат &apos;three&apos;
   <span class="punctuation token">}</span><span class="punctuation token">,</span>
   <span class="keyword token">function</span><span class="punctuation token">(</span>arg1<span class="punctuation token">,</span> callback<span class="punctuation token">)</span> <span class="punctuation token">{</span>
-    <span class="comment token">// arg1 равен 'three'</span>
-    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">'done'</span><span class="punctuation token">)</span><span class="punctuation token">; //результат 'done'</span>
+    <span class="comment token">// arg1 равен &apos;three&apos;</span>
+    <span class="function token">callback</span><span class="punctuation token">(</span><span class="keyword token">null</span><span class="punctuation token">,</span> <span class="string token">&apos;done&apos;</span><span class="punctuation token">)</span><span class="punctuation token">; //результат &apos;done&apos;</span>
   <span class="punctuation token">}</span>
 <span class="punctuation token">]</span><span class="punctuation token">,</span> <span class="keyword token">function</span> <span class="punctuation token">(</span>err<span class="punctuation token">,</span> result<span class="punctuation token">)</span> <span class="punctuation token">{</span>
-  <span class="comment token">// result равен 'done'</span>
+  <span class="comment token">// result равен &apos;done&apos;</span>
 <span class="punctuation token">}</span>
 <span class="punctuation token">)</span><span class="punctuation token">;</span></code></pre>
 

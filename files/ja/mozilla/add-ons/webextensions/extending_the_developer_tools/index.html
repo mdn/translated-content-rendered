@@ -183,13 +183,13 @@ translation_of: Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools
   </ol>
 </section></div>
 
-<div class="note">
+<div class="note notecard">
 <p>このページでは、Firefox 55に存在するdevtools APIについて説明しています。このAPIは<a href="https://developer.chrome.com/extensions/devtools">Chrome devtools APIs</a>に基づいていますが、まだFirefoxでは実装されていないため、ここでは説明していません。現在欠けている機能を確認するには、<a href="https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Using_the_devtools_APIs#Limitations_of_the_devtools_APIs">devtools APIの制限</a>を参照してください。</p>
 </div>
 
-<p><span class="seoSummary">WebExtensions API を使用して、ブラウザの組み込み開発者ツールを拡張できます。</span> devtools 拡張機能を作成するには、<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json">manifest.json</a> に "<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json/devtools_page">devtools_page</a>" キーを含めます:</p>
+<p><span class="seoSummary">WebExtensions API を使用して、ブラウザの組み込み開発者ツールを拡張できます。</span> devtools 拡張機能を作成するには、<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json">manifest.json</a> に &quot;<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json/devtools_page">devtools_page</a>&quot; キーを含めます:</p>
 
-<pre class="brush: json">"devtools_page": "devtools/devtools-page.html"</pre>
+<pre class="brush: json">&quot;devtools_page&quot;: &quot;devtools/devtools-page.html&quot;</pre>
 
 <p>このキーの値は、拡張機能にバンドルされている HTML ファイルを指す URL です。URL は manifest.json ファイル自体に関連する必要があります。</p>
 
@@ -218,10 +218,10 @@ translation_of: Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools
 <pre class="brush: html">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
-    &lt;meta charset="utf-8"&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;script src="devtools.js"&gt;&lt;/script&gt;
+    &lt;script src=&quot;devtools.js&quot;&gt;&lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</pre>
 
@@ -234,9 +234,9 @@ translation_of: Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools
 <p><code>devtools.panels.create()</code> API を使用して、devtools ウィンドウに独自のパネルを作成できます:</p>
 
 <pre class="brush: js">browser.devtools.panels.create(
-  "My Panel",                      // title
-  "icons/star.png",                // icon
-  "devtools/panel/panel.html"      // content
+  &quot;My Panel&quot;,                      // title
+  &quot;icons/star.png&quot;,                // icon
+  &quot;devtools/panel/panel.html&quot;      // content
 ).then((newPanel) =&gt; {
   newPanel.onShown.addListener(initialisePanel);
   newPanel.onHidden.addListener(unInitialisePanel);
@@ -258,7 +258,7 @@ translation_of: Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools
  <li>コンテンツスクリプトとは異なり、<code>devtools.inspectedWindow.eval()</code><strong> </strong>を使用してロードされたスクリプトは「<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/Content_scripts#DOM_access">DOM のクリーンビュー</a>」を取得<strong>しません</strong>。つまり、ページスクリプトによって行われたページの変更を確認できます。</li>
 </ul>
 
-<div class="note">
+<div class="note notecard">
 <p>DOM のクリーンビューはセキュリティ機能であり、ネイティブ DOM 関数の動作を再定義することにより、悪意のあるページが拡張機能をだますことを防ぐのに役立つことに注意してください。これは eval() を使用する際に非常に注意する必要があることを意味し、可能であれば通常のコンテンツスクリプトを使用する必要があります。</p>
 </div>
 
@@ -270,9 +270,9 @@ translation_of: Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools
 
 <pre class="brush: js">// devtools-panel.js
 
-const scriptToAttach = "document.body.innerHTML = 'Hi from the devtools';";
+const scriptToAttach = &quot;document.body.innerHTML = &apos;Hi from the devtools&apos;;&quot;;
 
-window.addEventListener("click", () =&gt; {
+window.addEventListener(&quot;click&quot;, () =&gt; {
   browser.runtime.sendMessage({
     tabId: browser.devtools.inspectedWindow.tabId,
     script: scriptToAttach
@@ -289,9 +289,9 @@ function handleMessage(request, sender, sendResponse) {
 
 browser.runtime.onMessage.addListener(handleMessage);</pre>
 
-<p>ターゲットウィンドウで実行されているコンテンツスクリプトとdevtoolsドキュメントの間でメッセージを交換する必要がある場合は、<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/connect" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.connect()</code></a> および <a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onConnect" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.onConnect</code></a> を使用してバックグラウンドページと devtools ドキュメント間の接続を設定することを<span class="tlid-translation translation" lang="ja"><span title="">お勧め</span></span>します。バックグラウンドページはタブ ID と <a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.Port</code></a> オブジェクト間のマッピングを維持し、これを使用して2つのスコープ間でメッセージをルーティングできます。</p>
+<p>ターゲットウィンドウで実行されているコンテンツスクリプトとdevtoolsドキュメントの間でメッセージを交換する必要がある場合は、<a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/connect" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.connect()</code></a> および <a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onConnect" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.onConnect</code></a> を使用してバックグラウンドページと devtools ドキュメント間の接続を設定することを<span class="tlid-translation translation" lang="ja"><span title>お勧め</span></span>します。バックグラウンドページはタブ ID と <a href="/ja/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>runtime.Port</code></a> オブジェクト間のマッピングを維持し、これを使用して2つのスコープ間でメッセージをルーティングできます。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14923/devtools-content-scripts.png" style="display: block; height: 416px; margin-left: auto; margin-right: auto; width: 600px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14923/devtools-content-scripts.png" style="display: block; height: 416px; margin-left: auto; margin-right: auto; width: 600px;"></p>
 
 <h2 id="devtools_APIs_の制限">devtools APIs の制限</h2>
 

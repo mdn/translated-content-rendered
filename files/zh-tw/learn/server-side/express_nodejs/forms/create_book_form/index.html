@@ -11,8 +11,8 @@ translation_of: Learn/Server-side/Express_Nodejs/forms/Create_book_form
 
 <p>打開 <strong>/controllers/bookController.js</strong>，並在文件頂部添加以下幾行:</p>
 
-<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">const { body,validationResult } = require('express-validator/check');
-const { sanitizeBody } = require('express-validator/filter');</code></pre>
+<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">const { body,validationResult } = require(&apos;express-validator/check&apos;);
+const { sanitizeBody } = require(&apos;express-validator/filter&apos;);</code></pre>
 
 <h2 id="Controller—get_route">Controller—get route</h2>
 
@@ -31,7 +31,7 @@ exports.book_create_get = function(req, res, next) {
         },
     }, function(err, results) {
         if (err) { return next(err); }
-        res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres });
+        res.render(&apos;book_form&apos;, { title: &apos;Create Book&apos;, authors: results.authors, genres: results.genres });
     });
 
 };</code></pre>
@@ -47,7 +47,7 @@ exports.book_create_post = [
     // Convert the genre to an array.
     (req, res, next) =&gt; {
         if(!(req.body.genre instanceof Array)){
-            if(typeof req.body.genre==='undefined')
+            if(typeof req.body.genre===&apos;undefined&apos;)
             req.body.genre=[];
             else
             req.body.genre=new Array(req.body.genre);
@@ -56,13 +56,13 @@ exports.book_create_post = [
     },
 
     // Validate fields.
-    body('title', 'Title must not be empty.').isLength({ min: 1 }).trim(),
-    body('author', 'Author must not be empty.').isLength({ min: 1 }).trim(),
-    body('summary', 'Summary must not be empty.').isLength({ min: 1 }).trim(),
-    body('isbn', 'ISBN must not be empty').isLength({ min: 1 }).trim(),
+    body(&apos;title&apos;, &apos;Title must not be empty.&apos;).isLength({ min: 1 }).trim(),
+    body(&apos;author&apos;, &apos;Author must not be empty.&apos;).isLength({ min: 1 }).trim(),
+    body(&apos;summary&apos;, &apos;Summary must not be empty.&apos;).isLength({ min: 1 }).trim(),
+    body(&apos;isbn&apos;, &apos;ISBN must not be empty&apos;).isLength({ min: 1 }).trim(),
 
     // Sanitize fields (using wildcard).
-    sanitizeBody('*').trim().escape(),
+    sanitizeBody(&apos;*&apos;).trim().escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) =&gt; {
@@ -96,10 +96,10 @@ exports.book_create_post = [
                 // Mark our selected genres as checked.
                 for (let i = 0; i &lt; results.genres.length; i++) {
                     if (book.genre.indexOf(results.genres[i]._id) &gt; -1) {
-                        results.genres[i].checked='true';
+                        results.genres[i].checked=&apos;true&apos;;
                     }
                 }
-                res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array() });
+                res.render(&apos;book_form&apos;, { title: &apos;Create Book&apos;,authors:results.authors, genres:results.genres, book: book, errors: errors.array() });
             });
             return;
         }
@@ -118,14 +118,14 @@ exports.book_create_post = [
 
 <p>The first main difference with respect to the other form handling code is that we use a wildcard to trim and escape all fields in one go (rather than sanitising them individually):</p>
 
-<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">sanitizeBody('*').trim().escape(),</code></pre>
+<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">sanitizeBody(&apos;*&apos;).trim().escape(),</code></pre>
 
 <p>The next main difference with respect to the other form handling code is how we sanitize the genre information. The form returns an array of <code>Genre</code> items (while for other fields it returns a string). In order to validate the information we first convert the request to an array (required for the next step).</p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">// Convert the genre to an array.
 (req, res, next) =&gt; {
     if(!(req.body.genre instanceof Array)){
-        if(typeof req.body.genre==='undefined')
+        if(typeof req.body.genre===&apos;undefined&apos;)
         req.body.genre=[];
         else
         req.body.genre=new Array(req.body.genre);
@@ -133,17 +133,17 @@ exports.book_create_post = [
     next();
 },</code></pre>
 
-<p>We then use a wildcard (<code>*</code>) in the sanitiser to individually validate each of the genre array entries. The code below shows how - this translates to "sanitise every item below key <code>genre</code>".</p>
+<p>We then use a wildcard (<code>*</code>) in the sanitiser to individually validate each of the genre array entries. The code below shows how - this translates to &quot;sanitise every item below key <code>genre</code>&quot;.</p>
 
-<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">sanitizeBody('genre.*').trim().escape(),</code></pre>
+<pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">sanitizeBody(&apos;genre.*&apos;).trim().escape(),</code></pre>
 
-<p>The final difference with respect to the other form handling code is that we need to pass in all existing genres and authors to the form. In order to mark the genres that were checked by the user we iterate through all the genres and add the <code>checked='true'</code> parameter to those that were in our post data (as reproduced in the code fragment below).</p>
+<p>The final difference with respect to the other form handling code is that we need to pass in all existing genres and authors to the form. In order to mark the genres that were checked by the user we iterate through all the genres and add the <code>checked=&apos;true&apos;</code> parameter to those that were in our post data (as reproduced in the code fragment below).</p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">// Mark our selected genres as checked.
 for (let i = 0; i &lt; results.genres.length; i++) {
     if (book.genre.indexOf(results.genres[i]._id) &gt; -1) {
-        // Current genre is selected. Set "checked" flag.
-        results.genres[i].checked='true';
+        // Current genre is selected. Set &quot;checked&quot; flag.
+        results.genres[i].checked=&apos;true&apos;;
     }
 }</code></pre>
 
@@ -156,32 +156,32 @@ for (let i = 0; i &lt; results.genres.length; i++) {
 block content
   h1= title
 
-  form(method='POST' action='')
+  form(method=&apos;POST&apos; action=&apos;&apos;)
     div.form-group
-      label(for='title') Title:
-      input#title.form-control(type='text', placeholder='Name of book' name='title' required='true' value=(undefined===book ? '' : book.title) )
+      label(for=&apos;title&apos;) Title:
+      input#title.form-control(type=&apos;text&apos;, placeholder=&apos;Name of book&apos; name=&apos;title&apos; required=&apos;true&apos; value=(undefined===book ? &apos;&apos; : book.title) )
     div.form-group
-      label(for='author') Author:
-      select#author.form-control(type='select', placeholder='Select author' name='author' required='true' )
+      label(for=&apos;author&apos;) Author:
+      select#author.form-control(type=&apos;select&apos;, placeholder=&apos;Select author&apos; name=&apos;author&apos; required=&apos;true&apos; )
         for author in authors
           if book
-            option(value=author._id selected=(author._id.toString()==book.author ? 'selected' : false) ) #{author.name}
+            option(value=author._id selected=(author._id.toString()==book.author ? &apos;selected&apos; : false) ) #{author.name}
           else
             option(value=author._id) #{author.name}
     div.form-group
-      label(for='summary') Summary:
-      input#summary.form-control(type='textarea', placeholder='Summary' name='summary' value=(undefined===book ? '' : book.summary) required='true')
+      label(for=&apos;summary&apos;) Summary:
+      input#summary.form-control(type=&apos;textarea&apos;, placeholder=&apos;Summary&apos; name=&apos;summary&apos; value=(undefined===book ? &apos;&apos; : book.summary) required=&apos;true&apos;)
     div.form-group
-      label(for='isbn') ISBN:
-      input#isbn.form-control(type='text', placeholder='ISBN13' name='isbn' value=(undefined===book ? '' : book.isbn) required='true')
+      label(for=&apos;isbn&apos;) ISBN:
+      input#isbn.form-control(type=&apos;text&apos;, placeholder=&apos;ISBN13&apos; name=&apos;isbn&apos; value=(undefined===book ? &apos;&apos; : book.isbn) required=&apos;true&apos;)
     div.form-group
       label Genre:
       div
         for genre in genres
-          div(style='display: inline; padding-right:10px;')
-            input.checkbox-input(type='checkbox', name='genre', id=genre._id, value=genre._id, checked=genre.checked )
+          div(style=&apos;display: inline; padding-right:10px;&apos;)
+            input.checkbox-input(type=&apos;checkbox&apos;, name=&apos;genre&apos;, id=genre._id, value=genre._id, checked=genre.checked )
             label(for=genre._id) #{genre.name}
-    button.btn.btn-primary(type='submit') Submit
+    button.btn.btn-primary(type=&apos;submit&apos;) Submit
 
   if errors
     ul
@@ -195,17 +195,17 @@ block content
 <ul>
  <li>The set of genres are displayed as checkboxes, using the <code>checked</code> value we set in the controller to determine whether or not the box should be selected.</li>
  <li>The set of authors are displayed as a single-selection drop-down list. In this case we determine what author to display by comparing the id of the current author option with the value previously entered by the user (passed in as the <code>book</code> variable). This is highlighted above!
-  <div class="note">
-  <p><strong>Note:</strong> If there is an error in the submitted form, then, when the form is to be re-rendered, the new book's author is identified only with a string (the value of the selected option in the list of authors). By contrast, the existing books' authors have <code>_id</code> properties that are not strings. So to compare the new with the existing we must cast each existing book's author's <code>_id</code> to a string, as shown above.</p>
+  <div class="note notecard">
+  <p><strong>Note:</strong> If there is an error in the submitted form, then, when the form is to be re-rendered, the new book&apos;s author is identified only with a string (the value of the selected option in the list of authors). By contrast, the existing books&apos; authors have <code>_id</code> properties that are not strings. So to compare the new with the existing we must cast each existing book&apos;s author&apos;s <code>_id</code> to a string, as shown above.</p>
   </div>
  </li>
 </ul>
 
 <h2 id="What_does_it_look_like">What does it look like?</h2>
 
-<p>Run the application, open your browser to <a class="external external-icon" href="http://localhost:3000/" rel="noopener">http://localhost:3000/</a>, then select the <em>Create new book </em>link. If everything is set up correctly, your site should look something like the following screenshot. After you submit a valid book, it should be saved and you'll be taken to the book detail page.</p>
+<p>Run the application, open your browser to <a class="external external-icon" href="http://localhost:3000/" rel="noopener">http://localhost:3000/</a>, then select the <em>Create new book </em>link. If everything is set up correctly, your site should look something like the following screenshot. After you submit a valid book, it should be saved and you&apos;ll be taken to the book detail page.</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14484/LocalLibary_Express_Book_Create_Empty.png" style="display: block; height: 498px; margin: 0px auto; width: 1000px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14484/LocalLibary_Express_Book_Create_Empty.png" style="display: block; height: 498px; margin: 0px auto; width: 1000px;"></p>
 
 <h2 id="Next_steps">Next steps</h2>
 

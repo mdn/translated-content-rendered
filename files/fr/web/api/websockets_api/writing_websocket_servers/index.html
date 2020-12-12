@@ -9,7 +9,7 @@ translation_of: Web/API/WebSockets_API/Writing_WebSocket_servers
 
 <p>Avant de débuter, vous <strong>devez</strong> connaître précisément le fonctionnement du protocole HTTP et disposer d&apos;une certaine expérience sur celui-ci. Des connaissances sur les sockets TCP dans votre langage de développement est également précieux. Ce guide ne présente ainsi que le <u><em>minimum</em></u><em> </em>des connaissances requises et non un guide ultime.</p>
 
-<div class="note">
+<div class="note notecard">
 <p>Lire la dernière spécification officielle sur les WebSockets <a href="http://datatracker.ietf.org/doc/rfc6455/?include_text=1">RFC 6455</a>. Les sections 1 et 4-7 sont particulièrement intéressantes pour ce qui nous occupe. La section 10 évoque la sécurité et doit être connue et mise en oeuvre avant d&apos;exposer votre serveur au-delà du réseau local / lors de la mise en production. </p>
 </div>
 
@@ -42,15 +42,15 @@ Sec-WebSocket-Version: 13
 
 <p>Si un des entêtes n&apos;est pas compris ou sa valeur n&apos;est pas correcte, le serveur devrait envoyer une réponse  &quot;<a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes#400">400 Bad Request</a>&quot; (<em>erreur 400 : la requête est incorrecte</em>) et clore immédiatement la connexion. Il peut par ailleurs indiquer la raison pour laquelle la poignée de mains a échoué dans le corps de réponse HTTP, mais le message peut ne jamais être affiché par le navigateur (<em>en somme, tout dépend du comportement du client</em>). Si le serveur ne comprend pas la version de WebSockets présentée, il doit envoyer dans la réponse un entête <em>Sec-WebSocket-Version</em> correspondant à la ou les version-s supportée-s. Ici le guide explique la version 13, la plus récente à l&apos;heure de l&apos;écriture du tutoriel (<em>voir le tutoriel en version anglaise pour la date exacte ; il s&apos;agit là d&apos;une traduction</em>). Maintenant, nous allons passer à l&apos;entête attendu : <em>Sec-WebSocket-Key</em>.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Astuce:</strong>  Un grand nombre de navigateurs enverront un  <a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS#Origin"><code>Entête d&apos;origine</code></a>. Vous pouvez alors l&apos;utiliser pour vérifier la sécurité de la transaction (par exemple vérifier la similitude des domaines, listes blanches ou noires, etc.) et éventuellement retourner une réponse <a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes#403">403 Forbidden</a> si l&apos;origine ne vous plaît pas. Toutefois garder à l&apos;esprit que cet entête peut être simulé ou trompeur (il peut être ajouté manuellement ou lors du transfert). De nombreuses applications refusent les transactions sans celui-ci. </p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Astuce:</strong> L&apos;URI de la requête (<code>/chat </code>dans notre cas), n&apos;a pas de signification particulièrement dans les spécifications en usage : elle permet simplement, par convention, de disposer d&apos;une multitude d&apos;applications en parallèle grâce à WebSocket. Par exemple <code>exemple.com/chat</code> peut être associée à une API/une application de dialogue multiutilisateurs lorsque <code>/game</code> invoquera son homologue pour un jeu. </p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note:</strong> <a href="https://developer.mozilla.org/en-US/docs/HTTP/Response_codes">Les codes réguliers (<em>c-à-d défini par le protocole standard</em>) HTTP</a> ne peuvent être utilisés qu&apos;<strong><em>avant</em></strong> la poignée : ceux après la poignée, sont définis d&apos;une manière spécifique dans la section 7.4 de la documentation sus-nommée. </p>
 </div>
 
@@ -67,13 +67,13 @@ Connection: Upgrade
 
 <p>En sus, le serveur peut décider de proposer des extensions de protocoles ou des sous-protocoles à cet instant ; voir <a href="#Miscellaneous">Miscellaneous</a> pour les détails. L&apos;entête Sec-WebSocket-Accept nous intéresse ici : le serveur doit la former depuis l&apos;entête Sec-WebSocket-Key envoyée précédemment par le client. Pour l&apos;obtenir, vous devez concaténater (<em>rassembler</em>) la valeur de <em>Sec-WebSocket-Key</em> et &quot;<em>258EAFA5-E914-47DA-95CA-C5AB0DC85B11</em>&quot; (valeur fixée par défaut : c&apos;est une &quot;<a href="https://en.wikipedia.org/wiki/Magic_string" style="line-height: 1.5em;">magic string</a>&quot;) puis procéder au hash par la méthode <a href="https://en.wikipedia.org/wiki/SHA-1" style="line-height: 1.5em;">SHA-1</a> du résultat et retourner le format au format <a href="https://en.wikipedia.org/wiki/Base64" style="line-height: 1.5em;">base64</a>. </p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Pour information / pour mémoire :</strong> Ce processus qui peut paraître inutilement complexe, permet de certifier que le serveur et le client sont bien sur une base WebSocket et non une requête HTTP  (qui serait alors mal interprétée). </p>
 </div>
 
 <p>Ainsi si la clé (la valeur de l&apos;entête du client) était &quot;<code>dGhlIHNhbXBsZSBub25jZQ==</code>&quot;, le retour (<em><u>Accept</u> * dans la version d&apos;origine du tutoriel</em>) sera : &quot;<code>s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</code>&quot;. Une fois que le serveur a envoyé les entêtes attendues, alors la poignée de mains est considérée comme effectuée et vous pouvez débuter l&apos;échange de données ! </p>
 
-<div class="note">
+<div class="note notecard">
 <p>Le serveur peut envoyer à ce moment, d&apos;autres entêtes comme par exemple Set-Cookie, ou demander une authenficiation ou encore une redirection via les codes standards HTTP et ce <em><strong>avant </strong></em>la fin du processus de poignée de main. </p>
 </div>
 
@@ -148,7 +148,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
     DECODED[i] = ENCODED[i] ^ MASK[i % 4];
 <span style="line-height: 1.5;">}</span></pre>
 
-<div class="note">
+<div class="note notecard">
 <p>Ici la variable <code>DECODED</code> correspond aux données utiles à votre application - en fonction de l&apos;utilisation ou non d&apos;un sous-protocole (<em>si c&apos;est <code>json</code>, vous devez encore décoder les données utiles reçues avec le parseur JSON</em>). </p>
 </div>
 
@@ -176,7 +176,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <p>Le <em>ping </em>ou le <em>pong </em>sont des trames classiques dites <strong>de contrôle</strong>. Les <em>pings </em>disposent d&apos;un opcode à <code>0x9</code> et les <em>pongs </em>à <code>0xA</code>. Lorsqu&apos;un <em>ping </em>est envoyé, le <em>pong </em>doit disposer de la même donnée utile en réponse que le ping (et d&apos;une taille maximum autorisé de 125). Le <em>pong </em>seul (c-à-d sans <em>ping</em>) est ignoré. </p>
 
-<div class="note">
+<div class="note notecard">
 <p>Lorsque plusieurs pings sont envoyés à la suite, un <strong>seul </strong>pong suffit en réponse (<em>le plus récent pour la donnée utile renvoyée</em>). </p>
 </div>
 
@@ -186,7 +186,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <h2 id="Diverses_informations_utiles"><a id="Miscellaneous" name="Miscellaneous">Diverses informations utiles</a></h2>
 
-<div class="note">
+<div class="note notecard">
 <p>L&apos;ensemble des codes, extensions et sous-protocoles liés aux WebSocket sont enregistrés dans le (registre) <a href="http://www.iana.org/assignments/websocket/websocket.xml">IANA WebSocket Protocol Registry</a>.</p>
 </div>
 
@@ -198,13 +198,13 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <h3 id="Les_extensions">Les extensions</h3>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Cette section mériterait d&apos;être étendue et complétée. Merci de le faire si vous disposez des moyens pour le faire. </strong></p>
 </div>
 
 <p>L&apos;idée des extensions pourrait être, par exemple, la compression d&apos;un fichier avant de l&apos;envoyer par courriel / email à quelqu&apos;un : les données transférées ne changent pas de contenu, mais leur format oui (et leur taille aussi...). Ce n&apos;est donc pas le format du contenu qui change que le mode transmission - c&apos;est le principe des extensions en WebSockets, dont le principe de base est d&apos;être un protocole simple d&apos;échange de données. </p>
 
-<div class="note">
+<div class="note notecard">
 <p>Les extensions sont présentées et expliquées dans les sections 5.8, 9, 11.3.2, and 11.4 de la documentation sus-nommées. </p>
 </div>
 
@@ -212,7 +212,7 @@ for (var i = 0; i &lt; ENCODED.length; i++) {
 
 <p>Les sous-protocoles sont à comparer à <a href="https://en.wikipedia.org/wiki/XML_schema">un schéma XML</a> ou <a href="https://en.wikipedia.org/wiki/Document_Type_Definition">une déclaration de DocType</a>. Ainsi vous pouvez utiliser seulement du XML et sa syntaxe et, imposer par le biais des sous-protocoles, son utilisation durant l&apos;échange WebSocket. C&apos;est l&apos;intérêt de ces sous-protocoles : établir une structure définie (<em>et intangible : le client se voit imposer la mise en oeuvre par le serveur</em>), bien que les deux doivent l&apos;accepter pour communiquer ensemble. </p>
 
-<div class="note">
+<div class="note notecard">
 <p>Les sous-protocoles sont expliqués dans les sections 1.9, 4.2, 11.3.4, and 11.5 de la documentation sus-nommés. </p>
 </div>
 
@@ -241,7 +241,7 @@ Sec-WebSocket-Protocol: wamp
 
 <p>Si vous souhaitez que votre serveur puisse supporter certains sous-protocoles, vous pourriez avoir besoin d&apos;une application ou de scripts supplémentaires sur le serveur. Imaginons par exemple que vous utilisiez le sous-protocole json - où toutes les données échangées par WebSockets sont donc formatés suivant le format <a href="https://fr.wikipedia.org/wiki/JavaScript_Object_Notation">JSON</a>. Si le client sollicite ce sous-protocole et que le serveur souhaite l&apos;accepter, vous <u><strong>devez disposer</strong></u> d&apos;un parseur (d&apos;un décodeur) JSON et décoder les données par celui-ci. </p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Astuce:</strong> Pour éviter des conflits d&apos;espaces de noms, il est recommandé d&apos;utiliser le sous-protocole comme un sous-domaine de celui utilisé. Par exemple si vous utilisez un sous-protocole propriétaire qui utilise un format d&apos;échange de données non-standard pour une application de <em>chat </em>sur le domaine <em>exemple.com</em>, vous devrirez utiliser : <code>Sec-WebSocket-Protocol: chat.exemple.com</code>. S&apos;il y a différentes versions possibles, modifiez le chemin pour faire correspondre le path à votre version comme ceci : <code>chat.exemple.com/2.0</code>. Notez que ce n&apos;est pas obligatoire, c&apos;est une convention d&apos;écriture optionnel et qui peut être utilisée d&apos;une toute autre façon. </p>
 </div>
 

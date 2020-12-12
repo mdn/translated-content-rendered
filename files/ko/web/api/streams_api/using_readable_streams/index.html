@@ -7,11 +7,11 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 
 <p class="summary">자바스크립트 개발자로서, 프로그래밍적으로 네트워크로부터 받은 데이터 스트림을 Chunk단위로 읽고 다루는 것은 매우 유용합니다! 그러나 어떻게 스트림 API의 Readable stream을 잘 사용할수 있을까요. 이번 내용은 그것을 설명하고 있습니다.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note</strong>: This article assumes that you understand the use cases of readable streams, and are aware of the high-level concepts. If not, we suggest that you first read the <a href="/en-US/docs/Web/API/Streams_API#Concepts_and_usage">Streams concepts and usage overview</a> and dedicated <a href="/en-US/docs/Web/API/Streams_API/Concepts">Streams API concepts</a> article, then come back.</p>
 </div>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note</strong>: If you are looking for information on writable streams try <a href="/en-US/docs/Web/API/Streams_API/Using_writable_streams">Using writable streams</a> instead.</p>
 </div>
 
@@ -32,7 +32,7 @@ translation_of: Web/API/Streams_API/Using_readable_streams
 <p>우리의 <a href="https://github.com/mdn/dom-examples/tree/master/streams/simple-pump">Simple stream pump</a>예시에서 보여주듯(<a href="https://mdn.github.io/dom-examples/streams/simple-pump/">see it live also</a>), Readable 스트림을 노출시키기 위해서는 단지 Response의 body 속성에 접근하기만 하면 됩니다.</p>
 
 <pre class="brush: js">// 오리지널 이미지를 Fetch 함
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // body 를 ReadableStream으로 가공함
 .then(response =&gt; response.body)
 </pre>
@@ -44,7 +44,7 @@ fetch('./tortoise.png')
 <p>이제 우리는 스트림화된 body를 가지고 있으며, 이 스트림을 읽기 위해서는 리더기를 붙여야 합니다. 이 작업은 <a href="/ko/docs/Web/API/ReadableStream/getReader"><code>ReadableStream.getReader()</code></a> 메서드를 사용하여 처리합니다.</p>
 
 <pre class="brush: js">// 오리지널 이미지를 Fetch 함
-fetch('./tortoise.png')
+fetch(&apos;./tortoise.png&apos;)
 // body 를 ReadableStream으로 가공함
 .then(response =&gt; response.body)
 .then(body =&gt; {
@@ -55,7 +55,7 @@ fetch('./tortoise.png')
 <p>또한 <code>response.body</code> 는 동기이므로 굳이 프로미스를 사용할 필요가 없으며, 위의 예시를 한번의 스텝으로 줄일수 있다는 점에 주목해 주십시요</p>
 
 <pre class="brush: js">// 오리지널 이미지를 Fetch 함
-  fetch('./tortoise.png')
+  fetch(&apos;./tortoise.png&apos;)
   // body 를 ReadableStream으로 가공함
   .then(response =&gt; {
     const reader = response.body.getReader();</pre>
@@ -66,7 +66,7 @@ fetch('./tortoise.png')
 
 <p>정확하게는 이 메서드는 각 스트림으로부터 하나의  data chunk를 읽습니다. 그리고 이러한 data chunk는 우리가 원하는대로 사용할 수 있습니다.</p>
 
-<p>예를 들어 우리의 Simple stream pump example에서는 <a href="/ko/docs/Web/API/ReadableStreamDefaultReader/read"><code>ReadableStreamDefaultReader.read()</code></a> 사용하여 Data Chunk를 새로운 커스텀 <code>ReadableStream</code>에 집어 넣고 있습니다. 그리고 만약 읽을수 있는 다음 Data Chunk가 있다면, <a href="/ko/docs/Web/API/ReadableStreamDefaultReader/read"><code>ReadableStreamDefaultReader.read()</code></a> 를 다시 사용하여 다음 Data Chunk를 커스텀 <code>ReadableStream</code>에 집어 넣습니다. 더이상 읽을수 있는 Data Chunk가 없다면, 그 커스텀 <code>ReadableStream</code>(우리는 이 새로운 Readable 스트림에 대해 다음 섹션에서 다 자세히 살펴 볼것 입니다.)을 통해 새로운 <a href="/ko/docs/Web/API/Response"><code>Response</code></a> 객체를 생성합니다. 그 다음 이 <a href="/ko/docs/Web/API/Response"><code>Response</code></a> 객체를 <a href="/ko/docs/Web/API/Blob"><code>Blob</code></a> 형태로 변환하고  이 <a href="/ko/docs/Web/API/Blob"><code>Blob</code></a> 으로 부터 <a href="/ko/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a> 메서드를 사용하여 URL 객체를 생성합니다. 마지막으로 이 URL객체를 {htmlelement("img")}} 에 적용하여 이미지를 보여줌으로서 fetch된 오리지널 이미지를 효과적으로 복사하는 것입니다.</p>
+<p>예를 들어 우리의 Simple stream pump example에서는 <a href="/ko/docs/Web/API/ReadableStreamDefaultReader/read"><code>ReadableStreamDefaultReader.read()</code></a> 사용하여 Data Chunk를 새로운 커스텀 <code>ReadableStream</code>에 집어 넣고 있습니다. 그리고 만약 읽을수 있는 다음 Data Chunk가 있다면, <a href="/ko/docs/Web/API/ReadableStreamDefaultReader/read"><code>ReadableStreamDefaultReader.read()</code></a> 를 다시 사용하여 다음 Data Chunk를 커스텀 <code>ReadableStream</code>에 집어 넣습니다. 더이상 읽을수 있는 Data Chunk가 없다면, 그 커스텀 <code>ReadableStream</code>(우리는 이 새로운 Readable 스트림에 대해 다음 섹션에서 다 자세히 살펴 볼것 입니다.)을 통해 새로운 <a href="/ko/docs/Web/API/Response"><code>Response</code></a> 객체를 생성합니다. 그 다음 이 <a href="/ko/docs/Web/API/Response"><code>Response</code></a> 객체를 <a href="/ko/docs/Web/API/Blob"><code>Blob</code></a> 형태로 변환하고  이 <a href="/ko/docs/Web/API/Blob"><code>Blob</code></a> 으로 부터 <a href="/ko/docs/Web/API/URL/createObjectURL"><code>URL.createObjectURL()</code></a> 메서드를 사용하여 URL 객체를 생성합니다. 마지막으로 이 URL객체를 {htmlelement(&quot;img&quot;)}} 에 적용하여 이미지를 보여줌으로서 fetch된 오리지널 이미지를 효과적으로 복사하는 것입니다.</p>
 
 <pre class="brush: js">  return new ReadableStream({
     start(controller) {
@@ -114,7 +114,7 @@ fetch('./tortoise.png')
   return;
 }</pre>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note</strong>: 여기서 사용한 <code>close()</code> 는 새로만든 커스텀 스트림의 일부이며 오리지널 스트림의 것이 아닙니다. 커스텀 스트림에 대해서는 다음섹션에서 더 자세히 살펴 볼 예정입니다. </p>
 </div>
 
@@ -167,7 +167,7 @@ return pump();</pre>
 <ol>
  <li><code>start(controller)</code> — <code>ReadableStream</code> 이 생성되자 마자 딱 한번만 호출 되는 메서드 입니다. 이 메서드에는 스트림을 기능을 설정할 수 있는 코드가 포함되어야 합니다. 예를 들면 데이터 생성을 시작한다거나 아니면 소스에 접근하여 데이터를 가져오는 코드등이 들어가게 될것입니다.</li>
  <li><code>pull(controller)</code> — 이 메서드는 스트림 내부의 queue가 가득 찰때까지 반복적으로 호출 됩니다. 더 많은 청크가 큐에 들어갈 때 스트림을 제어하는 ​​데 사용할 수 있습니다.</li>
- <li><code>cancel()</code> — 이 메서드는 스트림이 캔슬될때 호출 됩니다 (예를 들어 {domxref("ReadableStream.cancel()")}} 이 호출 되었을때). 메서드의 내용은 스트림 소스에 대한 액세스를 해제하는 데 필요한 모든 것을 수행해야합니다.</li>
+ <li><code>cancel()</code> — 이 메서드는 스트림이 캔슬될때 호출 됩니다 (예를 들어 {domxref(&quot;ReadableStream.cancel()&quot;)}} 이 호출 되었을때). 메서드의 내용은 스트림 소스에 대한 액세스를 해제하는 데 필요한 모든 것을 수행해야합니다.</li>
  <li><code>type</code> and <code>autoAllocateChunkSize</code> —  스트림이 바이트 스트림임을 나타 내기 위해 사용됩니다. 바이트 스트림은 목적과 사용 사례가 일반 (기본) 스트림과 약간 다르므로 향후 자습서에서 별도로 다룰 것입니다. 또한 아직 어느 곳에서도 구현되지 않았습니다.</li>
 </ol>
 
@@ -203,7 +203,7 @@ return pump();</pre>
 
 <h3 id="Reading_from_custom_streams">Reading from custom streams</h3>
 
-<p>우리의 Simple stream pump example 에서, 우리는 {domxref("Response.Response", "Response")}} 생성자 함수에 우리가 만든 커스텀 readable 스트림을 인자로 전달하였으며 그렇게 생성된 response 인스턴스를 <code>blob()</code> 으로 사용 하였습니다.</p>
+<p>우리의 Simple stream pump example 에서, 우리는 {domxref(&quot;Response.Response&quot;, &quot;Response&quot;)}} 생성자 함수에 우리가 만든 커스텀 readable 스트림을 인자로 전달하였으며 그렇게 생성된 response 인스턴스를 <code>blob()</code> 으로 사용 하였습니다.</p>
 
 <pre class="brush: js">.then(stream =&gt; new Response(stream))
 .then(response =&gt; response.blob())
@@ -224,18 +224,18 @@ return pump();</pre>
       // Add the string to the stream
       controller.enqueue(string);
       // show it on the screen
-      let listItem = document.createElement('li');
+      let listItem = document.createElement(&apos;li&apos;);
       listItem.textContent = string;
       list1.appendChild(listItem);
     }, 1000);
-    button.addEventListener('click', function() {
+    button.addEventListener(&apos;click&apos;, function() {
       clearInterval(interval);
       readStream();
       controller.close();
     })
   },
   pull(controller) {
-    // We don't really need a pull in this example
+    // We don&apos;t really need a pull in this example
   },
   cancel() {
     // This is called if the reader cancels,
@@ -257,15 +257,15 @@ return pump();</pre>
     // done  - true if the stream has already given you all its data.
     // value - some data. Always undefined when done is true.
     if (done) {
-      console.log("Stream complete");
+      console.log(&quot;Stream complete&quot;);
       para.textContent = result;
       return;
     }
 
     charsReceived += value.length;
     const chunk = value;
-    let listItem = document.createElement('li');
-    listItem.textContent = 'Read ' + charsReceived + ' characters so far. Current chunk = ' + chunk;
+    let listItem = document.createElement(&apos;li&apos;);
+    listItem.textContent = &apos;Read &apos; + charsReceived + &apos; characters so far. Current chunk = &apos; + chunk;
     list2.appendChild(listItem);
 
     result += chunk;
@@ -304,13 +304,13 @@ return pump();</pre>
 <p>We have created an example called <a href="https://github.com/mdn/dom-examples/tree/master/streams/png-transform-stream">Unpack Chunks of a PNG</a> (<a href="https://mdn.github.io/dom-examples/streams/png-transform-stream/">see it live also</a>) that fetches an image as a stream, then pipes it through to a custom PNG transform stream <span class="pl-c">that retrieves PNG chunks out of a binary data stream.</span></p>
 
 <pre class="brush: js">// Fetch the original image
-fetch('png-logo.png')
+fetch(&apos;png-logo.png&apos;)
 // Retrieve its body as ReadableStream
 .then(response =&gt; response.body)
 // Create a gray-scaled PNG stream out of the original
-.then(rs =&gt; logReadableStream('Fetch Response Stream', rs))
+.then(rs =&gt; logReadableStream(&apos;Fetch Response Stream&apos;, rs))
 .then(body =&gt; body.pipeThrough(new PNGTransformStream()))
-.then(rs =&gt; logReadableStream('PNG Chunk Stream', rs))</pre>
+.then(rs =&gt; logReadableStream(&apos;PNG Chunk Stream&apos;, rs))</pre>
 
 <h2 id="Summary">Summary</h2>
 

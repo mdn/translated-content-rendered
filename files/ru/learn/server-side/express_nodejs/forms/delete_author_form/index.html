@@ -19,28 +19,28 @@ exports.author_delete_get = function(req, res, next) {
             Author.findById(req.params.id).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.params.id }).exec(callback)
+          Book.find({ &apos;author&apos;: req.params.id }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         if (results.author==null) { // No results.
-            res.redirect('/catalog/authors');
+            res.redirect(&apos;/catalog/authors&apos;);
         }
         // </code>Удачно, значит рендерим.<code class="language-js">
-        res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+        res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
     });
 
 };</code></pre>
 
 <p>TКонтроллер получает id экземпляра <code>Author</code> для удаления из параметра URL  (<code>req.params.id</code>). Он использует метод  <code>async.parallel()</code> , чтобы получить запись автра и паралельнно вс связанные книги. WКогда оба пораметра авершины, он рендерит страницу  <code><strong>author_delete</strong></code><strong>.pug</strong>, передает значения для <code>title</code>, <code>author</code>, и <code>author_books</code>.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Заметка:</strong> Если <code>findById()</code><strong> </strong>не возвращает результатов, то автор отсутствует в базе данных. В этом случае удалять нечего, поэтому сразу выводим список всех авторов.</p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">}, function(err, results) {
     if (err) { return next(err); }
     if (results.author==null) { // No results.
-        res.redirect('/catalog/authors')
+        res.redirect(&apos;/catalog/authors&apos;)
     }</code></pre>
 </div>
 
@@ -56,14 +56,14 @@ exports.author_delete_post = function(req, res, next) {
           Author.findById(req.body.authorid).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.body.authorid }).exec(callback)
+          Book.find({ &apos;author&apos;: req.body.authorid }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         // Success
         if (results.authors_books.length &gt; 0) {
             // </code>Автор книги. Визуализация выполняется так же, как и для GET route.<code class="language-js">
-            res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+            res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
             return;
         }
         else {
@@ -71,7 +71,7 @@ exports.author_delete_post = function(req, res, next) {
             Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
                 if (err) { return next(err); }
                 // </code>Успех-перейти к списку авторов<code class="language-js">
-                res.redirect('/catalog/authors')
+                res.redirect(&apos;/catalog/authors&apos;)
             })
         }
     });
@@ -79,7 +79,7 @@ exports.author_delete_post = function(req, res, next) {
 
 <p>Сначала мы проверяем, что был предоставлен id (он отправляется через параметры тела формы, а не через версию в URL). Затем мы получаем автора и связанные с ним книги так же, как и для маршрута <code>GET</code>. Если книг нет, то удаляем объект автора и перенаправляем в список всех авторов. Если есть еще книги, то мы просто перерисовываем форму, передавая автора и список книг, которые нужно удалить.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Заметка:</strong> Мы можем проверить, возвращает ли вызов <code>findbyid ()</code> какой-либо результат, и если нет, немедленно отобразить список всех авторов.Для краткости мы оставили код как есть выше (он все равно вернет список авторов, если id не будет найден, но это произойдет после <code>findByIdAndRemove()</code>).</p>
 </div>
 
@@ -97,7 +97,7 @@ block content
 
     p #[strong Delete the following books before attempting to delete this author.]
 
-    div(style='margin-left:20px;margin-top:20px')
+    div(style=&apos;margin-left:20px;margin-top:20px&apos;)
 
       h4 Books
 
@@ -110,11 +110,11 @@ block content
   else
     p Do you really want to delete this Author?
 
-    form(method='POST' action='')
+    form(method=&apos;POST&apos; action=&apos;&apos;)
       div.form-group
-        input#authorid.form-control(type='hidden',name='authorid', required='true', value=author._id )
+        input#authorid.form-control(type=&apos;hidden&apos;,name=&apos;authorid&apos;, required=&apos;true&apos;, value=author._id )
 
-      button.btn.btn-primary(type='submit') Delete</code></pre>
+      button.btn.btn-primary(type=&apos;submit&apos;) Delete</code></pre>
 
 <p>Представление расширяет шаблон макета, переопределяя блок с именем <code>content</code>. Вверху отображаются сведения об авторе. Затем он включает условный оператор, основанный на количестве <code><strong>author_books</strong></code> (пункты <code>if</code> и <code>else</code> ).</p>
 
@@ -127,7 +127,7 @@ block content
 
 <p>Затем мы добавим элемент управления <code>Delete</code> в представление сведений об авторе (страница сведений-хорошее место для удаления записи).</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note:</strong> В полном объеме контроль будет доступен только авторизованным пользователям. Однако на данный момент у нас нет системы авторизации!</p>
 </div>
 
@@ -135,11 +135,11 @@ block content
 
 <pre class="brush: html line-numbers  language-html notranslate"><code class="language-html">hr
 p
-  a(href=author.url+'/delete') Delete author</code></pre>
+  a(href=author.url+&apos;/delete&apos;) Delete author</code></pre>
 
 <p>Теперь элемент управления должен отображаться в виде ссылки, как показано ниже на странице сведений об авторе.</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
 
 <h2 class="highlight-spanned" id="Как_это_выглядит">Как это выглядит?</h2>
 
@@ -147,13 +147,13 @@ p
 
 <p>Если у автора нет книг, вам будет представлена такая страница. После нажатия клавиши delete сервер удалит автора и перенаправит в список авторов</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
 
 <p>Если у автора есть книги, то вам будет представлен следующий вид. Затем вы можете удалить книги из их подробных страниц (как только этот код будет реализован!).</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note:</strong> Другие страницы для удаления объектов могут быть реализованы примерно таким же образом. Мы оставили это как задачи.</p>
 </div>
 

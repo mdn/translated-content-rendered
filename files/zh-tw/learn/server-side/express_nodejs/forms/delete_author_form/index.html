@@ -21,28 +21,28 @@ exports.author_delete_get = function(req, res, next) {
             Author.findById(req.params.id).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.params.id }).exec(callback)
+          Book.find({ &apos;author&apos;: req.params.id }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         if (results.author==null) { // No results.
-            res.redirect('/catalog/authors');
+            res.redirect(&apos;/catalog/authors&apos;);
         }
         // Successful, so render.
-        res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+        res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
     });
 
 };</code></pre>
 
 <p>The controller gets the id of the <code>Author</code> instance to be deleted from the URL parameter (<code>req.params.id</code>). It uses the <code>async.parallel()</code> method to get the author record and all associated books in parallel. When both operations have completed it renders the <code><strong>author_delete</strong></code><strong>.pug</strong> view, passing variables for the <code>title</code>, <code>author</code>, and <code>author_books</code>.</p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>Note:</strong> If  <code>findById()</code><strong> </strong>returns no results the author is not in the database. In this case there is nothing to delete, so we immediately render the list of all authors. </p>
 
 <pre class="brush: js line-numbers  language-js notranslate"><code class="language-js">}, function(err, results) {
     if (err) { return next(err); }
     if (results.author==null) { // No results.
-        res.redirect('/catalog/authors')
+        res.redirect(&apos;/catalog/authors&apos;)
     }</code></pre>
 </div>
 
@@ -58,14 +58,14 @@ exports.author_delete_post = function(req, res, next) {
           Author.findById(req.body.authorid).exec(callback)
         },
         authors_books: function(callback) {
-          Book.find({ 'author': req.body.authorid }).exec(callback)
+          Book.find({ &apos;author&apos;: req.body.authorid }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         // Success
         if (results.authors_books.length &gt; 0) {
             // Author has books. Render in same way as for GET route.
-            res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.authors_books } );
+            res.render(&apos;author_delete&apos;, { title: &apos;Delete Author&apos;, author: results.author, author_books: results.authors_books } );
             return;
         }
         else {
@@ -73,7 +73,7 @@ exports.author_delete_post = function(req, res, next) {
             Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
                 if (err) { return next(err); }
                 // Success - go to author list
-                res.redirect('/catalog/authors')
+                res.redirect(&apos;/catalog/authors&apos;)
             })
         }
     });
@@ -81,8 +81,8 @@ exports.author_delete_post = function(req, res, next) {
 
 <p>First we validate that an id has been provided (this is sent via the form body parameters, rather than using the version in the URL). Then we get the author and their associated books in the same way as for the <code>GET</code> route. If there are no books then we delete the author object and redirect to the list of all authors. If there are still books then we just re-render the form, passing in the author and list of books to be deleted.</p>
 
-<div class="note">
-<p><strong>Note:</strong> We could check if the call to <code>findById()</code><strong> </strong>returns any result, and if not,  immediately render the list of all authors.  We've left the code as it is above for brevity (it will still return the list of authors if the id is not found, but this will happen after <code>findByIdAndRemove()</code>).</p>
+<div class="note notecard">
+<p><strong>Note:</strong> We could check if the call to <code>findById()</code><strong> </strong>returns any result, and if not,  immediately render the list of all authors.  We&apos;ve left the code as it is above for brevity (it will still return the list of authors if the id is not found, but this will happen after <code>findByIdAndRemove()</code>).</p>
 </div>
 
 <h2 class="highlight-spanned" id="View">View</h2>
@@ -99,7 +99,7 @@ block content
 
     p #[strong Delete the following books before attempting to delete this author.]
 
-    div(style='margin-left:20px;margin-top:20px')
+    div(style=&apos;margin-left:20px;margin-top:20px&apos;)
 
       h4 Books
 
@@ -112,51 +112,51 @@ block content
   else
     p Do you really want to delete this Author?
 
-    form(method='POST' action='')
+    form(method=&apos;POST&apos; action=&apos;&apos;)
       div.form-group
-        input#authorid.form-control(type='hidden',name='authorid', required='true', value=author._id )
+        input#authorid.form-control(type=&apos;hidden&apos;,name=&apos;authorid&apos;, required=&apos;true&apos;, value=author._id )
 
-      button.btn.btn-primary(type='submit') Delete</code></pre>
+      button.btn.btn-primary(type=&apos;submit&apos;) Delete</code></pre>
 
 <p>The view extends the layout template, overriding the block named <code>content</code>. At the top it displays the author details. It then includes a conditional statement based on the number of <code><strong>author_books</strong></code> (the <code>if</code> and <code>else</code> clauses).</p>
 
 <ul>
  <li>If there <em>are</em> books associated with the author then the page lists the books and states that these must be deleted before this <code>Author</code> may be deleted.</li>
- <li>If there <em>are no</em> books then the page displays a confirmation prompt. If the <strong>Delete</strong> button is clicked then the author id is sent to the server in a <code>POST</code> request and that author's record will be deleted.</li>
+ <li>If there <em>are no</em> books then the page displays a confirmation prompt. If the <strong>Delete</strong> button is clicked then the author id is sent to the server in a <code>POST</code> request and that author&apos;s record will be deleted.</li>
 </ul>
 
 <h2 class="highlight-spanned" id="Add_a_delete_control">Add a delete control</h2>
 
 <p>Next we will add a <strong>Delete</strong> control to the<em> Author detail</em> view (the detail page is a good place from which to delete a record).</p>
 
-<div class="note">
-<p><strong>Note:</strong> In a full implementation the control would be made visible only to authorised users. However at this point we haven't got an authorisation system in place!</p>
+<div class="note notecard">
+<p><strong>Note:</strong> In a full implementation the control would be made visible only to authorised users. However at this point we haven&apos;t got an authorisation system in place!</p>
 </div>
 
 <p>Open the <strong>author_detail.pug</strong> view and add the following lines at the bottom.</p>
 
 <pre class="brush: html line-numbers  language-html notranslate"><code class="language-html">hr
 p
-  a(href=author.url+'/delete') Delete author</code></pre>
+  a(href=author.url+&apos;/delete&apos;) Delete author</code></pre>
 
 <p>The control should now appear as a link, as shown below on the <em>Author detail</em> page.</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14492/LocalLibary_Express_Author_Detail_Delete.png" style="border-style: solid; border-width: 1px; display: block; height: 202px; margin: 0px auto; width: 500px;"></p>
 
 <h2 class="highlight-spanned" id="What_does_it_look_like">What does it look like?</h2>
 
 <p>Run the application and open your browser to <a class="external external-icon" href="http://localhost:3000/" rel="noopener">http://localhost:3000/</a>. Then select the <em>All authors </em>link, and then select a particular author. Finally select the <em>Delete author</em> link.</p>
 
-<p>If the author has no books, you'll be presented with a page like this. After pressing delete, the server will delete the author and redirect to the author list.</p>
+<p>If the author has no books, you&apos;ll be presented with a page like this. After pressing delete, the server will delete the author and redirect to the author list.</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14494/LocalLibary_Express_Author_Delete_NoBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 342px; margin: 0px auto; width: 600px;"></p>
 
-<p>If the author does have books, then you'll be presented with a view like the following. You can then delete the books from their detail pages (once that code is implemented!).</p>
+<p>If the author does have books, then you&apos;ll be presented with a view like the following. You can then delete the books from their detail pages (once that code is implemented!).</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/14496/LocalLibary_Express_Author_Delete_WithBooks.png" style="border-style: solid; border-width: 1px; display: block; height: 327px; margin: 0px auto; width: 500px;"></p>
 
-<div class="note">
-<p><strong>Note:</strong> The other pages for deleting objects can be implemented in much the same way. We've left that as a challenge.</p>
+<div class="note notecard">
+<p><strong>Note:</strong> The other pages for deleting objects can be implemented in much the same way. We&apos;ve left that as a challenge.</p>
 </div>
 
 <h2 id="Next_steps">Next steps</h2>

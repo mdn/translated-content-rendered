@@ -117,13 +117,13 @@ translation_of: Games/Techniques/3D_collision_detection
 
 <p>2D 衝突検出と同様に、<strong>座標軸に沿ったバウンディングボックス</strong>（axis-aligned bounding boxes、AABB）は、2つのゲームエンティティがオーバーラップしているかどうかを判断するための最も速いアルゴリズムです。 これは、ゲームエンティティを回転しない（つまり座標軸に沿った）ボックスで包み、3D 座標空間でこれらのボックスの位置をチェックして、それらが重なっているかどうかを確認することで構成されます。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/11797/Screen%20Shot%202015-10-16%20at%2015.11.21.png" style="display: block; height: 275px; margin: 0px auto; width: 432px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/11797/Screen%20Shot%202015-10-16%20at%2015.11.21.png" style="display: block; height: 275px; margin: 0px auto; width: 432px;"></p>
 
 <p>パフォーマンス上の理由から、<strong>座標軸に沿った拘束</strong>（axis-aligned constraint）があります。 回転しない2つのボックス間の重複領域は、論理比較のみで確認できますが、回転するボックスには追加の三角関数操作が必要であり、計算に時間がかかります。 回転するエンティティがある場合は、バウンディングボックスの寸法を変更してオブジェクトを包むか、球（回転に対して不変）などの別のバウンディングジオメトリータイプを使用することを選択できます。 以下のアニメーション GIF は、回転するエンティティに合うようにサイズを調整する AABB の図形例を示しています。 ボックスは常に寸法を変更して、内部に含まれるエンティティにぴったりとフィットします。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/11799/rotating_knot.gif" style="display: block; height: 192px; margin: 0px auto; width: 207px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/11799/rotating_knot.gif" style="display: block; height: 192px; margin: 0px auto; width: 207px;"></p>
 
-<div class="note">
+<div class="note notecard">
 <p><strong>注</strong>: この手法の実際の実装については、<a href="/ja/docs/Games/Techniques/3D_collision_detection/Bounding_volume_collision_detection_with_THREE.js">Three.js を使用したバウンディングボリューム</a>の記事を確認してください。</p>
 </div>
 
@@ -168,7 +168,7 @@ translation_of: Games/Techniques/3D_collision_detection
 
 <p>球に点が含まれているかどうかを確認するには、点と球の中心との間の距離を計算する必要があります。 この距離が球の半径以下の場合、点は球の内側にあります。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/11803/point_vs_sphere.png" style="display: block; height: 262px; margin: 0px auto; width: 385px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/11803/point_vs_sphere.png" style="display: block; height: 262px; margin: 0px auto; width: 385px;"></p>
 
 <p>2つの点 <em>A</em> と <em>B</em> の間のユークリッド距離が <math><semantics><msqrt><mrow><mo stretchy="false">(</mo><msub><mi>A</mi><mi>x</mi></msub><mo>-</mo><msub><mi>B</mi><mi>x</mi></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><msub><mi>A</mi><mi>y</mi></msub><mo>-</mo><msub><mi>B</mi><mi>y</mi></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo stretchy="false">(</mo><msub><mi>A</mi><mi>z</mi></msub><mo>-</mo><msub><mi>B</mi><mi>z</mi></msub><mo stretchy="false">)</mo></mrow></msqrt><annotation encoding="TeX">\sqrt{(A_x - B_x) ^ 2) + (A_y - B_y)^2 + (A_z - B_z)}</annotation></semantics></math> であることを考慮すると、点対球の衝突検出の式は次のようになります。</p>
 
@@ -185,7 +185,7 @@ translation_of: Games/Techniques/3D_collision_detection
 }
 </pre>
 
-<div class="note">
+<div class="note notecard">
 <p>上記のコードは平方根を特徴としており、計算にコストがかかる可能性があります。 これを回避する簡単な最適化は、距離の2乗と半径の2乗を比較することで構成されているため、最適化された方程式には、代わりに <code>distanceSqr &lt; sphere.radius * sphere.radius</code> が含まれます。</p>
 </div>
 
@@ -193,7 +193,7 @@ translation_of: Games/Techniques/3D_collision_detection
 
 <p>球対球のテストは、点対球のテストに似ています。 ここでテストする必要があるのは、球の中心間の距離がそれらの半径の合計以下であることです。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/11805/sphere_vs_sphere.png" style="display: block; height: 262px; margin: 0px auto; width: 414px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/11805/sphere_vs_sphere.png" style="display: block; height: 262px; margin: 0px auto; width: 414px;"></p>
 
 <p>数学的には、これは次のようになります。</p>
 
@@ -213,7 +213,7 @@ translation_of: Games/Techniques/3D_collision_detection
 
 <p>球と AABB が衝突しているかどうかのテストは少し複雑ですが、それでも単純で高速です。 論理的なアプローチは、AABB のすべての頂点をチェックし、それぞれに対して点対球のテストを実行することです。 ただし、これはやり過ぎです。 AABB の<em>最も近い点</em>（必ずしも頂点である必要はありません）と球の中心との間の距離を計算して、球の半径以下であるかどうかを確認するだけで済むため、すべての頂点をテストする必要はありません。 この値は、球の中心を AABB の限界にクランプすることで取得できます。</p>
 
-<p><img alt="" src="https://mdn.mozillademos.org/files/11837/sphere_vs_aabb.png" style="display: block; height: 282px; margin: 0px auto; width: 377px;"></p>
+<p><img alt src="https://mdn.mozillademos.org/files/11837/sphere_vs_aabb.png" style="display: block; height: 282px; margin: 0px auto; width: 377px;"></p>
 
 <p>JavaScript では、次のようにこのテストを行います。</p>
 
