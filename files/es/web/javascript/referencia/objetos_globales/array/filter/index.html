@@ -149,32 +149,44 @@ console.log(filterItems(&apos;an&apos;)); // [&apos;banana&apos;, &apos;mango&ap
 
 <p><code>filter()</code> se añadió a la norma ECMA-262 en la 5ta edición; como tal puede no estar presente en todas las implementaciones de la norma. Puedes sobrellevarlo insertando el siguiente código al comienzo de su programa, para permitir el uso de <code>filter()</code> en implementaciones de ECMA-262 que no lo soporten de forma nativa. Este algoritmo es exactamente el especificado en ECMA-262, 5ta edición, supone que  <code>fn.call</code> evalua al valor original de <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/Function/call"><code>Function.prototype.call</code></a>, y que <a href="/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/push"><code>Array.prototype.push</code></a> tiene su valor original.</p>
 
-<pre class="brush: js notranslate">if (!Array.prototype.filter)
+<pre class="notranslate">if (!Array.prototype.filter){
   Array.prototype.filter = function(func, thisArg) {
     &apos;use strict&apos;;
-    if ( ! ((typeof func === &apos;Function&apos;) &amp;&amp; this) )
+    if ( ! ((typeof func === &apos;Function&apos; || typeof func === &apos;function&apos;) &amp;&amp; this) )
         throw new TypeError();
 
     var len = this.length &gt;&gt;&gt; 0,
         res = new Array(len), // preallocate array
-        c = 0, i = -1;
-    if (thisArg === undefined)
-      while (++i !== len)
+        t = this, c = 0, i = -1;
+
+    var kValue;
+    if (thisArg === undefined){
+      while (++i !== len){
         // checks to see if the key was set
-        if (i in this)
-          if (func(t[i], i, t))
-            res[c++] = t[i];
-    else
-      while (++i !== len)
+        if (i in this){
+          kValue = t[i]; // in case t is changed in callback
+          if (func(t[i], i, t)){
+            res[c++] = kValue;
+          }
+        }
+      }
+    }
+    else{
+      while (++i !== len){
         // checks to see if the key was set
-        if (i in this)
-          if (func.call(thisArg, t[i], i, t))
-            res[c++] = t[i];
+        if (i in this){
+          kValue = t[i];
+          if (func.call(thisArg, t[i], i, t)){
+            res[c++] = kValue;
+          }
+        }
+      }
+    }
 
     res.length = c; // shrink down array to proper size
     return res;
   };
-</pre>
+}</pre>
 
 <h2 id="Especificaciones">Especificaciones</h2>
 
@@ -193,12 +205,12 @@ console.log(filterItems(&apos;an&apos;)); // [&apos;banana&apos;, &apos;mango&ap
   <tr>
    <td><a class="external" href="https://www.ecma-international.org/ecma-262/6.0/#sec-array.prototype.filter" hreflang="en" lang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="es">La definición de &apos;Array.prototype.filter&apos; en esta especificación.</small></a></td>
    <td><span class="spec-Standard">Standard</span></td>
-   <td> </td>
+   <td></td>
   </tr>
   <tr>
    <td><a class="external" href="https://tc39.es/ecma262/#sec-array.prototype.filter" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="es">La definición de &apos;Array.prototype.filter&apos; en esta especificación.</small></a></td>
    <td><span class="spec-Living">Living Standard</span></td>
-   <td> </td>
+   <td></td>
   </tr>
  </tbody>
 </table>

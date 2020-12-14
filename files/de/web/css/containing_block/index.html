@@ -1,0 +1,272 @@
+---
+title: Layout und der enthaltende Block
+slug: Web/CSS/Containing_block
+translation_of: Web/CSS/Containing_block
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/de/docs/Web/CSS/Reference">CSS Referenz</a></strong></li><li><strong><a href="/de/docs/Web/CSS/Containing_block">Containing block</a></strong></li></ol></section></div>
+
+<p>The size and position of an element are often impacted by its <strong>containing block</strong>. Most often, the containing block is the <a href="/en-US/docs/Web/CSS/CSS_Box_Model/Introduction_to_the_CSS_box_model#content-area">content area</a> of an element&apos;s nearest <a href="/en-US/docs/Web/HTML/Block-level_elements">block-level</a> ancestor, but this is not always the case. <span class="seoSummary">In this article, we examine the factors that determine an element&apos;s containing block.</span></p>
+
+<p>When a user agent (such as your browser) lays out a document, it generates a box for every element. Each box is divided into four areas:</p>
+
+<ol start="1">
+ <li>Content area</li>
+ <li>Padding area</li>
+ <li>Border area</li>
+ <li>Margin area</li>
+</ol>
+
+<p><img alt="Diagram of the box model" src="https://mdn.mozillademos.org/files/16558/box-model.png" style="height: 300px; width: 544px;"></p>
+
+<p>Many developers believe that the containing block of an element is always the content area of its parent, but that isn&apos;t necessarily true. Let&apos;s investigate the factors that determine what an element&apos;s containing block is.</p>
+
+<h2 id="Effects_of_the_containing_block">Effects of the containing block</h2>
+
+<p>Before learning what determines the containing block of an element, it&apos;s useful to know why it matters in the first place.</p>
+
+<p>The size and position of an element are often impacted by its containing block. Percentage values that are applied to the <a href="/de/docs/Web/CSS/width" title="Die width CSS Eigenschaft legt die Breite des Inhaltsbereichs eines Elements fest. Der Inhaltsbereich ist innerhalb des Innenabstands, Rahmens und Außenabstands des Elements."><code>width</code></a>, <a href="/de/docs/Web/CSS/height" title="Die height CSS Eigenschaft bestimmt die Höhe des Inhaltsbereichs eines Elements. Der Inhaltsbereich ist innerhalb des Innenabstands, der Rahmen und des Außenabstands des Elements."><code>height</code></a>, <a href="/de/docs/Web/CSS/padding" title="Die padding Eigenschaft ist eine Kurzform für die Innenabstände aller vier Seiten eines Elementes. Der Innenabstand ist der Bereich zwischen dem Inhalt und dem Rahmen (auch: padding area)."><code>padding</code></a>, <a href="/de/docs/Web/CSS/margin" title="Die margin Eigenschaft ist eine Kurzform für die Außenabstände aller vier Seiten eines Elements."><code>margin</code></a>, and offset properties of an absolutely positioned element (i.e., which has its <a href="/de/docs/Web/CSS/position" title="Die position Eigenschaft legt die Positionsart eines Elements fest. Für die Positionierung selbst werden die Eigenschaften top, right, bottom oder left verwendet."><code>position</code></a> set to <code>absolute</code> or <code>fixed</code>) are computed from the element&apos;s containing block.</p>
+
+<h2 id="Identifying_the_containing_block">Identifying the containing block</h2>
+
+<p>The process for identifying the containing block depends entirely on the value of the element&apos;s <a href="/de/docs/Web/CSS/position" title="Die position Eigenschaft legt die Positionsart eines Elements fest. Für die Positionierung selbst werden die Eigenschaften top, right, bottom oder left verwendet."><code>position</code></a> property:</p>
+
+<ol start="1">
+ <li>If the <code>position</code> property is <code><strong>static</strong></code>, <code><strong>relative</strong></code>, or <strong><code>sticky</code></strong>, the containing block is formed by the edge of the <em>content box</em> of the nearest ancestor element that is either <strong>a block container</strong> (such as an inline-block, block, or list-item element) or <strong>establishes a formatting context</strong> (such as a table container, flex container, grid container, or the block container itself).</li>
+ <li>If the <code>position</code> property is <code><strong>absolute</strong></code>, the containing block is formed by the edge of the <em>padding box</em> of the nearest ancestor element that has a <code>position</code> value other than <code>static</code> (<code>fixed</code>, <code>absolute</code>, <code>relative</code>, or <code>sticky</code>).</li>
+ <li>If the <code>position</code> property is <code><strong>fixed</strong></code>, the containing block is established by the <a href="/de/docs/Glossary/Viewport">viewport</a> (in the case of continuous media) or the page area (in the case of paged media).</li>
+ <li>If the <code>position</code> property is <code><strong>absolute</strong></code> or <code><strong>fixed</strong></code>, the containing block may also be formed by the edge of the <em>padding box</em> of the nearest ancestor element that has the following:
+  <ol start="1">
+   <li>A <a href="/de/docs/Web/CSS/transform" title="{{CSRef}} {{SeheCompatTable}}"><code>transform</code></a> or <a href="/de/docs/Web/CSS/perspective" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>perspective</code></a> value other than <code>none</code></li>
+   <li>A <a href="/de/docs/Web/CSS/will-change" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>will-change</code></a> value of <code>transform</code> or <code>perspective</code></li>
+   <li>A <a href="/de/docs/Web/CSS/filter" title="Die filter CSS Eigenschaft erlaubt es, Effekte wie Unschärfe oder Farbverschiebungen auf Elemente anzuwenden, bevor sie angezeigt werden. Filter werden normalerweise dazu benutzt, die Darstellung eines Bildes, eines Hintergrunds oder eines Rahmens anzupassen."><code>filter</code></a> value other than <code>none</code> or a <code>will-change</code> value of <code>filter</code> (only works on Firefox).</li>
+   <li>A <a href="/de/docs/Web/CSS/contain" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>contain</code></a> value of <code>paint</code> (e.g. <code>contain: paint;</code>)</li>
+  </ol>
+ </li>
+</ol>
+
+<div class="note notecard">
+<p><strong>Note:</strong> The containing block in which the root element (<a href="/de/docs/Web/HTML/Element/html" title="Das HTML Wurzel Element (&lt;html&gt;) repäsentiert die Wurzel eines HTML Dokuments. Alle anderen Elemente müssen ein Nachfahre dieses Elements sein."><code>&lt;html&gt;</code></a>) resides is a rectangle called the <strong>initial containing block</strong>. It has the dimensions of the viewport (for continuous media) or the page area (for paged media).</p>
+</div>
+
+<h2 id="Calculating_percentage_values_from_the_containing_block">Calculating percentage values from the containing block</h2>
+
+<p>As noted above, when certain properties are given a percentage value, the computed value depends on the element&apos;s containing block. The properties that work this way are <strong>box model properties</strong> and <strong>offset properties</strong>:</p>
+
+<ol start="1">
+ <li>The <a href="/de/docs/Web/CSS/height" title="Die height CSS Eigenschaft bestimmt die Höhe des Inhaltsbereichs eines Elements. Der Inhaltsbereich ist innerhalb des Innenabstands, der Rahmen und des Außenabstands des Elements."><code>height</code></a>, <a href="/de/docs/Web/CSS/top" title="Die top Eigenschaft macht eine Angabe zur Position von Elementen und wird daher zusammen mit der position Eigenschaft notiert, wenn für die Positionsart der Wert absolute, fixed oder relative definiert wurde."><code>top</code></a>, and <a href="/de/docs/Web/CSS/bottom" title="Die bottom Eigenschaft macht eine Angabe zur Position von Elementen und wird daher zusammen mit der position Eigenschaft notiert, wenn für die Positionsart der Wert absolute, fixed oder relative definiert wurde."><code>bottom</code></a> properties compute percentage values from the <code>height</code> of the containing block.</li>
+ <li>The <a href="/de/docs/Web/CSS/width" title="Die width CSS Eigenschaft legt die Breite des Inhaltsbereichs eines Elements fest. Der Inhaltsbereich ist innerhalb des Innenabstands, Rahmens und Außenabstands des Elements."><code>width</code></a>, <a href="/de/docs/Web/CSS/left" title="Die CSS Eigenschaft left definiert einen Teil der Position von positionierten Elementen."><code>left</code></a>, <a href="/de/docs/Web/CSS/right" title="Die right CSS Eigenschaft gibt einen Teil der Position eines positionierten Elements an."><code>right</code></a>, <a href="/de/docs/Web/CSS/padding" title="Die padding Eigenschaft ist eine Kurzform für die Innenabstände aller vier Seiten eines Elementes. Der Innenabstand ist der Bereich zwischen dem Inhalt und dem Rahmen (auch: padding area)."><code>padding</code></a>, and <a href="/de/docs/Web/CSS/margin" title="Die margin Eigenschaft ist eine Kurzform für die Außenabstände aller vier Seiten eines Elements."><code>margin</code></a> properties compute percentage values from the <code>width</code> of the containing block.</li>
+</ol>
+
+<h2 id="Some_examples">Some examples</h2>
+
+<p>The HTML code for all our examples is:</p>
+
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+
+<p>Only the CSS is altered in each instance below.</p>
+
+<h3 id="Example_1">Example 1</h3>
+
+<p>In this example, the paragraph is statically positioned, so its containing block is <a href="/de/docs/Web/HTML/Element/section" title="Das HTML Element Section (&lt;section&gt;) stellt eine allgemeine Unterteilung des Dokumentes dar, z.B. eine thematische Gruppierung des Inhaltes typischerweise mit einer Überschrift.  Jeder &lt;section&gt; Abschnitt sollte identifizierbar sein, üblicherweise durch Einfügen einer Überschrift (h1-h6 Element) als Kindelement des &lt;section&gt; Elementes."><code>&lt;section&gt;</code></a> because it&apos;s the nearest ancestor that is a block container.</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css notranslate">body {
+  background: beige;
+}
+
+section {
+  display: block;
+  width: 400px;
+  height: 160px;
+  background: lightgray;
+}
+
+p {
+  width: 50%;   /* == 400px * .5 = 200px */
+  height: 25%;  /* == 160px * .25 = 40px */
+  margin: 5%;   /* == 400px * .05 = 20px */
+  padding: 5%;  /* == 400px * .05 = 20px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_1" src="https://mdn.mozillademos.org/de/docs/Web/CSS/Containing_block$samples/Example_1?revision=1657996" width="100%"></iframe></p>
+
+<h3 id="Example_2">Example 2</h3>
+
+<p>In this example, the paragraph&apos;s containing block is the <a href="/de/docs/Web/HTML/Element/body" title="Das HTML &lt;body&gt; Element repräsentiert den Inhalt eines HTML Dokuments. Es gibt nur ein &lt;body&gt; Element in einem Dokument."><code>&lt;body&gt;</code></a> element, because <code>&lt;section&gt;</code> is not a block container (because of <code>display: inline</code>) and doesn’t establish a formatting context.</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css notranslate">body {
+  background: beige;
+}
+
+section {
+  display: inline;
+  background: lightgray;
+}
+
+p {
+  width: 50%;     /* == half the body&apos;s width */
+  height: 200px;  /* Note: a percentage would be 0 */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_2" src="https://mdn.mozillademos.org/de/docs/Web/CSS/Containing_block$samples/Example_2?revision=1657996" width="100%"></iframe></p>
+
+<h3 id="Example_3">Example 3</h3>
+
+<p>In this example, the paragraph&apos;s containing block is <code>&lt;section&gt;</code> because the latter&apos;s <code>position</code> is <code>absolute</code>. The paragraph&apos;s percentage values are affected by the <code>padding</code> of its containing block, though if the containing block&apos;s <a href="/de/docs/Web/CSS/box-sizing" title="Die CSS Eigenschaft box-sizing "><code>box-sizing</code></a> value were <code>border-box</code> this would not be the case.</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css notranslate">body {
+  background: beige;
+}
+
+section {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 400px;
+  height: 160px;
+  padding: 30px 20px;
+  background: lightgray;
+}
+
+p {
+  position: absolute;
+  width: 50%;   /* == (400px + 20px + 20px) * .5 = 220px */
+  height: 25%;  /* == (160px + 30px + 30px) * .25 = 55px */
+  margin: 5%;   /* == (400px + 20px + 20px) * .05 = 22px */
+  padding: 5%;  /* == (400px + 20px + 20px) * .05 = 22px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_3" src="https://mdn.mozillademos.org/de/docs/Web/CSS/Containing_block$samples/Example_3?revision=1657996" width="100%"></iframe></p>
+
+<h3 id="Example_4">Example 4</h3>
+
+<p>In this example, the paragraph&apos;s <code>position</code> is <code>fixed</code>, so its containing block is the initial containing block (on screens, the viewport). Thus, the paragraph&apos;s dimensions change based on the size of the browser window.</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css notranslate">body {
+  background: beige;
+}
+
+section {
+  width: 400px;
+  height: 480px;
+  margin: 30px;
+  padding: 15px;
+  background: lightgray;
+}
+
+p {
+  position: fixed;
+  width: 50%;   /* == (50vw - (width of vertical scrollbar)) */
+  height: 50%;  /* == (50vh - (height of horizontal scrollbar)) */
+  margin: 5%;   /* == (5vw - (width of vertical scrollbar)) */
+  padding: 5%;  /* == (5vw - (width of vertical scrollbar)) */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_4" src="https://mdn.mozillademos.org/de/docs/Web/CSS/Containing_block$samples/Example_4?revision=1657996" width="100%"></iframe></p>
+
+<h3 id="Example_5">Example 5</h3>
+
+<p>In this example, the paragraph&apos;s <code>position</code> is <code>absolute</code>, so its containing block is <code>&lt;section&gt;</code>, which is the nearest ancestor with a <a href="/de/docs/Web/CSS/transform" title="{{CSRef}} {{SeheCompatTable}}"><code>transform</code></a> property that isn&apos;t <code>none</code>.</p>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;body&gt;
+  &lt;section&gt;
+    &lt;p&gt;This is a paragraph!&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/body&gt;
+</pre>
+</div>
+
+<pre class="brush: css notranslate">body {
+  background: beige;
+}
+
+section {
+  transform: rotate(0deg);
+  width: 400px;
+  height: 160px;
+  background: lightgray;
+}
+
+p {
+  position: absolute;
+  left: 80px;
+  top: 30px;
+  width: 50%;   /* == 200px */
+  height: 25%;  /* == 40px */
+  margin: 5%;   /* == 20px */
+  padding: 5%;  /* == 20px */
+  background: cyan;
+}
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Example_5" src="https://mdn.mozillademos.org/de/docs/Web/CSS/Containing_block$samples/Example_5?revision=1657996" width="100%"></iframe></p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li>CSS Schlüsselkonzepte:
+ <a href="/de/docs/Web/CSS/Syntax">CSS Syntax</a>,
+ <a href="/de/docs/Web/CSS/Spezifität">Spezifität</a> und
+ <a href="/de/docs/Web/CSS/Vererbung">Vererbung</a>,
+ das <a href="/de/docs/Web/CSS/Boxmodell">Boxmodell</a>,
+ <a href="/de/docs/Web/CSS/Layoutmodi">Layoutmodi</a> und
+ <a href="/de/docs/Web/Guide/CSS/Visuelles_Formatierungsmodell">visuelle Formatierungsmodelle</a>
+ und <a href="/en-US/docs/Web/CSS/Boxmodell/Abstandzusammenfallen_meistern">Abstandzusammenfallen</a>,
+ or the <a href="/de/docs/Web/CSS/Initialwert">initiale</a>,
+ <a href="/de/docs/Web/CSS/berechneter_Wert">berechnete</a>,
+ <a href="/de/docs/Web/CSS/verwendeter_Wert">verwendete</a>
+ and <a href="/de/docs/Web/CSS/tatsächlicher_Wert">tatsächliche</a> Werte.
+ Definitions of <a href="/de/docs/Web/CSS/Wertdefinitionssyntax">Wertsyntax</a>,
+ <a href="/de/docs/Web/CSS/Kurzschreibweiseeigenschaften">Kurzschreibweiseeigenschaften</a>
+ and <a href="/de/docs/Web/CSS/ersetztes_Element">ersetzte Elemente</a>.</li>
+ <li>The <a href="/de/docs/Web/CSS/all"><code>all</code></a> property resets all CSS declarations to a given known state</li>
+</ul>

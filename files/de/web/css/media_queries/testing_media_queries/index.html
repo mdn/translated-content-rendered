@@ -1,0 +1,88 @@
+---
+title: Media Queries programmatisch testen
+slug: Web/CSS/Media_Queries/Testing_media_queries
+translation_of: Web/CSS/Media_Queries/Testing_media_queries
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/de/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/de/docs/Web/CSS/Reference">CSS Referenz</a></strong></li><li><strong><a href="/de/docs/Web/CSS/Media_Queries">Media Queries</a></strong></li><li class="toggle"><details open><summary>Handbuch</summary><ol><li><em>Testing media queries programmatically</em></li><li><a href="/de/docs/Web/CSS/Media_Queries/Using_Media_Queries_for_Accessibility">Using Media Queries for Accessibility</a> <a href="/de/docs/Web/CSS/Media_Queries/Using_Media_Queries_for_Accessibility$translate" style="opacity: 0.5;">[Übersetzen]</a></li><li><a href="/de/docs/Web/CSS/Media_Queries/Using_media_queries">Using media queries</a></li></ol></details></li><li class="toggle"><details open><summary>At-Regeln</summary><ol><li><a href="/de/docs/Web/CSS/@import"><code>@import</code></a></li><li><a href="/de/docs/Web/CSS/@media"><code>@media</code></a></li></ol></details></li></ol></section></div>
+
+<p>The <a href="/de/docs/Glossary/DOM">DOM</a> provides features that can test the results of a <a href="/en-US/docs/Web/CSS/Media_Queries">media query</a> programmatically, via the <a href="/de/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> interface and its methods and properties. Once you&apos;ve created a <code>MediaQueryList</code> object, you can check the result of the query or receive notifications when the result changes.</p>
+
+<h2 id="Creating_a_media_query_list">Creating a media query list</h2>
+
+<p>Before you can evaluate the results of a media query, you need to create the <code>MediaQueryList</code> object representing the query. To do this, use the <a href="/de/docs/Web/API/Window/matchMedia"><code>window.matchMedia</code></a> method.</p>
+
+<p>For example, to set up a query list that determines if the device is in landscape or portrait orientation:</p>
+
+<pre class="brush: js notranslate">const mediaQueryList = window.matchMedia(&quot;(orientation: portrait)&quot;);
+</pre>
+
+<h2 id="Checking_the_result_of_a_query">Checking the result of a query</h2>
+
+<p>Once you&apos;ve created your media query list, you can check the result of the query by looking at the value of its <code>matches</code> property:</p>
+
+<pre class="brush: js notranslate">if (mediaQueryList.matches) {
+  /* The viewport is currently in portrait orientation */
+} else {
+  /* The viewport is not currently in portrait orientation, therefore landscape */
+}
+</pre>
+
+<h2 id="Receiving_query_notifications">Receiving query notifications</h2>
+
+<p>If you need to be aware of changes to the evaluated result of the query on an ongoing basis, it&apos;s more efficient to register a <a href="/en-US/docs/Web/API/EventTarget/addEventListener">listener</a> than to poll the query&apos;s result. To do this, call the <code>addListener()</code> method on the <a href="/de/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a> object, with a callback function to invoke when the media query status changes (e.g., the media query test goes from <code>true</code> to <code>false</code>):</p>
+
+<pre class="brush: js notranslate">// Create the query list.
+const mediaQueryList = window.matchMedia(&quot;(orientation: portrait)&quot;);
+
+// Define a callback function for the event listener.
+function handleOrientationChange(mql) {
+  // ...
+}
+
+// Run the orientation change handler once.
+handleOrientationChange(mediaQueryList);
+
+// Add the callback function as a listener to the query list.
+mediaQueryList.addListener(handleOrientationChange);
+</pre>
+
+<p>This code creates the orientation-testing media query list, then adds an event listener to it. After adding the listener, we also call the listener directly. This makes our listener perform adjustments based on the current device orientation; otherwise, our code might assume the device is in portrait mode at startup, even if it&apos;s actually in landscape mode.</p>
+
+<p>The <code>handleOrientationChange()</code> function would look at the result of the query and handle whatever we need to do on an orientation change:</p>
+
+<pre class="brush: js notranslate">function handleOrientationChange(evt) {
+  if (evt.matches) {
+    /* The viewport is currently in portrait orientation */
+  } else {
+    /* The viewport is currently in landscape orientation */
+  }
+}
+</pre>
+
+<p>Above, we define the parameter as <code>evt</code> — an event object. This makes sense because <a href="/en-US/docs/Web/API/MediaQueryList#Browser_compatibility">newer implementations of <code>MediaQueryList</code></a> handle event listeners in a standard way. They no longer use the unusual <a href="/de/docs/Web/API/MediaQueryListListener"><code>MediaQueryListListener</code></a> mechanism, but a standard event listener setup, passing an <a href="/en-US/docs/Web/API/Event">event object</a> of type <a href="/de/docs/Web/API/MediaQueryListEvent"><code>MediaQueryListEvent</code></a> as the argument to the callback function.</p>
+
+<p>This event object also includes the <a href="/de/docs/Web/API/MediaQueryListEvent/media"><code>media</code></a> and <a href="/de/docs/Web/API/MediaQueryListEvent/matches"><code>matches</code></a> properties, so you can query these features of the <code>MediaQueryList</code> by directly accessing it, or accessing the event object.</p>
+
+<h2 id="Ending_query_notifications">Ending query notifications</h2>
+
+<p>To stop receiving notifications about changes to the value of your media query, call <code>removeListener()</code> on the <code>MediaQueryList</code>, passing it the name of the previously-defined callback function:</p>
+
+<pre class="brush: js notranslate">mediaQueryList.removeListener(handleOrientationChange);
+</pre>
+
+<h2 id="Browser_compatibility">Browser compatibility</h2>
+
+<h3 id="MediaQueryList_interface"><code>MediaQueryList</code> interface</h3>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.MediaQueryList"></div>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/CSS/Media_queries">Media queries</a></li>
+ <li><a href="/de/docs/Web/API/Window/matchMedia"><code>window.matchMedia()</code></a></li>
+ <li><a href="/de/docs/Web/API/MediaQueryList"><code>MediaQueryList</code></a></li>
+ <li><a href="/de/docs/Web/API/MediaQueryListEvent"><code>MediaQueryListEvent</code></a></li>
+</ul>
