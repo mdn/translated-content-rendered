@@ -1,0 +1,89 @@
+---
+title: Event 属性
+slug: unrooted/Web/Guide/HTML/Event_attributes
+tags:
+  - Beginner
+  - Guide
+  - HTML
+  - Intermediate
+  - JavaScript
+translation_of: >-
+  Learn/JavaScript/Building_blocks/Events#Inline_event_handlers_%E2%80%94_don%27t_use_these
+translation_of_original: Web/Guide/HTML/Event_attributes
+---
+<p><span class="seoSummary">すべての HTML 要素は、特定のイベントが発生したときの JavaScript の実行が許可された属性の集合から成り立ちます。これらは Event 属性と呼ばれ、その属性名には &quot;on&quot; の接頭辞が付きます。</span>例えば、ユーザーが要素をクリックしたときに JavaScript を実行するために、JavaScript を <code>onclick</code> 属性の中に書きます。</p>
+
+<p>イベントの応答として JavaScript のコードが実行された場合、<code>this</code> スコープは HTML 要素となり、このスコープ内にある <code>event</code> 変数を通して <a href="/ja/docs/Web/API/Event" title="Event インターフェイスは、DOM で発生するイベントを表します。ユーザーによって発生するイベント (マウスやキーボードのイベント) もありますし、API によって発生するイベント (アニメーションの実行が完了したことを示すイベントや、動画再生が一時停止したイベントなど) もあります。さまざまな型のイベントがあり、一部のイベントは基底の Event インターフェイスを基にした他のインターフェイスを使用します。Event 自体は、すべてのイベントで共通のプロパティやメソッドを持ちます。"><code>Event</code></a> オブジェクトにアクセスできます。</p>
+
+<div class="warning notecard">
+<p><strong>警告:</strong> これらの属性を使うことは避けるべきです。これは HTML を巨大化し可読性を下げます。情報と振る舞いの関心事が正しく分離されておらず、発見が困難なバグを生み出します。その上に、Event 属性の使い方はほとんどの場合、<a href="/ja/docs/Web/API/Window" title="Window インターフェイスは、DOM document を収めるウィンドウを表します。document プロパティは、そのウィンドウに読み込まれた DOM の document オブジェクト を指します。"><code>Window</code></a> オブジェクト上のグローバル関数にスクリプトを晒す原因になります。これはグローバルの名前空間を汚染します。</p>
+</div>
+
+<p>これらの属性が魅力的で簡単に使うことができたとしても、これを使うのは避けるべきです。代わりに、イベントリスナーを追加する為には <a href="/ja/docs/Web/API/EventTarget/addEventListener" title="EventTarget の addEventListener() メソッドは、特定のイベントが対象に配信されるたびに呼び出される関数を設定します。"><code>EventTarget.addEventListener()</code></a> 関数を使ってください。</p>
+
+<p>この Event 属性は、&apos;unsafe-inline&apos; キーワードを使わない限りすべてのインラインスクリプトをブロックする<a href="/docs/Security/CSP/Introducing_Content_Security_Policy">コンテンツ・セキュリティ・ポリシー</a>を使うことよって ブロックされる可能性があります。</p>
+
+<h2 id="Example_using_event_attributes" name="Example_using_event_attributes">Event 属性の使用例</h2>
+
+<p>この例は <a href="/ja/docs/Web/HTML/Element/div" title="HTML の コンテンツ分割要素 (&lt;div&gt;) は、フローコンテンツの汎用コンテナーです。 CSS を用いてスタイル付けがされるまでは、コンテンツやレイアウトには影響を与えません。"><code>&lt;div&gt;</code></a> がクリックされる度にテキストを要素に追加します。</p>
+
+<div class="note notecard">
+<p><strong>注意:</strong> これは、これらの属性の 1 つを使用する例であり、するべきではない方法です。</p>
+</div>
+
+<pre class="brush: html">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Event 属性の例&lt;/title&gt;
+    &lt;script&gt;
+      function doSomething() {
+        document.getElementById(&quot;thanks&quot;).innerHTML += &quot;&lt;p&gt;クリックしてくれてありがとう!&lt;/p&gt;&quot;;
+      }
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div onclick=&quot;doSomething();&quot;&gt;クリック!&lt;/div&gt;
+    &lt;div id=&quot;thanks&quot;&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p>この例を実行してみてください:</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_Example_using_event_attributes" src="https://mdn.mozillademos.org/ja/docs/Web/Guide/HTML/Event_attributes$samples/Example_using_event_attributes?revision=1591522"></iframe></p>
+
+<h2 id="Example_using_event_listeners" name="Example_using_event_listeners">イベントリスナーの使用例</h2>
+
+<p>代わりに、以下に示すように <a href="/ja/docs/Web/API/EventTarget/addEventListener" title="EventTarget の addEventListener() メソッドは、特定のイベントが対象に配信されるたびに呼び出される関数を設定します。"><code>EventTarget.addEventListener()</code></a> を使うべきです。</p>
+
+<pre class="brush: html">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Event 属性の例&lt;/title&gt;
+    &lt;script&gt;
+      function doSomething() {
+        document.getElementById(&quot;thanks&quot;).innerHTML += &quot;&lt;p&gt;クリックしてくれてありがとう!&lt;/p&gt;&quot;;
+      }
+
+      // ページのロードが完了した時に呼ばれる;
+      // ここは、ページ内の要素にイベントリスナを追加するなど、何でも必要な設定を実行する場所です。
+
+      function setup() {
+        document.getElementById(&quot;click&quot;).addEventListener(&quot;click&quot;, doSomething, true);
+      }
+      // ウィンドウ内のドキュメントのロードが完了したことを知る為の、
+      // &quot;load&quot; イベントを受け取る為にイベントリスナを window オブジェクトに追加する
+
+      window.addEventListener(&quot;load&quot;, setup, true);
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;click&quot;&gt;クリック!&lt;/div&gt;
+    &lt;div id=&quot;thanks&quot;&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+<p>この動作を以下の例から確認できます:</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" id="frame_Example_using_event_listeners" src="https://mdn.mozillademos.org/ja/docs/Web/Guide/HTML/Event_attributes$samples/Example_using_event_listeners?revision=1591522"></iframe></p>
+<section id="Quick_Links"><ol><li><a href="/ja/docs/Web/API/Event">Event</a></li><li><a href="/ja/docs/Web/API/EventTarget">EventTarget</a></li><li><a href="/ja/docs/Web/API/EventTarget.addEventListener">EventTarget.addEventListener</a></li></ol></section>
