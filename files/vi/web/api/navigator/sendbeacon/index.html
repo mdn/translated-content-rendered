@@ -1,0 +1,105 @@
+---
+title: Navigator.sendBeacon()
+slug: Web/API/Navigator/sendBeacon
+tags:
+  - API
+  - Beacon
+  - Navigator
+  - sendBeacon
+  - web perfomance
+translation_of: Web/API/Navigator/sendBeacon
+original_slug: Web/API/Navigator/sendBeacon-vi
+---
+<div><span class="seoSummary">Phương thức <code><strong>navigator.sendBeacon()</strong></code> gửi </span><a href="/en-US/docs/Glossary/Asynchronous">bất đồng bộ</a> 1 lượng nhỏ dữ liệu đến máy chủ (web server) thông qua giao thức <a href="/en-US/docs/Glossary/HTTP">HTTP</a> .</div>
+
+<h2 id="Cú_pháp">Cú pháp</h2>
+
+<pre class="syntaxbox notranslate">navigator.sendBeacon(<var>url</var>, <var>data</var>);
+</pre>
+
+<h3 id="Tham_Số">Tham Số</h3>
+
+<dl>
+ <dt><code><var>url</var></code></dt>
+ <dd>Đường dẫn để nhận dữ liệu (Tạo request). Có thể là đường dẫn tuyệt đối hoặc tương đối.</dd>
+ <dt><code><var>data</var></code></dt>
+ <dd>Một đối tượng chứa dữ liệu để gửi đi có thể là 1 <a href="/vi/docs/Web/API/ArrayBuffer"><code>ArrayBuffer</code></a>, <a href="/vi/docs/Web/API/ArrayBufferView"><code>ArrayBufferView</code></a>, <a href="/vi/docs/Web/API/Blob"><code>Blob</code></a>, <a href="/vi/docs/Web/API/DOMString"><code>DOMString</code></a>, <a href="/vi/docs/Web/API/FormData"><code>FormData</code></a>, hoặc <a href="/vi/docs/Web/API/URLSearchParams"><code>URLSearchParams</code></a>.</dd>
+</dl>
+
+<h3 id="Giá_trị_trả_về">Giá trị trả về</h3>
+
+<p>Phương thức <code><strong>sendBeacon()</strong></code> trả về <code>true</code> nếu như <a href="/en-US/docs/Glossary/user_agent">user agent</a> (tác nhân người dùng hay web browser) xếp <font face="consolas, Liberation Mono, courier, monospace"><span style="background-color: rgba(220, 220, 220, 0.5);">dữ liệu (data)</span></font> để gửi đi thành công. Nếu không, sẽ trả về <code>false</code>.</p>
+
+<h2 id="Mô_tả">Mô tả</h2>
+
+<p>Phương thức này dùng cho phân tích và chuẩn đoán cần gửi dữ liệu về máy chủ trước thời điểm đóng trang, nếu như gửi sớm hơn, có thể sẽ bị thiếu thông tin cần thu thập. Ví dụ, đường dẫn nào người dùng nhấn vào trước khi chuyển đến trang khác và đóng trang.</p>
+
+<p>Việc đảm bảo rằng dữ liệu được gửi đi trong khi đóng trang (unload) trước đây thường rất khó để thực hiện, bởi user agents (web browser) luôn bỏ qua những <a href="/vi/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> bất đồng bộ được chạy trong sự kiện <a href="/vi/docs/Web/API/Window/unload_event"><code>unload</code></a>.</p>
+
+<p>Trước đây, người ta thường làm trễ thời gian tải lại trang đủ lâu để gửi được dữ liệu đi bằng 1 số cách sau:</p>
+
+<ul>
+ <li>Gửi dữ liệu với 1 <code>XMLHttpRequest</code> đồng bộ, chặn các xử lý khác, được gọi trong sự kiện <code>unload</code> hoặc <a href="/vi/docs/Web/API/Window/beforeunload_event"><code>beforeunload</code></a>.</li>
+ <li>Tạo 1 thẻ <a href="/vi/docs/Web/HTML/Element/img"><code>&lt;img&gt;</code></a> và đặt thuộc tính <code>src</code> trong khi xử lý <code>unload</code>. Hầu hết các user agents (trình duyệt) sẽ làm trễ việc tải lại trang cho đến khi tải xong ảnh.</li>
+ <li><code><font face="Arial, x-locale-body, sans-serif"><span style="background-color: #ffffff;">Tạo vòng lặp không xử lý gì chạy trong vài giây khi </span></font>unload</code>.</li>
+</ul>
+
+<p>Tất cả những phương thức đó đều chặn quá trình tải lại trang, làm chậm việc chuyển đến trang tiếp theo. Trang tiếp theo không thể làm gì để ngăn chặn việc này, vì vậy trang mới sẽ có vẻ chậm đi, mặc dù đó là lỗi từ trang trước.</p>
+
+<p>Ví dụ sau đây là 1 đoạn code mẫu để gửi dữ liệu về server bằng 1 <code>XMLHttpRequest</code> đồng bộ trong khi xử lý <code>unload</code>. Điều này làm trễ việc tải trang tiếp theo.</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;unload&quot;, function logData() {
+  var xhr = new XMLHttpRequest();
+  xhr.open(&quot;POST&quot;, &quot;/log&quot;, false); // tham số thứ 3 là `false` để gửi request bất đồng bộ
+  xhr.send(analyticsData);
+});
+</pre>
+
+<p>Đây là những gì <code><strong>sendBeacon()</strong></code> thay thế. Với phương thức <code>sendBeacon()</code>, dữ liệu sẽ được gửi đi bất đồng bộ, User Agent (trình duyệt) có thể làm thế mà không tạo trễ khi tải lại trang hoặc chuyển đến trang tiếp theo. <strong>Điều này giải quyết tất cả vấn đề với việc gửi các dữ liệu phân tích:</strong></p>
+
+<ul>
+ <li>Dữ liệu được gửi đi đáng tin cậy</li>
+ <li>Dữ liệu được gửi bất đồng bộ</li>
+ <li>Không ảnh hưởng đến việc tải trang tiếp theo</li>
+ <li>Hơn nữa, code đơn giản hơn so với tất cả các cách trước đây</li>
+</ul>
+
+<p>Ví dụ sau đây là 1 đoạn code mẫu để gửi dữ liệu về server sử dụng phương thức <code style>sendBeacon()</code>.</p>
+
+<pre class="brush: js notranslate">window.addEventListener(&quot;unload&quot;, function logData() {
+  navigator.sendBeacon(&quot;/log&quot;, analyticsData);
+});
+</pre>
+
+<p>sendBeacon tạo 1 HTTP request với phương thức POST, kèm theo tất cả cookies liên quan khi được gọi.</p>
+
+<h2 id="Tài_liệu_chi_tiết">Tài liệu chi tiết</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Tài liệu</th>
+   <th scope="col">Trạng thái</th>
+   <th scope="col">Bình luận</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://w3c.github.io/beacon/#sendbeacon-method" hreflang="en" lang="en">Beacon<br><small lang="vi">The definition of &apos;sendBeacon()&apos; in that specification.</small></a></td>
+   <td><span class="spec-CR">Candidate Recommendation</span></td>
+   <td>Định nghĩa đầu tiên</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Tương_thích_với_trình_duyệt">Tương thích với trình duyệt</h2>
+
+<div class="hidden">The compatibility table on this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:api.Navigator.sendBeacon"></div>
+
+<h2 id="Xem_thêm">Xem thêm</h2>
+
+<ul>
+ <li><a href="/vi/docs/Web/API/Navigator"><code>navigator</code></a></li>
+</ul>
