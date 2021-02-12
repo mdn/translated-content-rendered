@@ -1,0 +1,156 @@
+---
+title: <template>
+slug: Web/HTML/Element/template
+tags:
+  - Plantilla
+translation_of: Web/HTML/Element/template
+original_slug: Web/HTML/Elemento/template
+---
+<p><span class="seoSummary">El <strong>elemento</strong> <strong>HTML <code>&lt;template&gt;</code></strong> es un mecanismo para mantener el contenido </span> <span class="seoSummary"><a href="/es/docs/Glossary/HTML">HTML</a></span> <span class="seoSummary">del lado del cliente que no se renderiza cuando se carga una página, pero que posteriormente puede ser instanciado durante el tiempo de ejecución empleando JavaScript.</span></p>
+
+<p>Piensa en la plantilla como un fragmento de contenido que está siendo almacenado para un uso posterior en el documento. El analizador procesa el contenido del elemento <strong><code>&lt;template&gt;</code> </strong>durante la carga de la página, pero sólo lo hace para asegurar que esos contenidos son válidos; sin embargo, estos contenidos del elemento no se renderizan.</p>
+
+<table class="properties">
+ <tbody>
+  <tr>
+   <th scope="row"><a href="/en-US/docs/Web/HTML/Content_categories">Categorías de Contenido</a></th>
+   <td><a href="/en-US/docs/Web/HTML/Content_categories#Metadata_content">Metadata content</a>, <a href="/en-US/docs/Web/HTML/Content_categories#Flow_content">flow content</a>, <a href="/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content">phrasing content</a>, script-supporting element</td>
+  </tr>
+  <tr>
+   <th scope="row">Contenido permitido</th>
+   <td>Sin restricciones</td>
+  </tr>
+  <tr>
+   <th scope="row">Omisión de etiquetas</th>
+   <td>None, both the starting and ending tag are mandatory.</td>
+  </tr>
+  <tr>
+   <th scope="row">Padres permitidos</th>
+   <td>Cualquier elemento que acepte <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Metadata_content">metadata content</a>, <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content">phrasing content</a>, o <a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Script-supporting_elements">script-supporting elements</a>. También se permiten como hijos de un elemento <a href="/es/docs/Web/HTML/Elemento/colgroup"><code>&lt;colgroup&gt;</code></a> que no tenga un atributo <code><a href="/es/docs/Web/HTML/Element/colgroup#attr-span">span</a></code> .</td>
+  </tr>
+  <tr>
+   <th scope="row">Implicit ARIA role</th>
+   <td><a href="https://www.w3.org/TR/html-aria/#dfn-no-corresponding-role">No corresponding role</a></td>
+  </tr>
+  <tr>
+   <th scope="row">Permitted ARIA roles</th>
+   <td>No <code>role</code> permitted</td>
+  </tr>
+  <tr>
+   <th scope="row">DOM interface</th>
+   <td><a href="/es/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a></td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Atributos">Atributos</h2>
+
+<p>Este elemento sólo incluye <a href="/es/docs/Web/HTML/Atributos_Globales">atributos globales</a>.</p>
+
+<p>SInembargo, <a href="/es/docs/Web/API/HTMLTemplateElement"><code>HTMLTemplateElement</code></a> tiene una propiedad  <a href="/es/docs/Web/API/HTMLTemplateElement/content"><code>content</code></a>, que es solo-lectura cuyo  <a href="/es/docs/Web/API/DocumentFragment"><code>DocumentFragment</code></a> contiene el subárbol DOM que representa a la plantilla.</p>
+
+<h2 id="Ejemplo">Ejemplo</h2>
+
+<p>Primero empezamos con la parte HTML del ejemplo.</p>
+
+<pre class="brush: html notranslate">&lt;table id=&quot;producttable&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;td&gt;UPC_Code&lt;/td&gt;
+      &lt;td&gt;Product_Name&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;!-- datos opcionales pueden incluirse aquí opcionalmente --&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;template id=&quot;productrow&quot;&gt;
+  &lt;tr&gt;
+    &lt;td class=&quot;record&quot;&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/template&gt;
+</pre>
+
+<p>Inicialmente tenemos una tabla en la cual insertaremos más tarde contenido usando código JavaScript. Más abajo viene el template, el cual describe la estructura de un fragmento HTML representando la fila de una tabla.</p>
+
+<p>Ahora que la tabla ha sido creada y el template definido, usamos JavaScript para insertar filas en la tabla, con cada fila siendo construida usando el template como su base.</p>
+
+<pre class="brush:js; notranslate">// Comprobar si el navegador soporta el elemento HTML template element chequeando
+// si tiene el atributo &apos;content&apos;
+if (&apos;content&apos; in document.createElement(&apos;template&apos;)) {
+
+  // Instanciar la tabla con el tbody existente
+  // y la fila con el template
+  var t = document.querySelector(&apos;#productrow&apos;),
+  td = t.content.querySelectorAll(&quot;td&quot;);
+  td[0].textContent = &quot;1235646565&quot;;
+  td[1].textContent = &quot;Stuff&quot;;
+
+  // Clonar la nueva fila e insertarla en la tabla
+  var tb = document.querySelector(&quot;tbody&quot;);
+  var clone = document.importNode(t.content, true);
+  tb.appendChild(clone);
+
+  // Crear una nueva fila
+  td[0].textContent = &quot;0384928528&quot;;
+  td[1].textContent = &quot;Acme Kidney Beans&quot;;
+
+  // Clonar la nueva fila e insertarla en la tabla
+  var clone2 = document.importNode(t.content, true);
+  tb.appendChild(clone2);
+
+} else {
+  // Buscar otra manera de añadir filas a la tabla porque el
+  // elemento template no está soportado.
+}
+</pre>
+
+<p>El resultado es la tabla HTML original HTML , con dos nuevas filas adjuntadas via JavaScript:</p>
+
+<div class="hidden">
+<pre class="brush: css notranslate">table {
+  background: #000;
+}
+table td {
+  background: #fff;
+}</pre>
+</div>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="120" id="frame_Examples" src="https://mdn.mozillademos.org/es/docs/Web/HTML/Elemento/template$samples/Examples?revision=1624420" width="500"></iframe></p>
+
+<h2 id="Especificaciones">Especificaciones</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Especificación</th>
+   <th scope="col">Estado</th>
+   <th scope="col">Comentario</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://html.spec.whatwg.org/multipage/scripting.html#the-template-element" hreflang="en" lang="en">HTML Living Standard<br><small lang="es">La definición de &apos;template element&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td></td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.w3.org/TR/html52//scripting-1.html#the-template-element" hreflang="en" lang="en">HTML5<br><small lang="es">La definición de &apos;template element&apos; en esta especificación.</small></a></td>
+   <td><span class="spec-REC">Recommendation</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidad_navegadores">Compatibilidad navegadores</h2>
+
+<div class="hidden">The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</div>
+
+<div class="bc-data" id="bcd:html.elements.template"></div>
+
+<h2 id="Ver_también">Ver también</h2>
+
+<ul>
+ <li>Web components: <a href="/es/docs/Web/HTML/Elemento/slot"><code>&lt;slot&gt;</code></a> (e históríco: <a href="/es/docs/Web/HTML/Elemento/shadow"><code>&lt;shadow&gt;</code></a>)</li>
+ <li><a href="https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots">Usando templates y slots</a></li>
+</ul>

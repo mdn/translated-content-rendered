@@ -1,0 +1,88 @@
+---
+title: 'Chapter 2: Technologies used in developing extensions'
+slug: >-
+  orphaned/Firefox_addons_developer_guide/Technologies_used_in_developing_extensions
+original_slug: Firefox_addons_developer_guide/Technologies_used_in_developing_extensions
+---
+<p></p><div class="draft notecard">
+    <p><strong>Borrador</strong><br>
+    Esta página no está completa.</p>
+
+</div> <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/es/docs/Firefox_addons_developer_guide/Introduction_to_Extensions" class="button">« Anterior</a><a href="/es/docs/Firefox_addons_developer_guide/Introduction_to_XUL—How_to_build_a_more_intuitive_UI" class="button">Siguiente  »</a></p>
+</div><p></p>
+<p><em>This document was authored by <a href="http://piro.sakura.ne.jp/" class="external" title="http://piro.sakura.ne.jp/">Hiroshi Shimoda</a> of </em><a href="http://www.clear-code.com/" class="external" title="http://www.clear-code.com/"><em>Clear Code Inc.</em></a><em> and was originally published in Japanese for the </em><a href="https://wiki.mozilla.org/Japan/FxDevCon/Summer2007/English" class="link-https" title="https://wiki.mozilla.org/Japan/FxDevCon/Summer2007/English"><em>Firefox Developers Conference Summer 2007</em></a><em>. Shimoda-san </em><em>is a co-author of <a href="http://www.oreilly.co.jp/books/9784873113753/index.html" class="external" title="http://www.oreilly.co.jp/books/9784873113753/index.html">Firefox 3 Hacks</a> (O&apos;Reilly Japan, 2008).</em></p>
+<p>Antes de sumergirse en una explicación, rápidamente nos introduciremos en las tecnologías utilizadas para desarrollar extensiones en firefox. Nosotros también conoceremos los conocimientos míminos que se necesitan para desarrollar una extensión para firefox.</p>
+<h2 id="Tecnologías_utilizadas_para_desarrollar_extensiones_para_Firefox">Tecnologías utilizadas para desarrollar extensiones para Firefox</h2>
+<p>Firefox y sus extensiones están ambos basados en el desarrollo con tecnologías ampliamente usadas en la web. Su estructura es similar a la de HTML dynamico usado en algunas páginas webs, or el HTML de aplicaciones usado en Windows. Si tienes experiencia desarrollando HTML dinamico, Tú probablemente lo encontrarás relativamente fácil desarrollar una extensión para Firefox.</p>
+<h2 id="El_rol_de_cada_tecnología">El rol de cada tecnología</h2>
+<p>Firefox está construido en gran parte con cuatro tecnologías: XUL, CSS, Javascript y XPCOM. Las extensiones también están construidas usando esas cuatros tecnologías.</p>
+<p><strong>Figure 1: rol de cada tecnología en firefox.</strong></p>
+<p><img src="/@api/deki/files/3762/=chap2_fig1.png" alt style="width: 740px; height: 350px;" class="internal"></p>
+<p>En addition a esas tecnologías, el desarrollo de una extensión requerira que aprendas sobre como otorgar priviligos para vence priviligios de restricciones de seguridad en el código que escribistes, y como insertar tu codigo dentro de Firefox UI. Estos errores son discutidos en el <a href="/En/Firefox_addons_developer_guide/Let&apos;s_build_a_Firefox_extension" class="internal" title="En/Firefox addons developer guide/Let&apos;s build a Firefox extension">Capítulo 5</a>.</p>
+<h2 id="Conocimientos_básicos_requeridos">Conocimientos básicos requeridos</h2>
+<p>En el interest de brevedad, Vamos a omitir explicaciones de tecnologías, y nos enfocaremos en la introducción de nuevas tecnologías que necesitarás entender para desarrollar para Firefox. Asumimos que tu tienes esperiencia desarrollando con HTML dinamico, así como de los temas a continuación.<br>
+  Para más información sobre estas tecnologías, por favor consulte otras fuentes.</p>
+<ul>
+  <li><a href="/en/XML" class="internal">XML codificación</a></li>
+  <li><a href="/en/CSS" class="internal">CSS coding</a></li>
+  <li><a href="/en/JavaScript" class="internal">Basic JavaScript syntax</a></li>
+</ul>
+<h3 id="XML_A_text-based_structural_language">XML: A text-based structural language</h3>
+<p> XML, siglas en inglés de <a href="http://www.w3.org/TR/REC-xml/" class="external" title="http://www.w3.org/TR/REC-xml/">eXtensible Markup Language</a> (&apos;lenguaje de marcas extensible&apos;), es un lenguaje de marcas desarrollado por el World Wide Web Consortium (W3C). Deriva del lenguaje SGML y permite definir la gramática de lenguajes específicos (de la misma manera que HTML es a su vez un lenguaje definido por SGML) para estructurar documentos grandes. A diferencia de otros lenguajes XML da soporte a bases de datos, siendo útil cuando varias aplicaciones se deben comunicar entre sí o integrar información. (Bases de datos Silberschatz).</p>
+<p><strong>Listing 1: XML syntax</strong></p>
+<pre class="brush: xml">&lt;elementname someattribute=&quot;somevalue&quot;&gt;
+  content
+&lt;/elementname&gt;</pre>
+<p>As shown in Listing 1, XML uses elements, which consist of an opening tag, a closing tag, and content.</p>
+<div class="note notecard" id="footnote2">
+  <strong>Note: </strong>Elements that take no content can be expressed in compact form as <code>&lt;elementname/&gt;.</code></div>
+<p>An element can include other elements as well as text in its content, and all information is structured as a tree. As in all trees, elements can have children (elements contained within them) and parents (elements that contain them). Attributes can also be added to opening tags, each with a value.</p>
+<p>As the &quot;extensible&quot; part of XML implies, elements from various XML-based languages such as XHTML and SVG can be interspersed in one another as a means to extend the language. All elements can carry a &quot;namespace URI&quot; identifier, which is unique for each language. For example, even though XHTML and SVG have elements with the same name, these can be distinguished. The namespace URI for XHTML is <code>&quot;<a href="http://www.w3.org/1999/xhtml" class="external">http://www.w3.org/1999/xhtml</a>&quot;</code> ; for SVG is it &quot;<code><a href="http://www.w3.org/2000/svg" class="external">http://www.w3.org/2000/svg</a></code>&quot;.</p>
+<h3 id="CSS_A_style_language_to_alter_the_display_of_XML_documents">CSS: A style language to alter the display of XML documents</h3>
+<p>Like XML, Cascading Style Sheets (CSS) is a <a href="http://www.w3.org/Style/CSS/" class="external" title="http://www.w3.org/Style/CSS/">technical specification</a> established by the W3C; it is a style-description language defining the display of data marked up in XML and HTML. As shown in Listing 1, it has an extremely simple syntax. By separating the structure of the data, expressed through HTML or XML, and the display style, indicated by CSS, data can be reused better than it is when structural and stylistic markup are both embedded in HTML.</p>
+<p>There are three CSS specifications (Level 1 through Level 3), with progressively powerful features. The Gecko rendering engine handles nearly all of CSS Level 2 and some of CSS Level 3.</p>
+<p><strong>Listing 2: CSS code sample</strong></p>
+<pre class="brush: css">body {
+  color: black;
+  background-color: white;
+}
+p {
+  margin-bottom: 1em;
+  text-indent: 1em;
+}
+</pre>
+<h3 id="JavaScript_The_world&apos;s_most_misunderstood_language">JavaScript: The world&apos;s most misunderstood language</h3>
+<p>JavaScript is a scripting language first developed in the 1990s, at which time it was created as a way to add dynamic features to web pages. Because it was often used at first to display pop-up windows, marching text in status bars, or in other ways that made web pages less useful to users, the language acquired a reputation as having little practical use and lacking in functionality.</p>
+<p>Also, because a series of security holes were discovered in JavaScript and the compatible technology JScript, there was an initial reluctance to use JavaScript at all.</p>
+<p>Nevertheless, the rise of web services like Google Maps, which used JavaScript and asynchronous communications, created an awareness of a set of technologies nicknamed <a href="/en/AJAX" class="internal" title="En/AJAX">AJAX</a> (Asynchronous JavaScript and XML); that plus the advent of a number of libraries that paper over implementation differences between different web browsers has more recently led to a re-evaluation of JavaScript as a programming language.</p>
+<p>JavaScript is a prototype-based object-oriented language, and as shown in Listing 3, also permits independent class definitions. It does not have strict typing like Java, making it extremely flexible and giving it qualities that in some senses could be considered similar to Lisp.</p>
+<p>Firefox 3.5 includes a number of extensions to the specification standardized in ECMAScript 3rd Edition, and can use <a href="/en/New_in_JavaScript_1.7" class="internal" title="En/New in JavaScript 1.7">JavaScript 1.7</a> and <a href="/en/New_in_JavaScript_1.8" class="internal" title="En/New in JavaScript 1.8">JavaScript 1.8</a>.</p>
+<p><strong>Listing 3: An example of a class definition in JavaScript</strong></p>
+<pre class="brush: js">function MyClass() {
+}
+MyClass.prototype = {
+  property1 : true,
+  property2 : &apos;string&apos;,
+  method : function() {
+    alert(&apos;Hello, world!&apos;);
+  }
+};
+var obj = new MyClass();
+obj.method();
+</pre>
+<h3 id="DOM_An_API_for_manipulating_XML_documents">DOM: An API for manipulating XML documents</h3>
+<p>The <a href="/en/DOM" class="internal" title="En/DOM">Document Object Model</a> (DOM) is a <a href="http://www.w3.org/DOM/" class="external" title="http://www.w3.org/DOM/">technical standard</a> promulgated by the W3C, and is an API for manipulating the contents of XML documents as objects. In earlier dynamic HTML approaches, the typical method was to use the <code>innerHTML</code> property of the HTML element node to dynamically change the contents of the HTML document by manipulating strings, but using the DOM makes it possible to manipulate XML documents in a way that better matches JavaScript&apos;s object-oriented nature.</p>
+<p>In addition, XUL lacks any equivalent for the <code>innerHTML</code> property, so if it weren’t for the DOM, dynamic processing would be impossible.</p>
+<p>There are a number of levels to the DOM with different levels of functionality. Gecko supports nearly all of DOM Level 2 and some of DOM Level 3.</p>
+<p>With the DOM, the contents of an XML document are handled as a &quot;DOM tree,&quot; a collection of element nodes and other nodes. Listing 4 shows an example that deletes the second child element of the element with the &quot;toolbar&quot; id, adds a new button element as a substitute, and sets a label attribute.</p>
+<p>We do not go into the details of the various APIs in the DOM. To learn more about the DOM, please take a look at the <a href="/en/XUL_Tutorial/Document_Object_Model" class="internal" title="En/XUL Tutorial/Document Object Model">MDC documentation</a>.</p>
+<p><strong>Listing 4: An example manipulation using the DOM</strong></p>
+<pre class="brush: js">var bar = document.getElementById(&apos;toolbar&apos;);
+bar.removeChild(bar.childNodes[1]);
+bar.appendChild(document.createElement(&apos;button&apos;));
+bar.lastChild.setAttribute(&apos;label&apos;, &apos;Hello!&apos;);
+</pre>
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/es/docs/Firefox_addons_developer_guide/Introduction_to_Extensions" class="button">« Anterior</a><a href="/es/docs/Firefox_addons_developer_guide/Introduction_to_XUL—How_to_build_a_more_intuitive_UI" class="button">Siguiente  »</a></p>
+</div><p></p>

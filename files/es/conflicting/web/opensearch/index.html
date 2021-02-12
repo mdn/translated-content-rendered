@@ -1,0 +1,54 @@
+---
+title: Añadir motores de búsqueda desde páginas web
+slug: conflicting/Web/OpenSearch
+tags:
+  - Plugins_de_búsqueda
+translation_of: Web/OpenSearch
+translation_of_original: Web/API/Window/sidebar/Adding_search_engines_from_Web_pages
+original_slug: Añadir_motores_de_búsqueda_desde_páginas_web
+---
+<p>Firefox permite que código JavaScript instale plugins de motores de búsqueda, y soporta dos formatos de plugin de motores de búsqueda: <a href="es/Creando_plugins_de_OpenSearch_para_Firefox">OpenSearch</a>, y Sherlock.
+</p>
+<div class="note notecard"><b>Nota:</b> a partir de Firefox 2, OpenSearch es el formato preferido de búsqueda para Firefox.</div>
+<p>Cuando código JavaScript intenta instalar un plugin de búsqueda, Firefox presenta una alerta pidiendo permiso al usuario para instalar el plugin.
+</p>
+<h2 id="Instalando_plugins_de_OpenSearch">Instalando plugins de OpenSearch</h2>
+<p>Para instalar un plugin de OpenSearch, necesita utlilizar el método<code>window.external.AddSearchProvider()</code> DOM . El síntaxis de éste método es:
+</p>
+<pre class="eval">window.external.AddSearchProvider(<i>engineURL</i>);
+</pre>
+<p>Donde <i>engineURL</i> es la URL absoluta del archivo XML para el plugin del motor de búsqueda.
+</p>
+<div class="note notecard"><b>Nota:</b> El soporte de OpenSearch esta sólo disponible en Firefox 2 y posterior.</div>
+<h2 id="Instalando_plugins_de_Sherlock">Instalando plugins de Sherlock</h2>
+<p>Para instalar un plugin de Sherlock, necesitará llamar <code>window.sidebar.addSearchEngine()</code>, el síntaxis para el mismo es:
+</p>
+<pre class="eval">window.sidebar.addSearchEngine(<i>engineURL</i>, <i>iconURL</i>, <i>suggestedName</i>, <i>suggestedCategory</i>);
+</pre>
+<ul><li> El parámetro <code>engineURL</code> es la URL del plugin de Sherlock (un archivo &quot;.src&quot;) a instalar.
+</li><li> <code>iconURL</code> es la URL a un icono para asociar al plugin.
+</li><li> El parámetro <code>suggestedName</code> sólo se usa al pedir permiso al usuario para instalar el plugin, así que un mensaje cómo &quot;Desea instalar <i>suggestedName</i> de <i>engineURL</i>?&quot; podrá mostrarse.
+</li><li> El parámetro <code>suggestedCategory</code> no se usa. Debería especificar un valor vacío tipo string (<code>&quot;&quot;</code>) o <code>null</code> (nulo).
+</li></ul>
+<p>Para detalles de Sherlock, visite <a href="http://developer.apple.com/macosx/sherlock/" class=" external">http://developer.apple.com/macosx/sherlock/</a>
+</p>
+<h2 id="Detección_de_la_capacidad_del_motor_de_búsqueda_del_navegador">Detección de la capacidad del motor de búsqueda del navegador</h2>
+<p>Debido a que las APIs para añadir motores de búsqueda ha cambiado en el paso de la versión 1.5 a la 2 de firefox y ya que Firefox 1.5 no soporta los ficheros de descripción OpenSearch, los desarrolladores web que quieran añadir motores de búsqueda manteniendo la compatibilidad hacia atrás (p.e. que funcione en Firefox 1.5, Firefox 2.0 o IE 7) deben soportar tanto el formato Sherlock como el OpenSearch y deben detectar las capacidades del navegador de acuerdo a ello. El siguiente fragmento de código es un ejemplo de cómo puede hacerse esto:
+</p>
+<pre class="eval">function installSearchEngine() {
+ if (window.external &amp;&amp; (&quot;AddSearchProvider&quot; in window.external)) {
+   // Firefox 2 and IE 7, OpenSearch
+   window.external.AddSearchProvider(&quot;<span class="nowiki">http://example.com/search-plugin.xml</span>&quot;);
+ } else if (window.sidebar &amp;&amp; (&quot;addSearchEngine&quot; in window.sidebar)) {
+   // Firefox &lt;= 1.5, Sherlock
+   window.sidebar.addSearchEngine(&quot;<span class="nowiki">http://example.com/search-plugin.src</span>&quot;,
+                                  &quot;<span class="nowiki">http://example.com/search-icon.png</span>&quot;,
+                                  &quot;Search Plugin&quot;, &quot;&quot;);
+ } else {
+   // Sin soporte para motores de búsqueda (IE 6, Opera, etc...).
+   alert(&quot;Sin soporte para motores de búsqueda&quot;);
+ }
+}
+</pre>
+<div class="noinclude">
+</div>

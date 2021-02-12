@@ -1,0 +1,131 @@
+---
+title: Cómo crear un DOM tree
+slug: Web/API/Document_object_model/How_to_create_a_DOM_tree
+translation_of: Web/API/Document_object_model/How_to_create_a_DOM_tree
+original_slug: How_to_create_a_DOM_tree
+---
+<p> </p>
+<p>Esta página describe cómo usar el API <a href="http://www.w3.org/TR/DOM-Level-3-Core/core.html" class="external">DOM Core</a> en JavaScript para crear o modificar objetos DOM. Es aplicable a todas las aplicaciones basadas en Gecko (como Mozilla Firefox) cuyo código tenga privilegios (como las extensiones) y a las que no (páginas web).</p>
+<h3 id="Dynamically_creating_a_DOM_tree" name="Dynamically_creating_a_DOM_tree">Creación dinámica de un DOM tree</h3>
+<p>Considere el siguiente documento XML:</p>
+<pre class="brush: xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;people&gt;
+  &lt;person first-name=&quot;eric&quot; middle-initial=&quot;H&quot; last-name=&quot;jung&quot;&gt;
+    &lt;address street=&quot;321 south st&quot; city=&quot;denver&quot; state=&quot;co&quot; country=&quot;usa&quot;/&gt;
+    &lt;address street=&quot;123 main st&quot; city=&quot;arlington&quot; state=&quot;ma&quot; country=&quot;usa&quot;/&gt;
+  &lt;/person&gt;
+
+  &lt;person first-name=&quot;jed&quot; last-name=&quot;brown&quot;&gt;
+    &lt;address street=&quot;321 north st&quot; city=&quot;atlanta&quot; state=&quot;ga&quot; country=&quot;usa&quot;/&gt;
+    &lt;address street=&quot;123 west st&quot; city=&quot;seattle&quot; state=&quot;wa&quot; country=&quot;usa&quot;/&gt;
+    &lt;address street=&quot;321 south avenue&quot; city=&quot;denver&quot; state=&quot;co&quot; country=&quot;usa&quot;/&gt;
+  &lt;/person&gt;
+&lt;/people&gt;
+</pre>
+<p>El W3C DOM API soportado por Mozilla, puede ser usado para crear una representación en memoria del documento anterior, como se ve a continuación:</p>
+<pre class="brush: js">var doc = document.implementation.createDocument(&quot;&quot;, &quot;&quot;, null);
+var peopleElem = doc.createElement(&quot;people&quot;);
+
+var personElem1 = doc.createElement(&quot;person&quot;);
+personElem1.setAttribute(&quot;first-name&quot;, &quot;eric&quot;);
+personElem1.setAttribute(&quot;middle-initial&quot;, &quot;h&quot;);
+personElem1.setAttribute(&quot;last-name&quot;, &quot;jung&quot;);
+
+var addressElem1 = doc.createElement(&quot;address&quot;);
+addressElem1.setAttribute(&quot;street&quot;, &quot;321 south st&quot;);
+addressElem1.setAttribute(&quot;city&quot;, &quot;denver&quot;);
+addressElem1.setAttribute(&quot;state&quot;, &quot;co&quot;);
+addressElem1.setAttribute(&quot;country&quot;, &quot;usa&quot;);
+personElem1.appendChild(addressElem1);
+
+var addressElem2 = doc.createElement(&quot;address&quot;);
+addressElem2.setAttribute(&quot;street&quot;, &quot;123 main st&quot;);
+addressElem2.setAttribute(&quot;city&quot;, &quot;arlington&quot;);
+addressElem2.setAttribute(&quot;state&quot;, &quot;ma&quot;);
+addressElem2.setAttribute(&quot;country&quot;, &quot;usa&quot;);
+personElem1.appendChild(addressElem2);
+
+var personElem2 = doc.createElement(&quot;person&quot;);
+personElem2.setAttribute(&quot;first-name&quot;, &quot;jed&quot;);
+personElem2.setAttribute(&quot;last-name&quot;, &quot;brown&quot;);
+
+var addressElem3 = doc.createElement(&quot;address&quot;);
+addressElem3.setAttribute(&quot;street&quot;, &quot;321 north st&quot;);
+addressElem3.setAttribute(&quot;city&quot;, &quot;atlanta&quot;);
+addressElem3.setAttribute(&quot;state&quot;, &quot;ga&quot;);
+addressElem3.setAttribute(&quot;country&quot;, &quot;usa&quot;);
+personElem2.appendChild(addressElem3);
+
+var addressElem4 = doc.createElement(&quot;address&quot;);
+addressElem4.setAttribute(&quot;street&quot;, &quot;123 west st&quot;);
+addressElem4.setAttribute(&quot;city&quot;, &quot;seattle&quot;);
+addressElem4.setAttribute(&quot;state&quot;, &quot;wa&quot;);
+addressElem4.setAttribute(&quot;country&quot;, &quot;usa&quot;);
+personElem2.appendChild(addressElem4);
+
+var addressElem5 = doc.createElement(&quot;address&quot;);
+addressElem5.setAttribute(&quot;street&quot;, &quot;321 south avenue&quot;);
+addressElem5.setAttribute(&quot;city&quot;, &quot;denver&quot;);
+addressElem5.setAttribute(&quot;state&quot;, &quot;co&quot;);
+addressElem5.setAttribute(&quot;country&quot;, &quot;usa&quot;);
+personElem2.appendChild(addressElem5);
+
+peopleElem.appendChild(personElem1);
+peopleElem.appendChild(personElem2);
+doc.appendChild(peopleElem);
+</pre>
+<p>Vea también el <a href="/en/XUL_Tutorial/Document_Object_Model" title="en/XUL_Tutorial/Document_Object_Model"> Capítulo DOM del Tutorial de XUL</a>.</p>
+<p>Se puede automatizar la creación de un DOM tree usando el <a href="/en/JXON#JXON_reverse_algorithms" title="en/JXON#JXON_reverse_algorithms">JXON reverse algorithm (algoritmo inverso JXON)</a> en asociación con la siguiente representación JSON:</p>
+<pre class="brush: js">{
+  &quot;people&quot;: {
+    &quot;person&quot;: [{
+      &quot;address&quot;: [{
+        &quot;@street&quot;: &quot;321 south st&quot;,
+        &quot;@city&quot;: &quot;denver&quot;,
+        &quot;@state&quot;: &quot;co&quot;,
+        &quot;@country&quot;: &quot;usa&quot;
+      }, {
+        &quot;@street&quot;: &quot;123 main st&quot;,
+        &quot;@city&quot;: &quot;arlington&quot;,
+        &quot;@state&quot;: &quot;ma&quot;,
+        &quot;@country&quot;: &quot;usa&quot;
+      }],
+      &quot;@first-name&quot;: &quot;eric&quot;,
+      &quot;@middle-initial&quot;: &quot;H&quot;,
+      &quot;@last-name&quot;: &quot;jung&quot;
+    }, {
+      &quot;address&quot;: [{
+        &quot;@street&quot;: &quot;321 north st&quot;,
+        &quot;@city&quot;: &quot;atlanta&quot;,
+        &quot;@state&quot;: &quot;ga&quot;,
+        &quot;@country&quot;: &quot;usa&quot;
+      }, {
+        &quot;@street&quot;: &quot;123 west st&quot;,
+        &quot;@city&quot;: &quot;seattle&quot;,
+        &quot;@state&quot;: &quot;wa&quot;,
+        &quot;@country&quot;: &quot;usa&quot;
+      }, {
+        &quot;@street&quot;: &quot;321 south avenue&quot;,
+        &quot;@city&quot;: &quot;denver&quot;,
+        &quot;@state&quot;: &quot;co&quot;,
+        &quot;@country&quot;: &quot;usa&quot;
+      }],
+      &quot;@first-name&quot;: &quot;jed&quot;,
+      &quot;@last-name&quot;: &quot;brown&quot;
+    }]
+  }
+}
+</pre>
+<h3 id="So_what.3F" name="So_what.3F">¿Ahora qué?</h3>
+<p>Los DOM trees pueden ser <a href="/en/Using_XPath" title="en/Using_XPath">invocados usando expresiones XPath</a>, convertidos a cadenas de texto, salvados a un archivo local o remoto usando <a href="/en/Parsing_and_serializing_XML" title="en/Parsing_and_serializing_XML">XMLSerializer</a> (sin tener que convertirlo primero a una cadena de texto), Enviados mediante <a href="/en/DOM/XMLHttpRequest" title="en/XMLHttpRequest">POST a un servidor web</a> (via <code>XMLHttpRequest</code>), transformados usando <a href="/en/XSLT" title="en/XSLT">XSLT</a>, <a href="/en/XLink" title="en/XLink">XLink</a>, convertidos a un objeto JavaScript a tráves del  <a href="/en/JXON" title="en/JXON">algoritmo </a><a href="/en/JXON" title="en/JXON">JXON</a>, etc.</p>
+<p>Adicionalmente se puede hacer uso de los DOM trees para modelar los datos que no estén bien formados para RDF (o si sólo no prefieres usar RDF). Otra aplicación que puedes darle, se relaciona a XUL (que es XML), la UI (interfaz) de tu aplicación puede ser manipulada dinámicamente, descargada, subida, guardada, cargada, convertida, o transformada fácilmente.</p>
+<h2 id="Vea_también">Vea también</h2>
+<ul>
+ <li><a href="/en/XML" class="internal">XML</a></li>
+ <li><a href="/en/JXON" class="internal">JXON</a></li>
+ <li><a href="/en/XPath" class="internal">XPath</a></li>
+ <li><a href="/en/E4X" class="internal">E4X (ECMAScript for XML)</a></li>
+ <li><a href="/en/Parsing_and_serializing_XML" class="internal">Parsing and serializing XML</a></li>
+ <li><a href="/en/DOM/XMLHttpRequest" class="internal">XMLHttpRequest</a></li>
+</ul>
+<p></p>

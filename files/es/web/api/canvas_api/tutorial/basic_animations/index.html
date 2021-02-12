@@ -1,0 +1,405 @@
+---
+title: Animaciones básicas
+slug: Web/API/Canvas_API/Tutorial/Basic_animations
+tags:
+  - Canvas
+  - HTML5
+  - Intermedio
+  - Tutorial
+  - graficos
+translation_of: Web/API/Canvas_API/Tutorial/Basic_animations
+original_slug: Web/Guide/HTML/Canvas_tutorial/Basic_animations
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/es/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/es/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/es/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/es/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/es/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/es/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/es/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/es/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/es/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/es/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/es/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/es/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/es/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/es/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/es/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/es/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/es/docs/Web/API/Canvas_API/Tutorial/Compositing" style="float: left;" class="button">« Anterior</a><a href="/es/docs/Web/API/Canvas_API/Tutorial/Advanced_animations" class="button">Siguiente  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>Ya que estamos usando JavaScript para controlar elementos <a href="/es/docs/Web/HTML/Elemento/canvas" title="El elemento HTML canvas (&lt;canvas&gt;) se puede utilizar para dibujar gráficos a través de secuencias de comandos (por lo general JavaScript ). Por ejemplo, puede usarse para dibujar gráficos, hacer composiciones de fotos o incluso realizar animaciones."><code>&lt;canvas&gt;</code></a> , también es muy fácil hacer animaciones (interactivas). En este capitulo veremos como hacer algunas animaciones básicas.</p>
+</div>
+
+<p>Probablemente la mayor limitación es que una vez que se dibuja una forma, se mantiene de esa manera. Si necesitamos moverlo tenemos que volver a dibujarlo y todo lo que se dibujó antes. Se necesita mucho tiempo para volver a dibujar estructuras complejas y el rendimiento depende en gran medida de la velocidad de la computadora en la que se ejecuta.</p>
+
+<h2 id="Basic_animation_steps" name="Basic_animation_steps">Pasos básicos de animación</h2>
+
+<p>Estos son los pasos que necesitas para dibujar un cuadro:</p>
+
+<ol>
+ <li><strong>Limpiar el canvas</strong><br>
+  A menos que las formas que vas a dibujar llenen el canvas completo (por ejemplo, una imagen de fondo), debes borrar cualquier forma que haya dibujado previamente. La forma más fácil de hacerlo es usar el método <a href="/es/docs/Web/API/CanvasRenderingContext2D/clearRect" title="Edite el código de abajo y vea sus cambios actualizados en vivo en el canvas:"><code>clearRect()</code></a>.</li>
+ <li><strong>Guardar el estado del canvas</strong><br>
+  Si estás cambiando alguna configuración (como estilos, transformaciones, etc.) que afecte el estado del canvas y deseas asegurarte de que se utiliza el estado original cada vez que se dibuja una figura, debes guardar ese estado original. </li>
+ <li><strong>Dibujar formas animadas</strong><br>
+  El paso en el que realizas el renderizado del cuadro actual.</li>
+ <li><strong>Restaurar el estado del canvas</strong><br>
+  Si has guardado el estado, restáuralo antes de dibujar un nuevo cuadro.</li>
+</ol>
+
+<h2 id="Controlling_an_animation" name="Controlling_an_animation">Controlando una animación</h2>
+
+<p>Las formas se dibujan en el canvas utilizando los métodos de canvas directamente o llamando a funciones personalizadas. En circunstancias normales, solo vemos que estos resultados aparecen en el canvas cuando el script termina de ejecutarse. Por ejemplo, no es posible hacer una animación desde un bucle <code>for</code>.</p>
+
+<p>Eso significa que necesitamos una forma de ejecutar nuestras funciones de dibujo durante un período de tiempo. Hay dos formas de controlar una animación como esta.</p>
+
+<h3 id="Actualizaciones_Programadas">Actualizaciones Programadas</h3>
+
+<p>Primero <a href="/es/docs/Web/API/Window/setInterval" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.setInterval()</code></a>, <a href="/es/docs/Web/API/Window/setTimeout" title="La documentación acerca de este tema no ha sido escrita todavía . ¡Por favor  considera contribuir !"><code>window.setTimeout()</code></a>, y <a href="/es/docs/Web/API/Window/requestAnimationFrame" title="window.requestAnimationFrame informa al navegador que quieres realizar una animación y solicita que el navegador programe el repintado de la ventana para el próximo ciclo de animación. El método acepta como argumento una función a la que llamar antes de efectuar el repintado."><code>window.requestAnimationFrame()</code></a> son funciones que pueden ser usadas para llamar una función especifica en un periodo de tiempo establecido.</p>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/WindowTimers/setInterval" title="El valor de retorno procesoID es un valor numérico distinto de cero que identifica al temporizador que fue creado al llamar setInterval(); este valor puede ser usado como parámetro en la función Window.clearInterval() para detener el temporizador. Las funciones setInterval() y setTimeout() comparten la misma pila de IDs, por lo que, técnicamente, los comandos clearInterval() y clearTimeout() pueden usarse indiscriminadamente. Sin embargo, por motivos de claridad y mantenimiento, es importante usarlos como corresponde."><code>setInterval(function, delay)</code></a></dt>
+ <dd>Ejecuta una función especificada por <code>function</code> cada <code>delay</code> milisegundos.</dd>
+ <dt><a href="/es/docs/Web/API/WindowTimers/setTimeout" title="El método setTimeout() del mixin WindowOrWorkerGlobalScope establece un temporizador que ejecuta una función o una porción de código después de que transcurre un tiempo establecido."><code>setTimeout(function, delay)</code></a></dt>
+ <dd>Ejecuta una función especificada por <code>function</code> dentro de <code>delay</code> milisegundos.</dd>
+ <dt><a href="/es/docs/Web/API/Window/requestAnimationFrame" title="window.requestAnimationFrame informa al navegador que quieres realizar una animación y solicita que el navegador programe el repintado de la ventana para el próximo ciclo de animación. El método acepta como argumento una función a la que llamar antes de efectuar el repintado."><code>requestAnimationFrame(callback)</code></a></dt>
+ <dd>Comunica al navegador que  deseas iniciar una animación y requieres que el navegador llame a las funciones especificas para actualizar la misma antes de la siguiente escena.</dd>
+</dl>
+
+<p>Si no quieres ninguna interacción del usuario puedes usar la función <code>setInterval()</code> que repite la ejecución del código suministrado. Si lo que queremos es hacer un juego, podríamos usar eventos de teclado o el mouse para controlar la animación y usar <code>setTimeout()</code>. Al establecer los <a href="/es/docs/Web/API/EventListener" title="Este metodo es llamado cuando un evento ocurre del tipo para el cual la interfaz EventListener fue registrada."><code>EventListener</code></a>, capturamos cualquier interacción del usuario y ejecutamos nuestras funciones de animación.</p>
+
+<div class="note notecard">
+<p>En los siguiente ejemplo,usaremos el método para controlar animaciones <a href="/es/docs/Web/API/Window/requestAnimationFrame" title="window.requestAnimationFrame informa al navegador que quieres realizar una animación y solicita que el navegador programe el repintado de la ventana para el próximo ciclo de animación. El método acepta como argumento una función a la que llamar antes de efectuar el repintado."><code>window.requestAnimationFrame()</code></a>. El método <code>requestAnimationFrame</code> provee formas amigables y mas eficientes  para animar llamando cada marco de animación cuando el sistema esta listo para dibujar. La cantidad de devoluciones de llamadas suele ser 60 veces por segundo y podría ser reducido a menor periodo cuando se corre en un segundo plano. Para mas información acerca de los ciclos de animación, especialmente para juegos, Ver el Articulo <a href="/es/docs/Games/Anatomy">Anatomía de un videojuego</a> en nuestra <a href="/en-US/docs/Games">GameZona de desarrollo de Juegos</a>.</p>
+</div>
+
+<h2 id="Un_sistema_solar_animado">Un sistema solar animado</h2>
+
+<p>Este ejemplo animado es un pequeño modelo de nuestro sistema solar.</p>
+
+<pre class="brush: js">var sun = new Image();
+var moon = new Image();
+var earth = new Image();
+function init(){
+  sun.src = &apos;https://mdn.mozillademos.org/files/1456/Canvas_sun.png&apos;;
+  moon.src = &apos;https://mdn.mozillademos.org/files/1443/Canvas_moon.png&apos;;
+  earth.src = &apos;https://mdn.mozillademos.org/files/1429/Canvas_earth.png&apos;;
+  window.requestAnimationFrame(draw);
+}
+
+function draw() {
+  var ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+
+  ctx.globalCompositeOperation = &apos;destination-over&apos;;
+  ctx.clearRect(0,0,300,300); // limpiar canvas
+
+  ctx.fillStyle = &apos;rgba(0,0,0,0.4)&apos;;
+  ctx.strokeStyle = &apos;rgba(0,153,255,0.4)&apos;;
+  ctx.save();
+  ctx.translate(150,150);
+
+  // La tierra
+  var time = new Date();
+  ctx.rotate( ((2*Math.PI)/60)*time.getSeconds() + ((2*Math.PI)/60000)*time.getMilliseconds() );
+  ctx.translate(105,0);
+  ctx.fillRect(0,-12,50,24); // Sombra
+  ctx.drawImage(earth,-12,-12);
+
+  // La luna
+  ctx.save();
+  ctx.rotate( ((2*Math.PI)/6)*time.getSeconds() + ((2*Math.PI)/6000)*time.getMilliseconds() );
+  ctx.translate(0,28.5);
+  ctx.drawImage(moon,-3.5,-3.5);
+  ctx.restore();
+
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(150,150,105,0,Math.PI*2,false); // Órbita terrestre
+  ctx.stroke();
+
+  ctx.drawImage(sun,0,0,300,300);
+
+  window.requestAnimationFrame(draw);
+}
+
+init();
+</pre>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;300&quot; height=&quot;300&quot;&gt;&lt;/canvas&gt;</pre>
+</div>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="https://mdn.mozillademos.org/files/202/Canvas_animation1.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="310" id="frame_Un_sistema_solar_animado" src="https://mdn.mozillademos.org/es/docs/Web/Guide/HTML/Canvas_tutorial/Basic_animations$samples/Un_sistema_solar_animado?revision=1501673" width="310"></iframe></td></tr></tbody></table>
+
+<h2 id="Un_reloj_animado">Un reloj animado</h2>
+
+<p>Este ejemplo dibuja una reloj animado, mostrando la hora actual.</p>
+
+<pre class="brush: js">function clock(){
+  var now = new Date();
+  var ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+  ctx.save();
+  ctx.clearRect(0,0,150,150);
+  ctx.translate(75,75);
+  ctx.scale(0.4,0.4);
+  ctx.rotate(-Math.PI/2);
+  ctx.strokeStyle = &quot;black&quot;;
+  ctx.fillStyle = &quot;white&quot;;
+  ctx.lineWidth = 8;
+  ctx.lineCap = &quot;round&quot;;
+
+  // Aguja de la hora
+  ctx.save();
+  for (var i=0;i&lt;12;i++){
+    ctx.beginPath();
+    ctx.rotate(Math.PI/6);
+    ctx.moveTo(100,0);
+    ctx.lineTo(120,0);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Aguja del minuto
+  ctx.save();
+  ctx.lineWidth = 5;
+  for (i=0;i&lt;60;i++){
+    if (i%5!=0) {
+      ctx.beginPath();
+      ctx.moveTo(117,0);
+      ctx.lineTo(120,0);
+      ctx.stroke();
+    }
+    ctx.rotate(Math.PI/30);
+  }
+  ctx.restore();
+
+  var sec = now.getSeconds();
+  var min = now.getMinutes();
+  var hr  = now.getHours();
+  hr = hr&gt;=12 ? hr-12 : hr;
+
+  ctx.fillStyle = &quot;black&quot;;
+
+  // Escribimos la hora
+  ctx.save();
+  ctx.rotate( hr*(Math.PI/6) + (Math.PI/360)*min + (Math.PI/21600)*sec )
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.moveTo(-20,0);
+  ctx.lineTo(80,0);
+  ctx.stroke();
+  ctx.restore();
+
+  // escribimos los minutos
+  ctx.save();
+  ctx.rotate( (Math.PI/30)*min + (Math.PI/1800)*sec )
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(-28,0);
+  ctx.lineTo(112,0);
+  ctx.stroke();
+  ctx.restore();
+
+  // escribimos los segundos
+  ctx.save();
+  ctx.rotate(sec * Math.PI/30);
+  ctx.strokeStyle = &quot;#D40000&quot;;
+  ctx.fillStyle = &quot;#D40000&quot;;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(-30,0);
+  ctx.lineTo(83,0);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0,0,10,0,Math.PI*2,true);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(95,0,10,0,Math.PI*2,true);
+  ctx.stroke();
+  ctx.fillStyle = &quot;rgba(0,0,0,0)&quot;;
+  ctx.arc(0,0,3,0,Math.PI*2,true);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.lineWidth = 14;
+  ctx.strokeStyle = &apos;#325FA2&apos;;
+  ctx.arc(0,0,142,0,Math.PI*2,true);
+  ctx.stroke();
+
+  ctx.restore();
+
+  window.requestAnimationFrame(clock);
+}
+
+window.requestAnimationFrame(clock);</pre>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/canvas&gt;</pre>
+</div>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="https://mdn.mozillademos.org/files/203/Canvas_animation2.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="180" id="frame_Un_reloj_animado" src="https://mdn.mozillademos.org/es/docs/Web/Guide/HTML/Canvas_tutorial/Basic_animations$samples/Un_reloj_animado?revision=1501673" width="180"></iframe></td></tr></tbody></table>
+
+<h2 id="Un_panorama_en_bucle">Un panorama en bucle</h2>
+
+<p>En este ejemplo, una foto panorámica avanza de izquierda a derecha. Donde usaremos <a href="http://commons.wikimedia.org/wiki/File:Capitan_Meadows,_Yosemite_National_Park.jpg" title="http://commons.wikimedia.org/wiki/File:Capitan_Meadows,_Yosemite_National_Park.jpg">una imagen del Parque Nacional de Yosemite</a> que tomamos de Wikipedia, pero tu podrías usar cualquier imagen que sea mas grande que el canvas.</p>
+
+<pre class="brush: js">var img = new Image();
+
+// Variables de usuario - personalizar estas para cambiar la imagen cuando inicie el desplazamiento
+// dirección y velocidad.
+
+img.src = &apos;https://mdn.mozillademos.org/files/4553/Capitan_Meadows,_Yosemite_National_Park.jpg&apos;;
+var CanvasXSize = 800;
+var CanvasYSize = 200;
+var speed = 30; //más bajo es más rápido
+var scale = 1.05;
+var y = -4.5; //desplazamiento vertical
+
+// Programa principal
+
+var dx = 0.75;
+var imgW;
+var imgH;
+var x = 0;
+var clearX;
+var clearY;
+var ctx;
+
+img.onload = function() {
+    imgW = img.width * scale;
+    imgH = img.height * scale;
+
+    if (imgW &gt; CanvasXSize) {
+        // imagen más grande que canvas
+        x = CanvasXSize - imgW;
+    }
+    if (imgW &gt; CanvasXSize) {
+        // ancho de imagen más grande que canvas
+        clearX = imgW;
+    } else {
+        clearX = CanvasXSize;
+    }
+    if (imgH &gt; CanvasYSize) {
+        // altura de la imagen más grande que canvas
+        clearY = imgH;
+    } else {
+        clearY = CanvasYSize;
+    }
+
+    // obtener contexto de canvas
+    ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+
+    // establecer frecuencia de actualización
+    return setInterval(draw, speed);
+}
+
+function draw() {
+    ctx.clearRect(0, 0, clearX, clearY); // clear the canvas
+
+    // si la imagen es &lt;= tamaño de Canvas
+    if (imgW &lt;= CanvasXSize) {
+        // reiniciar, comenzar desde el principio
+        if (x &gt; CanvasXSize) {
+            x = -imgW + x;
+        }
+        // dibujar image1 adicional
+        if (x &gt; 0) {
+            ctx.drawImage(img, -imgW + x, y, imgW, imgH);
+        }
+        // dibujar image2 adicional
+        if (x - imgW &gt; 0) {
+            ctx.drawImage(img, -imgW * 2 + x, y, imgW, imgH);
+        }
+    }
+
+    // la imagen es &gt; tamaño de Canvas
+    else {
+        // reiniciar, comenzar desde el principio
+        if (x &gt; (CanvasXSize)) {
+            x = CanvasXSize - imgW;
+        }
+        // dibujar image adicional
+        if (x &gt; (CanvasXSize-imgW)) {
+            ctx.drawImage(img, x - imgW + 1, y, imgW, imgH);
+        }
+    }
+    // dibujar imagen
+    ctx.drawImage(img, x, y,imgW, imgH);
+    // cantidad para moverse
+    x += dx;
+}</pre>
+
+<p>Debajo esta el elemento <a href="/es/docs/Web/HTML/Elemento/canvas" title="El elemento HTML canvas (&lt;canvas&gt;) se puede utilizar para dibujar gráficos a través de secuencias de comandos (por lo general JavaScript ). Por ejemplo, puede usarse para dibujar gráficos, hacer composiciones de fotos o incluso realizar animaciones."><code>&lt;canvas&gt;</code></a> en el cual va la imagen se va ha desplazar. Nota que el ancho y el alto especificado aquí son las variables <code>CanvasXZSize</code> y <code>CanvasYSize</code>.</p>
+
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;800&quot; height=&quot;200&quot;&gt;&lt;/canvas&gt;</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="230" id="frame_Un_panorama_en_bucle" src="https://mdn.mozillademos.org/es/docs/Web/Guide/HTML/Canvas_tutorial/Basic_animations$samples/Un_panorama_en_bucle?revision=1501673" width="830"></iframe></p>
+
+<h2 id="Other_examples" name="Other_examples">Otros ejemplos</h2>
+
+<dl>
+ <dt><a href="/es/docs/Web/API/Canvas_API/A_basic_ray-caster" title="/en-US/docs/Web/Guide/HTML/A_basic_ray-caster">Un ray-caster básico</a></dt>
+ <dd>Un buen ejemplo de como hacer animaciones usando como control el teclado.</dd>
+ <dt><a href="/es/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Animaciones avanzadas</a></dt>
+ <dd>Vamos a echar un vistazo a algunas técnicas de animación avanzadas y física en el próximo capítulo.</dd>
+</dl>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/es/docs/Web/API/Canvas_API/Tutorial/Compositing" style="float: left;" class="button">« Anterior</a><a href="/es/docs/Web/API/Canvas_API/Tutorial/Advanced_animations" class="button">Siguiente  »</a></p>
+</div>
