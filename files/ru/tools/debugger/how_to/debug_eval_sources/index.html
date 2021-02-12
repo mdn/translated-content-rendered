@@ -1,0 +1,88 @@
+---
+title: Отладка кода внутри eval
+slug: Tools/Debugger/How_to/Debug_eval_sources
+tags:
+  - Отладка
+translation_of: Tools/Debugger/How_to/Debug_eval_sources
+original_slug: Tools/Debugger/How_to/Отладка_кода_внутри_eval
+---
+<div><section class="Quick_links" id="Quick_Links">
+    <ol>
+        <li><a href="/ru/docs/Tools/Page_Inspector">Инспектор страницы</a></li>
+        <li><a href="/ru/docs/Tools/Web_Console">Web консоль</a></li>
+        <li><a href="/ru/docs/Tools/Debugger">Отладчик JavaScript</a></li>
+        <li><a href="/ru/docs/Tools/Network_Monitor">Монитор сетевой активности</a></li>
+        <li><a href="/ru/docs/Tools/Performance">Performance</a></li>
+        <li><a href="/ru/docs/Tools/Application">Application</a></li>
+        <li><a href="/ru/docs/Tools/Responsive_Design_Mode">Режим адаптивного дизайна</a></li>
+        <li><a href="/ru/docs/Tools/Accessibility_inspector">Accessibility Inspector</a></li>
+        <li class="toggle">
+            <details>
+                <summary>Больше инструментов</summary>
+                <ol>
+                    <li><a href="/ru/docs/Tools/Memory">Memory</a></li>
+                    <li><a href="/ru/docs/Tools/Storage_Inspector">Storage Inspector</a></li>
+                    <li><a href="/ru/docs/Tools/DOM_Property_Viewer">DOM Property Viewer</a></li>
+                    <li><a href="/ru/docs/Tools/Eyedropper">Eyedropper</a></li>
+                    <li><a href="/ru/docs/Tools/Taking_screenshots">Screenshot</a></li>
+                    <li><a href="/ru/docs/Tools/Style_Editor">Редактор стилей</a></li>
+                    <li><a href="/ru/docs/Tools/Rulers">Rulers</a></li>
+                    <li><a href="/ru/docs/Tools/Measure_a_portion_of_the_page">Measure a portion of the page</a></li>
+                    <li><a href="/ru/docs/Tools/View_source">View Source</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>Connecting the devtools</summary>
+                <ol>
+                    <li><a href="/ru/docs/Tools/about:debugging">about:debugging</a></li>
+                    <li><a href="/ru/docs/Tools/Remote_Debugging/Debugging_Firefox_for_Android_over_Wifi">Connecting to Firefox for Android</a></li>
+                    <li><a href="/ru/docs/Tools/Working_with_iframes">Connecting to iframes</a></li>
+                    <li><a href="/ru/docs/Tools/Valence">Connecting to other browsers</a></li>
+                </ol>
+            </details>
+        </li>
+        <li class="toggle">
+            <details>
+                <summary>Debugging the browser</summary>
+                <ol>
+                    <li><a href="/ru/docs/Tools/Browser_Console">Browser Console</a></li>
+                    <li><a href="/ru/docs/Tools/Browser_Toolbox">Browser Toolbox</a></li>
+                </ol>
+            </details>
+        </li>
+        <li><a href="/ru/docs/Mozilla/Add-ons/WebExtensions/Extending_the_developer_tools">Extending the devtools</a></li>
+        <li><a href="/ru/docs/Tools/Settings">Settings</a></li>
+        <li><a href="/ru/docs/Tools/Tips">Tips</a></li>
+        <li><a href="/ru/docs/Tools/Release_notes">Release notes</a></li>
+    </ol>
+</section></div><div class="geckoVersionNote">
+<p>Доступно, начиная с Firefox 36.</p>
+</div>
+
+<p><code><font face="Open Sans, Arial, sans-serif">В Firefox версии 36 или старше доступна отладка кода, выполняемого с помощью </font><a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval">eval()</a></code> или конструктора <a href="/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function"><code>Function</code></a>.</p>
+
+<p>Чтобы воспользоваться этой возможностью, используйте директиву <code>//# sourceURL </code>: </p>
+
+<pre class="brush: js notranslate">var button = document.getElementById("clickme");
+button.addEventListener("click", evalFoo, false);
+
+var script = "function foo() {" +
+             "  console.log('called foo');" +
+             "}" +
+             "foo();//# sourceURL=my-foo.js";
+
+function evalFoo() {
+  eval(script);
+}</pre>
+
+<p>Такой код присвоит исполняемому скрипту имя "my-foo.js".</p>
+
+<p>Как только скрипт из строки <code>script</code> будет выполнен, он станет доступен в дебаггере как отдельный источник, а также будет доступен к отладке, как код из любого другого источника. Кроме этого, появится возможность, <a href="/ru/docs/Tools/Debugger/How_to/Работа_с_минифицированным_кодом">представить код в удобочитаемом виде</a>:</p>
+
+<p><img alt="" src="https://mdn.mozillademos.org/files/9781/debug-eval-source-url.png" style="display: block; margin-left: auto; margin-right: auto; width: 836px;"></p>
+
+<p>Это имя также будет использоваться в стеке вызовов функций, доступном в <a href="/ru/docs/Tools/Web_Console#Error_messages">веб-консоли</a>.</p>
+
+<p>Начиная с Firefox 40, оператор <code><a href="/en-US/docs/Web/JavaScript/Reference/Statements/debugger">debugger;</a></code> также останавливает дебаггер в безымянных источниках выполнения.</p>

@@ -1,0 +1,60 @@
+---
+title: Кэшируемые методы
+slug: Glossary/cacheable
+tags:
+  - Glossary
+  - HTTP
+translation_of: Glossary/cacheable
+original_slug: Словарь/cacheable
+---
+<p><strong>Кэшируемые</strong> ответы - это HTTP-ответы, которые могут быть закэшированы, то есть сохранены для дальнейшего восстановления и использования позже, тем самым снижая число запросов к серверу. Не все HTTP-ответы могут быть закэшированы. Вот несколько ограничений:</p>
+
+<ul>
+ <li>Метод, используемый в запросе, кэшируемый, если это <a href="/ru/docs/Web/HTTP/Methods/GET"><code>GET</code></a> или <a href="/ru/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a>. Ответ для <a href="/ru/docs/Web/HTTP/Methods/POST"><code>POST</code></a> или <a href="/ru/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a> запросов может также быть закэширован, если указан признак &quot;свежести&quot; данных и установлен заголовок <a href="/ru/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a>, но это редко реализуется. (Например, Firefox не поддерживает это согласно https://bugzilla.mozilla.org/show_bug.cgi?id=109553.) Другие методы, такие как <a href="/ru/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a> и <a href="/ru/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a> не кэшируемые, и результат их выполнения не кэшируется.</li>
+ <li>Коды ответа, известные системе кэширования, которые рассматриваются как кэшируемые: <a href="/ru/docs/Web/HTTP/Status/200"><code>200</code></a>, <a href="/ru/docs/Web/HTTP/Status/203"><code>203</code></a>, <a href="/ru/docs/Web/HTTP/Status/204"><code>204</code></a>, <a href="/ru/docs/Web/HTTP/Status/206"><code>206</code></a>, <a href="/ru/docs/Web/HTTP/Status/300"><code>300</code></a>, <a href="/ru/docs/Web/HTTP/Status/301"><code>301</code></a>, <a href="/ru/docs/Web/HTTP/Status/404"><code>404</code></a>, <a href="/ru/docs/Web/HTTP/Status/405"><code>405</code></a>, <a href="/ru/docs/Web/HTTP/Status/410"><code>410</code></a>, <a href="/ru/docs/Web/HTTP/Status/414"><code>414</code></a>, <a href="/ru/docs/Web/HTTP/Status/501"><code>501</code></a>.</li>
+ <li>Отсутствуют специальные заголовки в ответе, которые предотвращают кэширование: например, <a href="/ru/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a>.</li>
+</ul>
+
+<p>Обратите внимание, что некоторые некэшируемые запросы-ответы к определённым URI могут сделать недействительным (инвалидируют) предыдущие закэшированные ответы на тех же URI. Например, <a href="/ru/docs/Web/HTTP/Methods/PUT" title="Разница между PUT и POST в том, что PUT является идемпотентным, т.е. единичный и множественные вызовы этого метода, с идентичным набором данных, будут иметь тот же результат выполнения (без сторонних эффектов), в случае с POST, множественный вызов с идентичным набором данных может повлечь за собой сторонние эффекты."><code>PUT</code></a> к странице pageX.html инвалидируют все закэшированные ответы <a href="/ru/docs/Web/HTTP/Methods/GET" title="HTTP-метод GET запрашивает представление указанного ресурса. GET-запросы должны только получать данные."><code>GET</code></a> или <a href="/ru/docs/Web/HTTP/Methods/HEAD" title="HTTP-метод HEAD запрашивает заголовки, идентичные тем, что возвращаются, если указанный ресурс будет запрошен с помощью HTTP-метода GET. Такой запрос может быть выполнен перед загрузкой большого ресурса, например, для экономии пропускной способности."><code>HEAD</code></a> запросов к этой странице.</p>
+
+<p>Когда и метод запроса и статус ответа кэшированы, то ответ к запросу тоже может быть закэширован:</p>
+
+<pre>GET /pageX.html HTTP/1.1
+(…)
+
+200 OK
+(…)
+</pre>
+
+<p>Запрос <a href="/ru/docs/Web/HTTP/Methods/PUT" title="Разница между PUT и POST в том, что PUT является идемпотентным, т.е. единичный и множественные вызовы этого метода, с идентичным набором данных, будут иметь тот же результат выполнения (без сторонних эффектов), в случае с POST, множественный вызов с идентичным набором данных может повлечь за собой сторонние эффекты."><code>PUT</code></a> не может быть закэширован. Более того, он инвалидирует закэшированные данные запросов к тому же URI, сделанных через <a href="/ru/docs/Web/HTTP/Methods/HEAD" title="HTTP-метод HEAD запрашивает заголовки, идентичные тем, что возвращаются, если указанный ресурс будет запрошен с помощью HTTP-метода GET. Такой запрос может быть выполнен перед загрузкой большого ресурса, например, для экономии пропускной способности."><code>HEAD</code></a> или <a href="/ru/docs/Web/HTTP/Methods/GET" title="HTTP-метод GET запрашивает представление указанного ресурса. GET-запросы должны только получать данные."><code>GET</code></a>:</p>
+
+<pre>PUT /pageX.html HTTP/1.1
+(…)
+
+200 OK
+(…)
+</pre>
+
+<p>Специальный заголовок <a href="/ru/docs/Web/HTTP/Headers/Cache-Control" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>Cache-Control</code></a> в ответе может предотвратить кэширование:</p>
+
+<pre>GET /pageX.html HTTP/1.1
+(…)
+
+200 OK
+Cache-Control: no-cache
+(…)</pre>
+
+<h2 id="Материалы_для_изучения">Материалы для изучения</h2>
+
+<h3 id="Основные">Основные</h3>
+
+<ul>
+ <li>Определение <a href="https://tools.ietf.org/html/rfc7231#section-4.2.3">кэшируемых методов</a> в спецификации HTTP.</li>
+</ul>
+
+<h3 id="Технические">Технические</h3>
+
+<ul>
+ <li>Описание общих кэшируемых методов: <a href="/ru/docs/Web/HTTP/Methods/GET"><code>GET</code></a>, <a href="/ru/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a></li>
+ <li>Описание общих некэшируемых методов: <a href="/ru/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a>, <a href="/ru/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a>, often <a href="/ru/docs/Web/HTTP/Methods/POST"><code>POST</code></a></li>
+</ul>

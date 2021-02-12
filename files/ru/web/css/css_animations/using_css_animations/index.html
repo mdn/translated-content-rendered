@@ -1,0 +1,395 @@
+---
+title: Использование CSS-анимации
+slug: Web/CSS/CSS_Animations/Using_CSS_animations
+tags:
+  - Advanced
+  - CSS
+  - CSS Animations
+  - Example
+  - Experimental
+  - Guide
+translation_of: Web/CSS/CSS_Animations/Using_CSS_animations
+original_slug: Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy
+---
+<div class="experimental indicator-warning notecard">
+    <p><span class="icon-only-inline" title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span> <strong>Это экспериментальная технология</strong><br>Так как спецификация этой технологии ещё не стабилизировалась, смотрите <a href="#Browser_compatibility">таблицу совместимости</a> по поводу использования в различных браузерах. Также заметьте, что синтаксис и поведение экспериментальной технологии может измениться в будущих версиях браузеров, вслед за изменениями спецификации.</p>
+</div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ru/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/Reference">CSS документация</a></strong></li><li><strong><a href="/ru/docs/Web/CSS/CSS_Animations">CSS Animations</a></strong></li><li class="toggle"><details open><summary>Руководства</summary><ol><li><a href="/ru/docs/Web/CSS/CSS_Animations/Tips">CSS Animations tips and tricks</a> <a href="/ru/docs/Web/CSS/CSS_Animations/Tips$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/CSS_Animations/Detecting_CSS_animation_support">Detecting CSS animation support</a> <a href="/ru/docs/Web/CSS/CSS_Animations/Detecting_CSS_animation_support$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy">Использование CSS-анимации</a></li></ol></details></li><li class="toggle"><details open><summary>@-правила</summary><ol><li><a href="/ru/docs/Web/CSS/@keyframes"><code>@keyframes</code></a> <a href="/ru/docs/Web/CSS/@keyframes$translate" style="opacity: 0.5;">[Перевести]</a></li></ol></details></li><li class="toggle"><details open><summary>Свойства</summary><ol><li><a href="/ru/docs/Web/CSS/custom-ident"><code>&lt;custom-ident&gt;</code></a> <a href="/ru/docs/Web/CSS/custom-ident$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/timing-function"><code>&lt;timing-function&gt;</code></a> <a href="/ru/docs/Web/CSS/timing-function$translate" style="opacity: 0.5;">[Перевести]</a></li><li><a href="/ru/docs/Web/CSS/animation"><code>animation</code></a></li><li><a href="/ru/docs/Web/CSS/animation-delay"><code>animation-delay</code></a></li><li><a href="/ru/docs/Web/CSS/animation-direction"><code>animation-direction</code></a></li><li><a href="/ru/docs/Web/CSS/animation-duration"><code>animation-duration</code></a></li><li><a href="/ru/docs/Web/CSS/animation-fill-mode"><code>animation-fill-mode</code></a></li><li><a href="/ru/docs/Web/CSS/animation-iteration-count"><code>animation-iteration-count</code></a></li><li><a href="/ru/docs/Web/CSS/animation-name"><code>animation-name</code></a></li><li><a href="/ru/docs/Web/CSS/animation-play-state"><code>animation-play-state</code></a></li><li><a href="/ru/docs/Web/CSS/animation-timing-function"><code>animation-timing-function</code></a></li></ol></details></li></ol></section>
+
+<p><span class="seoSummary">CSS анимации позволяют анимировать переходы от одной конфигурации CSS стилей к другой.</span> CSS-анимации состоят из двух компонентов: стилевое описание анимации и набор ключевых кадров, определяющих начальное, конечное и, возможно, промежуточное состояние анимируемых стилей.</p>
+
+<p>Есть три преимущества CSS-анимации перед традиционными способами:</p>
+
+<ol>
+ <li>Простота использования для простых анимаций; Вы можете создать анимацию, не зная JavaScript.</li>
+ <li>Анимации будут хорошо работать даже при умеренных нагрузках системы. Простые анимации на JavaScript, если они плохо написаны, часто выполняются плохо. Движок может использовать frame-skipping и другие техники, чтобы сохранить производительность на таком высоком уровне .</li>
+ <li>Позволяет браузеру контролировать последовательность анимации, тем самым оптимизируя производительность и эффективность браузера. Например, уменьшая частоту обновления кадров анимации в непросматриваемых в данный момент вкладках.</li>
+</ol>
+
+<h2 id="Конфигурирование_анимации">Конфигурирование анимации</h2>
+
+<p>Чтобы создать CSS-анимацию Вы должны добавить в стиль элемента, который хотите анимировать, свойство <a href="/ru/docs/Web/CSS/animation" title="CSS свойство animation это короткая запись для animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode и animation-play-state."><code>animation</code></a> или его подсвойства. Это позволит Вам настроить ускорение и продолжительность анимации, а также другие детали того, как анимация должна протекать. Это не поможет Вам настроить внешний вид анимации, который настраивается с помощью <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a>, рассматриваемой далее в <a href="#Определение_последовательности_анимации_с_помощью_ключевых_кадров">Определение последовательности анимации с помощью ключевых кадров</a>.</p>
+
+<p>Свойство <a href="/ru/docs/Web/CSS/animation" title="CSS свойство animation это короткая запись для animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode и animation-play-state."><code>animation</code></a> имеет следующие подсвойства:</p>
+
+<dl>
+ <dt><a href="/ru/docs/Web/CSS/animation-name" title="CSS свойство animation-name определяет список анимаций, которые должны быть применены к выбраному элементу. Каждое имя указывает на правило @keyframes, которое определяет значения свойств для последовательности анимации."><code>animation-name</code></a></dt>
+ <dd>Определяет имя <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a>, настраивающего кадры анимации.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-duration" title="Свойство animation-duration устанавливает длительность анимации во времени за один цикл."><code>animation-duration</code></a></dt>
+ <dd>Определяет время, в течение которого должен пройти один цикл анимации.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-timing-function" title="CSS свойство animation-timing-function определяет как должна прогрессировать CSS анимация в течении каждого цикла. Возможны одно или несколько значений &lt;timing-function&gt;."><code>animation-timing-function</code></a></dt>
+ <dd>Настраивает ускорение анимации.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-delay" title="CSS свойство animation-delay определяет время задежки перед стартом анимации."><code>animation-delay</code></a></dt>
+ <dd><span id="result_box" lang="ru"><span class="hps">Настраивает</span> <span class="hps">задержку</span> <span class="hps">между временем загрузки элемента и временем начала анимации</span></span>.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-iteration-count" title="CSS свойство animation-iteration-count определяет сколько раз будет проигрываться анимационный цикл, перед тем как остановиться."><code>animation-iteration-count</code></a></dt>
+ <dd>Определяет количество повторений анимации; Вы можете использовать значение <code>infinite</code> для бесконечного повторения анимации.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-direction" title="CSS-свойство animation-direction определяет, должна ли анимация воспроизводиться вперед, назад или переменно вперед и назад.
+
+ Также удобно использовать сокращенное свойство animation, чтобы одновременно установить все свойства анимации."><code>animation-direction</code></a></dt>
+ <dd>Дает возможность при каждом повторе анимации идти по альтернативному пути, либо сбросить все значения и повторить анимацию.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-fill-mode" title="CSS свойство animation-fill-mode определяет, как нужно применять стили к объекту анимации до и после ее выполнения."><code>animation-fill-mode</code></a></dt>
+ <dd>Настраивает значения, используемые анимацией, до и после исполнения.</dd>
+ <dt><a href="/ru/docs/Web/CSS/animation-play-state" title="Свойство animation-play-state определяет состояние анимации, паузы или проигрыша. Это можно использовать, чтобы определить текущее состояние анимации, например, в скриптах."><code>animation-play-state</code></a></dt>
+ <dd>Позволяет приостановить и возобновить анимацию.</dd>
+</dl>
+
+<h2 id="Определение_последовательности_анимации_с_помощью_ключевых_кадров">Определение последовательности анимации с помощью ключевых кадров</h2>
+
+<p><span id="result_box" lang="ru"><span class="hps">После того, как</span> <span class="hps">вы настроили</span> <span class="hps">временные свойства (продолжительность, ускорение)</span> <span class="hps">анимации</span><span>, вы</span> <span class="hps">должны определить</span> <span class="hps">внешний вид</span> <span class="hps">анимации</span></span>. Это делается с помощью двух и более ключевых кадров после <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a>. Каждый кадр описывает, как должен выглядеть анимированный элемент в текущий момент.</p>
+
+<p>В то время, как временные характеристики (продолжительность анимации) указываются в стилях для анимируемого элемента, ключевые кадры используют <a href="/ru/docs/Web/CSS/percentage" title="CSS тип данных &lt;percentage&gt; представляет значение в процентах. Оно часто используется, чтобы определить размер относительно родительского элемента. Проценты используются в различных свойствах, таких как width, height, margin, padding, и font-size."><code>percentage</code></a>, чтобы определить стадию протекания анимации. 0% означает начало анимации, а 100% ее конец. Так как эти значения очень важны, то для них придумали специальные слова: <code>from</code> и <code>to</code>.</p>
+
+<p>Вы также можете добавить ключевые кадры, характеризующие промежуточное состояние анимации.</p>
+
+<h2 id="Примеры">Примеры</h2>
+
+<div class="note notecard"><strong>Внимание:</strong> Примеры ниже не используют префиксов для CSS стилей . Webkit-браузеры и старые версии других браузеров нуждаются в указании префиксов в CSS стилях. Примеры, на которые Вы можете кликнуть в своем браузере, также содержат префиксы -webkit-.</div>
+
+<h3 id="Скольжение_текста">Скольжение текста</h3>
+
+<p>Этот простой пример анимирует скольжение текста в элементе <a href="/ru/docs/Web/HTML/Element/p" title="HTML-элемент &lt;p&gt; представляет собой абзац."><code>&lt;p&gt;</code></a> от правого края окна браузера.</p>
+
+<p>Обратите внимание на то, что анимация может сделать страницу шире, чем окно браузера. Этого можно избежать, поместив элемент, который будет анимироваться, в контейнер и установив ему свойство <a href="/ru/docs/Web/CSS/overflow" title="Свойство CSS overflow определяет, необходимо ли для переполненного блочного элемента содержимое обрезать, предоставить полосы прокрутки или просто отобразить."><code>overflow</code></a><code>: hidden</code>.</p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<p>В стиле для элемента <a href="/ru/docs/Web/HTML/Element/p" title="HTML-элемент &lt;p&gt; представляет собой абзац."><code>&lt;p&gt;</code></a> с помощью свойства <a href="/ru/docs/Web/CSS/animation-duration" title="Свойство animation-duration устанавливает длительность анимации во времени за один цикл."><code>animation-duration</code></a> указано, что исполнение анимации от начала до конца должно занять 3 с , и что имя для  <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a>, описывающей саму анимацию, определено как &quot;slidein&quot;.</p>
+
+<p>В элемент <a href="/ru/docs/Web/HTML/Element/p" title="HTML-элемент &lt;p&gt; представляет собой абзац."><code>&lt;p&gt;</code></a> можно добавлять и другие пользовательские стили, чтобы как-то украсить его, однако здесь мы хотели продемонстрировать только эффект анимации.</p>
+
+<p>Kлючевые кадры определяются с помощью правила <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a>. В данном случае мы имеем только два ключевых кадра. Первый при 0% анимации (<code>from</code>). Здесь мы придаем элементу левый отступ в 100% и ширину в 300% (в три раза больше ширины родительского элемента). Это становится причиной того, что при первом кадре анимации заголовок <a href="/ru/docs/Web/HTML/Element/p" title="HTML-элемент &lt;p&gt; представляет собой абзац."><code>&lt;p&gt;</code></a> находится за пределами правого края окна браузера .</p>
+
+<p>Второй ключевой кадр (to) определяет конец анимации, т.е (100%). Левый отступ устанавливается равным 0, а ширина 100%. Все выглядит так, будто заголовок <a href="/ru/docs/Web/HTML/Element/p" title="HTML-элемент &lt;p&gt; представляет собой абзац."><code>&lt;p&gt;</code></a> приплывает к левому краю окна браузера.</p>
+
+<pre class="brush: html">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p>(Обновите страницу, чтобы увидеть анимацию, или щелкните по кнопке CodePen, чтобы воспроизвести ее в окне CodePen)</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_Скольжение_текста" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy$samples/%D0%A1%D0%BA%D0%BE%D0%BB%D1%8C%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%B0?revision=1573959" width="100%"></iframe></p>
+
+<h3 id="Добавление_других_ключевыч_кадров">Добавление других ключевыч кадров</h3>
+
+<p>Давайте добавим другие ключевые кадры в предыдущий пример. Скажем, мы хотим чтобы размер шрифта заголовка временно увеличивался по мере продвижения влево, а потом возращался к первоначальному значению . Это легко реализовать с помощью следующего ключевого кадра:</p>
+
+<pre class="brush: css">75% {
+  font-size: 300%;
+  margin-left: 25%;
+  width: 150%;
+}
+</pre>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+
+  75% {
+    font-size: 300%;
+    margin-left: 25%;
+    width: 150%;
+  }
+}
+</pre>
+
+<pre class="brush: html">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p>Это говорит браузеру о том, что при 75% выполнения анимации, шрифт должен быть 300%, а ширина 150%.</p>
+
+<p>(Обновите страницу, чтобы увидеть анимацию, или щелкните по кнопке CodePen, чтобы воспроизвести ее в окне CodePen)</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_Добавление_других_ключевыч_кадров" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy$samples/%D0%94%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B4%D1%80%D1%83%D0%B3%D0%B8%D1%85_%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%B2%D1%8B%D1%87_%D0%BA%D0%B0%D0%B4%D1%80%D0%BE%D0%B2?revision=1573959" width="100%"></iframe></p>
+
+<h3 id="Настройка_повторения">Настройка повторения</h3>
+
+<p>Чтобы настроить повторение, нужно добавить свойство <a href="/ru/docs/Web/CSS/animation-iteration-count" title="CSS свойство animation-iteration-count определяет сколько раз будет проигрываться анимационный цикл, перед тем как остановиться."><code>animation-iteration-count</code></a> и задать ему значение, равное нужному количеству повторений анимаций . В данном случае давайте установим значение <code>infinite</code> для бесконечного повторения:</p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+  animation-iteration-count: infinite;
+}
+</pre>
+
+<pre class="brush: css">@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<pre class="brush: html">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_Настройка_повторения" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy$samples/%D0%9D%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0_%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D1%8F?revision=1573959" width="100%"></iframe></p>
+
+<h3 id="Движение_текста_вправо_и_влево">Движение текста вправо и влево</h3>
+
+<p>Итак, мы настроили повторение, но получили нечто странное: текст при каждом повторении снова &quot;запрыгивает&quot; за край окна браузера. То, чего мы хотим, так это чтобы текст двигался влево и вправо. Этого легко достичь с помощью установки свойству <a href="/ru/docs/Web/CSS/animation-direction" title="CSS-свойство animation-direction определяет, должна ли анимация воспроизводиться вперед, назад или переменно вперед и назад.
+
+ Также удобно использовать сокращенное свойство animation, чтобы одновременно установить все свойства анимации."><code>animation-direction</code></a> значения <code>alternate</code>:</p>
+
+<pre class="brush: css">p {
+  animation-duration: 3s;
+  animation-name: slidein;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+</pre>
+
+<pre class="brush: css">@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+</pre>
+
+<pre class="brush: html">&lt;p&gt;The Caterpillar and Alice looked at each other for some time in silence:
+at last the Caterpillar took the hookah out of its mouth, and addressed
+her in a languid, sleepy voice.&lt;/p&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="250" id="frame_Движение_текста_вправо_и_влево" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy$samples/%D0%94%D0%B2%D0%B8%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5_%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%B0_%D0%B2%D0%BF%D1%80%D0%B0%D0%B2%D0%BE_%D0%B8_%D0%B2%D0%BB%D0%B5%D0%B2%D0%BE?revision=1573959" width="100%"></iframe></p>
+
+<h3 id="Использование_шорткодов">Использование шорткодов</h3>
+
+<p>Шорткод <a href="/ru/docs/Web/CSS/animation" title="CSS свойство animation это короткая запись для animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode и animation-play-state."><code>animation</code></a> полезен для экономии места в коде. Например, правило, которое мы используем в этой статье:</p>
+
+<pre><code>p {
+  animation-duration: 3s;
+  animation-name: slidein;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}</code></pre>
+
+<p>можно заменить на:</p>
+
+<pre><code>p {
+  animation: 3s infinite alternate slidein;
+}</code></pre>
+
+<div class="note notecard">
+<p><strong>Внимание</strong>: подробнее об этом на странице раздела <a href="/ru/docs/Web/CSS/animation" title="CSS свойство animation это короткая запись для animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode и animation-play-state."><code>animation</code></a> </p>
+</div>
+
+<h3 id="Установка_нескольких_значений_свойствам_анимации">Установка нескольких значений свойствам анимации  </h3>
+
+<p>CSS cвойство анимации может иметь несколько значений, разделенных запятыми. Это используется, чтобы указать несколько значений анимации в одном правиле и установить разную продолжительность, число повторений и т.д., для различных анимаций. Рассмотрим несколько примеров, чтобы увидеть разницу.</p>
+
+<p>В первом примере у свойства имени анимации установлены три значения, у свойств продолжительности и количества повторений  — по одному. В этом случае у всех трех анимаций одинаковая продолжительность и число повторений:</p>
+
+<pre><code>animation-name: fadeInOut, moveLeft300px, bounce;
+animation-duration: 3s;
+animation-iteration-count: 1;</code></pre>
+
+<p>Во втором примере установлены три значения для каждого из свойств. В этом случае каждая анимация выполняется с соответствующими по порядку значениями в каждом свойстве, так, например, <code>fadeInOut</code> имеет продолжительность 2.5 с и количество повторений 2, и т.д.</p>
+
+<pre><code>animation-name: fadeInOut, moveLeft300px, bounce;
+animation-duration: 2.5s, 5s, 1s;
+animation-iteration-count: 2, 1, 5;</code></pre>
+
+<p>В третьем примере определены три значения имени анимации, но два значения продолжительности и количества повторений. В случае, когда количества значений недостаточно для каждой анимации, значения берутся циклически от начала до конца. Например, у <code>fadeInOut</code> длительность будет 2.5s,  а <code>moveLeft300px</code> — 5s. Значения продолжительности закончились, теперь они берутся сначала — <code>bounce</code> получит продолжительность 2.5s. Значение количества повторений (а также другие указанные свойства) будет определено таким же образом.</p>
+
+<pre><code>animation-name: fadeInOut, moveLeft300px, bounce;
+animation-duration: 2.5s, 5s;
+animation-iteration-count: 2, 1;</code></pre>
+
+<h3 id="Использование_событий_анимации">Использование событий анимации</h3>
+
+<p>Вы можете получить дополнительный контроль над анимацией, а также полезную информацию о ней, с помощью <em>событий анимации</em>. Эти события, представленные объектом <a href="/ru/docs/Web/API/Event/AnimationEvent" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>AnimationEvent</code></a>, можно использовать, чтобы определить, когда начинается и заканчивается анимация или начинается новая итерация. Каждое событие содержит момент времени, когда оно произошло, а также имя анимации, которая вызвала событие.</p>
+
+<p>Мы будем модифицировать текст, чтобы выводить некоторую информацию  о каждом событии анимации. Так мы сможем увидеть, как она работает.</p>
+
+<h4 id="Добавление_CSS">Добавление CSS</h4>
+
+<p>Начнем с добавления CSS. Анимация будет длиться 3 секунды, будет называться &quot;slidein&quot;, будет повторяться 3 раза, а также значение <font face="consolas, Liberation Mono, courier, monospace"><span style="background-color: rgba(220, 220, 220, 0.5);">animation-direction</span></font> установлено <font face="consolas, Liberation Mono, courier, monospace"><span style="background-color: rgba(220, 220, 220, 0.5);">alternate</span></font>. В ключевых кадрах <a href="/ru/docs/Web/CSS/@keyframes" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>@keyframes</code></a> установлены такие значения ширины и левого отступа, что элемент будет скользить по экрану.</p>
+
+<pre class="brush: css">.slidein {
+  -moz-animation-duration: 3s;
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -moz-animation-name: slidein;
+  -webkit-animation-name: slidein;
+  animation-name: slidein;
+  -moz-animation-iteration-count: 3;
+  -webkit-animation-iteration-count: 3;
+  animation-iteration-count: 3;
+  -moz-animation-direction: alternate;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+}
+
+@-moz-keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+@-webkit-keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%
+  }
+
+  to {
+   margin-left: 0%;
+   width: 100%;
+ }
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%
+  }
+
+  to {
+   margin-left: 0%;
+   width: 100%;
+ }
+}</pre>
+
+<h4 id="Добавление_обработчика_события_анимации">Добавление обработчика события анимации</h4>
+
+<p>Будем использовать JavaScript для отслеживания всех трех возможных событий анимации. Следующий код конфигурирует обработчик; мы вызываем его при первой загрузке документа.</p>
+
+<pre class="brush: js">var e = document.getElementById(&quot;watchme&quot;);
+e.addEventListener(&quot;animationstart&quot;, listener, false);
+e.addEventListener(&quot;animationend&quot;, listener, false);
+e.addEventListener(&quot;animationiteration&quot;, listener, false);
+
+e.className = &quot;slidein&quot;;
+</pre>
+
+<p>Это довольно стандартный код; Вы можете получить дополнительную информацию в документации <a href="/ru/docs/Web/API/Element/addEventListener" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>element.addEventListener()</code></a>. Последнее, что делает этот код - это установка класса &quot;slidein&quot; для анимируемого элемента; мы делаем это, чтобы запустить анимацию.</p>
+
+<p>Почему? Потому что в нашем случае событие <code>animationstart</code> происходит как только анимация стартует, и это происходит раньше, чем исполняется наш сценарий. Так мы сможем контролировать начало анимации самостоятельно посредством вставки класса &quot;slidein&quot; для анимируемого элемента.</p>
+
+<h4 id="Регистрация_событий">Регистрация событий</h4>
+
+<p>События будут передаваться функции <code>listener()</code>, показанной ниже.</p>
+
+<pre class="brush: js">function listener(e) {
+  var l = document.createElement(&quot;li&quot;);
+  switch(e.type) {
+    case &quot;animationstart&quot;:
+      l.innerHTML = &quot;Started: elapsed time is &quot; + e.elapsedTime;
+      break;
+    case &quot;animationend&quot;:
+      l.innerHTML = &quot;Ended: elapsed time is &quot; + e.elapsedTime;
+      break;
+    case &quot;animationiteration&quot;:
+      l.innerHTML = &quot;New loop started at time &quot; + e.elapsedTime;
+      break;
+  }
+  document.getElementById(&quot;output&quot;).appendChild(l);
+}
+</pre>
+
+<p>Этот код также очень прост. Этот код следит за <a href="/ru/docs/Web/API/Event/type" title="Event.type - это доступное только для чтения свойство, возвращающее строку, содержащую тип события. Оно устанавливается в момент создания события и это имя обычно используется для ссылки на определенное событие."><code>event.type</code></a>, чтобы определить тип события, и добавляет элемент <a href="/ru/docs/Web/HTML/Element/ul" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>&lt;ul&gt;</code></a>, чтобы залогировать произошедшее событие.</p>
+
+<p>Вывод, когда анимация закончится, будет выглядеть примерно следующим образом:</p>
+
+<ul>
+ <li>Started: elapsed time is 0</li>
+ <li>New loop started at time 3.01200008392334</li>
+ <li>New loop started at time 6.00600004196167</li>
+ <li>Ended: elapsed time is 9.234000205993652</li>
+</ul>
+
+<p>Обратите внимание, что время, указанное в выводе, и время, которое мы указали в стилях, не совпадают. Также обратите внимание, что после окончания итерации не посылается событие <code>animationiteration</code> ; вместо него посылается событие <code>animationend</code>.</p>
+
+<h4 id="HTML">HTML</h4>
+
+<p>Ради полноты картины приведем код разметки HTML. В разметке имеется тег <em>ul,</em> в который и выводится вся информация:</p>
+
+<pre class="brush: html">&lt;body&gt;
+  &lt;h1 id=&quot;watchme&quot;&gt;Watch me move&lt;/h1&gt;
+  &lt;p&gt;This example shows how to use CSS animations to make &lt;code&gt;p&lt;/code&gt; elements
+  move across the page.&lt;/p&gt;
+  &lt;p&gt;In addition, we output some text each time an animation event fires, so you can see them in action.&lt;/p&gt;
+  &lt;ul id=&quot;output&quot;&gt;
+  &lt;/ul&gt;
+&lt;/body&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Использование_событий_анимации" src="https://mdn.mozillademos.org/ru/docs/Web/CSS/CSS_Animations/Ispolzovanie_CSS_animatciy$samples/%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D0%B9_%D0%B0%D0%BD%D0%B8%D0%BC%D0%B0%D1%86%D0%B8%D0%B8?revision=1573959" width="600"></iframe></p>
+
+<h2 id="Смотрите_также">Смотрите также</h2>
+
+<ul>
+ <li><a href="/ru/docs/Web/API/AnimationEvent"><code>AnimationEvent</code></a></li>
+ <li><a href="/en-US/docs/CSS/CSS_animations/Detecting_CSS_animation_support">Определение поддержки CSS анимации</a></li>
+ <li><a href="/en-US/docs/Web/Guide/CSS/Using_CSS_transitions">Использование CSS-переходов</a></li>
+</ul>

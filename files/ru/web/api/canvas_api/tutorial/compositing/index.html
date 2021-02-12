@@ -1,0 +1,180 @@
+---
+title: Композиция и обрезка
+slug: Web/API/Canvas_API/Tutorial/Compositing
+tags:
+  - канвас
+translation_of: Web/API/Canvas_API/Tutorial/Compositing
+original_slug: Web/API/Canvas_API/Tutorial/Композиции
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/ru/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Руководство по Canvas</summary>
+      <ol>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Базовое использование</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Рисование фигур</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Применение стилей и цветов</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Рисование текста</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Using_images">Использование изображений</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Transformations">Трансформации</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Compositing">Композиция и обрезка</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Простые анимации</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Расширенные анимации</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Манипуляция пикселями</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Достижение областей и доступность</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Оптимизация canvas</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Finale">Заключение</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Примеры</summary>
+      <ol>
+        <li><a href="/ru/docs/Web/API/Canvas_API/A_basic_ray-caster">Простой излучатель лучей</a></li>
+        <li><a href="/ru/Add-ons/Code_snippets/Canvas">Спиппеты кода Canvas</a></li>
+        <li><a href="/ru/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Манипяция видео с помощью canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Интерфейсы</summary>
+      <ol>
+        <li><a href="/ru/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/ru/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/ru/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/ru/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/ru/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/ru/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/ru/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span title="Это экспериментальное API, которое не должно использоваться в рабочем коде."><i class="icon-beaker"> </i></span></span> <a href="/ru/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ru/docs/MDN">Документация:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Полезные списки</summary>
+      <ol>
+        <li><a href="/ru/docs/tag/Canvas">Страницы отмеченные &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Внести свой вклад</summary>
+      <ol>
+        <li><a href="/ru/docs/MDN/Doc_status/API/Canvas">Статус документации по Canvas</a></li>
+        <li><a href="/ru/docs/MDN">Проект MDN</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ru/docs/Web/API/Canvas_API/Tutorial/Transformations" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">Следующая статья  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>Во всех наших <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Transformations">предыдущих примерах</a>, фигуры всегда были нарисованы одна поверх другой. Это более чем достаточно для большинства ситуаций, но это ограничивает порядок, в котором построены композиционные формы. Однако, мы можем изменить это поведение, установив свойство <code>globalCompositeOperation</code>. Кроме того, свойства <code>clip</code> позволяет скрыть нежелательные части формы.</p>
+</div>
+
+<h2 id="globalCompositeOperation" name="globalCompositeOperation"><code>globalCompositeOperation</code></h2>
+
+<p>Мы можем не только рисовать новые фигуры за существующие формы, но мы также можем использовать его, чтобы замаскировать определенные участки, очистить разделы от холста (не ограничивается прямоугольниками, как<a href="/ru/docs/Web/API/CanvasRenderingContext2D/clearRect" title="Метод CanvasRenderingContext2D.clearRect(), предоставляемый Canvas 2D API, устанавливает прозрачный черный цвет для всех пикселей, расположенных внутри прямоугольника, заданного начальной точкой (x, y) и размерами (width, height), таким образом стирая любое ранее нарисованное содержимое."><code>clearRect()</code></a> method does) и другое.</p>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>globalCompositeOperation = type</code></a></dt>
+ <dd>Это задает Тип операции композиции для применения при разработке новых форм, где Тип является строкой, идентифицирующей, какие из двенадцати операций композитинг в использовании.</dd>
+</dl>
+
+<p>См.  <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing/Example">примеры компоновки</a> кода из следующих примеров.</p>
+
+<p><iframe src="https://mdn.mozillademos.org/ru/docs/Web/API/Canvas_API/Tutorial/Compositing/Example$samples/Compositing_example?revision=1440747" width="750" height="6750" frameborder="0" class="live-sample-frame sample-code-frame" id="frame_Compositing_example"></iframe></p>
+
+<h2 id="Clipping_paths" name="Clipping_paths">Обрезка контуров</h2>
+
+<p><img src="https://mdn.mozillademos.org/files/209/Canvas_clipping_path.png" alt style="float: right;" class="internal">Отсеченный контур похож на обычную форму холста, но он действует как маска, чтобы скрыть нежелательные части фигур. Это визуализируется на изображении справа. Форма красной звезды - наша отправочная дорожка. Все, что выходит за пределы этого пути, не будет нарисовано на холсте.</p>
+
+<p>Если мы сравниваем отсеченный контур со свойством <code>globalCompositeOperation</code> на изображении, мы видим два режима композитинга, которые достигают более или менее того же эффекта в исходном и исходном состоянии.   Наиболее важные различия между ними заключаются в том, что отсечение контура фактически  никогда не обращается к холсту и контур обрезки никогда не влияет добавление новых форм. Это делает обрезку контура идеальным для рисования нескольких фигур в ограниченной области.</p>
+
+<p>В главе о <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes" title="Web/Guide/HTML/Canvas_tutorial/Drawing_shapes#Drawing_paths">рисовании форм</a>, я назвал только <code>stroke()</code> и <code>fill()</code> методы, но есть третий способ можно использовать с контурами, так называемый <code>clip()</code>.</p>
+
+<dl>
+ <dt><a href="/ru/docs/Web/API/CanvasRenderingContext2D/clip" title="Документация об этом ещё не написана; пожалуйста, поспособствуйте её написанию!"><code>clip()</code></a></dt>
+ <dd>Преобразует текущий выстраиваемый контур в отсечённый контур.</dd>
+</dl>
+
+<p>Используйте <code>clip()</code> вместо <code>closePath()</code> для закрытия контура и его преобразования в отсечённый контур вместо создания заполняющего  или обрамляющего контура.</p>
+
+<p>По умолчанию элемент <a href="/ru/docs/Web/HTML/Element/canvas" title="HTML &lt;canvas&gt; Элемент может быть использован для отрисовки графики через скрипты (обычно используется JavaScript). На пример, его можно использовать для отрисовки графиков, делать композиции фото или даже выполнять анимации. Вы можете (и должны) дать альтернативное содержание внури блока &lt;canvas&gt;. Этот контент будет рендерится в обоих браузерах, в старых которые не поддерживают canvas и в браузерах с отключённым JavaScript."><code>&lt;canvas&gt;</code></a> использует отсечённый контур, который в точности совпадает по размеру с размером самого холста. Это означает, что никакого отсечения попросту не произойдёт.</p>
+
+<h3 id="A_clip_example" name="A_clip_example">Пример обрезки</h3>
+
+<p>В этом примере мы будем использовать круговую обрезку контура, чтобы ограничить рисование набора случайных звезд определенной областью.</p>
+
+<pre class="brush: js;highlight[9]">function draw() {
+  var ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+  ctx.fillRect(0, 0, 150, 150);
+  ctx.translate(75, 75);
+
+  // Create a circular clipping path
+  ctx.beginPath();
+  ctx.arc(0, 0, 60, 0, Math.PI * 2, true);
+  ctx.clip();
+
+  // draw background
+  var lingrad = ctx.createLinearGradient(0, -75, 0, 75);
+  lingrad.addColorStop(0, &apos;#232256&apos;);
+  lingrad.addColorStop(1, &apos;#143778&apos;);
+
+  ctx.fillStyle = lingrad;
+  ctx.fillRect(-75, -75, 150, 150);
+
+  // draw stars
+  for (var j = 1; j &lt; 50; j++) {
+    ctx.save();
+    ctx.fillStyle = &apos;#fff&apos;;
+    ctx.translate(75 - Math.floor(Math.random() * 150),
+                  75 - Math.floor(Math.random() * 150));
+    drawStar(ctx, Math.floor(Math.random() * 4) + 2);
+    ctx.restore();
+  }
+
+}
+
+function drawStar(ctx, r) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  for (var i = 0; i &lt; 9; i++) {
+    ctx.rotate(Math.PI / 5);
+    if (i % 2 === 0) {
+      ctx.lineTo((r / 0.525731) * 0.200811, 0);
+    } else {
+      ctx.lineTo(r, 0);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+</pre>
+
+<div class="hidden">
+<pre class="brush: html">&lt;canvas id=&quot;canvas&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js">draw();</pre>
+</div>
+
+<p>В первых нескольких строках кода мы рисуем черный прямоугольник размером с холстом в качестве фона, а затем переводим начало координат в центр. Затем мы создаем круговой обтравочный контур, рисуя дугу и вызывающий <code>clip()</code>. Обрезанные контуры также являются частью состояния сохранения холста. Если бы мы хотели сохранить исходный обтравочный контур, мы могли бы сохранить состояние холста перед созданием нового.</p>
+
+<p>Все, что нарисовано после создания отсеченного контура, появится только внутри этого пути. Вы можете видеть это четко в линейном градиенте, который нарисован далее. После этого набирается набор из 50 случайно расположенных и масштабированных звезд, используя <code>drawStar()</code>. Снова звезды появляются только в пределах определенного обтравочного контура.</p>
+
+<p></p><table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img src="https://mdn.mozillademos.org/files/208/Canvas_clip.png" alt class="internal"></td><td><iframe src="https://mdn.mozillademos.org/ru/docs/Web/API/Canvas_API/Tutorial/%D0%9A%D0%BE%D0%BC%D0%BF%D0%BE%D0%B7%D0%B8%D1%86%D0%B8%D0%B8$samples/A_clip_example?revision=1440747" width="180" height="180" frameborder="0" class="live-sample-frame sample-code-frame" id="frame_A_clip_example"></iframe></td></tr></tbody></table><p></p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/ru/docs/Web/API/Canvas_API/Tutorial/Transformations" class="button">« Предыдущая статья</a><a href="/ru/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">Следующая статья  »</a></p>
+</div><p></p>
