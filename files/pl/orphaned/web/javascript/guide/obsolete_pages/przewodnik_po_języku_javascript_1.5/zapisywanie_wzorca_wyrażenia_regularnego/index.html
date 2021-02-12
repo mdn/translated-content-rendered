@@ -1,0 +1,219 @@
+---
+title: Zapisywanie wzorca wyrażenia regularnego
+slug: >-
+  orphaned/Web/JavaScript/Guide/Obsolete_Pages/Przewodnik_po_języku_JavaScript_1.5/Zapisywanie_wzorca_wyrażenia_regularnego
+tags:
+  - JavaScript
+  - Przewodnik_JavaScript
+  - Strony_wymagające_dopracowania
+  - Wszystkie_kategorie
+original_slug: >-
+  Web/JavaScript/Guide/Obsolete_Pages/Przewodnik_po_języku_JavaScript_1.5/Zapisywanie_wzorca_wyrażenia_regularnego
+---
+<h3 id="Zapisywanie_wzorca_wyra.C5.BCenia_regularnego" name="Zapisywanie_wzorca_wyra.C5.BCenia_regularnego">Zapisywanie wzorca wyrażenia regularnego</h3>
+
+<p>Wzorzec wyrażenia regularnego składa się ze znaków prostych takich jak <code>/abc/</code> lub kombinacji znaków prostych i specjalnych, jak np. <code>/ab*c/</code> lub <code>/Rozdział (\d+)\.\d*/</code>. Ostatni przykład zawiera nawiasy, które działają jak urządzenie pamięci. Wzorzec w nawiasie użyty w tym porównaniu jest zapamiętywany w celu umożliwienia ponownego użycia, tak jak zostało to opisane w <a href="pl/Przewodnik_po_j%c4%99zyku_JavaScript_1.5/Praca_z_wyra%c5%bceniami_regularnymi/U%c5%bcycie_odpowiedniego_znaku">Using Parenthesized Substring Matches</a>.</p>
+
+<p> </p>
+
+<h4 id="U.C5.BCywanie_prostych_wzorc.C3.B3w" name="U.C5.BCywanie_prostych_wzorc.C3.B3w">Używanie prostych wzorców</h4>
+
+<p>Proste wzorce tworzone są za pomocą znaków, z których ma składać się poszukiwany wynik. Przykładowo wzorzec /abc/ pasuje do kombinacji znaków w łańcuchach znaków tylko wtedy, gdy znaki &apos;abc&apos; pojawiają się razem i dokładnie w takiej kolejności. Sukcesem zakończy się poszukiwanie tych znaków w łańcuchu &quot;Cześć, znasz literki abc?&quot; i &quot;Najnowszym modelem samolotu jest slabcraft&quot;. W obydwu przypadkach występuje podciąg &apos;abc&apos;. Nie zostaną za to zwrócone żadne wyniki w łańcuchu &quot;abecadło z nieba spadło&quot;, ponieważ nie zawiera on podciągu &apos;abc&apos;.</p>
+
+<h4 id="U.C5.BCywanie_znak.C3.B3w_specjalnych" name="U.C5.BCywanie_znak.C3.B3w_specjalnych">Używanie znaków specjalnych</h4>
+
+<p>When the search for a match requires something more than a direct match, such as finding one or more b&apos;s, or finding white space, the pattern includes special characters. For example, the pattern <code>/ab*c/</code> matches any character combination in which a single &apos;a&apos; is followed by zero or more &apos;b&apos;s (* means 0 or more occurrences of the preceding item) and then immediately followed by &apos;c&apos;. In the string &quot;cbbabbbbcdebc,&quot; the pattern matches the substring &apos;abbbbc&apos;.</p>
+
+<p>Poniższa tabela zawiera kompletny wykaz znaków specjalnych wraz z opisem stosowanych w wyrażeniach regularnych.</p>
+
+<table class="fullwidth-table">
+ <tbody>
+  <tr>
+   <th>Znak</th>
+   <th>Znaczenie</th>
+  </tr>
+  <tr>
+   <td>\</td>
+   <td>jedno z poniższych:
+    <ul>
+     <li>przed znakami rozumianymi zazwyczaj dosłownie oznacza, że znak ten jest znakiem specjalnym i nie jest rozumiany dosłownie. Na przykład /b/ oznacza znak &apos;b&apos;. Umieszczenie przed &apos;b&apos; ukośnika lewego (<em>backslash</em> ) powoduje, że znak ten oznacza ogranicznik słowa.</li>
+    </ul>
+
+    <ul>
+     <li>przed znakami specjalnymi oznacza, że znak ten nie jest specjalny i jest rozumiany dosłownie. Na przykład * jest znakiem specjalnym, który oznacza 0 lub więcej wystąpień znaku poprzedzającego; np. /a*/ oznacza 0 lub więcej znaków &apos;a&apos;. Aby uzyskać znak dosłowny *, należy poprzedzić go ukośnikiem lewym; np. /a\*a/ oznacza &apos;a*a&apos;.</li>
+    </ul>
+   </td>
+  </tr>
+  <tr>
+   <td>^</td>
+   <td>Pasuje do początku wpisywanego tekstu. Jeśli flaga multiline (wiele linii) jest ustawiona na true, dodatkowo pasuje do każdej nowej linii.
+    <p>Np. <code>/^A/</code> nie da nam w efekcie &apos;A&apos; w łańcuchu &quot;an A&quot;, ale da nam &apos;A&apos; w łańcuchu &quot;An A&quot;</p>
+   </td>
+  </tr>
+  <tr>
+   <td>$</td>
+   <td>Pasuje do końca wprowadzanych danych. Jeśli flaga multiline jest ustawiona na true, to pasuje również do każdego zakończenia linii. Np. <code>/t$/</code> zwróci &apos;t&apos; z &quot;eat&quot;, ale nie z &quot;eater&quot;</td>
+  </tr>
+  <tr>
+   <td>*</td>
+   <td>Pasuje jeśli poprzedzający znak wystąpił 0 bądź więcej razy.
+    <p>Np. <code>/bo*/</code> zwróci &apos;boooo&apos; z &quot;A Ghost booooed&quot; oraz &apos;b&apos; z &quot;A bird warbled&quot;, ale nie zwróci nic z łańcucha &quot;A goat grunted&quot;.</p>
+   </td>
+  </tr>
+  <tr>
+   <td>+</td>
+   <td>Pasuje jeśli poprzedzający znak wystąpił 1 lub więcej razy. Równoważne z {1,} Np. <code>/a+/</code> dopasuje &apos;a&apos; z łańcucha &quot;candy&quot; oraz wszystkie literki a w &quot;caaaaaaandy&quot;.</td>
+  </tr>
+  <tr>
+   <td>?</td>
+   <td>Pasuje jeśli poprzedzający znak wystąpił raz lub nie wystąpił wcale.
+    <p>Np. <code>/e?le?/</code> dopasuje &apos;el&apos; w łańcuchu &quot;angel&quot; oraz &apos;le&apos; w &quot;angle&quot;.</p>
+
+    <p>Jeśli ? wystąpi zaraz za *, +, ? lub {}, to znaki te będą zwracały najkrótsze możliwe dopasowania, w przeciwieństwie do zwykłego zachowania, które możemy określić jako zachłanne (zwraca najdłuższe możliwe dopasowania).</p>
+
+    <p>Np. <code>/bo*?/</code> zwróci &apos;b&apos; z &quot;A Ghost booooed&quot;.</p>
+    Znak ten używamy też w<em>lookahead assertions</em> , wyjaśnione w komórkach x(?=y) i x(?!y) w tej tabeli.</td>
+  </tr>
+  <tr>
+   <td>.</td>
+   <td>(kropka) pasuje do każdego pojedynczego znaku oprócz znaku nowej linii. Np. <code>/.n/</code> z łańcucha &quot;nay, an apple is on the tree&quot;, dopasuje &apos;an&apos; i &apos;on&apos;, ale nie &apos;nay&apos;.</td>
+  </tr>
+  <tr>
+   <td>(x)</td>
+   <td>Matches &apos;x&apos; and remembers the match. These are called capturing parentheses. For example, <code>/(foo)/</code> matches and remembers &apos;foo&apos; in &quot;foo bar.&quot; The matched substring can be recalled from the resulting array&apos;s elements <code>1</code>, ..., <code>n</code>.</td>
+  </tr>
+  <tr>
+   <td>(?:x)</td>
+   <td>Matches &apos;x&apos; but does not remember the match. These are called non-capturing parentheses. The matched substring can not be recalled from the resulting array&apos;s elements <code>1</code>, ..., <code>n</code>.</td>
+  </tr>
+  <tr>
+   <td>x(?=y)</td>
+   <td>Matches &apos;x&apos; only if &apos;x&apos; is followed by &apos;y&apos;. For example, <code>/Jack(?=Sprat)/</code> matches &apos;Jack&apos; only if it is followed by &apos;Sprat&apos;. <code>/Jack(?=Sprat|Frost)/</code> matches &apos;Jack&apos; only if it is followed by &apos;Sprat&apos; or &apos;Frost&apos;. However, neither &apos;Sprat&apos; nor &apos;Frost&apos; is part of the match results.</td>
+  </tr>
+  <tr>
+   <td>x(?!y)</td>
+   <td>Matches &apos;x&apos; only if &apos;x&apos; is not followed by &apos;y&apos;. For example, <code>/\d+(?!\.)/</code> matches a number only if it is not followed by a decimal point. The regular expression <code>/\d+(?!\.)/.exec(&quot;3.141&quot;)</code> matches &apos;141&apos; but not &apos;3.141&apos;.</td>
+  </tr>
+  <tr>
+   <td>x|y</td>
+   <td>oznacza &apos;x&apos; lub &apos;y&apos;. Na przykład <code>/green|red/</code> pasuje do &apos;green&apos; w &quot;green apple&quot; i do &apos;red&apos; w &quot;red apple.&quot;</td>
+  </tr>
+  <tr>
+   <td>{n}</td>
+   <td>gdzie n jest liczbą całkowitą dodatnią. Oznacza dokładnie n wystąpień znaku poprzedzającego. Na przykład <code>/a{2}/</code> nie pasuje do &apos;a&apos; w &quot;candy,&quot;, za to pasuje do wszystkich znaków &apos;a&apos; w &quot;caandy,&quot; i pierwszych dwóch znaków &apos;a&apos; w &quot;caaandy.&quot;</td>
+  </tr>
+  <tr>
+   <td>{n,}</td>
+   <td>Where n is a positive integer. Matches at least n occurrences of the preceding character. For example, <code>/a{2,}/</code> doesn&apos;t match the &apos;a&apos; in &quot;candy&quot;, but matches all of the a&apos;s in &quot;caandy&quot; and in &quot;caaaaaaandy.&quot;</td>
+  </tr>
+  <tr>
+   <td>{n,m}</td>
+   <td>Where n and m are positive integers. Matches at least n and at most m occurrences of the preceding character. For example, <code>/a{1,3}/</code> matches nothing in &quot;cndy&quot;, the &apos;a&apos; in &quot;candy,&quot; the first two a&apos;s in &quot;caandy,&quot; and the first three a&apos;s in &quot;caaaaaaandy&quot; Notice that when matching &quot;caaaaaaandy&quot;, the match is &quot;aaa&quot;, even though the original string had more a&apos;s in it.</td>
+  </tr>
+  <tr>
+   <td><code>xyz</code></td>
+   <td>zestaw znaków. Pasuje do każdego znaku w nawiasie. Można określić zakres znaków za pomocą łącznika. Na przykład <code>abcd</code> oznacza to samo co <code>a-d</code>. Pasują one do &apos;b&apos; w &quot;brisket&quot; i do &apos;c&apos; w &quot;ache&quot;.</td>
+  </tr>
+  <tr>
+   <td><code>^xyz</code></td>
+   <td>A negated or complemented character set. That is, it matches anything that is not enclosed in the brackets. You can specify a range of characters by using a hyphen. For example, <code>^abc</code> is the same as <code>^a-c</code>. They initially match &apos;r&apos; in &quot;brisket&quot; and &apos;h&apos; in &quot;chop.&quot;</td>
+  </tr>
+  <tr>
+   <td><code>\\b</code></td>
+   <td>Matches a backspace. (Not to be confused with \b.)</td>
+  </tr>
+  <tr>
+   <td>\b</td>
+   <td>Matches a word boundary, such as a space or a newline character. (Not to be confused with <code>\\b</code>.) For example, <code>/\bn\w/</code> matches the &apos;no&apos; in &quot;noonday&quot;;<code>/\wy\b/</code> matches the &apos;ly&apos; in &quot;possibly yesterday.&quot;</td>
+  </tr>
+  <tr>
+   <td>\B</td>
+   <td>Matches a non-word boundary. For example, <code>/\w\Bn/</code> matches &apos;on&apos; in &quot;noonday&quot;, and <code>/y\B\w/</code> matches &apos;ye&apos; in &quot;possibly yesterday.&quot;</td>
+  </tr>
+  <tr>
+   <td>\cX</td>
+   <td>Where X is a control character. Matches a control character in a string. For example, <code>/\cM/</code> matches control-M in a string.</td>
+  </tr>
+  <tr>
+   <td>\d</td>
+   <td>Matches a digit character. Equivalent to <code>0-9</code>. For example, <code>/\d/</code> or <code>/0-9/</code> matches &apos;2&apos; in &quot;B2 is the suite number.&quot;</td>
+  </tr>
+  <tr>
+   <td>\D</td>
+   <td>Matches any non-digit character. Equivalent to <code>^0-9</code>. For example, <code>/\D/</code> or <code>/^0-9/</code> matches &apos;B&apos; in &quot;B2 is the suite number.&quot;</td>
+  </tr>
+  <tr>
+   <td>\f</td>
+   <td>Matches a form-feed.</td>
+  </tr>
+  <tr>
+   <td>\n</td>
+   <td>Matches a linefeed.</td>
+  </tr>
+  <tr>
+   <td>\r</td>
+   <td>Matches a carriage return.</td>
+  </tr>
+  <tr>
+   <td>\s</td>
+   <td>Matches a single white space character, including space, tab, form feed, line feed. Equivalent to
+    <p><code>\\f\\n\\r\\t\\v\\u00A0\\u2028\\u2029</code>.</p>
+    For example, <code>/\s\w*/</code> matches &apos; bar&apos; in &quot;foo bar.&quot;</td>
+  </tr>
+  <tr>
+   <td>\S</td>
+   <td>Matches a single character other than white space. Equivalent to
+    <p><code>^ \\f\\n\\r\\t\\v\\u00A0\\u2028\\u2029</code>.</p>
+    For example, <code>/\S\w*/</code> matches &apos;foo&apos; in &quot;foo bar.&quot;</td>
+  </tr>
+  <tr>
+   <td>\t</td>
+   <td>Matches a tab.</td>
+  </tr>
+  <tr>
+   <td>\v</td>
+   <td>Matches a vertical tab.</td>
+  </tr>
+  <tr>
+   <td>\w</td>
+   <td>Matches any alphanumeric character including the underscore. Equivalent to <code>A-Za-z0-9_</code>. For example, <code>/\w/</code> matches &apos;a&apos; in &quot;apple,&quot; &apos;5&apos; in &quot;$5.28,&quot; and &apos;3&apos; in &quot;3D.&quot;</td>
+  </tr>
+  <tr>
+   <td>\W</td>
+   <td>Matches any non-word character. Equivalent to <code>^A-Za-z0-9_</code>. For example, <code>/\W/</code> or <code>/^A-Za-z0-9_/</code> matches &apos;%&apos; in &quot;50%.&quot;</td>
+  </tr>
+  <tr>
+   <td>\n</td>
+   <td>Where n is a positive integer. A back reference to the last substring matching the n parenthetical in the regular expression (counting left parentheses). For example, <code>/apple(,)\sorange\1/</code> matches &apos;apple, orange,&apos; in &quot;apple, orange, cherry, peach.&quot;</td>
+  </tr>
+  <tr>
+   <td>\0</td>
+   <td>Matches a NUL character. Do not follow this with another digit.</td>
+  </tr>
+  <tr>
+   <td>\xhh</td>
+   <td>Matches the character with the code hh (two hexadecimal digits)</td>
+  </tr>
+  <tr>
+   <td>\uhhhh</td>
+   <td>Matches the character with the code hhhh (four hexadecimal digits).</td>
+  </tr>
+ </tbody>
+</table>
+
+<p><small><strong>Tabela 4.1: Znaki specjalne w wyrażeniach regularnych.</strong></small></p>
+
+<h4 id="U.C5.BCywanie_nawias.C3.B3w" name="U.C5.BCywanie_nawias.C3.B3w">Używanie nawiasów</h4>
+
+<p>Parentheses around any part of the regular expression pattern cause that part of the matched substring to be remembered. Once remembered, the substring can be recalled for other use, as described in <a href="pl/Przewodnik_po_j%c4%99zyku_JavaScript_1.5/Praca_z_wyra%c5%bceniami_regularnymi/U%c5%bcycie_odpowiedniego_znaku">Using Parenthesized Substring Matches</a>.</p>
+
+<p>For example, the pattern <code>/Chapter (\d+)\.\d*/</code> illustrates additional escaped and special characters and indicates that part of the pattern should be remembered. It matches precisely the characters &apos;Chapter &apos; followed by one or more numeric characters (\d means any numeric character and + means 1 or more times), followed by a decimal point (which in itself is a special character; preceding the decimal point with \ means the pattern must look for the literal character &apos;.&apos;), followed by any numeric character 0 or more times (\d means numeric character, * means 0 or more times). In addition, parentheses are used to remember the first matched numeric characters.</p>
+
+<p>This pattern is found in &quot;Open Chapter 4.3, paragraph 6&quot; and &apos;4&apos; is remembered. The pattern is not found in &quot;Chapter 3 and 4&quot;, because that string does not have a period after the &apos;3&apos;.</p>
+
+<p>To match a substring without causing the matched part to be remembered, within the parentheses preface the pattern with <code>?:</code>. For example, <code>(?:\d+)</code> matches one or more numeric characters but does not remember the matched characters.</p>
+
+<p><br>
+ </p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/pl/docs/Przewodnik_po_języku_JavaScript_1.5:Tworzenie_wyrażenia_regularnego" class="button">« Poprzedni</a><a href="/pl/docs/Przewodnik_po_języku_JavaScript_1.5:Praca_z_wyrażeniami_regularnymi" class="button">Następny  »</a></p>
+</div><p></p>
