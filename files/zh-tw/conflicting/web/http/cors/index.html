@@ -1,0 +1,310 @@
+---
+title: 伺服器端存取控制（CORS）
+slug: conflicting/Web/HTTP/CORS
+translation_of: Web/HTTP/CORS
+translation_of_original: Web/HTTP/Server-Side_Access_Control
+original_slug: Web/HTTP/Server-Side_Access_Control
+---
+<p>存取控制系統是執行<a href="http://searchsoftwarequality.techtarget.com/definition/authorization">授權</a>識別、<a href="http://searchsecurity.techtarget.com/definition/authentication">認證</a>、存取核可的實體，也負責透過登入來進行驗證，包含<a href="http://searchsecurity.techtarget.com/definition/password">密碼</a>、個人身份識別碼（personal identification numbers，PINs）、<a href="http://searchsecurity.techtarget.com/definition/biometrics">生物辨識</a>掃描，以及物理或電子的金鑰。</p>
+
+<p>存取控制是用於規範計算環境之資源可供哪些人或單位觀看、使用的一種安全技術。</p>
+
+<p></p><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li><a href="/zh-TW/docs/Web/HTTP"><strong><em>HTTP</em></strong></a></li>
+    <li><strong>Guides:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>Resources and URIs</summary>
+            <ol>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web">Identifying resources on the Web</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Data URIs</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/MIME_Types">Introduction to MIME Types</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">Complete list of MIME Types</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs">Choosing between www and non-www URLs</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP guide</summary>
+            <ol>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP">Basics of HTTP</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Overview">Overview of HTTP</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP">Evolution of HTTP</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Messages">HTTP Messages</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Session">A typical HTTP session</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Connection_management_in_HTTP_1.x">Connection management in HTTP/1.x</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Protocol_upgrade_mechanism">Protocol upgrade mechanism</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP security</summary>
+            <ol>
+                <li><a href="/zh-TW/docs/Web/HTTP/CSP">Content Security Policy (CSP)</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Public_Key_Pinning">HTTP Public Key Pinning (HPKP)</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Headers/Strict-Transport-Security">HTTP Strict Transport Security (HSTS)</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies">Cookie security</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+                <li><a href="/zh-TW/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+                <li><a href="https://wiki.mozilla.org/Security/Guidelines/Web_Security">Mozilla web security guidelines</a></li>
+                <li><a href="https://observatory.mozilla.org/">Mozilla Observatory</a></li>
+            </ol>
+        </details>
+    </li>
+
+    <li><a href="/zh-TW/docs/Web/HTTP/CORS">HTTP access control (CORS)</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Authentication">HTTP authentication</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Caching">HTTP caching</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Compression">HTTP compression</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Conditional_requests">HTTP conditional requests</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Content_negotiation">HTTP content negotiation</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Cookies">HTTP cookies</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Range_requests">HTTP range requests</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Redirections">HTTP redirects</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Resources_and_specifications">HTTP specifications</a></li>
+    <li><a href="/zh-TW/docs/Web/HTTP/Feature_Policy">Feature policy</a></li>
+    <li><strong>References:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP headers</summary>
+            <ol><li><a href="/zh-TW/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Accept$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Accept-Charset"><code>Accept-Charset</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Accept-Charset$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Accept-Encoding"><code>Accept-Encoding</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Accept-Encoding$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Accept-Language$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Accept-Ranges"><code>Accept-Ranges</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Accept-Ranges$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Headers$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Methods$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Origin$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Expose-Headers"><code>Access-Control-Expose-Headers</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Expose-Headers$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Max-Age"><code>Access-Control-Max-Age</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Max-Age$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Request-Headers"><code>Access-Control-Request-Headers</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Request-Headers$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Request-Method"><code>Access-Control-Request-Method</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Request-Method$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Age"><code>Age</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Age$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Allow"><code>Allow</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Allow$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Alt-Svc"><code>Alt-Svc</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Alt-Svc$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Authorization"><code>Authorization</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Authorization$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Cache-Control$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Clear-Site-Data"><code>Clear-Site-Data</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Clear-Site-Data$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Connection$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Disposition"><code>Content-Disposition</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Disposition$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Encoding"><code>Content-Encoding</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Encoding$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Language$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Length"><code>Content-Length</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Length$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Location$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Range"><code>Content-Range</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Range$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy"><code>Content-Security-Policy</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only"><code>Content-Security-Policy-Report-Only</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Type$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Cookie$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Cookie2"><code>Cookie2</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Cookie2$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/DNT"><code>DNT</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Date"><code>Date</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Date$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/ETag"><code>ETag</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/ETag$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Early-Data"><code>Early-Data</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Early-Data$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Expect"><code>Expect</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Expect$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Expect-CT"><code>Expect-CT</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Expect-CT$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Expires"><code>Expires</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Expires$translate">[Translate]</a></li><li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy"><code>Feature-Policy</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Forwarded"><code>Forwarded</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Forwarded$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/From"><code>From</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/From$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Host"><code>Host</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Host$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/If-Match"><code>If-Match</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/If-Match$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/If-Modified-Since"><code>If-Modified-Since</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/If-Modified-Since$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/If-None-Match"><code>If-None-Match</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/If-None-Match$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/If-Range"><code>If-Range</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/If-Range$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/If-Unmodified-Since"><code>If-Unmodified-Since</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/If-Unmodified-Since$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Index"><code>Index</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Index$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Keep-Alive"><code>Keep-Alive</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Keep-Alive$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Large-Allocation"><code>Large-Allocation</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Large-Allocation$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Last-Modified"><code>Last-Modified</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Last-Modified$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Location"><code>Location</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Location$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Origin$translate">[Translate]</a></li><li><span class="sidebar-icon"><span title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Pragma"><code>Pragma</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Pragma$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Proxy-Authenticate"><code>Proxy-Authenticate</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Proxy-Authenticate$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Proxy-Authorization"><code>Proxy-Authorization</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Proxy-Authorization$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Public-Key-Pins"><code>Public-Key-Pins</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Public-Key-Pins$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only"><code>Public-Key-Pins-Report-Only</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Range"><code>Range</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Range$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Referer"><code>Referer</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Referer$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Referrer-Policy"><code>Referrer-Policy</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Referrer-Policy$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Retry-After"><code>Retry-After</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Retry-After$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Sec-WebSocket-Accept"><code>Sec-WebSocket-Accept</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Sec-WebSocket-Accept$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Server"><code>Server</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Server-Timing"><code>Server-Timing</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Server-Timing$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Set-Cookie$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Set-Cookie2"><code>Set-Cookie2</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Set-Cookie2$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/SourceMap"><code>SourceMap</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/SourceMap$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Strict-Transport-Security"><code>Strict-Transport-Security</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Strict-Transport-Security$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/TE"><code>TE</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/TE$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Timing-Allow-Origin"><code>Timing-Allow-Origin</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Timing-Allow-Origin$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Tk"><code>Tk</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Tk$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Trailer"><code>Trailer</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Trailer$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Transfer-Encoding"><code>Transfer-Encoding</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Transfer-Encoding$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests"><code>Upgrade-Insecure-Requests</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/User-Agent"><code>用戶代理</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Vary"><code>Vary</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Vary$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Via"><code>Via</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Via$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/WWW-Authenticate"><code>WWW-Authenticate</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/WWW-Authenticate$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Warning"><code>Warning</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Warning$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/X-Content-Type-Options"><code>X-Content-Type-Options</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-Content-Type-Options$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control"><code>X-DNS-Prefetch-Control</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-For"><code>X-Forwarded-For</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-For$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-Host"><code>X-Forwarded-Host</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-Host$translate">[Translate]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-Proto"><code>X-Forwarded-Proto</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-Forwarded-Proto$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/X-Frame-Options"><code>X-Frame-Options 回應標頭</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/X-XSS-Protection"><code>X-XSS-Protection</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/X-XSS-Protection$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP request methods</summary>
+            <ol><li><a href="/zh-TW/docs/Web/HTTP/Methods/CONNECT"><code>CONNECT</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/DELETE$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/GET"><code>GET</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/GET$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/HEAD$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/OPTIONS$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/PATCH$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/POST"><code>POST</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/POST$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/PUT$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Methods/TRACE$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>HTTP response status codes</summary>
+          <ol><li><a href="/zh-TW/docs/Web/HTTP/Status/100"><code>100 Continue</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/100$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/101"><code>101 Switching Protocols</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/101$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/200"><code>200 OK</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/201"><code>201 Created</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/201$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/202"><code>202 Accepted</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/202$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/203"><code>203 Non-Authoritative Information</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/203$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/204"><code>204 No Content</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/204$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/205"><code>205 Reset Content</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/205$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/206"><code>206 Partial Content</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/206$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/300"><code>300 Multiple Choices</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/300$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/301"><code>301 Moved Permanently</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/301$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/302"><code>302 Found</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/302$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/303"><code>303 See Other</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/303$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/304"><code>304 Not Modified</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/304$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/307"><code>307 Temporary Redirect</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/307$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/308"><code>308 Permanent Redirect</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/308$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/400"><code>400 Bad Request</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/400$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/401"><code>401 Unauthorized</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/401$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/403"><code>403 Forbidden</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/403$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/404"><code>404 Not Found</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/405"><code>405 Method Not Allowed</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/405$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/406"><code>406 Not Acceptable</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/406$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/407"><code>407 Proxy Authentication Required</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/407$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/408"><code>408 Request Timeout</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/408$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/409"><code>409 Conflict</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/409$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/410"><code>410 Gone</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/410$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/411"><code>411 Length Required</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/411$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/412"><code>412 Precondition Failed</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/412$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/413"><code>413 Payload Too Large</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/413$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/414"><code>414 URI Too Long</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/414$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/415"><code>415 Unsupported Media Type</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/415$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/416"><code>416 Range Not Satisfiable</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/416$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/417"><code>417 Expectation Failed</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/417$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/418_I_m_a_teapot"><code>418 I&apos;m a teapot</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/422"><code>422 Unprocessable Entity</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/422$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/425"><code>425 Too Early</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/425$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/426"><code>426 Upgrade Required</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/426$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/428"><code>428 Precondition Required</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/428$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/429"><code>429 Too Many Requests</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/429$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/431"><code>431 Request Header Fields Too Large</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/431$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/451"><code>451 Unavailable For Legal Reasons</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/500"><code>500 Internal Server Error</code></a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/501"><code>501 Not Implemented</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/501$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/502"><code>502 Bad Gateway</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/502$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/503"><code>503 Service Unavailable</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/503$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/504"><code>504 Gateway Timeout</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/504$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/505"><code>505 HTTP Version Not Supported</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/505$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Status/511"><code>511 Network Authentication Required</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Status/511$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CSP directives</summary>
+          <ol><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri"><code>CSP: base-uri</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content"><code>CSP: block-all-mixed-content</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/child-src"><code>CSP: child-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/child-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src"><code>CSP: connect-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/default-src"><code>CSP: default-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/default-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/font-src"><code>CSP: font-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/font-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/form-action"><code>CSP: form-action</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/form-action$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors"><code>CSP: frame-ancestors</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src"><code>CSP: frame-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/img-src"><code>CSP: img-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/img-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src"><code>CSP: manifest-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/media-src"><code>CSP: media-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/media-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/object-src"><code>CSP: object-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/object-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types"><code>CSP: plugin-types</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/referrer"><code>CSP: referrer</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/referrer$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri"><code>CSP: report-uri</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for"><code>CSP: require-sri-for</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox"><code>CSP: sandbox</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"><code>CSP: script-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/script-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/style-src"><code>CSP: style-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/style-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests"><code>CSP: upgrade-insecure-requests</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src"><code>CSP: worker-src</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/report-to"><code>report-to</code></a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Content-Security-Policy/report-to$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CORS errors</summary>
+          <ol><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSDisabled">Reason: CORS disabled</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSDisabled$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; does not match &apos;xyz&apos;</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; missing</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded">Reason: CORS header ‘Origin’ cannot be added</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed">Reason: CORS preflight channel did not succeed</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSDidNotSucceed">Reason: CORS request did not succeed</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSDidNotSucceed$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed">Reason: CORS request external redirect not allowed</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp">Reason: CORS request not HTTP</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials">Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound">Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed">Reason: Multiple CORS header &apos;Access-Control-Allow-Origin&apos; not allowed</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials">Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight">Reason: missing token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>Feature-Policy directives</summary>
+          <ol><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/autoplay">Feature-Policy: autoplay</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/autoplay$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/camera">Feature-Policy: camera</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/camera$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media">Feature-Policy: encrypted-media</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/fullscreen">Feature-Policy: fullscreen</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/fullscreen$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/geolocation">Feature-Policy: geolocation</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/geolocation$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/microphone">Feature-Policy: microphone</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/microphone$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/midi">Feature-Policy: midi</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/midi$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/payment">Feature-Policy: payment</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/payment$translate">[Translate]</a></li><li><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/vr">Feature-Policy: vr</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/vr$translate">[Translate]</a></li><li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/document-domain">document-domain</a> <a style="opacity: 0.5;" href="/zh-TW/docs/Web/HTTP/Headers/Feature-Policy/document-domain$translate">[Translate]</a></li></ol>
+        </details>
+    </li>
+  </ol>
+</section><p></p>
+
+<p>瀏覽器透過 <a href="/zh-TW/docs/Web/API/XMLHttpRequest" title="使用 XMLHttpRequest（XHR）物件與伺服器互動，你可以從 URL 擷取資料且不須刷新整個頁面。這使得網頁可以只更新其中的一部分而不中斷使用者的操作。"><code>XMLHttpRequest</code></a> 或 <a href="/zh-TW/docs/Web/API/Fetch_API">Fetch API</a> 所發起的跨網域請求（cross-site request），會在寄送時使用特定的 <a href="/zh-TW/docs/Web/HTTP/Headers">HTTP 標頭</a>。同樣的，由伺服器回傳的跨網域回應（cross-site response）中也能看到特定的 HTTP 標頭。關於這些特定標頭的簡介，包括使用 JavaScript 發起請求與處理來自伺服器回應的範例以及每一個標頭的討論，<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS" class="internal">可以在 HTTP 存取控制（CORS）一文中找到</a>，並應該搭配本文一起閱讀。這篇文章包含使用 PHP 處理<strong>存取控制請求</strong>與建立<strong>存取控制回應</strong>。本文的目標讀者為伺服器端程式設計師或管理員。僅管本篇範例使用的是 PHP，但類似的概念也適用於 ASP.net、Perl、Python、Java 等等其他語言；一般來說，這些概念也能套用在任何處理 HTTP 請求及動態建立 HTTP 回應的伺服器端程式環境中。</p>
+
+<h2 id="HTTP_標頭討論">HTTP 標頭討論</h2>
+
+<p>討論到<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS" class="internal">同時涵蓋客戶端及伺服器端使用的 HTTP 標頭的文章在此</a>，建議先閱讀該篇文章。</p>
+
+<h2 id="可執行的程式碼範例">可執行的程式碼範例</h2>
+
+<p>隨後章節的 PHP 程式碼片段（以及 JavaScript 呼叫伺服器）可以在<a href="http://arunranga.com/examples/access-control/" class="external">這裡</a>取得。這些程式在實作了跨網域 <a href="/zh-TW/docs/Web/API/XMLHttpRequest" title="使用 XMLHttpRequest（XHR）物件與伺服器互動，你可以從 URL 擷取資料且不須刷新整個頁面。這使得網頁可以只更新其中的一部分而不中斷使用者的操作。"><code>XMLHttpRequest</code></a> 的瀏覽器中都可以運作。</p>
+
+<h2 id="簡單跨網域請求">簡單跨網域請求</h2>
+
+<p><a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#簡單請求" class="internal">簡單存取控制請求</a>會在以下情況下被建立發起：</p>
+
+<ul>
+ <li>一個 HTTP/1.1 <a href="/zh-TW/docs/Web/HTTP/Methods/GET"><code>GET</code></a> 或 <a href="/zh-TW/docs/Web/HTTP/Methods/POST"><code>POST</code></a> 方法送出之請求。若為 POST，則該請求之 <a href="/zh-TW/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> 標頭值須為 <code>application/x-www-form-urlencoded</code>、<code>multipart/form-data</code> 或 <code>text/plain</code> 其中之一。</li>
+ <li>HTTP 請求中沒有使用自定義的標頭（如 <code>X-Modified</code> 等等）。</li>
+</ul>
+
+<p>在此情況下，回傳回應需要考慮以下條件：</p>
+
+<ul>
+ <li>如果該資源是允許被任何人存取的（就像所有透過 GET 方法存取的 HTTP 資源），則只要回傳帶有 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a><code>: *</code> 標頭值的回應即可。<strong>除非</strong>資源需要身分驗證（credentials），如 <a href="/zh-TW/docs/Web/HTTP/Cookies">Cookies</a> 與 HTTP 認證（Authentication）資訊。</li>
+ <li>如果資源應該要限制請求者的網域（domain），<strong>或是</strong>假如資源需要身分驗證（credentials）來進行存取（或是要設定驗證）。則篩選請求的 <a href="/zh-TW/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a> 標頭就可能是必要的，或至少呼應請求者的 <code>Origin</code> 標頭值（例如 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a><code>: <a href="http://arunranga.com" class="external" rel="freelink">http://arunranga.com</a></code>）。另外，將會發送 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a><code>: true</code> 標頭，在<a href="#身分憑證請求" class="internal">下面的章節</a>會進行討論。</li>
+</ul>
+
+<p>在 HTTP 存取控制（CORS）一文的<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#簡單請求" class="internal">簡單存取控制請求</a>章節示範了客戶端與伺服器端之間標頭的交流。下面是一個處理簡單請求的 PHP 程式碼片段：</p>
+
+<pre class="brush: php">&lt;?php
+
+// 我們僅授權讓 arunranga.com 網域來存取資源
+// 因為我們認為該網域存取本 application/xml 資源是安全的
+
+if($_SERVER[&apos;HTTP_ORIGIN&apos;] == &quot;http://arunranga.com&quot;) {
+    header(&apos;Access-Control-Allow-Origin: http://arunranga.com&apos;);
+    header(&apos;Content-type: application/xml&apos;);
+    readfile(&apos;arunerDotNetResource.xml&apos;);
+} else {
+  header(&apos;Content-Type: text/html&apos;);
+  echo &quot;&lt;html&gt;&quot;;
+  echo &quot;&lt;head&gt;&quot;;
+  echo &quot;   &lt;title&gt;Another Resource&lt;/title&gt;&quot;;
+  echo &quot;&lt;/head&gt;&quot;;
+  echo &quot;&lt;body&gt;&quot;,
+       &quot;&lt;p&gt;This resource behaves two-fold:&quot;;
+  echo &quot;&lt;ul&gt;&quot;,
+         &quot;&lt;li&gt;If accessed from &lt;code&gt;http://arunranga.com&lt;/code&gt; it returns an XML document&lt;/li&gt;&quot;;
+  echo   &quot;&lt;li&gt;If accessed from any other origin including from simply typing in the URL into the browser&apos;s address bar,&quot;;
+  echo   &quot;you get this HTML document&lt;/li&gt;&quot;,
+       &quot;&lt;/ul&gt;&quot;,
+     &quot;&lt;/body&gt;&quot;,
+   &quot;&lt;/html&gt;&quot;;
+}
+?&gt;
+</pre>
+
+<p>以上的程式會檢查由瀏覽器所送出之請求的 <a href="/zh-TW/docs/Web/HTTP/Headers/Origin" title="The documentation about this has not yet been written; please consider contributing!"><code>Origin</code></a> 標頭（透過取得 $_SERVER[&apos;HTTP_ORIGIN&apos;]）是否為「<a href="http://arunranga.com" class="external" rel="freelink">http://arunranga.com</a>」。若相符，則回傳之回應中加入 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Origin" title="The documentation about this has not yet been written; please consider contributing!"><code>Access-Control-Allow-Origin</code></a><code>: <a href="http://arunranga.com" class="external" rel="freelink">http://arunranga.com</a></code> 標頭值。這個範例可以在<a href="http://arunranga.com/examples/access-control/" class="external">這裡看到執行的情形</a>。</p>
+
+<h2 id="預檢請求">預檢請求</h2>
+
+<p><a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#Preflighted_requests" class="internal">預檢存取控制請求</a>在以下情況下發起：</p>
+
+<ul>
+ <li>使用一個 <a href="/zh-TW/docs/Web/HTTP/Methods/GET"><code>GET</code></a> 或 <a href="/zh-TW/docs/Web/HTTP/Methods/POST"><code>POST</code></a> 以外的 HTTP 方法。或是在使用 <a href="/zh-TW/docs/Web/HTTP/Methods/POST"><code>POST</code></a> 方法的情況下，其 <a href="/zh-TW/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> 標頭值為 <code>application/x-www-form-urlencoded</code>、<code>multipart/form-data</code> 或 <code>text/plain</code> <strong>以外</strong>的值。例如，假設使用 <code>POST</code> 方法並包含之 <code>Content-Type</code> 標頭值為 <code>application/xml</code>，則此請求便為預檢（preflighted）請求。</li>
+ <li>一個帶有自定義 HTTP 標頭（如 <code>X-PINGARUNER</code>）的請求。</li>
+</ul>
+
+<p>在 HTTP 存取控制（CORS）一文的<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#預檢請求" class="internal">預檢存取控制請求</a>章節示範了客戶端與伺服器端之間標頭的交流。一個伺服器資源要回應預檢（preflighted）請求必須能夠進行以下的判斷：</p>
+
+<ul>
+ <li>基於 <a href="/zh-TW/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a> 的篩選，如果有的話。</li>
+ <li>回應一個 <a href="/zh-TW/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a> 請求（即預檢（preflighted）請求），包含寄送必要的 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a>、<a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a> 標頭值（假如有任何應用程式運作所需要的額外標頭），以及若是此資源要求身分驗證，則需要包含 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a> 標頭。</li>
+ <li>回應實際（actual）請求，包含處理 <code>POST</code> 請求的資料等等。</li>
+</ul>
+
+<p>下面是一個使用 PHP 實作之處理<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#預檢請求" class="internal">預檢請求</a>的範例：</p>
+
+<pre class="brush: php">&lt;?php
+
+if($_SERVER[&apos;REQUEST_METHOD&apos;] == &quot;GET&quot;) {
+
+  header(&apos;Content-Type: text/plain&apos;);
+  echo &quot;This HTTP resource is designed to handle POSTed XML input&quot;;
+  echo &quot;from arunranga.com and not be retrieved with GET&quot;;
+
+} elseif($_SERVER[&apos;REQUEST_METHOD&apos;] == &quot;OPTIONS&quot;) {
+  // 告訴客戶端我們支援來自 arunranga.com 的呼叫
+  // 以及這個預檢請求的有效期限僅有 20 天
+
+  if($_SERVER[&apos;HTTP_ORIGIN&apos;] == &quot;http://arunranga.com&quot;) {
+    header(&apos;Access-Control-Allow-Origin: http://arunranga.com&apos;);
+    header(&apos;Access-Control-Allow-Methods: POST, GET, OPTIONS&apos;);
+    header(&apos;Access-Control-Allow-Headers: X-PINGARUNER&apos;);
+    header(&apos;Access-Control-Max-Age: 1728000&apos;);
+    header(&quot;Content-Length: 0&quot;);
+    header(&quot;Content-Type: text/plain&quot;);
+    //exit(0);
+  } else {
+    header(&quot;HTTP/1.1 403 Access Forbidden&quot;);
+    header(&quot;Content-Type: text/plain&quot;);
+    echo &quot;You cannot repeat this request&quot;;
+  }
+
+} elseif($_SERVER[&apos;REQUEST_METHOD&apos;] == &quot;POST&quot;) {
+  // 處理 POST 請求，第一步為取得 POST 請求中 blob 型態的 XML
+  // 並且對其做一些處理，再傳送結果給客戶端
+
+  if($_SERVER[&apos;HTTP_ORIGIN&apos;] == &quot;http://arunranga.com&quot;) {
+    $postData = file_get_contents(&apos;php://input&apos;);
+    $document = simplexml_load_string($postData);
+
+    // 對 POST 請求的資料做一些處理
+
+    $ping = $_SERVER[&apos;HTTP_X_PINGARUNER&apos;];
+
+    header(&apos;Access-Control-Allow-Origin: http://arunranga.com&apos;);
+    header(&apos;Content-Type: text/plain&apos;);
+    echo // 在處理之後要回傳的一些回應字串
+  } else {
+    die(&quot;POSTing Only Allowed from arunranga.com&quot;);
+  }
+} else {
+    die(&quot;No Other Methods Allowed&quot;);
+}
+?&gt;
+</pre>
+
+<p>注意範例中在回應 <a href="/zh-TW/docs/Web/HTTP/Methods/OPTIONS" title="The documentation about this has not yet been written; please consider contributing!"><code>OPTIONS</code></a> 預檢（preflighted）請求與回應 <a href="/zh-TW/docs/Web/HTTP/Methods/POST" title="The documentation about this has not yet been written; please consider contributing!"><code>POST</code></a> 請求時都會回傳相對應的 HTTP 標頭值，因此一個伺服器資源可以處理預檢以及實際（actual）請求。在回應 <code>OPTIONS</code> 預檢請求之回應標頭中，伺服器告知客戶端可以使用 <code>POST</code> 方法發送實際（actual）請求，並且能於實際（actual）請求的 HTTP 標頭欄位中帶上 <code>X-PINGARUNER</code> 及其值。這個範例可以在<a href="http://arunranga.com/examples/access-control/" class="external">這裡看到執行的情形</a>。</p>
+
+<h2 id="身分驗證請求">身分驗證請求</h2>
+
+<p><a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#附帶身分憑證的請求" class="internal">身分驗證存取控制請求</a>——即請求可以附帶 <a href="/zh-TW/docs/Web/HTTP/Cookies">Cookies</a> 或 HTTP 認證（Authentication）訊息（並期望回應攜帶 Cookies）——可以是<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#簡單請求" class="internal">簡單</a>或<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#預檢" class="internal">預檢請求</a>，根據請求使用之 HTTP 方法而定。</p>
+
+<p>於<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#簡單請求" class="internal">簡單請求</a>情境中，請求將會連同 Cookies 一起發送（例如當 <code><a href="/zh-TW/docs/Web/API/XMLHttpRequest/withCredentials">withCredentials</a></code> 旗標被設置於 <a href="/zh-TW/docs/Web/API/XMLHttpRequest" title="使用 XMLHttpRequest（XHR）物件與伺服器互動，你可以從 URL 擷取資料且不須刷新整個頁面。這使得網頁可以只更新其中的一部分而不中斷使用者的操作。"><code>XMLHttpRequest</code></a> 時）。假如伺服器以附帶了 <a href="/zh-TW/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials" title="The documentation about this has not yet been written; please consider contributing!"><code>Access-Control-Allow-Credentials</code></a><code>: true</code> 標頭值的身分驗證回應來回傳，則回應會被客戶端接受並且可被用於網頁內容中。在<a href="/zh-TW/docs/Web/HTTP/Access_control_CORS#預檢請求" class="internal">預檢請求</a>中，伺服器可以用 <code>Access-Control-Allow-Credentials: true</code> 標頭來回應 <code>OPTIONS</code> 預檢請求。</p>
+
+<p>以下為一些處理身分驗證請求的 PHP 程式片段：</p>
+
+<pre class="brush: php">&lt;?php
+
+if($_SERVER[&apos;REQUEST_METHOD&apos;] == &quot;GET&quot;) {
+  header(&apos;Access-Control-Allow-Origin: http://arunranga.com&apos;);
+  header(&apos;Access-Control-Allow-Credentials: true&apos;);
+  header(&apos;Cache-Control: no-cache&apos;);
+  header(&apos;Pragma: no-cache&apos;);
+  header(&apos;Content-Type: text/plain&apos;);
+
+  // 檢查有沒有 Cookie，若沒有則當作是第一次訪問
+  if (!isset($_COOKIE[&quot;pageAccess&quot;])) {
+    setcookie(&quot;pageAccess&quot;, 1, time()+2592000);
+    echo &apos;I do not know you or anyone like you so I am going to&apos;;
+    echo &apos;mark you with a Cookie :-)&apos;;
+  } else {
+    $accesses = $_COOKIE[&apos;pageAccess&apos;];
+    setcookie(&apos;pageAccess&apos;, ++$accesses, time()+2592000);
+    echo &apos;Hello -- I know you or something a lot like you!&apos;;
+    echo &apos;You have been to &apos;, $_SERVER[&apos;SERVER_NAME&apos;], &apos;;
+    echo &apos;at least &apos;, $accesses-1, &apos; time(s) before!&apos;;
+  }
+} elseif($_SERVER[&apos;REQUEST_METHOD&apos;] == &quot;OPTIONS&quot;) {
+  // 告訴客戶端這個預檢請求的有效期限僅有 20 天
+  if($_SERVER[&apos;HTTP_ORIGIN&apos;] == &quot;http://arunranga.com&quot;) {
+    header(&apos;Access-Control-Allow-Origin: http://arunranga.com&apos;);
+    header(&apos;Access-Control-Allow-Methods: GET, OPTIONS&apos;);
+    header(&apos;Access-Control-Allow-Credentials: true&apos;);
+    header(&apos;Access-Control-Max-Age: 1728000&apos;);
+    header(&quot;Content-Length: 0&quot;);
+    header(&quot;Content-Type: text/plain&quot;);
+  } else {
+    header(&quot;HTTP/1.1 403 Access Forbidden&quot;);
+    header(&quot;Content-Type: text/plain&quot;);
+    echo &quot;You cannot repeat this request&quot;;
+  }
+} else {
+  die(&quot;This HTTP Resource can ONLY be accessed with GET or OPTIONS&quot;);
+}
+?&gt;
+</pre>
+
+<p>注意此範例中的身分驗證請求，其中的 <code>Access-Control-Allow-Origin:</code> 標頭值<strong>不得</strong>是萬用字元（wildcard）「*」。此標頭值<strong>必須</strong>為一個有效的的來源網域（origin domain）。以上的範例可以在<a href="http://arunranga.com/examples/access-control/" class="external">這裡看到執行的情形</a>。</p>
+
+<h2 id="Apache_範例">Apache 範例</h2>
+
+<h3 id="限制存取某些_URI">限制存取某些 URI</h3>
+
+<p>一個實用的訣竅是使用 Apache rewrite 環境變數（environment variable），並且讓 HTTP 標頭套用 <code>Access-Control-Allow-*</code> 至某些 URI。這相當有用，例如要限制跨來源（cross-origin）請求 <code>GET /api(.*).json</code> 為不帶身分驗證的請求：</p>
+
+<pre>RewriteRule ^/api(.*)\.json$ /api$1.json [CORS=True]
+Header set Access-Control-Allow-Origin &quot;*&quot; env=CORS
+Header set Access-Control-Allow-Methods &quot;GET&quot; env=CORS
+Header set Access-Control-Allow-Credentials &quot;false&quot; env=CORS
+</pre>
+
+<h2 id="參見">參見</h2>
+
+<ul>
+ <li><a href="http://arunranga.com/examples/access-control/" class="external">Examples of Access Control in Action</a></li>
+ <li><a href="https://github.com/jackblackevo/cors-jsonp-sample">Client-Side &amp; Server-Side (Java) sample for Cross-Origin Resource Sharing (CORS)</a></li>
+ <li><a href="/en-US/docs/Web/HTTP/Access_control_CORS" class="internal">HTTP Access Control covering the HTTP headers</a></li>
+ <li><a href="/zh-TW/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="/en-US/docs/Web/API/Fetch_API">Fetch API</a></li>
+</ul>
