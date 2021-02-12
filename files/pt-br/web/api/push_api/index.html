@@ -1,0 +1,186 @@
+---
+title: API Push
+slug: Web/API/Push_API
+tags:
+  - API
+  - Experimental
+  - Notificações
+  - Push
+  - Referencia
+  - Service Workers
+translation_of: Web/API/Push_API
+original_slug: Web/API/API_Push
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/pt-BR/docs/Web/API/Push_API">Push API</a></strong></li><li class="toggle"><details open><summary>Guias</summary><ol><li><a href="/pt-BR/docs/Web/API/Push_API/Best_Practices">Web Push API Notifications Best Practices</a> <a style="opacity: 0.5;" href="/pt-BR/docs/Web/API/Push_API/Best_Practices$translate">[Traduzir]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/pt-BR/docs/Web/API/PushManager"><code>PushManager</code></a></li><li><a href="/pt-BR/docs/Web/API/PushSubscription"><code>PushSubscription</code></a></li><li><a href="/pt-BR/docs/Web/API/PushEvent"><code>PushEvent</code></a></li><li><a href="/pt-BR/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriedades</summary><ol><li><a href="/pt-BR/docs/Web/API/ServiceWorkerRegistration/pushManager"><code>ServiceWorkerRegistration.pushManager</code></a></li><li><a href="/pt-BR/docs/Web/API/ServiceWorkerGlobalScope/onpush"><code>ServiceWorkerGlobalScope.onpush</code></a></li><li><a href="/pt-BR/docs/Web/API/ServiceWorkerGlobalScope/onpushsubscriptionchange"><code>ServiceWorkerGlobalScope.onpushsubscriptionchange</code></a></li></ol></details></li><li class="toggle"><details open><summary>Eventos</summary><ol><li><a href="/pt-BR/docs/Web/Events/push"><code>push</code></a></li><li><a href="/pt-BR/docs/Web/Events/pushsubscriptionchange"><code>pushsubscriptionchange</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span> <strong>Esta é uma <a href="/pt-BR/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">tecnologia experimental</a></strong><br>Verifique a <a href="#Compatibilidade_de_navegadores">tabela de compatibilidade entre Navegadores</a> cuidadosamente antes de usar essa funcionalidade em produção.</p>
+</div></div>
+
+<p>A <strong>API Push </strong>torna possível que aplicações web recebam mensagens enviadas a elas de um servidor, indepententemente de aplicação estar ou não em primeiro plano, ou até mesmo carregada, em um agente de usuário. Isso permite que desenvolvedores entreguem notificações e atualizações assíncronas a usuários que optarem por elas, resultando num melhor engajamento com conteúdo novo oportuno.</p>
+
+<div class="note notecard">
+<p><strong>Nota</strong>: Esta documentação cobre a especificação W3C da API Push; se você procura pela documentação do sistema de notificação proprietária do mecanismo push, veja<a href="/en-US/docs/Web/API/Simple_Push_API"> Simple Push</a>.</p>
+</div>
+
+<h2 id="Conceitos_e_uso_de_Push">Conceitos e uso de Push</h2>
+
+<p>Para uma aplicação receber mensagens push, ela precisa ter um <a href="/en-US/docs/Web/API/ServiceWorker_API">service worker</a> ativo. Quando o service worker está ativo, ele pode se inscrever para utilizar notificações push <a href="/pt-BR/docs/Web/API/PushManager/subscribe" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushManager.subscribe()</code></a>.</p>
+
+<p>O resultado de <a href="/pt-BR/docs/Web/API/PushSubscription" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushSubscription</code></a> inclui toda informação que a aplicação precisa para receber uma mensagem push: um endpoint e a chave encriptada necessária para o envio de dados.</p>
+
+<p>O service worker será iniciado conforme o necessário para lidar com as mensagens recebidas, que são entregues ao manipulador de evento <a href="/pt-BR/docs/Web/API/ServiceWorkerGlobalScope/onpush" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorkerGlobalScope.onpush</code></a> . Isto permite que a aplicação reaja a cada mensagem recebida, por exemplo para exibir a notificação ao usuário (usando <a href="/pt-BR/docs/Web/API/ServiceWorkerRegistration/showNotification" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorkerRegistration.showNotification()</code></a>.)</p>
+
+<p>Cada assinatura é única para um service worker.  O endpoint para a assinatura é uma <a href="http://www.w3.org/TR/capability-urls/">capability URL</a> única: o conhecimento do endpoint é tudo que é necessário para enviar uma mensagem para sua aplicação. A URL do endpoint precisa ser mantida em segredo, ou outras aplicações estranhas poderão enviar mensagens push para a sua aplicação.</p>
+
+<p>A ativação de um service worker para entregar mensagens push pode resultar em um aumento de uso de recursos, particularmente de bateria. Diferentes navegadores tem diferentes formas para lidar com isso — atualmente não existe uma forma padrão. Firefox permite um número limitado (cota) de mensagens push para serem enviadas para uma aplicação, embora as mensagens Push que gerem notificações são isentas deste limite.  O limite é atualizado a cada site visitado. Numa comparação, Chrome não aplica nenhum limite, mas requer que cada mensagem push exiba uma notificação.</p>
+
+<div class="note notecard">
+<p><strong>Nota</strong>: A partir do Gecko 44, a cota permitida de mensagens push por aplicação não é incrementada quando uma nova notificação é disparada quando outra está visível, por um período de três segundos. Isso lida com casos em que várias notificações são recebidas ao mesmo tempo, mas nem todas estão visíveis.</p>
+</div>
+
+<div class="note notecard">
+<p><strong>Nota</strong>: Chrome atualmente requer que você crie um projeto no <a href="https://developers.google.com/cloud-messaging/">Google Cloud Messaging</a> para enviar mensagens push e use um número do projeto e chave da API para o envio de notificações push. Isto também requer um <em>app manifest</em> com alguns parâmetros especiais para usar o serviço. Essa restrição deverá ser removida no futuro.</p>
+</div>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/PushEvent" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushEvent</code></a></dt>
+ <dd>Representa uma ação push enviada para o <a href="/en-US/docs/Web/API/ServiceWorkerGlobalScope">global scope</a> de um <a href="/pt-BR/docs/Web/API/ServiceWorker" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorker</code></a>. Ele contém informações enviadas de uma aplicação para um <a href="/pt-BR/docs/Web/API/PushSubscription" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushSubscription</code></a>.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/PushManager" title="A PushManagerinterface da API Push fornece uma maneira de receber notificações de servidores de terceiros, bem como solicitar URLs para notificações push."><code>PushManager</code></a></dt>
+ <dd>Fornece uma forma de receber notificações de servidor third-party bem como solicitar URL para notificações push. Essa interface substitui a funcionalidade oferecida que está obsoleta <a href="/pt-BR/docs/Web/API/PushRegistrationManager" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushRegistrationManager</code></a> interface.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/PushMessageData" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushMessageData</code></a></dt>
+ <dd>Fornece acesso aos dados push enviados por um servidor, e inclui métodos para manipular os dados recebidos.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/PushSubscription" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>PushSubscription</code></a></dt>
+ <dd>Fornece a URL de assinatura do endpoint e permite o cancelamento da assinatura de um serviço push.</dd>
+</dl>
+
+<h2 id="Service_worker_additions">Service worker additions</h2>
+
+<p>As seguintes informações adicionais para a <a href="/en-US/docs/Web/API/Service_Worker_API">Service Worker API</a> foram especificadas na Push API spec, para fornecer um ponto de entrada para usar mensagens Push, e para monitorar e responder os eventos de envio e assinatura.</p>
+
+<dl>
+ <dt><a href="/pt-BR/docs/Web/API/ServiceWorkerRegistration/pushManager" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorkerRegistration.pushManager</code></a> <span class="readOnly readOnlyInline notecard inline" title="Este valor não pode ser alterado.">Somente leitura </span></dt>
+ <dd>Retorna uma referência para a interface <a href="/pt-BR/docs/Web/API/PushManager" title="A PushManagerinterface da API Push fornece uma maneira de receber notificações de servidores de terceiros, bem como solicitar URLs para notificações push."><code>PushManager</code></a> para administrar assinaturas push incluindo subscrever, obter uma assinatura ativa e acessar o status de permissão de envio. Este é o ponto de entrada para usar mensagens Push.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ServiceWorkerGlobalScope/onpush" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorkerGlobalScope.onpush</code></a></dt>
+ <dd>Um manipulador de eventos disparado sempre que um evento  <code><a href="/pt-BR/docs/Web/Reference/Events/push" title="/pt-BR/docs/Web/Reference/Events/push">push</a></code> ocorre; isto é, sempre que uma mensagem do servidor de envio for recebida.</dd>
+ <dt><a href="/pt-BR/docs/Web/API/ServiceWorkerGlobalScope/onpushsubscriptionchange" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>ServiceWorkerGlobalScope.onpushsubscriptionchange</code></a></dt>
+ <dd>Um manipulador de eventos disparado sempre que um evento  <code><a href="/pt-BR/docs/Web/Reference/Events/pushsubscriptionchange" title="/pt-BR/docs/Web/Reference/Events/pushsubscriptionchange">pushsubscriptionchange</a></code> ocorre; por exemplo, quando uma assinatura push está inválida, ou está prestes a ser invalidada (ex. quando um serviço push service define um tempo de expiração.)</dd>
+</dl>
+
+<h2 id="Especificações">Especificações</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Especificação</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comentário</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://w3c.github.io/push-api/" class="external" hreflang="en">Push API</a></td>
+   <td><span class="spec-WD">Rascunho atual</span></td>
+   <td>Definição Inicial</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidade_em_Browsers">Compatibilidade em Browsers</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Estamos convertendo nossos dados de compatibilidade para o formato JSON</a></strong>.
+            Esta tabela de compatibilidade ainda usa o formato antigo,
+            pois ainda não convertemos os dados que ela contém.
+            <strong><a href="/pt-BR/docs/MDN/Contribute/Structures/Compatibility_tables">Descubra como você pode ajudar!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Dispositivo móvel</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Funcionalidade</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Suporte básico</td>
+   <td>42.0</td>
+   <td><a href="/en-US/Firefox/Releases/44">44.0</a> (44.0)<sup>[1]</sup></td>
+   <td><span style="color: #f00;">Não suportado</span><sup>[2]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><a href="/pt-BR/docs/Web/API/PushEvent/data"><code>PushEvent.data</code></a>,<br>
+    <a href="/pt-BR/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><a href="/en-US/Firefox/Releases/44">44.0</a> (44.0)</td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Funcionalidade</th>
+   <th>Android</th>
+   <th>Android Webview</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Suporte básico</td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span><sup>[2]</sup></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>42.0</td>
+  </tr>
+  <tr>
+   <td><a href="/pt-BR/docs/Web/API/PushEvent/data"><code>PushEvent.data</code></a>,<br>
+    <a href="/pt-BR/docs/Web/API/PushMessageData"><code>PushMessageData</code></a></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+   <td><span style="color: #f00;">Não suportado</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<p>[1] Atualmente disponível apenas nas versões desktop do Firefox; ainda, mensagens push são encaminhadas apenas quando o Firefox está em execução.</p>
+
+<p>[2] Ainda não implementado. Veja <a href="https://dev.modern.ie/platform/status/pushapi/">Microsoft Edge status information</a>.</p>
+
+<h2 id="Veja_também">Veja também</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/Push_API/Using_the_Push_API">Usando Push API</a></li>
+ <li><a href="https://github.com/chrisdavidmills/push-api-demo">Push API Demo</a>, no Github</li>
+ <li><a href="http://updates.html5rocks.com/2015/03/push-notificatons-on-the-open-web">Push Notifications on the Open Web</a>, Matt Gaunt</li>
+ <li><a href="/en-US/docs/Web/API/Service_Worker_API">Service Worker API</a></li>
+</ul>

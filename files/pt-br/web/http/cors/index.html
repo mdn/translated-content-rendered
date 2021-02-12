@@ -1,0 +1,650 @@
+---
+title: Cross-Origin Resource Sharing (CORS)
+slug: Web/HTTP/CORS
+tags:
+  - AJAX
+  - CORS
+  - HTTP
+  - XMLHttpRequest
+translation_of: Web/HTTP/CORS
+original_slug: Web/HTTP/Controle_Acesso_CORS
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li><a href="/pt-BR/docs/Web/HTTP"><strong><em>HTTP</em></strong></a></li>
+    <li><strong>Guides:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>Resources and URIs</summary>
+            <ol>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web">Identifying resources on the Web</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Data URIs</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/MIME_Types">Introduction to MIME Types</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">Complete list of MIME Types</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs">Choosing between www and non-www URLs</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP guide</summary>
+            <ol>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP">Basics of HTTP</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Overview">Overview of HTTP</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP">Evolution of HTTP</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Messages">HTTP Messages</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Session">A typical HTTP session</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Connection_management_in_HTTP_1.x">Connection management in HTTP/1.x</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Protocol_upgrade_mechanism">Protocol upgrade mechanism</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP security</summary>
+            <ol>
+                <li><a href="/pt-BR/docs/Web/HTTP/CSP">Content Security Policy (CSP)</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Public_Key_Pinning">HTTP Public Key Pinning (HPKP)</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Headers/Strict-Transport-Security">HTTP Strict Transport Security (HSTS)</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies">Cookie security</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+                <li><a href="/pt-BR/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+                <li><a href="https://wiki.mozilla.org/Security/Guidelines/Web_Security">Mozilla web security guidelines</a></li>
+                <li><a href="https://observatory.mozilla.org/">Mozilla Observatory</a></li>
+            </ol>
+        </details>
+    </li>
+
+    <li><a href="/pt-BR/docs/Web/HTTP/CORS">HTTP access control (CORS)</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Authentication">HTTP authentication</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Caching">HTTP caching</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Compression">HTTP compression</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Conditional_requests">HTTP conditional requests</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Content_negotiation">HTTP content negotiation</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Cookies">HTTP cookies</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Range_requests">HTTP range requests</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Redirections">HTTP redirects</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Resources_and_specifications">HTTP specifications</a></li>
+    <li><a href="/pt-BR/docs/Web/HTTP/Feature_Policy">Feature policy</a></li>
+    <li><strong>References:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP headers</summary>
+            <ol><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-CH"><code>Accept-CH</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-CH-Lifetime"><code>Accept-CH-Lifetime</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Charset"><code>Accept-Charset</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Encoding"><code>Accept-Encoding</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Patch"><code>Accept-Patch</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Ranges"><code>Accept-Ranges</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Expose-Headers"><code>Access-Control-Expose-Headers</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Max-Age"><code>Access-Control-Max-Age</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Headers"><code>Access-Control-Request-Headers</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Method"><code>Access-Control-Request-Method</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Age"><code>Age</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Allow"><code>Allow</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Alt-Svc"><code>Alt-Svc</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Authorization"><code>Authorization</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Clear-Site-Data"><code>Clear-Site-Data</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Conex%C3%A3o"><code>Connection</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Disposition"><code>Content-Disposition</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Encoding"><code>Content-Encoding</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Length"><code>Content-Length</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Range"><code>Content-Range</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy"><code>Content-Security-Policy</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only"><code>Content-Security-Policy-Report-Only</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Cookie2"><code>Cookie2</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy"><code>Cross-Origin-Embedder-Policy</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy"><code>Cross-Origin-Opener-Policy</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy"><code>Cross-Origin-Resource-Policy</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/DNT"><code>DNT</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/DPR"><code>DPR</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Date"><code>Date</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Device-Memory"><code>Device-Memory</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Digest"><code>Digest</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/ETag"><code>ETag</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Early-Data"><code>Early-Data</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Expect"><code>Expect</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Expect-CT"><code>Expect-CT</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Expires"><code>Expires</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy"><code>Feature-Policy</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Forwarded"><code>Forwarded</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/From"><code>From</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Host"><code>Host</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/If-Match"><code>If-Match</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/If-Modified-Since"><code>If-Modified-Since</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/If-None-Match"><code>If-None-Match</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/If-Range"><code>If-Range</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/If-Unmodified-Since"><code>If-Unmodified-Since</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Index"><code>Index</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Index$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Keep-Alive"><code>Keep-Alive</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Large-Allocation"><code>Large-Allocation</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Last-Modified"><code>Last-Modified</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Link"><code>Link</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Localiza%C3%A7%C3%A3o"><code>Location</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/NEL"><code>NEL</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Pragma"><code>Pragma</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Proxy-Authenticate"><code>Proxy-Authenticate</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Proxy-Authorization"><code>Proxy-Authorization</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Public-Key-Pins"><code>Public-Key-Pins</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This deprecated API should no longer be used, but will probably still work."><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only"><code>Public-Key-Pins-Report-Only</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Range"><code>Range</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Referer"><code>Referer</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Referrer-Policy"><code>Referrer-Policy</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Retry-After"><code>Retry-After</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Save-Data"><code>Save-Data</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-Dest"><code>Sec-Fetch-Dest</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-Dest$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-Mode"><code>Sec-Fetch-Mode</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-Mode$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-Site"><code>Sec-Fetch-Site</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-User"><code>Sec-Fetch-User</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Sec-Fetch-User$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Sec-WebSocket-Accept"><code>Sec-WebSocket-Accept</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Sec-WebSocket-Accept$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Server"><code>Server</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Server-Timing"><code>Server-Timing</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Set-Cookie2"><code>Set-Cookie2</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/SourceMap"><code>SourceMap</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Strict-Transport-Security"><code>Strict-Transport-Security</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/TE"><code>TE</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Timing-Allow-Origin"><code>Timing-Allow-Origin</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Tk"><code>Tk</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Trailer"><code>Trailer</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Transfer-Encoding"><code>Transfer-Encoding</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests"><code>Upgrade-Insecure-Requests</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/User-Agent"><code>User-Agent</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Vary"><code>Vary</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Via"><code>Via</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/WWW-Authenticate"><code>WWW-Authenticate</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Want-Digest"><code>Want-Digest</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Warning"><code>Warning</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/X-Content-Type-Options"><code>X-Content-Type-Options</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control"><code>X-DNS-Prefetch-Control</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/X-Forwarded-For"><code>X-Forwarded-For</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/X-Forwarded-Host"><code>X-Forwarded-Host</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/X-Forwarded-Proto"><code>X-Forwarded-Proto</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/X-Frame-Options"><code>X-Frame-Options</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/X-XSS-Protection"><code>X-XSS-Protection</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP request methods</summary>
+            <ol><li><a href="/pt-BR/docs/Web/HTTP/Methods/CONNECT"><code>CONNECT</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/GET"><code>GET</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/POST"><code>POST</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>HTTP response status codes</summary>
+          <ol><li><a href="/pt-BR/docs/Web/HTTP/Status/100"><code>100 Continue</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/101"><code>101 Switching Protocols</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/103"><code>103 Early Hints</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/200"><code>200 OK</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/201"><code>201 Created</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/202"><code>202 Accepted</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/203"><code>203 Non-Authoritative Information</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/204"><code>204 No Content</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/205"><code>205 Reset Content</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/206"><code>206 Partial Content</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/300"><code>300 Multiple Choices</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/301"><code>301 Moved Permanently</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/302"><code>302 Found</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/303"><code>303 See Other</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/304"><code>304 Not Modified</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/307"><code>307 Redirecionamento temporário</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/308"><code>308 Permanent Redirect</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/400"><code>400 Bad Request</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/401"><code>401 Unauthorized</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/402"><code>402 Payment Required</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/403"><code>403 Forbidden</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/404"><code>404 Not Found</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/405"><code>405 Method Not Allowed</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/406"><code>406 Not Acceptable</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/407"><code>407 Proxy Authentication Required</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/408"><code>408 Request Timeout</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/409"><code>409 Conflict</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/410"><code>410 Gone</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/411"><code>411 Length Required</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/412"><code>412 Precondition Failed</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/413"><code>413 Payload Too Large</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/414"><code>414 URI Too Long</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/415"><code>415 Unsupported Media Type</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/416"><code>416 Range Not Satisfiable</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/417"><code>417 Expectation Failed</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/418"><code>418 I&apos;m a teapot</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/422"><code>422 Unprocessable Entity</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/425"><code>425 Too Early</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/426"><code>426 Upgrade Required</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/428"><code>428 Precondition Required</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/429"><code>429 Too Many Requests</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/431"><code>431 Request Header Fields Too Large</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/451"><code>451 Unavailable For Legal Reasons</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/500"><code>500 Internal Server Error</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/501"><code>501 Not Implemented</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/502"><code>502 Bad Gateway</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/503"><code>503 Service Unavailable</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/504"><code>504 Gateway Timeout</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/505"><code>505 HTTP Version Not Supported</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/506"><code>506 Variant Also Negotiates</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/507"><code>507 Insufficient Storage</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/508"><code>508 Loop Detected</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/510"><code>510 Not Extended</code></a></li><li><a href="/pt-BR/docs/Web/HTTP/Status/511"><code>511 Network Authentication Required</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CSP directives</summary>
+          <ol><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri"><code>CSP: base-uri</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content"><code>CSP: block-all-mixed-content</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/child-src"><code>CSP: child-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/child-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src"><code>CSP: connect-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/default-src"><code>CSP: default-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/default-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/font-src"><code>CSP: font-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/font-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/form-action"><code>CSP: form-action</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/form-action$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors"><code>CSP: frame-ancestors</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src"><code>CSP: frame-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/img-src"><code>CSP: img-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/img-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src"><code>CSP: manifest-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/media-src"><code>CSP: media-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/media-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/navigate-to"><code>CSP: navigate-to</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/navigate-to$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/object-src"><code>CSP: object-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/object-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types"><code>CSP: plugin-types</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/prefetch-src"><code>CSP: prefetch-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/prefetch-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/referrer"><code>CSP: referrer</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/referrer$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/report-to"><code>CSP: report-to</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/report-to$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri"><code>CSP: report-uri</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for"><code>CSP: require-sri-for</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox"><code>CSP: sandbox</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"><code>CSP: script-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-attr"><code>CSP: script-src-attr</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-attr$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-elem"><code>CSP: script-src-elem</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-elem$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src"><code>CSP: style-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-attr"><code>CSP: style-src-attr</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-attr$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-elem"><code>CSP: style-src-elem</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-elem$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/trusted-types"><code>CSP: trusted-types</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/trusted-types$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests"><code>CSP: upgrade-insecure-requests</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src"><code>CSP: worker-src</code></a> <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src$translate" style="opacity: 0.5;">[Traduzir]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CORS errors</summary>
+          <ol><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSDisabled">Reason: CORS disabled</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSDisabled$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; does not match &apos;xyz&apos;</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; missing</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded">Reason: CORS header ‘Origin’ cannot be added</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed">Reason: CORS preflight channel did not succeed</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSDidNotSucceed">Razão: A requisição CORS não foi bem sucedida</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed">Reason: CORS request external redirect not allowed</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp">Reason: CORS request not HTTP</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials">Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound">Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed">Reason: Multiple CORS header &apos;Access-Control-Allow-Origin&apos; not allowed</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials">Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Methods’</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight">Reason: missing token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel</a> <a href="/pt-BR/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight$translate" style="opacity: 0.5;">[Traduzir]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>Feature-Policy directives</summary>
+          <ol><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/accelerometer">Feature-Policy: accelerometer</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/accelerometer$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/ambient-light-sensor">Feature-Policy: ambient-light-sensor</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/ambient-light-sensor$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/autoplay">Feature-Policy: autoplay</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/autoplay$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/battery">Feature-Policy: battery</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/battery$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/camera">Feature-Policy: camera</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/camera$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/display-capture">Feature-Policy: display-capture</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/display-capture$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/document-domain">Feature-Policy: document-domain</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/document-domain$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media">Feature-Policy: encrypted-media</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/fullscreen">Feature-Policy: fullscreen</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/fullscreen$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/geolocation">Feature-Policy: geolocation</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/geolocation$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/gyroscope">Feature-Policy: gyroscope</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/gyroscope$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/layout-animations">Feature-Policy: layout-animations</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/layout-animations$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/legacy-image-formats">Feature-Policy: legacy-image-formats</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/legacy-image-formats$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/magnetometer">Feature-Policy: magnetometer</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/magnetometer$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/microphone">Feature-Policy: microphone</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/microphone$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/midi">Feature-Policy: midi</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/midi$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/oversized-images">Feature-Policy: oversized-images</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/oversized-images$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/payment">Feature-Policy: payment</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/payment$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/picture-in-picture">Feature-Policy: picture-in-picture</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/picture-in-picture$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/publickey-credentials-get">Feature-Policy: publickey-credentials-get</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/publickey-credentials-get$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/screen-wake-lock">Feature-Policy: screen-wake-lock</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/screen-wake-lock$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/sync-xhr">Feature-Policy: sync-xhr</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/sync-xhr$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/unoptimized-images">Feature-Policy: unoptimized-images</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/unoptimized-images$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/unsized-media">Feature-Policy: unsized-media</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/unsized-media$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/usb">Feature-Policy: usb</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/usb$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/vibrate">Feature-Policy: vibrate</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/vibrate$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/vr">Feature-Policy: vr</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/vr$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/wake-lock">Feature-Policy: wake-lock</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/wake-lock$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/xr">Feature-Policy: xr</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/xr$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/xr-spatial-tracking">Feature-Policy: xr-spatial-tracking</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/xr-spatial-tracking$translate" style="opacity: 0.5;">[Traduzir]</a></li><li><a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/web-share">web-share</a> <a href="/pt-BR/docs/Web/HTTP/Headers/Feature-Policy/web-share$translate" style="opacity: 0.5;">[Traduzir]</a></li></ol>
+        </details>
+    </li>
+  </ol>
+</section></div>
+
+<p><a href="/pt-BR/docs/Glossario/CORS">CORS</a> - Cross-Origin Resource Sharing (Compartilhamento de recursos com origens diferentes) é um mecanismo que usa cabeçalhos adicionais <a href="/pt-BR/docs/Glossario/HTTP">HTTP</a> para informar a um navegador que permita que um aplicativo Web seja executado em uma origem (domínio) com permissão para acessar recursos selecionados de um servidor em uma origem distinta. Um aplicativo Web executa uma <strong>requisição <em>cross-origin</em> HTTP </strong>ao solicitar um recurso que tenha uma origem diferente (domínio, protocolo e porta) da sua própria origem.</p>
+
+<p>Um exemplo de requisição <em>cross-origin</em>: o código JavaScript <em>frontend </em>de um aplicativo web disponível em <code>http://domain-a.com</code> usa <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> para fazer uma requisição para <code>http://api.domain-b.com/data.json</code>.</p>
+
+<p>Por motivos de segurança, navegadores restringem requisições <em>cross-origin</em> HTTP iniciadas por scripts. Por exemplo, <code>XMLHttpRequest</code> e <a href="/pt-BR/docs/Web/API/Fetch_API">Fetch API</a> seguem a <a href="/en-US/docs/Web/Security/Same-origin_policy">política de mesma origem</a> (<em>same-origin policy</em>). Isso significa que um aplicativo web que faz uso dessas APIs só poderá fazer solicitações para recursos de mesma origem da qual o aplicativo foi carregado, a menos que a resposta da outra origem inclua os cabeçalhos CORS corretos.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/14295/CORS_principle.png" style="height: 305px; width: 440px;"></p>
+
+<p>O mecânismo CORS suporta requisições seguras do tipo <em>cross-origin e </em>transferências de dados entre navegadores e servidores web. Navegadores modernos usam o CORS em uma API contêiner, como <code>XMLHttpRequest</code> ou <a href="/pt-BR/docs/Web/API/Fetch_API">Fetch</a>, para ajudar a reduzir os riscos de requisições <em>cross-origin</em> HTTP.</p>
+
+<h2 id="Quem_deve_ler_este_artigo">Quem deve ler este artigo?</h2>
+
+<p>Todos, realmente.</p>
+
+<p>Este artigo destina-se a administradores da Web, desenvolvedores de servidores e desenvolvedores front-end. Os navegadores modernos lidam com os componentes do lado cliente em compartilhamento entre origens, incluindo cabeçalhos e aplicação de políticas. Mas esse novo padrão significa que os servidores precisam lidar com novos cabeçalhos de requisição e resposta. Outro artigo para desenvolvedores de servidores que discutem <a href="en-US/docs/Web/HTTP/Server-Side_Access_Control">compartilhamento <em>cross-origin</em> a partir de uma perspectiva de servidor (com fragmentos de código PHP)</a>, pode ser uma leitura complementar.</p>
+
+<h2 id="Quais_solicitações_usam_o_CORS">Quais solicitações usam o CORS?</h2>
+
+<p>Esse <a href="https://fetch.spec.whatwg.org/#http-cors-protocol">padrão de compartilhamento <em>cross-origin</em></a> é usado para habilitar solicitações HTTP entre sites para:</p>
+
+<ul>
+ <li>Chamadas <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> ou <a href="/pt-BR/docs/Web/API/Fetch_API">Fetch API</a> pela comunicação entre origens diferentes, tal como discutido acima.</li>
+ <li>Web Fonts (para o uso de fontes pelo <em>cross-domain</em> em <code>@font</code> do CSS), <a href="https://www.w3.org/TR/css-fonts-3/#font-fetching-requirements">para que os servidores possam implantar fontes TrueType que só podem ser carregadas em origens diferentes e usadas por sites com autorização para isso</a>.</li>
+ <li><a href="/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL">Texturas WebGL</a>.</li>
+ <li><em>Frames </em>de Imagens/vídeos desenhados em uma tela usando <a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/drawImage"><code>drawImage()</code></a>.</li>
+</ul>
+
+<p>Este artigo é uma discussão geral sobre <em>Cross-Origin Resource Sharing</em> (Compartilhamento de recursos com origens diferentes) e inclui uma discussão de cabeçalhos HTTP necessários.</p>
+
+<h2 id="Visão_Geral">Visão Geral</h2>
+
+<p>O padrão <em>Cross-Origin Resource Sharing</em> trabalha adicionando novos <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">cabeçalhos HTTP</a> que permitem que os servidores descrevam um conjunto de origens que possuem permissão a ler uma informação usando o navegador. Além disso, para métodos de requisição HTTP que podem causar efeitos colaterais nos dados do servidor (em particular, para métodos HTTP diferentes de <a href="/pt-BR/docs/Web/HTTP/Methods/GET" title="A tabela de compatibilidade nesta página é gerada a partir de dados estruturados. Se você quiser contribuir com os dados, consulte https://github.com/mdn/browser-compat-data e envie-nos um pull request."><code>GET</code></a> ou para uso de <a href="/pt-BR/docs/Web/HTTP/Methods/POST" title="O método HTTP POST envia dados ao servidor. O tipo do corpo da solicitação é indicado pelo cabeçalho Content-Type."><code>POST</code></a> com certos <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MIME types</a>), a especificação exige que navegadores &quot;pré-enviem&quot; a requisição, solicitando os métodos suportados pelo servidor com um método de requisição HTTP <a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS" title="O método HTTP OPTIONS é utilizado para que um cliente possa descobrir quais as opções de requisição permitidas para um determinado recurso em um servidor. O cliente pode especificar uma URL específica no método OPTIONS ou um asterisco(*) indicando que se refere ao servidor como um todo para sanar suas dúvidas em relação as opções de requisição permitidas."><code>OPTIONS</code></a> e, após a &quot;aprovação&quot;, o servidor envia a requisição verdadeira com o método de requisição HTTP correto. Servidores também podem notificar clientes se &quot;credenciais&quot; (incluindo <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies">Cookies</a> e dados de autenticação HTTP) devem ser enviadas com as requisições.</p>
+
+<p>Falhas no CORS resultam em erros, mas por questões de segurança, detalhes sobre erros não estão disponíveis no código JavaScript. O código tem apenas conhecimento de que ocorreu um erro. A única maneira para determinar especificamente o que ocorreu de errado é procurar no console do navegador por mais detalhes.</p>
+
+<p>Seções subsequentes discutem cenários, assim como fornecem um detalhamento dos cabeçalhos HTTP utilizados.</p>
+
+<h2 id="Exemplos_de_cenários_com_controle_de_acesso">Exemplos de cenários com controle de acesso</h2>
+
+<p>Aqui, apresentamos três cenários que ilustram como <em>Cross-Origin Resource Sharing</em> funciona. Todos estes exemplos usam o objeto <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a>, que pode ser utilizado para fazer requisições entre origens em qualquer navegador compatível.</p>
+
+<p>Os snippets JavaScript inclusos nessas seções (e instâncias executáveis de código do lado servidor que tratam corretamente essas requisições entre origens) podem ser encontrados &quot;em ação&quot; aqui: <a class="external" href="http://arunranga.com/examples/access-control/">http://arunranga.com/examples/access-control/</a>, e irão funcionar em navegadores que suportam <code>XMLHttpRequest</code> entre origens.</p>
+
+<p>Uma discussão sobre <em>Cross-Origin Resource Sharing</em> a partir da perspectiva do servidor (incluindo snippets de código PHP) pode ser encontrada no artigo <a href="/en-US/docs/Web/HTTP/Server-Side_Access_Control">Server-Side Access Control (CORS)</a>.</p>
+
+<h3 id="Requisições_simples">Requisições simples</h3>
+
+<p>Algumas requisições não acionam um <a href="/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests">pré-envio CORS</a>. Essas são denominadas neste artigo como “requisições simples” (<em>simple request</em>), embora a especificação <a class="external" href="https://fetch.spec.whatwg.org/" hreflang="en" lang="en" title="The &apos;Fetch&apos; specification">Fetch</a> (que define CORS) não utilize esse termo. Uma requisição que não aciona um <a href="/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests">pré-envio CORS</a> — denominada “requisição simples” — é uma que <strong>atende todas as seguintes condições</strong>:</p>
+
+<ul>
+ <li>Os únicos métodos permitidos são:
+  <ul>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/GET"><code>GET</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/POST"><code>POST</code></a></li>
+  </ul>
+ </li>
+ <li>Além dos cabeçalhos definidos automaticamente pelo agente do usuário (por exemplo, <a href="/pt-BR/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a>, <a href="/pt-BR/docs/Web/HTTP/Headers/User-Agent"><code>User-Agent</code></a> ou <a href="https://fetch.spec.whatwg.org/#forbidden-header-name">qualquer um dos outros cabeçalhos com nomes definidos na especificação Fetch como “<em>forbidden header name</em>”</a>), os únicos cabeçalhos que podem ser definidos manualmente são <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">aqueles cujo a especificação Fetch define como sendo um “<em>CORS-safelisted request-header</em>”</a>, que são:
+  <ul>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> (porém observe os requisitos adicionais abaixo)</li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#dpr">DPR</a></code></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Downlink"><code>Downlink</code></a></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#save-data">Save-Data</a></code></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#viewport-width">Viewport-Width</a></code></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#width">Width</a></code></li>
+  </ul>
+ </li>
+ <li>Os únicos valores permitidos para o <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> do cabeçalho são:
+  <ul>
+   <li><code>application/x-www-form-urlencoded</code></li>
+   <li><code>multipart/form-data</code></li>
+   <li><code>text/plain</code></li>
+  </ul>
+ </li>
+ <li>Nenhum <em>event listener</em> é registrado em qualquer objeto <a href="/pt-BR/docs/Web/API/XMLHttpRequestUpload"><code>XMLHttpRequestUpload</code></a> usado na requisição, estes são acessados usando a propriedade <a href="/pt-BR/docs/Web/API/XMLHttpRequest/upload"><code>XMLHttpRequest.upload</code></a>.</li>
+ <li>Nenhum objeto <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> é usado na requisição.</li>
+</ul>
+
+<div class="note notecard"><strong>Nota:</strong> Esses são os mesmos tipos de requisições entre origens distintas que o conteúdo da web já pode realizar e nenhum dado dado de resposta é liberado ao solicitante, a menos que o servidor envie um cabeçalho adequado. Portanto, sites que impedem a falsificação de requisições entre origens não tem nada a temer em relação ao controle de acesso HTTP.</div>
+
+<div class="note notecard"><strong>Nota:</strong> O WebKit Nightly e Safari Technology Preview impõem restrições adicionais nos valores permitidos nos cabeçalhos <a href="/pt-BR/docs/Web/HTTP/Headers/Accept" title="O cabeçalho de requisição HTTP Accept anuncia quais tipos de conteúdo, expressos como MIME types, o cliente é capaz de entender. Usando negociação de conteúdo, o servidor então seleciona uma das propostas, a usa e então informa o cliente da sua escolha com o cabeçalho de resposta Content-Type. Navegadores colocam valores adequados para este cabeçalho dependendo do contexto onde a requisição é feita: quando buscando um CSS stylesheet, um valor diferente é colocado para a requisição, o mesmo acontece com imagens, vídeos ou scripts."><code>Accept</code></a>, <a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Language" title="O cabeçalho HTTP Accept-Language anuncia quais linguas o cliente é capaz de entender, e qual é a preferência do variante do Locale. (Por Linguas, queremos dizer linguas como Inglês e portugues) Usando content negotiation, o servidor seleciona uma das propostas, usa ela e informa o cliente da sua escolha com o Content-Language cabeçalho de responsta. Navegadores configuram valores adequados para este cabeçalhos de acordo com a língua configurada pelo usuario."><code>Accept-Language</code></a> e <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Language" title="O cabeçalho de entidade Content-Language  é usado para descrever a língua(s) destinada para a audiência, para que isto permita um usuário de se diferenciar de acordo com a língua preferida do usuário."><code>Content-Language</code></a>. Caso algum destes cabeçalhos tenham valores ”não-padronizados”, o WebKit/Safari não considera que a requisição atenda as condições para uma “requisição simples”. O que o WebKit/Safari considera valores “não-padronizados” para estes cabeçalhos não é documentado exceto nos seguintes bugs do WebKit: <em><a href="https://bugs.webkit.org/show_bug.cgi?id=165178" rel="nofollow noreferrer">Require preflight for non-standard CORS-safelisted request headers Accept, Accept-Language, and Content-Language</a>, <a href="https://bugs.webkit.org/show_bug.cgi?id=165566" rel="nofollow noreferrer">Allow commas in Accept, Accept-Language, and Content-Language request headers for simple CORS</a></em>  e <em><a href="https://bugs.webkit.org/show_bug.cgi?id=166363" rel="nofollow noreferrer">Switch to a blacklist model for restricted Accept headers in simple CORS requests</a></em>. Nenhum outro navegador implementa estas restrições adicionais, pois elas não são parte da especificação.</div>
+
+<p>Por exemplo, suponha que o conteúdo web no domínio <code class="plain">http://foo.example</code> deseje chamar (<code>invocation</code> do exemplo abaixo) um outro conteúdo no domínio <code class="plain">http://bar.other</code>. Esse código Javascript pode estar hospedado em foo.example:</p>
+
+<pre class="brush: js notranslate" id="line1">var invocation = new XMLHttpRequest();
+var url = &apos;http://bar.other/resources/public-data/&apos;;
+
+function callOtherDomain() {
+  if(invocation) {
+    invocation.open(&apos;GET&apos;, url, true);
+    invocation.onreadystatechange = handler;
+    invocation.send();
+  }
+}
+</pre>
+
+<p>Isso fará uma troca simples entre cliente e servidor, utilizando o cabeçalho CORS para tratar os privilégios.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/14293/simple_req.png" style="height: 224px; width: 521px;"></p>
+
+<p>Neste caso, vamos ver o que o navegador enviará ao servidor e vamos olhar como o servidor responde:</p>
+
+<pre class="brush: html notranslate">GET /resources/public-data/ HTTP/1.1
+Host: bar.other
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 Minefield/3.1b3pre
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive
+Referer: http://foo.example/examples/access-control/simpleXSInvocation.html
+Origin: http://foo.example
+
+
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 00:23:53 GMT
+Server: Apache/2.0.61
+Access-Control-Allow-Origin: *
+Keep-Alive: timeout=2, max=100
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+Content-Type: application/xml
+
+[XML Data]
+</pre>
+
+<p>As linhas de 1 a 10 são enviadas no header. Note que o cabeçalho principal da requisição HTTP aqui é <a href="/pt-BR/docs/Web/HTTP/Headers/Origin" title="O cabeçalho de requisição Origin indica onde a requisição se originou. Ele não inclui nenhuma informação do caminho, somente o nome do servidor. Ele é enviado com requisições CORS, também como requisições POST. Ele é similar ao cabeçalho Referer, mas, diferente deste cabeçalho, ele não mostra o caminho inteiro."><code>Origin</code></a> na linha 10, o qual revela que a chamada é proveniente de um conteúdo no domínio <code class="plain">http://foo.example</code>.</p>
+
+<p>As linhas de 13 a 22 mostram a resposta HTTP do servidor no domínio <code class="plain">http://bar.other</code>. Nesta resposta, o servidor envia de volta um cabeçalho <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Origin" title="O Access-Control-Allow-Origin cabeçalho de resposta indica se os recursos da resposta podem ser compartilhados com a origin dada."><code>Access-Control-Allow-Origin</code></a> exibido na linha 16. O uso dos cabeçalhos <a href="/pt-BR/docs/Web/HTTP/Headers/Origin" title="O cabeçalho de requisição Origin indica onde a requisição se originou. Ele não inclui nenhuma informação do caminho, somente o nome do servidor. Ele é enviado com requisições CORS, também como requisições POST. Ele é similar ao cabeçalho Referer, mas, diferente deste cabeçalho, ele não mostra o caminho inteiro."><code>Origin</code></a> e <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Origin" title="O Access-Control-Allow-Origin cabeçalho de resposta indica se os recursos da resposta podem ser compartilhados com a origin dada."><code>Access-Control-Allow-Origin</code></a> mostram o protocolo de controle de acesso em seu uso mais simples. Neste caso, o servidor responde com <code>Access-Control-Allow-Origin: *</code>, o que significa que o recurso pode ser acessado por <strong>qualquer</strong> domínio pela comunicação entre origens. Se os proprietários dos recursos em <code class="plain">http://bar.other</code> desejarem restringir o acesso ao conteúdo para o mesmo ser apenas de <code class="plain">http://foo.example</code>, eles retornaram:</p>
+
+<p><code class="plain">Access-Control-Allow-Origin: http://foo.example</code></p>
+
+<p>Observe que, agora, nenhum dominio além de <code class="plain">http://foo.example</code> (identificado na requisição pelo cabeçalho ORIGIN: como na linha 10) pode acessar o recurso pela comunicação entre origens. O cabeçalho <code>Access-Control-Allow-Origin</code> deve conter o valor que foi enviado no cabeçalho <code>Origin</code> da requisição. </p>
+
+<h3 id="Requisições_com_pré-envio">Requisições com pré-envio</h3>
+
+<p>Ao contrário de <a href="/en-US/docs/Web/HTTP/Access_control_CORS#Simple_requests">“requisições simples” (discutido acima)</a>, requisições com &quot;pré-envio&quot; (<em>Preflighted requests</em>) primeiramente enviam uma requisição HTTP através do método <a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS" title="O método HTTP OPTIONS é utilizado para que um cliente possa descobrir quais as opções de requisição permitidas para um determinado recurso em um servidor. O cliente pode especificar uma URL específica no método OPTIONS ou um asterisco(*) indicando que se refere ao servidor como um todo para sanar suas dúvidas em relação as opções de requisição permitidas."><code>OPTIONS</code></a> para obter um recurso em outro domínio, a fim de determinar se de fato a requisição atual é segura para envio. Requisições entre sites possuem pré-envio, já que podem interferir em dados do usuário.</p>
+
+<p>Em particular, uma requisição tem um pré-envio <strong>se qualquer das seguintes condições</strong> for verdadeira:</p>
+
+<ul>
+ <li><strong>Se</strong> a requisição usa algum dos seguintes métodos:
+
+  <ul>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/CONNECT"><code>CONNECT</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a></li>
+  </ul>
+ </li>
+ <li><strong>Ou se</strong>, além dos cabeçalhos definidos automaticamente pelo agente do usuário (por exemplo, <a href="/pt-BR/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a>, {HTTPHeader(&quot;User-Agent&quot;)}} ou <a href="https://fetch.spec.whatwg.org/#forbidden-header-name">qualquer <strong>OUTRO</strong> cabeçalho com um nome definido na especificação Fetch como “<em>forbidden header name</em>”</a>), a requisição inclui quaisquer cabeçalhos <strong>além</strong> <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">daqueles que a especificação Fetch define como sendo um “<em>CORS-safelisted request-header</em>”</a>, que são:
+  <ul>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> (porém observe os requisitos adicionais abaixo)</li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#dpr">DPR</a></code></li>
+   <li><a href="/pt-BR/docs/Web/HTTP/Headers/Downlink"><code>Downlink</code></a></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#save-data">Save-Data</a></code></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#viewport-width">Viewport-Width</a></code></li>
+   <li><code><a href="http://httpwg.org/http-extensions/client-hints.html#width">Width</a></code></li>
+  </ul>
+ </li>
+ <li><strong>Ou se</strong> o <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a> do cabeçalho <strong>tem</strong> <strong>outro</strong> valor que:
+  <ul>
+   <li><code>application/x-www-form-urlencoded</code></li>
+   <li><code>multipart/form-data</code></li>
+   <li><code>text/plain</code></li>
+  </ul>
+ </li>
+ <li><strong>Ou se</strong> um ou mais <em>event listener</em> estiver registrado em um objeto <a href="/pt-BR/docs/Web/API/XMLHttpRequestUpload"><code>XMLHttpRequestUpload</code></a> usado nessa requisição.</li>
+ <li><strong>Ou se</strong> um objeto <a href="/pt-BR/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> é usado nessa requisição.</li>
+</ul>
+
+<div class="note notecard"><strong>Nota:</strong> WebKit Nightly e Safari Technology Preview colocam restrições adicionais nos valores permitidos dos cabeçalhos <a href="/pt-BR/docs/Web/HTTP/Headers/Accept" title="O cabeçalho de requisição HTTP Accept anuncia quais tipos de conteúdo, expressos como MIME types, o cliente é capaz de entender. Usando negociação de conteúdo, o servidor então seleciona uma das propostas, a usa e então informa o cliente da sua escolha com o cabeçalho de resposta Content-Type. Navegadores colocam valores adequados para este cabeçalho dependendo do contexto onde a requisição é feita: quando buscando um CSS stylesheet, um valor diferente é colocado para a requisição, o mesmo acontece com imagens, vídeos ou scripts."><code>Accept</code></a>, <a href="/pt-BR/docs/Web/HTTP/Headers/Accept-Language" title="O cabeçalho HTTP Accept-Language anuncia quais linguas o cliente é capaz de entender, e qual é a preferência do variante do Locale. (Por Linguas, queremos dizer linguas como Inglês e portugues) Usando content negotiation, o servidor seleciona uma das propostas, usa ela e informa o cliente da sua escolha com o Content-Language cabeçalho de responsta. Navegadores configuram valores adequados para este cabeçalhos de acordo com a língua configurada pelo usuario."><code>Accept-Language</code></a> e <a href="/pt-BR/docs/Web/HTTP/Headers/Content-Language" title="O cabeçalho de entidade Content-Language  é usado para descrever a língua(s) destinada para a audiência, para que isto permita um usuário de se diferenciar de acordo com a língua preferida do usuário."><code>Content-Language</code></a>. Caso qualquer um desses cabeçalhos tenha algum valor fora do padrão (non-standard), o WebKit/Safari faz o pré-envio da requisição. O que o WebKit/Safari considera como valor “non-standard” para tais cabeçalhos não está documentado, exceto nos seguintes bugs do WebKit: <a href="https://bugs.webkit.org/show_bug.cgi?id=165178" rel="nofollow noreferrer">Require preflight for non-standard CORS-safelisted request headers Accept, Accept-Language, and Content-Language</a>, <a href="https://bugs.webkit.org/show_bug.cgi?id=165566" rel="nofollow noreferrer">Allow commas in Accept, Accept-Language, e Content-Language request headers for simple CORS</a> e <a href="https://bugs.webkit.org/show_bug.cgi?id=166363" rel="nofollow noreferrer">Switch to a blacklist model for restricted Accept headers in simple CORS requests</a>. Nenhum outro navegador implementa estas restrições adicionais, pois elas não são parte da especificação.</div>
+
+<p>O exemplo a seguir é de uma requisição com pré-envio.</p>
+
+<pre class="brush: js notranslate" id="line1">var invocation = new XMLHttpRequest();
+var url = &apos;http://bar.other/resources/post-here/&apos;;
+var body = &apos;&lt;?xml version=&quot;1.0&quot;?&gt;&lt;person&gt;&lt;name&gt;Arun&lt;/name&gt;&lt;/person&gt;&apos;;
+
+function callOtherDomain(){
+  if(invocation)
+    {
+      invocation.open(&apos;POST&apos;, url, true);
+      invocation.setRequestHeader(&apos;X-PINGOTHER&apos;, &apos;pingpong&apos;);
+      invocation.setRequestHeader(&apos;Content-Type&apos;, &apos;application/xml&apos;);
+      invocation.onreadystatechange = handler;
+      invocation.send(body);
+    }
+}
+
+......
+</pre>
+
+<p>No exemplo acima, a linha 3 cria um XML para enviar com a requisição <code>POST</code> da linha 8. Também, na linha 9, é definido um cabeçalho de uma requisição HTTP &quot;personalizada&quot; (non-standard) com (<code>X-PINGOTHER: pingpong</code>). Tais cabeçalhos não fazem parte do protocolo HTTP/1.1, mas podem ser usados para aplicações web. Já que a requisição usa um Content-Type do tipo <code>application/xml</code> e como é uma requisição personalizada, esta requisição faz um pré-envio.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/14289/prelight.png"></p>
+
+<p>(Observação: conforme descrito abaixo, a requisição POST real não inclui os cabeçalhos Access-Control-Request- *; eles são necessários apenas para a requisição OPTIONS.)</p>
+
+<p>Vamos conferir a comunicação completa que ocorre entre cliente e servidor. A primeira comunicação é a <em>requisição com pré-envio/resposta</em>:</p>
+
+<pre class="brush: shell;highlight:[10,11,17,18,19,20] notranslate">OPTIONS /resources/post-here/ HTTP/1.1
+Host: bar.other
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 Minefield/3.1b3pre
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive
+Origin: http://foo.example
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: X-PINGOTHER, Content-Type
+
+
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 01:15:39 GMT
+Server: Apache/2.0.61 (Unix)
+Access-Control-Allow-Origin: http://foo.example
+Access-Control-Allow-Methods: POST, GET, OPTIONS
+Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+Access-Control-Max-Age: 86400
+Vary: Accept-Encoding, Origin
+Content-Encoding: gzip
+Content-Length: 0
+Keep-Alive: timeout=2, max=100
+Connection: Keep-Alive
+Content-Type: text/plain
+</pre>
+
+<p>Uma vez que a requisição com pré-envio é completa, a requisição efetiva será enviada:</p>
+
+<pre class="brush:shell;highlight:[13,23] notranslate">POST /resources/post-here/ HTTP/1.1
+Host: bar.other
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 Minefield/3.1b3pre
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive
+X-PINGOTHER: pingpong
+Content-Type: text/xml; charset=UTF-8
+Referer: http://foo.example/examples/preflightInvocation.html
+Content-Length: 55
+Origin: http://foo.example
+Pragma: no-cache
+Cache-Control: no-cache
+
+&lt;?xml version=&quot;1.0&quot;?&gt;&lt;person&gt;&lt;name&gt;Arun&lt;/name&gt;&lt;/person&gt;
+
+
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 01:15:40 GMT
+Server: Apache/2.0.61 (Unix)
+Access-Control-Allow-Origin: http://foo.example
+Vary: Accept-Encoding, Origin
+Content-Encoding: gzip
+Content-Length: 235
+Keep-Alive: timeout=2, max=99
+Connection: Keep-Alive
+Content-Type: text/plain
+
+[Some GZIP&apos;d payload]
+</pre>
+
+<p>As linhas de 1 a 12 acima representam a requisição com pré-envio tendo o método <a href="/pt-BR/docs/Web/HTTP/Methods/OPTIONS" title="O método HTTP OPTIONS é utilizado para que um cliente possa descobrir quais as opções de requisição permitidas para um determinado recurso em um servidor. O cliente pode especificar uma URL específica no método OPTIONS ou um asterisco(*) indicando que se refere ao servidor como um todo para sanar suas dúvidas em relação as opções de requisição permitidas."><code>OPTIONS</code></a>. O navegador determina que precisa fazer este envio baseado nos parâmetros da requisição do código JavaScript acima utilizado, para que o servidor possa responder caso seja aceitável o envio da requisição com os dados parâmetros da mesma. OPTIONS é um método HTTP/1.1 usado para determinar informações complementares dos servidores, sendo o mesmo um método <a href="/pt-BR/docs/Glossario/seguro">safe</a>, o que significa que não pode ser utilizado para troca de recurso. Note que junto da requisição OPTIONS, outros dois cabeçalhos são enviados (linhas 10 e 11, respectivamente):</p>
+
+<pre class="notranslate">Access-Control-Request-Method: POST
+Access-Controa l-Request-Headers: X-PINGOTHER, Content-Type
+</pre>
+
+<p>O cabeçalho <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Method" title="O cabeçalho de requisição Access-Control-Request-Method é usado pelos navegadores quando executando uma preflight request, para deixar o servidor sabendo quais métodos HTTP vão ser usados quando a requisição verdadeira for feita. Este cabeçalho é necessário como toda requisição pré-vôo é um OPTIONS e não usa o mesmo método na requisição verdadeira."><code>Access-Control-Request-Method</code></a> notifica o servidor como sendo uma parte da requisição com pré-envio que, quando a requisição efetiva é enviada, será enviada com uma requisição de método <code>POST</code>. O cabeçalho <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Headers" title="O cabeçalho da solicitação Access-Control-Request-Headers é usado ao emitir um preflight request para permitir que o servidor saiba quais cabeçalhos HTTP serão usados quando a solicitação real for feita."><code>Access-Control-Request-Headers</code></a> notifica o servidor que quando a requisição efetiva fora enviada, será enviada com os seguintes cabeçalhos personalizados <code>X-PINGOTHER</code> e <code>Content-Type</code>. O servidor agora tem a oportunidade para definir se deseja aceitar uma requisição sob estas condições.</p>
+
+<p>As linhas 14 a 26 acima são as respostas que o servidor devolve, indicando que o método (<code>POST</code>) e os cabeçalhos (<code>X-PINGOTHER</code>) da requisição são aceitáveis. Em particular, vejamos as linhas 17 a 20:</p>
+
+<pre class="notranslate">Access-Control-Allow-Origin: http://foo.example
+Access-Control-Allow-Methods: POST, GET, OPTIONS
+Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+Access-Control-Max-Age: 86400</pre>
+
+<p>O servidor responde com <code>Access-Control-Allow-Methods</code> e diz que <code>POST</code>, <code>GET</code>, e <code>OPTIONS</code> são métodos viáveis para requerir o recurso em questão. Perceba que este cabeçalho é similar ao cabeçalho da resposta <a href="/pt-BR/docs/Web/HTTP/Headers/Allow" title="O cabeçalho de resposta Allow lista um conjunto de métodos suportados pelo recurso."><code>Allow</code></a>, mas usado estritamente dentro do contexto do controle de acesso.</p>
+
+<p>O servidor envia também <code>Access-Control-Allow-Headers</code> com um valor de &quot;<code>X-PINGOTHER, Content-Type</code>&quot;, confirmando estes são cabeçalhos permitidos a serem usados com a requisição efetiva. Assim como <code>Access-Control-Allow-Methods</code>, <code>Access-Control-Allow-Headers</code> é uma lista de cabeçalhos aceitáveis, separados por vírgula.</p>
+
+<p>Por fim, <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Max-Age" title="O cabeçalho de resposta Access-Control-Max-Age indica por quanto tempo os resultados de uma preflight request (que é a informação contida nos cabeçalhos Access-Control-Allow-Methods e Access-Control-Allow-Headers) pode ser cacheada (mantida)."><code>Access-Control-Max-Age</code></a> traz o valor em segundos de quão longo pode ser mantida em cache a resposta da requisição pré-envio sem o envio de outra requisição pré-envio. Neste caso, 86400 segundos são 24 horas. Note que cada browser tem um<a href="/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age"> valor interno máximo</a> que toma precedência quado <code>Access-Control-Max-Age</code> for maior.</p>
+
+<h4 id="Requisições_com_pré-envio_e_redirecionamento">Requisições com pré-envio e redirecionamento</h4>
+
+<p>Not all browsers currently support following redirects after a preflighted request. If a redirect occurs after a preflighted request, some browsers currently will report an error message such as the following.</p>
+
+<blockquote>
+<p>The request was redirected to &apos;https://example.com/foo&apos;, which is disallowed for cross-origin requests that require preflight</p>
+</blockquote>
+
+<blockquote>
+<p>Request requires preflight, which is disallowed to follow cross-origin redirect</p>
+</blockquote>
+
+<p>The CORS protocol originally required that behavior but <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">was subsequently changed to no longer require it</a>. However, not all browsers have implemented the change, and so still exhibit the behavior that was originally required.</p>
+
+<p>So until all browsers catch up with the spec, you may be able to work around this limitation by doing one or both of the following:</p>
+
+<ul>
+ <li>change the server-side behavior to avoid the preflight and/or to avoid the redirect—if you have control over the server the request is being made to</li>
+ <li>change the request such that it is a <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Controle_Acesso_CORS$edit#Simple_requests">simple request</a> that doesn’t cause a preflight</li>
+</ul>
+
+<p>But if it’s not possible to make those changes, then another way that may be possible is to this:</p>
+
+<ol>
+ <li>Make a <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Controle_Acesso_CORS$edit#Simple_requests">simple request</a> (using <a href="/pt-BR/docs/Web/API/Response/url"><code>Response.url</code></a> for the Fetch API, or <a href="/pt-BR/docs/Web/API/XMLHttpRequest/responseURL"><code>XMLHttpRequest.responseURL</code></a>) to determine what URL the real preflighted request would end up at.</li>
+ <li>Make another request (the “real” request) using the URL you obtained from <code>Response.url</code> or <code>XMLHttpRequest.responseURL</code> in the first step.</li>
+</ol>
+
+<p>However, if the request is one that triggers a preflight due to the presence of the <code>Authorization</code> header in the request, you won’t be able to work around the limitation using the steps above. And you won’t be able to work around it at all unless you have control over the server the request is being made to.</p>
+
+<h3 id="Requisições_com_credenciais">Requisições com credenciais</h3>
+
+<p>The most interesting capability exposed by both <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> or <a href="/en-US/docs/Web/API/Fetch_API">Fetch</a> and CORS is the ability to make &quot;credentialed&quot; requests that are aware of <a href="/en-US/docs/Web/HTTP/Cookies">HTTP cookies</a> and HTTP Authentication information. By default, in cross-site <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> or <a href="/en-US/docs/Web/API/Fetch_API">Fetch</a> invocations, browsers will <strong>not</strong> send credentials. A specific flag has to be set on the <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> object or the <a href="/pt-BR/docs/Web/API/Request"><code>Request</code></a> constructor when it is invoked.</p>
+
+<p>In this example, content originally loaded from <code class="plain">http://foo.example</code> makes a simple GET request to a resource on <code class="plain">http://bar.other</code> which sets Cookies. Content on foo.example might contain JavaScript like this:</p>
+
+<pre class="brush: js notranslate" id="line1">var invocation = new XMLHttpRequest();
+var url = &apos;http://bar.other/resources/credentialed-content/&apos;;
+
+function callOtherDomain(){
+  if(invocation) {
+    invocation.open(&apos;GET&apos;, url, true);
+    invocation.withCredentials = true;
+    invocation.onreadystatechange = handler;
+    invocation.send();
+  }
+}</pre>
+
+<p>Line 7 shows the flag on <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> that has to be set in order to make the invocation with Cookies, namely the <code>withCredentials</code> boolean value. By default, the invocation is made without Cookies. Since this is a simple <code>GET</code> request, it is not preflighted, but the browser will <strong>reject</strong> any response that does not have the <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials" title="O cabeçalho de resposta Access-Control-Allow-Credentials diz aos navegadores se a resposta deve ser exposta ao código frontend JavaScript quando o modo de credenciais da requisição (Request.credentials) é include."><code>Access-Control-Allow-Credentials</code></a>: <code>true</code> header, and <strong>not</strong> make the response available to the invoking web content.</p>
+
+<p><img alt src="https://mdn.mozillademos.org/files/14291/cred-req.png" style="height: 223px; width: 521px;"></p>
+
+<p>Here is a sample exchange between client and server:</p>
+
+<pre class="brush: shell notranslate">GET /resources/access-control-with-credentials/ HTTP/1.1
+Host: bar.other
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 Minefield/3.1b3pre
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive
+Referer: http://foo.example/examples/credential.html
+Origin: http://foo.example
+Cookie: pageAccess=2
+
+
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 01:34:52 GMT
+Server: Apache/2.0.61 (Unix) PHP/4.4.7 mod_ssl/2.0.61 OpenSSL/0.9.7e mod_fastcgi/2.4.2 DAV/2 SVN/1.4.2
+X-Powered-By: PHP/5.2.6
+Access-Control-Allow-Origin: http://foo.example
+Access-Control-Allow-Credentials: true
+Cache-Control: no-cache
+Pragma: no-cache
+Set-Cookie: pageAccess=3; expires=Wed, 31-Dec-2008 01:34:53 GMT
+Vary: Accept-Encoding, Origin
+Content-Encoding: gzip
+Content-Length: 106
+Keep-Alive: timeout=2, max=100
+Connection: Keep-Alive
+Content-Type: text/plain
+
+
+[text/plain payload]
+</pre>
+
+<p>Although line 11 contains the Cookie destined for the content on <code class="plain">http://bar.other</code>, if bar.other did not respond with an <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials" title="O cabeçalho de resposta Access-Control-Allow-Credentials diz aos navegadores se a resposta deve ser exposta ao código frontend JavaScript quando o modo de credenciais da requisição (Request.credentials) é include."><code>Access-Control-Allow-Credentials</code></a><code>: true</code> (line 19) the response would be ignored and not made available to web content.</p>
+
+<h4 id="Solicitações_credenciadas_e_curingas_wildcards">Solicitações credenciadas e curingas (<em>wildcards</em>)</h4>
+
+<p>When responding to a credentialed request, the server <strong>must</strong> specify an origin in the value of the <code>Access-Control-Allow-Origin</code> header, instead of specifying the &quot;<code>*</code>&quot; wildcard.</p>
+
+<p>Because the request headers in the above example include a <code>Cookie</code> header, the request would fail if the value of the <code>Access-Control-Allow-Origin</code> header were &quot;*&quot;. But it does not fail: Because the value of the <code>Access-Control-Allow-Origin</code> header is &quot;<code class="plain">http://foo.example</code>&quot; (an actual origin) rather than the &quot;<code>*</code>&quot; wildcard, the credential-cognizant content is returned to the invoking web content.</p>
+
+<p>Note that the <code>Set-Cookie</code> response header in the example above also sets a further cookie. In case of failure, an exception—depending on the API used—is raised.</p>
+
+<p>All of these examples can be <a class="external" href="http://arunranga.com/examples/access-control/">seen working here</a>. The next section deals with the actual HTTP headers.</p>
+
+<h2 id="Os_cabeçalhos_de_resposta_HTTP">Os cabeçalhos de resposta HTTP</h2>
+
+<p>This section lists the HTTP response headers that servers send back for access control requests as defined by the Cross-Origin Resource Sharing specification. The previous section gives an overview of these in action.</p>
+
+<h3 id="Access-Control-Allow-Origin">Access-Control-Allow-Origin</h3>
+
+<p>A returned resource may have one <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Origin" title="O Access-Control-Allow-Origin cabeçalho de resposta indica se os recursos da resposta podem ser compartilhados com a origin dada."><code>Access-Control-Allow-Origin</code></a> header, with the following syntax:</p>
+
+<pre class="notranslate">Access-Control-Allow-Origin: &lt;origin&gt; | *
+</pre>
+
+<p>The <code>origin</code> parameter specifies a URI that may access the resource. The browser must enforce this. For requests <strong>without</strong> credentials, the server may specify &quot;*&quot; as a wildcard, thereby allowing any origin to access the resource.</p>
+
+<p>For example, to allow http://mozilla.org to access the resource, you can specify:</p>
+
+<pre class="notranslate">Access-Control-Allow-Origin: http://mozilla.org</pre>
+
+<p>If the server specifies an origin host rather than &quot;*&quot;, then it could also include Origin in the Vary response header to indicate to clients that server responses will differ based on the value of the Origin request header.</p>
+
+<h3 id="Access-Control-Expose-Headers">Access-Control-Expose-Headers</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Expose-Headers" title="O cabeçalho de resposta Access-Control-Expose-Headers indica quais cabeçalhos podem ser expostos como parte da resposta listando os seus nomes."><code>Access-Control-Expose-Headers</code></a> header lets a server whitelist headers that browsers are allowed to access. For example:</p>
+
+<pre class="notranslate">Access-Control-Expose-Headers: X-My-Custom-Header, X-Another-Custom-Header
+</pre>
+
+<p>This allows the <code>X-My-Custom-Header</code> and <code>X-Another-Custom-Header</code> headers to be exposed to the browser.</p>
+
+<h3 id="Access-Control-Max-Age">Access-Control-Max-Age</h3>
+
+<p>The  <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Max-Age" title="O cabeçalho de resposta Access-Control-Max-Age indica por quanto tempo os resultados de uma preflight request (que é a informação contida nos cabeçalhos Access-Control-Allow-Methods e Access-Control-Allow-Headers) pode ser cacheada (mantida)."><code>Access-Control-Max-Age</code></a> header indicates how long the results of a preflight request can be cached. For an example of a preflight request, see the above examples.</p>
+
+<pre class="notranslate">Access-Control-Max-Age: &lt;delta-seconds&gt;
+</pre>
+
+<p>The <code>delta-seconds</code> parameter indicates the number of seconds the results can be cached.</p>
+
+<h3 id="Access-Control-Allow-Credentials">Access-Control-Allow-Credentials</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials" title="O cabeçalho de resposta Access-Control-Allow-Credentials diz aos navegadores se a resposta deve ser exposta ao código frontend JavaScript quando o modo de credenciais da requisição (Request.credentials) é include."><code>Access-Control-Allow-Credentials</code></a> header Indicates whether or not the response to the request can be exposed when the <code>credentials</code> flag is true.  When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials. Note that simple <code>GET</code> requests are not preflighted, and so if a request is made for a resource with credentials, if this header is not returned with the resource, the response is ignored by the browser and not returned to web content.</p>
+
+<pre class="notranslate">Access-Control-Allow-Credentials: true
+</pre>
+
+<p><a class="internal" href="#Requisições_com_credenciais">Credentialed requests</a> are discussed above.</p>
+
+<h3 id="Access-Control-Allow-Methods">Access-Control-Allow-Methods</h3>
+
+<p>O <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Methods" title="O cabeçalho de resposta Access-Control-Allow-Methods especifica o método ou métodos permitidos quando acessando o recurso em resposta a uma preflight request."><code>Access-Control-Allow-Methods</code></a> cabeçalho especifica o método ou os métodos permitidos ao acessar o recurso. Isso é usado em resposta há uma requisição preflight. As condições na qual a requisição é preflight são discutidas à seguir.</p>
+
+<pre class="notranslate">Access-Control-Allow-Methods: &lt;method&gt;[, &lt;method&gt;]*
+</pre>
+
+<p>An example of a <a class="internal" href="#Preflighted_requests">preflight request is given above</a>, including an example which sends this header to the browser.</p>
+
+<h3 id="Access-Control-Allow-Headers">Access-Control-Allow-Headers</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Allow-Headers" title="O cabeçalho de resposta Access-Control-Allow-Headers é usado na resposta à uma preflight request na qual incluí o cabeçalho  Access-Control-Request-Headers para indicar quais cabeçalhos HTTP podem ser utilizados durante a requisição efetiva."><code>Access-Control-Allow-Headers</code></a> header is used in response to a <a class="internal" href="#Preflighted_requests">preflight request</a> to indicate which HTTP headers can be used when making the actual request.</p>
+
+<pre class="notranslate">Access-Control-Allow-Headers: &lt;field-name&gt;[, &lt;field-name&gt;]*
+</pre>
+
+<h2 id="Os_cabeçalhos_de_solicitação_HTTP">Os cabeçalhos de solicitação HTTP</h2>
+
+<p>This section lists headers that clients may use when issuing HTTP requests in order to make use of the cross-origin sharing feature. Note that these headers are set for you when making invocations to servers. Developers using cross-site <a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a> capability do not have to set any cross-origin sharing request headers programmatically.</p>
+
+<h3 id="Origin">Origin</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Origin" title="O cabeçalho de requisição Origin indica onde a requisição se originou. Ele não inclui nenhuma informação do caminho, somente o nome do servidor. Ele é enviado com requisições CORS, também como requisições POST. Ele é similar ao cabeçalho Referer, mas, diferente deste cabeçalho, ele não mostra o caminho inteiro."><code>Origin</code></a> header indicates the origin of the cross-site access request or preflight request.</p>
+
+<pre class="notranslate">Origin: &lt;origin&gt;
+</pre>
+
+<p>The origin is a URI indicating the server from which the request initiated.  It does not include any path information, but only the server name.</p>
+
+<div class="note notecard"><strong>Note:</strong> The <code>origin</code> can be the empty string; this is useful, for example, if the source is a <code>data</code> URL.</div>
+
+<p>Note that in any access control request, the <a href="/pt-BR/docs/Web/HTTP/Headers/Origin" title="O cabeçalho de requisição Origin indica onde a requisição se originou. Ele não inclui nenhuma informação do caminho, somente o nome do servidor. Ele é enviado com requisições CORS, também como requisições POST. Ele é similar ao cabeçalho Referer, mas, diferente deste cabeçalho, ele não mostra o caminho inteiro."><code>Origin</code></a> header is <strong>always</strong> sent.</p>
+
+<h3 id="Access-Control-Request-Method">Access-Control-Request-Method</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Method" title="O cabeçalho de requisição Access-Control-Request-Method é usado pelos navegadores quando executando uma preflight request, para deixar o servidor sabendo quais métodos HTTP vão ser usados quando a requisição verdadeira for feita. Este cabeçalho é necessário como toda requisição pré-vôo é um OPTIONS e não usa o mesmo método na requisição verdadeira."><code>Access-Control-Request-Method</code></a> is used when issuing a preflight request to let the server know what HTTP method will be used when the actual request is made.</p>
+
+<pre class="notranslate">Access-Control-Request-Method: &lt;method&gt;
+</pre>
+
+<p>Examples of this usage can be <a class="internal" href="#Preflighted_requests">found above.</a></p>
+
+<h3 id="Access-Control-Request-Headers">Access-Control-Request-Headers</h3>
+
+<p>The <a href="/pt-BR/docs/Web/HTTP/Headers/Access-Control-Request-Headers" title="O cabeçalho da solicitação Access-Control-Request-Headers é usado ao emitir um preflight request para permitir que o servidor saiba quais cabeçalhos HTTP serão usados quando a solicitação real for feita."><code>Access-Control-Request-Headers</code></a> header is used when issuing a preflight request to let the server know what HTTP headers will be used when the actual request is made.</p>
+
+<pre class="notranslate">Access-Control-Request-Headers: &lt;field-name&gt;[, &lt;field-name&gt;]*
+</pre>
+
+<p>Examples of this usage can be <a class="internal" href="#Preflighted_requests">found above</a>.</p>
+
+<h2 id="Especificações">Especificações</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://fetch.spec.whatwg.org/#cors-protocol" hreflang="en" lang="en">Fetch<br><small lang="pt-BR">The definition of &apos;CORS&apos; in that specification.</small></a></td>
+   <td><span class="spec-Living">Padrão em tempo real</span></td>
+   <td>New definition; supplants <a href="https://www.w3.org/TR/cors/">W3C CORS</a> specification.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilidade_entre_Navegadores">Compatibilidade entre Navegadores</h2>
+
+<div class="hidden">
+<p>The compatibility table in this page is generated from structured data. If you&apos;d like to contribute to the data, please check out <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a> and send us a pull request.</p>
+</div>
+
+<div class="bc-data" id="bcd:http.headers.Access-Control-Allow-Origin"></div>
+
+<h3 id="Notas_de_compatibilidade">Notas de compatibilidade</h3>
+
+<ul>
+ <li>Internet Explorer 8 and 9 expose CORS via the <code>XDomainRequest</code> object, but have a full implementation in IE 10. </li>
+ <li>While Firefox 3.5 introduced support for cross-site XMLHttpRequests and Web Fonts, certain requests were limited until later versions. Specifically, Firefox 7 introduced the ability for cross-site HTTP requests for WebGL Textures, and Firefox 9 added support for Images drawn on a canvas using <code>drawImage</code>.</li>
+</ul>
+
+<h2 id="Veja_também">Veja também</h2>
+
+<ul>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors">CORS errors</a></li>
+ <li><a href="https://enable-cors.org/server.html">Enable CORS: I want to add CORS support to my server</a></li>
+ <li><a href="/pt-BR/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a></li>
+ <li><a href="http://www.kendoui.com/blogs/teamblog/posts/11-10-03/using_cors_with_all_modern_browsers.aspx">Using CORS with All (Modern) Browsers</a></li>
+ <li><a href="http://www.html5rocks.com/en/tutorials/cors/">Using CORS - HTML5 Rocks</a></li>
+ <li><a href="https://arunranga.com/examples/access-control/">Code Samples Showing <code>XMLHttpRequest</code> and Cross-Origin Resource Sharing</a></li>
+ <li><a href="https://github.com/jackblackevo/cors-jsonp-sample">Client-Side &amp; Server-Side (Java) sample for Cross-Origin Resource Sharing (CORS)</a></li>
+ <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Server-Side_Access_Control">Cross-Origin Resource Sharing From a Server-Side Perspective (PHP, etc.)</a></li>
+ <li><a href="https://stackoverflow.com/questions/43871637/no-access-control-allow-origin-header-is-present-on-the-requested-resource-whe/43881141#43881141">Stack Overflow answer with “how to” info for dealing with common problems</a>:
+  <ul>
+   <li>How to avoid the CORS preflight</li>
+   <li>How to use a CORS proxy to get around <em>“No Access-Control-Allow-Origin header”</em></li>
+   <li>How to fix <em>“Access-Control-Allow-Origin header must not be the wildcard”</em></li>
+  </ul>
+ </li>
+</ul>

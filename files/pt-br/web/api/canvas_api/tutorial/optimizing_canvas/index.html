@@ -1,0 +1,187 @@
+---
+title: Otimizando canvas
+slug: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+tags:
+  - Canvas
+  - Gráfico 2D
+  - Otimização
+translation_of: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+original_slug: Web/Guide/HTML/Canvas_tutorial/Otimizando_Canvas
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/pt-BR/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/pt-BR/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/pt-BR/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/pt-BR/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/pt-BR/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/pt-BR/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/pt-BR/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/pt-BR/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">« Previous</a><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">Next  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>O elemento <a href="/pt-BR/docs/Web/HTML/Element/canvas" title="O elemento HTML Canvas (&lt;canvas&gt;) pode ser utilizado para desenhar gráficos utilizando scripts (geralmente JavaScript). Por exemplo, além de desenhar gráficos, ele pode ser usado para fazer composições de fotos e também para animações. Você poderá colocar conteúdos alternativos dentro do bloco &lt;canvas&gt;. Este conteúdo será renderizado também em navegadores antigos e em navegadores com JavaScript desabilitado."><code>&lt;canvas&gt;</code></a> é um dos padrões mais largamente utilizados para renderização de gráficos 2D na Web. É muito usado em jogos e em visualizações complexas. Porém, quando sítios web e aplicativos utilizam canvas até seus limites, começam a surgir problemas de perda de performance. <span class="seoSummary">Este artigo tem o objetivo de prover sugestões de otimização de seu elemento canvas e garantir que seu site ou aplicativo funcione melhor.</span></p>
+</div>
+
+<h2 id="Dicas_de_performance">Dicas de performance</h2>
+
+<p>O que segue é uma coleção de dicas para melhorar a performance.</p>
+
+<h3 id="Pre-render_similar_primitives_or_repeating_objects_on_an_off-screen_canvas">Pre-render similar primitives or repeating objects on an off-screen canvas</h3>
+
+<p>If you find yourself with complex drawing operations on each frame, consider creating an offscreen canvas, draw to it once (or whenever it changes) on the offscreen canvas, then on each frame draw the offscreen canvas.</p>
+
+<pre class="brush: js">myEntity.offscreenCanvas = document.createElement(&apos;canvas&apos;);
+myEntity.offscreenCanvas.width = myEntity.width;
+myEntity.offscreenCanvas.height = myEntity.height;
+myEntity.offscreenContext = myEntity.offscreenCanvas.getContext(&apos;2d&apos;);
+
+myEntity.render(myEntity.offscreenContext);
+</pre>
+
+<h3 id="Avoid_floating-point_coordinates_and_use_integers_instead">Avoid floating-point coordinates and use integers instead</h3>
+
+<p>Sub-pixel rendering occurs when you render objects on a canvas without whole values.</p>
+
+<pre class="brush: js">ctx.drawImage(myImage, 0.3, 0.5);
+</pre>
+
+<p>This causes the browser to do extra calculations to create the anti-aliasing effect. To avoid this, make sure to round all co-ordinates used in calls to <a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/drawImage" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>drawImage()</code></a> using <a href="/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Math/floor" title="A função Math.floor(x) retorna o menor número inteiro dentre o número &quot;x&quot;."><code>Math.floor()</code></a>, for example.</p>
+
+<h3 id="Don’t_scale_images_in_drawImage">Don’t scale images in <code>drawImage</code></h3>
+
+<p>Cache various sizes of your images on an offscreen canvas when loading as opposed to constantly scaling them in <a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/drawImage" title="A documentação sobre isto ainda não foi escrita; por favor considere contribuir!"><code>drawImage()</code></a>.</p>
+
+<h3 id="Use_multiple_layered_canvases_for_complex_scenes">Use multiple layered canvases for complex scenes</h3>
+
+<p>You may find you have some elements that are frequently changing and moving around whereas other things (like UI) never change. An optimization in this situation is to create layers using multiple canvas elements.</p>
+
+<p>For example you could create a UI layer that sits on top of everything and is only drawn during user input. You could create game layer where the frequently updating entities exist and a background layer for entities that rarely update.</p>
+
+<pre class="brush: html">&lt;div id=&quot;stage&quot;&gt;
+  &lt;canvas id=&quot;ui-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;game-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;background-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+  #stage {
+    width: 480px;
+    height: 320px;
+    position: relative;
+    border: 2px solid black
+  }
+  canvas { position: absolute; }
+  #ui-layer { z-index: 3 }
+  #game-layer { z-index: 2 }
+  #background-layer { z-index: 1 }
+&lt;/style&gt;
+</pre>
+
+<h3 id="CSS_for_large_background_images">CSS for large background images</h3>
+
+<p>If like most games you have a static background image, use a plain <a href="/pt-BR/docs/Web/HTML/Element/div" title="O elemento de divisão HTML &lt;div&gt; é um container genérico para conteúdo de fluxo, que de certa forma não representa nada. Ele pode ser utilizado para agrupar elementos para fins de estilos (usando class ou id), ou porque eles compartilham valores de atributos, como lang. Ele deve ser utilizado somente quando não tiver outro elemento de semântica (tal como &lt;article&gt; ou &lt;nav&gt;)."><code>&lt;div&gt;</code></a> element with a CSS <a href="/pt-BR/docs/Web/CSS/background" title="A propriedade CSS background é um atalho para definir os valores de fundo individuais em um único lugar na folha de estilo. Background pode ser usado para definir os valores para um ou mais dos seguintes: background-clip, background-color, background-image, background-origin, background-position , background-repeat, background-size e background-attachment."><code>background</code></a> property and position it under the canvas. This will avoid drawing a large image to the canvas on every tick.</p>
+
+<h3 id="Scaling_canvas_using_CSS_transforms">Scaling canvas using CSS transforms</h3>
+
+<p><a href="/en-US/docs/Web/Guide/CSS/Using_CSS_transforms">CSS transforms</a> are faster by using the GPU. Best case is to not scale the canvas or have a smaller canvas and scale up rather than a bigger canvas and scale down. For Firefox OS, target 480 x 320 px.</p>
+
+<pre class="brush: js">var scaleX = window.innerWidth / canvas.width;
+var scaleY = window.innerHeight / canvas.height;
+
+var scaleToFit = Math.min(scaleX, scaleY);
+var scaleToCover = Math.max(scaleX, scaleY);
+
+stage.style.transformOrigin = &apos;0 0&apos;; //scale from top left
+stage.style.transform = &apos;scale(&apos; + scaleToFit + &apos;)&apos;;
+</pre>
+
+<h3 id="Turn_off_transparency">Turn off transparency</h3>
+
+<p>If your game uses canvas and doesn’t need to be transparent, set the <code>alpha</code> option to <code>false</code> when creating a drawing context with <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext" title="The HTMLCanvasElement.getContext() method returns a drawing context on the canvas, or null if the context identifier is not supported."><code>HTMLCanvasElement.getContext()</code></a>. This information can be used internally to optimize rendering.</p>
+
+<pre class="brush: js">var ctx = canvas.getContext(&apos;2d&apos;, { alpha: false });</pre>
+
+<h3 id="More_tips">More tips</h3>
+
+<ul>
+ <li>Batch canvas calls together (for example, draw a poly-line instead of multiple separate lines).</li>
+ <li>Avoid unnecessary canvas state changes.</li>
+ <li>Render screen differences only, not the whole new state.</li>
+ <li>Avoid the <a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/shadowBlur"><code>shadowBlur</code></a> property whenever possible.</li>
+ <li>Avoid <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_text">text rendering</a> whenever possible.</li>
+ <li>Try different ways to clear the canvas (<a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/clearRect"><code>clearRect()</code></a> vs. <a href="/pt-BR/docs/Web/API/CanvasRenderingContext2D/fillRect"><code>fillRect()</code></a> vs. resizing the canvas)</li>
+ <li>With animations, use <a href="/pt-BR/docs/Web/API/Window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> instead of <a href="/pt-BR/docs/Web/API/Window/setInterval"><code>window.setInterval()</code></a> .</li>
+ <li>Be careful with heavy physics libraries</li>
+</ul>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="http://www.html5rocks.com/en/tutorials/canvas/performance/#toc-ref">Improving HTML5 Canvas Performance – HTML5 Rocks</a></li>
+ <li><a href="https://hacks.mozilla.org/2013/05/optimizing-your-javascript-game-for-firefox-os/">Optimizing your JavaScript game for Firefox OS – Mozilla Hacks</a></li>
+</ul>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" class="button">« Previous</a><a href="/pt-BR/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">Next  »</a></p>
+</div><p></p>
