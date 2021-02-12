@@ -1,0 +1,176 @@
+---
+title: copy
+slug: Web/API/Element/copy_event
+tags:
+  - Clipboard API
+  - Event
+  - Reference
+translation_of: Web/API/Element/copy_event
+original_slug: Web/Events/copy
+---
+<p>当用户通过浏览器UI（例如，使用 <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>C</kbd>  键盘快捷方式或从菜单中选择“复制”）启动复制操作并响应允许的<a href="/zh-CN/docs/Web/API/Document/execCommand" title="当一个HTML文档切换到设计模式时，document暴露 execCommand 方法，该方法允许运行命令来操纵可编辑内容区域的元素。"><code>document.execCommand(&apos;copy&apos;)</code></a>调用时触发<code>copy</code>事件。</p>
+
+<h2 id="基本信息">基本信息</h2>
+
+<dl>
+ <dt style="float: left; text-align: right; width: 120px;">Specification</dt>
+ <dd style="margin: 0 0 0 120px;"><a class="external" href="https://www.w3.org/TR/clipboard-apis/#the-copy-action">Clipboard</a></dd>
+ <dt style="float: left; text-align: right; width: 120px;">Interface</dt>
+ <dd style="margin: 0 0 0 120px;"><a href="/zh-CN/docs/Web/API/ClipboardEvent" title="ClipboardEvent 接口描述了与修改剪切板相关的事件，这些事件包括 cut 、copy 和 paste 事件。"><code>ClipboardEvent</code></a></dd>
+ <dt style="float: left; text-align: right; width: 120px;">Bubbles</dt>
+ <dd style="margin: 0 0 0 120px;">Yes</dd>
+ <dt style="float: left; text-align: right; width: 120px;">Cancelable</dt>
+ <dd style="margin: 0 0 0 120px;">Yes</dd>
+ <dt style="float: left; text-align: right; width: 120px;">Target</dt>
+ <dd style="margin: 0 0 0 120px;"><a href="/zh-CN/docs/Web/API/Element" title="Element是非常通用的基类，所有 Document对象下的对象都继承它. 这个接口描述了所有相同种类的元素所普遍具有的方法和属性。 这些继承自Element并且增加了一些额外功能的接口描述了具体的行为. 例如,  HTMLElement 接口是所有HTML元素的基础接口， 而 SVGElement 接口是所有SVG元素的基本接口.大多数功能在类的层次中进一步制定."><code>Element</code></a>：获得焦点的元素（如<a href="/zh-CN/docs/Web/API/HTMLElement/contentEditable" title="HTMLElement.contentEditable 属性用于表明元素是否是可编辑的。该枚举属性（enumerated attribute）可以具有下面的几种值之一："><code>contentEditable</code></a>内容能编辑或者可以选中的元素），或<a href="/zh-CN/docs/Web/HTML/Element/body" title="HTML body 元素表示文档的内容。document.body 属性提供了可以轻松访问文档的 body 元素的脚本。"><code>&lt;body&gt;</code></a>。</dd>
+ <dt style="float: left; text-align: right; width: 120px;">Default Action</dt>
+ <dd style="margin: 0 0 0 120px;">见下文。</dd>
+</dl>
+
+<p>调用<a href="/zh-CN/docs/Web/API/DataTransfer/setData" title="DataTransfer.setData() 方法用来设置拖放操作的drag data到指定的数据和类型。"><code>setData(format, data)</code></a>可以修改<a href="/zh-CN/docs/Web/API/ClipboardEvent/clipboardData" title="ClipboardEvent.clipboardData 属性保存了一个 DataTransfer 对象，这个对象可用于："><code>ClipboardEvent.clipboardData</code></a>事件的默认行为：</p>
+
+<pre class="brush: js">document.addEventListener(&apos;copy&apos;, function(e){
+    e.clipboardData.setData(&apos;text/plain&apos;, &apos;Hello, world!&apos;);
+    e.clipboardData.setData(&apos;text/html&apos;, &apos;&lt;b&gt;Hello, world!&lt;/b&gt;&apos;);
+    e.preventDefault(); // We want our data, not data from any selection, to be written to the clipboard
+});</pre>
+
+<p>不能使用<a href="/zh-CN/docs/Web/API/DataTransfer/getData" title="DataTransfer.getData() 方法接受指定类型的拖放（以DOMString的形式）数据。如果拖放行为没有操作任何数据，会返回一个空字符串。"><code>clipboardData.getData()</code></a>在事件处理函数中获取剪切板数据。</p>
+
+<p>事件的默认行为与事件的来源和事件处理函数相关：</p>
+
+<ul>
+ <li><a href="/en-US/docs/Web/Guide/Events/Creating_and_triggering_events">synthetic</a> copy事件没有默认行为，除非：</li>
+ <li>如果默认事件没有取消，就复制到选区（如果有选中内容）到剪切板；</li>
+ <li>如果取消了默认事件，但是调用了<code>setData()</code>方法：就复制<code>clipboardData</code>的内容到到剪切板；</li>
+ <li>如果取消了默认行为，而且没有调用<code>setData()</code>方法，就没有任何行为。</li>
+</ul>
+
+<h2 id="属性">属性</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Property</th>
+   <th scope="col">Type</th>
+   <th scope="col">Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>target</code> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></td>
+   <td><a href="/zh-CN/docs/Web/API/EventTarget"><code>EventTarget</code></a></td>
+   <td>The event target (the topmost target in the DOM tree).</td>
+  </tr>
+  <tr>
+   <td><code>type</code> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></td>
+   <td><a href="/zh-CN/docs/Web/API/DOMString"><code>DOMString</code></a></td>
+   <td>The type of event.</td>
+  </tr>
+  <tr>
+   <td><code>bubbles</code> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></td>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event normally bubbles or not.</td>
+  </tr>
+  <tr>
+   <td><code>cancelable</code> <span class="readOnly readOnlyInline notecard inline" title="该属性的值无法更改">只读 </span></td>
+   <td><a href="/zh-CN/docs/Web/JavaScript/Reference/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event is cancellable or not.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>clipboardData</code></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><a href="/en-US/Firefox/Releases/22">22</a> (22)</td>
+   <td><span style="color: #f00;">未实现</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>clipboardData</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Please update this with the earliest version of support.">(Yes)</span></td>
+   <td>22.0 (22)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="参见">参见</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/API/HTMLElement/oncopy"><code>HTMLElement.oncopy</code></a></li>
+ <li>Related events
+  <ul>
+   <li><code><a href="/zh-CN/docs/Web/Reference/Events/cut">cut</a></code></li>
+   <li><code><a href="/zh-CN/docs/Web/Reference/Events/paste">paste</a></code></li>
+  </ul>
+ </li>
+</ul>

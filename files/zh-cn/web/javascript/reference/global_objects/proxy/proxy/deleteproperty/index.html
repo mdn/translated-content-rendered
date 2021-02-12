@@ -1,0 +1,161 @@
+---
+title: handler.deleteProperty()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/deleteProperty
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/deleteProperty
+original_slug: Web/JavaScript/Reference/Global_Objects/Proxy/handler/deleteProperty
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects">JavaScript 标准库</a></strong></li><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li><li data-default-state="open"><a href="#"><strong>方法</strong></a><ol><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/apply"><code>handler.apply()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/construct"><code>handler.construct()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/defineProperty"><code>handler.defineProperty()</code></a></li><li><em><code>handler.deleteProperty()</code></em></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><s class="obsoleteElement"><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/enumerate"><code>handler.enumerate()</code></a></s></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/get"><code>handler.get()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getOwnPropertyDescriptor"><code>handler.getOwnPropertyDescriptor()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/getPrototypeOf"><code>handler.getPrototypeOf()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/has"><code>handler.has()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/isExtensible"><code>handler.isExtensible()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/ownKeys"><code>handler.ownKeys()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/preventExtensions"><code>handler.preventExtensions()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set"><code>handler.set()</code></a></li><li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/setPrototypeOf"><code>handler.setPrototypeOf()</code></a></li></ol></li></ol></section></div>
+
+<p><strong><code>handler.deleteProperty()</code></strong> 方法用于拦截对对象属性的 <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete" title="delete 操作符用于删除对象的某个属性；如果没有指向这个属性的引用，那它最终会被释放。"><code>delete</code></a> 操作。</p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js">var p = new Proxy(target, {
+  deleteProperty: function(target, property) {
+  }
+});
+</pre>
+
+<h3 id="参数">参数</h3>
+
+<p><code>deleteProperty</code> 方法将会接受以下参数。 <code>this</code> 被绑定在 handler上。</p>
+
+<dl>
+ <dt><code>target</code></dt>
+ <dd>目标对象。</dd>
+ <dt><code>property</code></dt>
+ <dd>待删除的属性名。</dd>
+</dl>
+
+<h3 id="返回值">返回值</h3>
+
+<p><code>deleteProperty</code> 必须返回一个 <a href="/zh-CN/docs/Web/JavaScript/Reference/Boolean" title="此页面仍未被本地化, 期待您的翻译!"><code>Boolean</code></a> 类型的值，表示了该属性是否被成功删除。</p>
+
+<h2 id="描述">描述</h2>
+
+<p><code><strong>handler.deleteProperty()</strong></code> 方法可以拦截 <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete" title="delete 操作符用于删除对象的某个属性；如果没有指向这个属性的引用，那它最终会被释放。"><code>delete</code></a> 操作。</p>
+
+<h3 id="拦截">拦截</h3>
+
+<p>该方法会拦截以下操作:</p>
+
+<ul>
+ <li>删除属性: <code>delete proxy[foo]</code> 和 <code>delete proxy.foo</code></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/deleteProperty"><code>Reflect.deleteProperty()</code></a></li>
+</ul>
+
+<h3 id="不变量">不变量</h3>
+
+<p>如果违背了以下不变量，proxy 将会抛出一个 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError" title="TypeError（类型错误） 对象用来表示值的类型非预期类型时发生的错误。"><code>TypeError</code></a>:</p>
+
+<ul>
+ <li>如果目标对象的属性是不可配置的，那么该属性不能被删除。</li>
+</ul>
+
+<h2 id="示例">示例</h2>
+
+<p>以下代码演示了对 <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete" title="delete 操作符用于删除对象的某个属性；如果没有指向这个属性的引用，那它最终会被释放。"><code>delete</code></a> 操作的拦截。</p>
+
+<pre class="brush: js">var p = new Proxy({}, {
+  deleteProperty: function(target, prop) {
+    console.log(&apos;called: &apos; + prop);
+    return true;
+  }
+});
+
+delete p.a; // &quot;called: a&quot;
+</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-delete-p" class="external" hreflang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="zh-CN">[[Delete]]</small></a></td>
+   <td><span class="spec-Standard">Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+  <tr>
+   <td><a lang="en" href="https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-delete-p" class="external" hreflang="en">ECMAScript Latest Draft (ECMA-262)<br><small lang="zh-CN">[[Delete]]</small></a></td>
+   <td><span class="spec-Draft">Draft</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">We&apos;re converting our compatibility data into a machine-readable JSON format</a></strong>.
+            This compatibility table still uses the old format,
+            because we haven&apos;t yet converted the data it contains.
+            <strong><a href="/zh-CN/docs/MDN/Contribute/Structures/Compatibility_tables">Find out how you can help!</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Desktop</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div></div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><a href="/en-US/Firefox/Releases/18">18</a> (18)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Chrome for Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Mobile</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>18.0 (18)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="另见">另见</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/delete"><code>delete</code></a> 操作符</li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/deleteProperty"><code>Reflect.deleteProperty()</code></a></li>
+</ul>

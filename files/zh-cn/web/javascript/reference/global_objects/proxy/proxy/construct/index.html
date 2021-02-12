@@ -1,0 +1,131 @@
+---
+title: handler.construct()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/construct
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/construct
+original_slug: Web/JavaScript/Reference/Global_Objects/Proxy/handler/construct
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects">JavaScript 标准库</a></strong></li><li><strong><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p><code><strong>handler.construct()</strong></code> 方法用于拦截<a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new"><code>new</code></a> 操作符. 为了使new操作符在生成的Proxy对象上生效，用于初始化代理的目标对象自身必须具有[[Construct]]内部方法（即 <code>new target</code> 必须是有效的）。</p>
+
+<p><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-construct.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></p>
+
+<h2 id="语法">语法</h2>
+
+<pre class="brush: js notranslate">var p = new Proxy(target, {
+  construct: function(target, argumentsList, newTarget) {
+  }
+});
+</pre>
+
+<h3 id="参数">参数</h3>
+
+<p>下面的参数将会传递给<code>construct</code>方法，<code>this</code>绑定在handler上。</p>
+
+<dl>
+ <dt><code>target</code></dt>
+ <dd>目标对象。</dd>
+ <dt><code>argumentsList</code></dt>
+ <dd>constructor的参数列表。</dd>
+ <dt><code>newTarget</code></dt>
+ <dd>最初被调用的构造函数，就上面的例子而言是p。</dd>
+</dl>
+
+<h3 id="返回值">返回值</h3>
+
+<p><code>construct</code> 方法必须返回一个对象。</p>
+
+<h2 id="描述">描述</h2>
+
+<p><code><strong>handler.construct()</strong></code> 方法用于拦截 <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new"><code>new</code></a>操作符。</p>
+
+<h3 id="拦截">拦截</h3>
+
+<p>该拦截器可以拦截以下操作:</p>
+
+<ul>
+ <li><code>new proxy(...args)</code></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/construct"><code>Reflect.construct()</code></a></li>
+</ul>
+
+<h3 id="约束">约束</h3>
+
+<p>如果违反以下约定，代理将会抛出错误 <a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/TypeError"><code>TypeError</code></a>:</p>
+
+<ul>
+ <li>必须返回一个对象.</li>
+</ul>
+
+<h2 id="示例">示例</h2>
+
+<p>下面代码演示如何拦截 <a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new"><code>new</code></a> 操作。</p>
+
+<pre class="brush: js notranslate">var p = new Proxy(function() {}, {
+  construct: function(target, argumentsList, newTarget) {
+    console.log(&apos;called: &apos; + argumentsList.join(&apos;, &apos;));
+    return { value: argumentsList[0] * 10 };
+  }
+});
+
+console.log(new p(1).value); // &quot;called: 1&quot;
+                             // 10
+</pre>
+
+<p>下面的代码违反了约定.</p>
+
+<pre class="brush: js notranslate">var p = new Proxy(function() {}, {
+  construct: function(target, argumentsList, newTarget) {
+    return 1;
+  }
+});
+
+new p(); // TypeError is thrown
+</pre>
+
+<p>下面的代码未能正确的初始化Proxy。Proxy初始化时，传给它的<code>target</code> 必须具有一个有效的constructor供<code>new</code>操作符调用。</p>
+
+<pre class="brush: js notranslate">var p = new Proxy({}, {
+  construct: function(target, argumentsList, newTarget) {
+    return {};
+  }
+});
+
+new p(); // TypeError is thrown, &quot;p&quot; is not a constructor
+</pre>
+
+<h2 id="规范">规范</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget" hreflang="en" lang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="zh-CN">[[Construct]]</small></a></td>
+   <td><span class="spec-Standard">Standard</span></td>
+   <td>Initial definition.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="zh-CN">[[Construct]]</small></a></td>
+   <td><span class="spec-Living">Living Standard</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="浏览器兼容性">浏览器兼容性</h2>
+
+<div><div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.construct"></div></div>
+
+<div id="compat-mobile"> </div>
+
+<h2 id="相关主题">相关主题</h2>
+
+<ul>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Operators/new"><code>new</code></a> operator.</li>
+ <li><a href="/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect/construct"><code>Reflect.construct()</code></a></li>
+</ul>
