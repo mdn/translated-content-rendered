@@ -1,0 +1,564 @@
+---
+title: Zugriff auf Dateien von Webapplikationen
+slug: Web/API/File/Using_files_from_web_applications
+translation_of: Web/API/File/Using_files_from_web_applications
+original_slug: Web/API/File/Zugriff_auf_Dateien_von_Webapplikationen
+---
+<p>Mithilfe der File API, welche mit HTML5 zum DOM hinzugefügt wurde, ist es nun für Webinhalte möglich den Benutzer lokale Dateien auswählen zu lassen und den Inhalt dieser Dateien auszulesen. Die Auswahl kann entweder durch das HTML Element <a href="/de/docs/Web/HTML/Element/input" title="Das HTML-Element &lt;input&gt; ermöglicht es, interaktive Bedienelemente für webbasierte Formulare zu erstellen, die Daten vom Benutzer entgegennehmen."><code>&lt;input&gt;</code></a> oder durch Drag and Drop erfolgen.</p>
+
+<p>Es ist auch möglich die DOM File API von Erweiterungen oder anderem Chrome Code zu benutzen. In diesem Fall müssen einige zusätzliche Dinge beachtet werden, die im Abschnitt <a href="/en/Extensions/Using_the_DOM_File_API_in_chrome_code" title="en/Extensions/Using the DOM File API in chrome code">Using the DOM File API in chrome code</a> näher erläutert werden.</p>
+
+<h2 id="Auf_ausgewählte_Dateien_zugreifen">Auf ausgewählte Dateien zugreifen</h2>
+
+<p>Gehen wir von folgendem HTML-Code aus:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot;&gt;</pre>
+
+<p>Die File API erlaubt den Zugriff auf eine <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> mit <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekten, die die vom Benutzer ausgewählten Dateien repräsentieren.</p>
+
+<p>Wenn der Benutzer nur eine Datei auswählt, dann muss nur die erste Datei in der Liste betrachtet werden.</p>
+
+<p>Eine ausgewählte Datei erhält man über den üblichen DOM Selektor:</p>
+
+<pre class="brush: js">var selectedFile = document.getElementById(&apos;input&apos;).files[0];</pre>
+
+<p>Oder mit einem <a href="http://jquery.com/" title="http://jquery.com/">jQuery</a> Selektor:</p>
+
+<pre class="brush: js">var selectedFile = $(&apos;#input&apos;).get(0).files[0];
+
+var selectedFile = $(&apos;#input&apos;)[0].files[0];</pre>
+
+<div class="note notecard">
+<p>Tritt der Fehler &quot;<code>files is undefined</code>&quot; auf:<br>
+ Es wurde das falsche HTML element ausgewählt. Es ist zu beachten, dass ein jQuery Selektor eine Liste von zutreffenden DOM Elementen zurückliefert. Das richtige DOM Element muss ausgewählt werden, um &quot;<code>files</code>&quot; darauf anzuwenden.</p>
+</div>
+
+<h2 id="Zugriff_auf_ausgwählte_Dateien_über_den_Change_Event">Zugriff auf ausgewählte Dateien über den Change Event</h2>
+
+<p>Es ist auch möglich (aber nicht unbedingt erforderlich), auf die <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> über das change event zuzugreifen:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;</pre>
+
+<p>Wenn der Benutzer eine Datei auswählt, wird die Funktion <code>handleFiles()</code> aufgerufen. Als Parameter wird die <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> übergeben. Sie enthält die <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekte, die die vom Benutzer ausgewählten Dateien repräsentieren.</p>
+
+<p>Soll der Benutzer mehrere Dateien auswählen können, dann kann einfach das Attribut <code>multiple</code> auf das <code>input</code> Element angewendet werden:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;input&quot; multiple onchange=&quot;handleFiles(this.files)&quot;&gt;</pre>
+
+<p>In diesem Fall enthält die Dateiliste, die an die <code>handleFiles()</code> Funktion übergeben wird, ein <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> für jede Datei, die der Benutzer ausgewählt hat.</p>
+
+<h3 id="Dynamisch_einen_Change_Listener_hinzufügen">Dynamisch einen Change Listener hinzufügen</h3>
+
+<p>Wurde das <code>input</code> Feld mit einer JavaScript Bibliothek wie <a href="http://www.jquery.com/" class="external" title="http://www.jquery.com/">jQuery</a> erzeugt, dann muss der event Listener mit <a href="/de/docs/Web/API/Element/addEventListener" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>element.addEventListener()</code></a> hinzugefügt werden:</p>
+
+<pre class="brush: js">var inputElement = document.getElementById(&quot;input&quot;);
+inputElement.addEventListener(&quot;change&quot;, handleFiles, false);
+function handleFiles() {
+  var fileList = this.files; /* Jetzt kann die Dateiliste verarbeitet werden */
+}</pre>
+
+<p>In diesem Fall ist die <code>handleFiles()</code> Funktion selbst der Event Handler, anders als in den vorigen Beispielen, wo sie von einem Event Handler aufgerufen wurde.</p>
+
+<h2 id="Informationen_über_die_ausgewählte(n)_Datei(en)">Informationen über die ausgewählte(n) Datei(en)</h2>
+
+<p>Das <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> Objekt, das vom DOM geliefert wurde, enthält eine Liste aller Dateien, die vom Benutzer ausgewählt wurden. Jede der Dateien wird durch ein <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekt repräsentiert. Die Anzahl der ausgewälten Dateien kann über das <code>length</code> Attribut der Liste ermittelt werden:</p>
+
+<pre class="brush: js"><code>var numFiles = files.length;</code></pre>
+
+<p>Die einzelnen <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekte erhält man, indem das <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> Objekt einfach wie ein Array behandelt wird:</p>
+
+<pre class="brush: js">for (var i = 0, numFiles = files.length; i &lt; numFiles; i++) {
+  var file = files[i];
+  ..
+}
+</pre>
+
+<p>Diese Schleife iteriert über alle Dateien in der Liste.</p>
+
+<p>Im <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekt liefern drei Attribute hilfreiche Informationen über die Datei:</p>
+
+<dl>
+ <dt><code>name</code></dt>
+ <dd>Der Dateiname als read-only String. Es ist nur der Dateiname enthalten, keine Pfadinformationen.</dd>
+ <dt><code>size</code></dt>
+ <dd>Die Dateigröße in Bytes als read-only 64-Bit Integer.</dd>
+ <dt><code>type</code></dt>
+ <dd>Der MIME type der Datei als read-only String oder <code>&quot;&quot;</code>, wenn der Typ nicht ermittelt werden konnte.</dd>
+</dl>
+
+<h3 id="Beispiel_Dateigröße_anzeigen">Beispiel: Dateigröße anzeigen</h3>
+
+<p>Das folgende Beispiel zeigt eine mögliche Verwendung des <code>size</code> Attributs:</p>
+
+<pre class="brush: html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;File(s) size&lt;/title&gt;
+&lt;script&gt;
+function updateSize() {
+  var nBytes = 0,
+      oFiles = document.getElementById(&quot;uploadInput&quot;).files,
+      nFiles = oFiles.length;
+  for (var nFileId = 0; nFileId &lt; nFiles; nFileId++) {
+    nBytes += oFiles[nFileId].size;
+  }
+  var sOutput = nBytes + &quot; bytes&quot;;
+  // optional code for multiples approximation
+  for (var aMultiples = [&quot;KiB&quot;, &quot;MiB&quot;, &quot;GiB&quot;, &quot;TiB&quot;, &quot;PiB&quot;, &quot;EiB&quot;, &quot;ZiB&quot;, &quot;YiB&quot;], nMultiple = 0, nApprox = nBytes / 1024; nApprox &gt; 1; nApprox /= 1024, nMultiple++) {
+    sOutput = nApprox.toFixed(3) + &quot; &quot; + aMultiples[nMultiple] + &quot; (&quot; + nBytes + &quot; bytes)&quot;;
+  }
+  // end of optional code
+  document.getElementById(&quot;fileNum&quot;).innerHTML = nFiles;
+  document.getElementById(&quot;fileSize&quot;).innerHTML = sOutput;
+}
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body onload=&quot;updateSize();&quot;&gt;
+&lt;form name=&quot;uploadForm&quot;&gt;
+&lt;p&gt;&lt;input id=&quot;uploadInput&quot; type=&quot;file&quot; name=&quot;myFiles&quot; onchange=&quot;updateSize();&quot; multiple&gt; selected files: &lt;span id=&quot;fileNum&quot;&gt;0&lt;/span&gt;; total size: &lt;span id=&quot;fileSize&quot;&gt;0&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;input type=&quot;submit&quot; value=&quot;Send file&quot;&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="Verstecktes_input_Element_mit_click()_Methode">Verstecktes input Element mit click() Methode</h2>
+
+<p>Ab Gecko 2.0 (Firefox 4 / Thunderbird 3.3 / SeaMonkey 2.1), kann das zugegebenermaßen hässliche Datei-<a href="/de/docs/Web/HTML/Element/input" title="Das HTML-Element &lt;input&gt; ermöglicht es, interaktive Bedienelemente für webbasierte Formulare zu erstellen, die Daten vom Benutzer entgegennehmen."><code>&lt;input&gt;</code></a> Element versteckt und durch eigene Oberflächenelemente zum Zugriff auf den Datei-Öffnen-Dialog ersetzt werden. Dazu wird das <code>input</code> Element mit dem CSS Stil <code>display:none</code> versehen und mit der Methode <a href="/de/docs/Web/API/Element/click" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>click()</code></a> aufgerufen.</p>
+
+<p>Gehen wir von folgendem HTML-Code aus:</p>
+
+<pre class="brush: html"><code>&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; style=&quot;display:none&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;
+&lt;a href=&quot;#&quot; id=&quot;fileSelect&quot;&gt;Bitte Dateien auswählen&lt;/a&gt;
+</code>
+</pre>
+
+<p>Der Code, der auf den <code>click</code> Event reagiert, kann wie folgt aussehen:</p>
+
+<pre class="brush: js">var fileSelect = document.getElementById(&quot;fileSelect&quot;),
+  fileElem = document.getElementById(&quot;fileElem&quot;);
+
+fileSelect.addEventListener(&quot;click&quot;, function (e) {
+  if (fileElem) {
+    fileElem.click();
+  }
+  e.preventDefault(); // prevent navigation to &quot;#&quot;
+}, false);
+</pre>
+
+<p>Das neue Oberflächenelement zum Zugriff auf den Datei-Öffnen-Dialog kann nun beliebig gestaltet werden.</p>
+
+<h2 id="label_Element_zum_Auslösen_eines_versteckten_input_Elements">label Element zum Auslösen eines versteckten input Elements</h2>
+
+<p>Wird statt eines Links (<a href="/de/docs/Web/HTML/Element/a" title="Das HTML-Element &lt;a&gt; (auch HTML-Anker-Element) definiert einen Hyperlink, ein benanntes Ziel für einen Hyperlink oder beides."><code>&lt;a&gt;</code></a> Element) ein <a href="/de/docs/Web/HTML/Element/label" title="The HTML &lt;label&gt; element represents a caption for an item in a user interface."><code>&lt;label&gt;</code></a> Element verwendet, dann kann das versteckte <code>input</code> Element auch ohne JavaScript ausgelöst werden. Dabei darf das input-Element aber weder mit <code>display: none</code> noch mit <code>visibility: hidden</code> versteckt werden, weil es in diesen Fällen nicht mit der Tastatur bedienbar wäre. Es darf nur <a href="https://a11yproject.com/posts/how-to-hide-content/">visuell versteckt</a> werden.</p>
+
+<p>Gehen wir von folgendem HTML-Code aus:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; class=&quot;visually-hidden&quot;&gt;
+&lt;label for=&quot;fileElem&quot;&gt;Bitte Dateien auswählen&lt;/label&gt;
+</pre>
+
+<p>und folgendem CSS:</p>
+
+<pre class="brush: css">.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+input.visually-hidden:focus + label {
+  outline: thin dotted;
+}
+</pre>
+
+<p>Bei einem Klick auf das <code>label</code> Element wird der Datei-Öffnen-Dialog angezeigt.</p>
+
+<p>Das <code>label</code> Element kann per CSS beliebig gestaltet werden. Man muss aber das Label des versteckten Eingabefelds hervorheben, wenn dieses den Fokus hat, d.h. per Tab-Taste angewählt wurde – sei es durch outline wie im obigen Beispiel oder background-color oder box-shadow. (Gegenwärtig stellt Firefox das Label von fokussierten <code>&lt;input type=&quot;file&quot;&gt;</code>-Elementen nicht hervorgehoben dar.)</p>
+
+<h2 id="Dateien_per_Drag_and_Drop_auswählen">Dateien per Drag and Drop auswählen</h2>
+
+<p>Es ist auch möglich, per Drag and Drop Dateien an die Webanwendung zu übergeben.</p>
+
+<p>Zuerst muss eine Drop Zone eingerichtet werden. Welcher Teil der Oberfläche Drops entgegen nimmt, ist vom Design der Anwendung abhängig. Generell ist das Empfangen von Drop Events aber einfach:</p>
+
+<pre class="brush: js">var dropbox;
+
+dropbox = document.getElementById(&quot;dropbox&quot;);
+dropbox.addEventListener(&quot;dragenter&quot;, dragenter, false);
+dropbox.addEventListener(&quot;dragover&quot;, dragover, false);
+dropbox.addEventListener(&quot;drop&quot;, drop, false);
+</pre>
+
+<p>In diesem Beispiel wird das Element mit der ID <code>dropbox</code> als Drop Zone verwendet. Das wird durch Registrieren der Listener für <code><a href="/de/docs/Web/Reference/Events/dragenter" title="/de/docs/Web/Reference/Events/dragenter">dragenter</a></code>, <code><a href="/de/docs/Web/Reference/Events/dragover" title="/de/docs/Web/Reference/Events/dragover">dragover</a></code> und <code><a href="/de/docs/Web/Reference/Events/drop" title="/de/docs/Web/Reference/Events/drop">drop</a></code> Events erreicht.</p>
+
+<p>dragenter und dragover benötigen wir in unserem Fall eigentlich nicht. Wir verhindern lediglich eine weitere Behandlung der Events durch Aufruf von <code>e.stopPropagation()</code> und <code>e.preventDefault()</code>:</p>
+
+<pre class="brush: js">function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+</pre>
+
+<p>Das Wesentliche geschieht in der Behandlung des <code>drop</code> Events:</p>
+
+<pre class="brush: js">function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  var dt = e.dataTransfer;
+  var files = dt.files;
+
+  handleFiles(files);
+}
+</pre>
+
+<p>Hier ermitteln wir das <code>dataTransfer</code> Feld aus dem Event, entnehmen ihm die Dateiliste und übergeben diese an <code>handleFiles()</code>. Von da an ist die Weiterverarbeitung die gleiche wie bei Verwendung des <code>input</code> Elements.</p>
+
+<h2 id="Beispiel_Thumbnails_von_ausgewählten_Bildern_anzeigen">Beispiel: Thumbnails von ausgewählten Bildern anzeigen</h2>
+
+<p>Gehen wir davon aus, dass auf einer Foto-Webseite mit HTML5 eine Thumbnail Vorschau von Bildern angezeigt werden soll, bevor sie hochgeladen werden. Das input Element oder die Drop Zone kann wie oben beschrieben eingerichtet werden. Diese rufen die folgende handleFiles() Funktion auf:</p>
+
+<pre class="brush: js">function handleFiles(files) {
+  for (var i = 0; i &lt; files.length; i++) {
+    var file = files[i];
+    var imageType = /^image\//;
+
+    if (!imageType.test(file.type)) {
+      continue;
+    }
+
+    var img = document.createElement(&quot;img&quot;);
+    img.classList.add(&quot;obj&quot;);
+    img.file = file;
+    preview.appendChild(img); // Gehen wird davon aus, dass &quot;preview&quot; das div-Element ist, in dem der Inhalt angezeigt wird.
+
+    var reader = new FileReader();
+    reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+    reader.readAsDataURL(file);
+  }
+}
+</pre>
+
+<p>Mit der Schleife wird über die ausgewählten Dateien iteriert. Bei jeder Datei wird mit Hilfe des <code>type</code> Attributs (indem der Reguläre Ausdruck &quot;^image\/&quot; darauf angewendet wird) geprüft, ob es sich um eine Bild Datei handelt. Liegt eine Bild Datei vor, dann wird ein neues <code>img</code> Element erzeugt. Mit CSS können z.B. hübsche Ränder oder Schatten erzeugt und die Größe des Bildes festgelegt werden, das muss also nicht hier im Code erfolgen.</p>
+
+<p>Jedem Bild wird die CSS Klasse <code>obj</code> zugewiesen, so dass es einfach ist, es im DOM Baum zu finden. Außerdem wird jedem Bild im <code>file</code> Attribut das <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekt für das Bild zugewiesen; das benötigen wir später für den tatsächlichen Upload der Datei. Mit <a href="/de/docs/Web/API/Node/appendChild" title="Die Node.appendChild() Methode fügt einen Kind-Knoten am Ende der Liste aller Kinder des angegebenen Eltern-Knotens an (to append = anhängen)."><code>Node.appendChild()</code></a> wird das neue Thumbnail dem <code>preview</code> Bereich unserer Anwendung hinzugefügt.</p>
+
+<p>Dann erstellen wir einen <a href="/de/docs/Web/API/FileReader" title="Mit dem FileReader-Objekt können Webapplikationen den Inhalt von auf dem Computer des Benutzers gespeicherten Dateien (oder Rohdaten-Buffer) asynchron lesen. Mit File oder Blob-Objekten wird die zu lesende Datei oder die zu lesenden Daten spezifiziert."><code>FileReader</code></a>, um das Bild asynchron zu laden und es dem <code>img</code> Element hinzuzufügen. Nach dem Erstellen des FileReader Objektes definieren wir die <code>onload</code> Funktion und rufen <code>readAsDataURL()</code> auf, um die Leseoperation im Hintergrund zu starten. Ist der komplette Inhalt der Bilddatei geladen, dann wird er in eine <code>data:</code> URL umgewandelt, die an den <code>onload</code> Callback übergeben wird. Unsere Implementation dieser Routine setzt das <code>src</code> Attribut des <code>img</code> Elements auf das geladene Bild, was dazu führt, dass das Bild im Thumbnail auf dem Bildschirm des Benutzers erscheint.</p>
+
+<h2 id="Verwendung_von_Objekt_URLs">Verwendung von Objekt URLs</h2>
+
+<p>Mit Gecko 2.0 (Firefox 4 / Thunderbird 3.3 / SeaMonkey 2.1) wurde die Unterstützung für die DOM Methoden <a href="/de/docs/Web/API/Window/URL/createObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.createObjectURL()</code></a> und <a href="/de/docs/Web/API/Window/URL/revokeObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.revokeObjectURL()</code></a> eingeführt. Mit ihnen lassen sich einfache URL Strings erzeugen, die beliebige Daten referenzieren, auf die per DOM <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekte zugegriffen werden kann; einschließlich lokale Dateien auf dem Computer des Anwenders.</p>
+
+<p>Wenn man aus HTML mit einer URL auf ein <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekt verweisen möchte, dann kann man dafür eine Objekt URL erzeugen:</p>
+
+<pre class="brush: js"><code>var objectURL = window.URL.createObjectURL(fileObj);</code></pre>
+
+<p>Die Objekt URL ist ein String, der das <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> Objekt identifiziert. Jedes Mal, wenn <a href="/de/docs/Web/API/Window/URL/createObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.createObjectURL()</code></a> aufgerufen wird, wird eine eindeutige Objekt URL erzeugt, auch wenn vorher bereits eine Objekt URL für diese Datei erzeugt wurde. Jede von ihnen muss wieder freigegeben werden. Sie werden automatisch freigegeben, wenn das Dokument entladen wird. Wenn ihre Anwendung die Objekt URLs dynamisch verwendet, dann sollten Sie sie auch explizit durch Aufruf von <a href="/de/docs/Web/API/Window/URL/revokeObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.revokeObjectURL()</code></a> freigeben:</p>
+
+<pre class="brush: js"><code>window.URL.revokeObjectURL(objectURL);</code></pre>
+
+<h2 id="Beispiel_Mit_Objekt_URLs_Bilder_anzeigen">Beispiel: Mit Objekt URLs Bilder anzeigen</h2>
+
+<p>Dieses Beispiel verwendet Objekt URLs, um Thumbnails von Bildern anzuzeigen. Darüber hinaus werden weitere Dateiinformationen einschließlich Name und Größe angezeigt. <a href="/samples/domref/file-click-demo.html" title="https://developer.mozilla.org/samples/domref/file-click-demo.html">Live Ansicht des Beispiels</a>.</p>
+
+<p>Das HTML für die Oberfläche sieht folgendermaßen aus:</p>
+
+<pre class="brush: html">&lt;input type=&quot;file&quot; id=&quot;fileElem&quot; multiple accept=&quot;image/*&quot; style=&quot;display:none&quot; onchange=&quot;handleFiles(this.files)&quot;&gt;
+&lt;a href=&quot;#&quot; id=&quot;fileSelect&quot;&gt;Bitte Dateien auswählen&lt;/a&gt;
+&lt;div id=&quot;fileList&quot;&gt;
+  &lt;p&gt;Keine Dateien ausgewählt!&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Das erstellt ein Datei <a href="/de/docs/Web/HTML/Element/input" title="Das HTML-Element &lt;input&gt; ermöglicht es, interaktive Bedienelemente für webbasierte Formulare zu erstellen, die Daten vom Benutzer entgegennehmen."><code>&lt;input&gt;</code></a> Element, zusammen mit einem Link, der den Datei-Öffnen-Dialog anzeigt (so kann das Datei <code>input</code> Element versteckt werden, da es nicht so attraktiv aussieht). Das wird oben im Abschnitt <a href="#Verstecktes_input_Element_mit_click()_Methode">Verstecktes input Element mit click() Methode</a> näher beschrieben.</p>
+
+<p>Die <code>handleFiles()</code> Methode sieht folgendermaßen aus:</p>
+
+<pre class="brush: js">window.URL = window.URL || window.webkitURL;
+
+var fileSelect = document.getElementById(&quot;fileSelect&quot;),
+    fileElem = document.getElementById(&quot;fileElem&quot;),
+    fileList = document.getElementById(&quot;fileList&quot;);
+
+fileSelect.addEventListener(&quot;click&quot;, function (e) {
+  if (fileElem) {
+    fileElem.click();
+  }
+  e.preventDefault(); // prevent navigation to &quot;#&quot;
+}, false);
+
+function handleFiles(files) {
+  if (!files.length) {
+    fileList.innerHTML = &quot;&lt;p&gt;No files selected!&lt;/p&gt;&quot;;
+  } else {
+    var list = document.createElement(&quot;ul&quot;);
+    for (var i = 0; i &lt; files.length; i++) {
+      var li = document.createElement(&quot;li&quot;);
+      list.appendChild(li);
+
+      var img = document.createElement(&quot;img&quot;);
+      img.src = window.URL.<strong>createObjectURL</strong>(files[i]);
+      img.height = 60;
+      img.onload = function() {
+        window.URL.<strong>revokeObjectURL</strong>(this.src);
+      }
+      li.appendChild(img);
+      var info = document.createElement(&quot;span&quot;);
+      info.innerHTML = files[i].name + &quot;: &quot; + files[i].size + &quot; bytes&quot;;
+      li.appendChild(info);
+    }
+  }
+}
+</pre>
+
+<p>Das <a href="/de/docs/Web/HTML/Element/div" title="Das HTML &lt;div&gt; Element (oder HTML Document Division Element) ist ein generischer Container für fließenden Inhalt, der im Grunde genommen Nichts repräsentiert. Dieser kann für die Gruppierung von Elementen genutzt werden, um sie zu stylen (mit Hilfe des class oder id Attributs) oder weil sie die gleichen Attribut-Werte besitzen, wie zum Beispiel das Attribut lang. Dies sollte nur genutzt werden, wenn kein anderes semantisches Element (wie &lt;article&gt; oder &lt;nav&gt;) geeignet ist."><code>&lt;div&gt;</code></a> Element mit der ID <code>fileList</code> wird ermittelt. Das ist der Block, in den wir später unsere Dateiliste einschließlich Thumbnails einfügen.</p>
+
+<p>Ist das <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a> Objekt, das an <code>handleFiles()</code> übergeben wird, <code>null</code>, dann wird einfach &quot;No files selected!&quot; ausgegeben. Ansonsten bauen wir unsere Dateiliste wie folgt:</p>
+
+<ol>
+ <li>Ein neues (<a href="/de/docs/Web/HTML/Element/ul" title="Das HTML Element unordered list &lt;ul&gt; wird verwendet um eine ungeordnete Liste darzustellen. Eine Sammlung von Einträgen, die keine nummerische Ordung aufweisen bzw. deren Aufzählung bedeutungslos ist. Die einzelnen Einträge der Liste werden durch das list item (&lt;li&gt;) Element definiert, welches das einzige Element ist, was innerhalb eines &lt;ul&gt; Tag stehen darf."><code>&lt;ul&gt;</code></a>) Element wird erzeugt.</li>
+ <li>Das neue Listenelement wird dem <a href="/de/docs/Web/HTML/Element/div" title="Das HTML &lt;div&gt; Element (oder HTML Document Division Element) ist ein generischer Container für fließenden Inhalt, der im Grunde genommen Nichts repräsentiert. Dieser kann für die Gruppierung von Elementen genutzt werden, um sie zu stylen (mit Hilfe des class oder id Attributs) oder weil sie die gleichen Attribut-Werte besitzen, wie zum Beispiel das Attribut lang. Dies sollte nur genutzt werden, wenn kein anderes semantisches Element (wie &lt;article&gt; oder &lt;nav&gt;) geeignet ist."><code>&lt;div&gt;</code></a> Block hinzugefügt durch Aufruf der <a href="/de/docs/Web/API/Element/appendChild" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>element.appendChild()</code></a> Methode.</li>
+ <li>Für jedes <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> in der <a href="/de/docs/Web/API/FileList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>FileList</code></a>, die durch <code>files</code> repräsentiert wird:
+  <ol>
+   <li>Erzeuge ein neues Listenelement (<a href="/de/docs/Web/HTML/Element/li" title="Das HTML Element list item &lt;li&gt; wird verwendet, um einen Listeneintrag innerhalb einer geordneten Liste (&lt;ol&gt;) oder einer ungeordneten Liste (&lt;ul&gt;) oder einem Menü (&lt;menu&gt;) auszuzeichnen. In Menüs und ungeordneten Listen werden Listeneinträge normalerweise mit Aufzählungszeichen dargestellt. In geordneten Listen werden sie normalerweise mit einem aufsteigendem Zähler wie einer Nummer oder einem Buchstaben auf der linken Seite dargestellt."><code>&lt;li&gt;</code></a>) und füge es der Liste hinzu.</li>
+   <li>Erzeuge ein neues Bildelement (<a href="/de/docs/Web/HTML/Element/img" title="Das Element &lt;img&gt; fügt eine Grafik in ein Dokument ein."><code>&lt;img&gt;</code></a>).</li>
+   <li>Setze das src Attribut des Bildes auf die neue Objekt URL, die die Datei repräsentiert, wobei die Objekt URL mit <a href="/de/docs/Web/API/Window/URL/createObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.createObjectURL()</code></a> erzeugt wird.</li>
+   <li>Setze die Bildgröße auf 60 Pixel.</li>
+   <li>Richte den <code>onload</code> Event Handler ein, um die Objekt URL wieder freizugeben, da sie nach dem Laden des Bildes nicht mehr benötigt wird. Das wird durch Aufruf der Methode <a href="/de/docs/Web/API/Window/URL/revokeObjectURL" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>window.URL.revokeObjectURL()</code></a> und Übergabe des Objekt URL Strings aus <code>img.src</code> gemacht.</li>
+   <li>Füge das neue Bildelement dem Listenelement hinzu.</li>
+  </ol>
+ </li>
+</ol>
+
+<h2 id="Example_Uploading_a_user-selected_file">Example: Uploading a user-selected file</h2>
+
+<p>Another thing you might want to do is let the user upload the selected file or files (such as the images selected using the previous example) to a server. This can be done asynchronously very easily.</p>
+
+<h3 id="Creating_the_upload_tasks">Creating the upload tasks</h3>
+
+<p>Continuing with the code that built the thumbnails in the previous example, recall that every thumbnail image is in the CSS class <code>obj</code> with the corresponding <a href="/de/docs/Web/API/File" title="DasFile Interface stellt Informationen über Dateien bereit und erlaubt den Zugriff auf deren Inhalt."><code>File</code></a> attached in a <code>file</code> attribute. This allows us to select all of the images the user has chosen for uploading using <a href="/de/docs/Web/API/Document/querySelectorAll" title="Gibt alle Elemente des Dokuments zurück, auf die die Gruppe der übergebenen CSS Selektoren zutrifft. Der Document-Tree wird dabei mittels Tiefensuche in pre-order Traversierung durchsucht. Das zurückgegebene Objekt ist eine NodeList."><code>Document.querySelectorAll()</code></a>, like this:</p>
+
+<pre class="brush: js">function sendFiles() {
+  var imgs = document.querySelectorAll(&quot;.obj&quot;);
+
+  for (var i = 0; i &lt; imgs.length; i++) {
+    new FileUpload(imgs[i], imgs[i].file);
+  }
+}
+</pre>
+
+<p>Line 2 fetches a <span style="line-height: 1.5;"><a href="/de/docs/Web/API/NodeList" title="Die Beschreibung hierüber wurde bisher noch nicht geschrieben. Bitte überlege, mitzuwirken!"><code>NodeList</code></a></span><span style="line-height: 1.5;">, called </span><code style="font-size: 14px;">imgs</code><span style="line-height: 1.5;">, of all the elements in the document with the CSS class </span><code style="font-size: 14px;">obj</code><span style="line-height: 1.5;">. In our case, these will be all of the image thumbnails. Once we have that list, it&apos;s trivial to go through it and create a new </span><code style="font-size: 14px;">FileUpload</code><span style="line-height: 1.5;"> instance for each. Each of these handles uploading the corresponding file.</span></p>
+
+<h3 id="Handling_the_upload_process_for_a_file">Handling the upload process for a file</h3>
+
+<p>The <code>FileUpload</code> function accepts two inputs: an image element and a file from which to read the image data.</p>
+
+<pre class="brush: js">function FileUpload(img, file) {
+  var reader = new FileReader();
+  this.ctrl = createThrobber(img);
+  var xhr = new XMLHttpRequest();
+  this.xhr = xhr;
+
+  var self = this;
+  this.xhr.upload.addEventListener(&quot;progress&quot;, function(e) {
+        if (e.lengthComputable) {
+          var percentage = Math.round((e.loaded * 100) / e.total);
+          self.ctrl.update(percentage);
+        }
+      }, false);
+
+  xhr.upload.addEventListener(&quot;load&quot;, function(e){
+          self.ctrl.update(100);
+          var canvas = self.ctrl.ctx.canvas;
+          canvas.parentNode.removeChild(canvas);
+      }, false);
+  xhr.open(&quot;POST&quot;, &quot;http://demos.hacks.mozilla.org/paul/demos/resources/webservices/devnull.php&quot;);
+  xhr.overrideMimeType(&apos;text/plain; charset=x-user-defined-binary&apos;);
+  reader.onload = function(evt) {
+    xhr.sendAsBinary(evt.target.result);
+  };
+  reader.readAsBinaryString(file);
+}
+</pre>
+
+<p>The <code>FileUpload()</code> function shown above creates a throbber, which is used to display progress information, and then creates an <a href="/de/docs/Web/API/XMLHttpRequest" title="XMLHttpRequest ist ein JavaScript Objekt, das von Microsoft entwickelt und von Mozilla, Apple, und Google übernommen wurde. Es wird derzeit im W3C standardisiert. Es bietet einen einfachen Weg, Daten von einem URL zu erhalten. Trotz seines Namens kann man mit XMLHttpRequest jede Art von Daten laden, nicht nur XML, und es unterstützt auch andere Protokolle als HTTP (inklusive file und ftp)."><code>XMLHttpRequest</code></a> to handle uploading the data.</p>
+
+<p>Before actually transferring the data, several preparatory steps are taken:</p>
+
+<ol>
+ <li>The <code>XMLHttpRequest</code>&apos;s upload <code>progress</code> listener is set to update the throbber with new percentage information so that as the upload progresses the throbber will be updated based on the latest information.</li>
+ <li>The <code>XMLHttpRequest</code>&apos;s upload <code>load</code> event handler is set to update the throbber progress information to 100% to ensure the progress indicator actually reaches 100% (in case of granularity quirks during the process). It then removes the throbber since it&apos;s no longer needed. This causes the throbber to disappear once the upload is complete.</li>
+ <li>The request to upload the image file is opened by calling <code>XMLHttpRequest</code>&apos;s <code>open()</code> method to start generating a POST request.</li>
+ <li>The MIME type for the upload is set by calling the <code>XMLHttpRequest</code> function <code>overrideMimeType()</code>. In this case, we&apos;re using a generic MIME type; you may or may not need to set the MIME type at all depending on your use case.</li>
+ <li>The <code>FileReader</code> object is used to convert the file to a binary string.</li>
+ <li>Finally, when the content is loaded the <code>XMLHttpRequest</code> function <code>sendAsBinary()</code> is called to upload the file&apos;s content.</li>
+</ol>
+
+<div class="note notecard"><strong>Note:</strong> The non-standard <code>sendAsBinary</code> method in the example above is considered deprecated as of Gecko 31 (Firefox 31 / Thunderbird 31 / SeaMonkey 2.28) and will be removed soon. The standard <code>send(Blob data)</code> method can be used instead.</div>
+
+<h3 id="Handling_the_upload_process_for_a_file_asynchronously">Handling the upload process for a file, asynchronously</h3>
+
+<pre class="brush: js">&lt;?php
+if (isset($_FILES[&apos;myFile&apos;])) {
+    // Example:
+    move_uploaded_file($_FILES[&apos;myFile&apos;][&apos;tmp_name&apos;], &quot;uploads/&quot; . $_FILES[&apos;myFile&apos;][&apos;name&apos;]);
+    exit;
+}
+?&gt;&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;dnd binary upload&lt;/title&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        function sendFile(file) {
+            var uri = &quot;/index.php&quot;;
+            var xhr = new XMLHttpRequest();
+            var fd = new FormData();
+
+            xhr.open(&quot;POST&quot;, uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 &amp;&amp; xhr.status == 200) {
+                    // Handle response.
+                    alert(xhr.responseText); // handle response.
+                }
+            };
+            fd.append(&apos;myFile&apos;, file);
+            // Initiate a multipart/form-data upload
+            xhr.send(fd);
+        }
+
+        window.onload = function() {
+            var dropzone = document.getElementById(&quot;dropzone&quot;);
+            dropzone.ondragover = dropzone.ondragenter = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+
+            dropzone.ondrop = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+
+                var filesArray = event.dataTransfer.files;
+                for (var i=0; i&lt;filesArray.length; i++) {
+                    sendFile(filesArray[i]);
+                }
+            }
+        }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div&gt;
+        &lt;div id=&quot;dropzone&quot; style=&quot;margin:30px; width:500px; height:300px; border:1px dotted grey;&quot;&gt;Drag &amp; drop your file here...&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h2 id="Example_Using_object_URLs_to_display_PDF">Example: Using object URLs to display PDF</h2>
+
+<p>Object URLs can be used for other things than just images! They can be used to display embedded PDF files or any other resources that can be displayed by the browser.</p>
+
+<p>In Firefox, to have the PDF appear embedded in the iframe (rather than proposed as a downloaded file), the preference <code>pdfjs.disabled</code> must be set to <code>false</code> <span class="icon-only-inline" title="This API has not been standardized."><i class="icon-warning-sign"> </i></span>.</p>
+
+<pre class="brush: html">&lt;iframe id=&quot;viewer&quot;&gt;
+</pre>
+
+<p>And here is the change of the <code>src</code> attribute:</p>
+
+<pre class="brush: js">var obj_url = window.URL.createObjectURL(blob);
+var iframe = document.getElementById(&apos;viewer&apos;);
+iframe.setAttribute(&apos;src&apos;, obj_url);
+window.URL.revokeObjectURL(obj_url);</pre>
+
+<h2 id="Example_Using_object_URLs_with_other_file_types">Example: Using object URLs with other file types</h2>
+
+<p>You can manipulate files of other formats the same way. Here is how to preview uploaded video:</p>
+
+<pre class="brush: js">var video = document.getElementById(&apos;video&apos;);
+var obj_url = window.URL.createObjectURL(blob);
+video.src = obj_url;
+video.play()
+window.URL.revokeObjectURL(obj_url);</pre>
+
+<h2 id="Specification" name="Specification">Specifications</h2>
+
+<ul>
+ <li><a href="http://www.w3.org/TR/progress-events/" class="external">File upload state</a> (HTML 5 working draft)</li>
+ <li><a href="http://www.w3.org/TR/FileAPI/">File API</a></li>
+</ul>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/de/docs/Web/API/File"><code>File</code></a></li>
+ <li><a href="/de/docs/Web/API/FileList"><code>FileList</code></a></li>
+ <li><a href="/de/docs/Web/API/FileReader"><code>FileReader</code></a></li>
+ <li><a href="/en/DOM/XMLHttpRequest/Using_XMLHttpRequest">Using XMLHttpRequest</a></li>
+ <li><a href="/en/Extensions/Using_the_DOM_File_API_in_chrome_code">Using the DOM File API in chrome code</a></li>
+ <li><a href="/de/docs/Web/API/XMLHttpRequest"><code>XMLHttpRequest</code></a></li>
+ <li><a href="http://www.jquery.com/" class="external">jQuery</a> JavaScript library</li>
+</ul>
+
+<p></p><div class="horizFlexboxContainer">
+  <div class="smallTextMultiColumnBoxHeading">HTML5 Documentation</div>
+  <div class="smallTextMultiColumnBoxList">
+<table class="html5ArticleToc">
+	<tbody>
+		<tr>
+			<td style="width: 150px; border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);"><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#HTML">HTML</a></td>
+			<td style="border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);">
+				<ul>
+					<li><a href="/de/docs/Using_HTML5_audio_and_video">Audio/Video</a></li>
+					<li><a href="/de/docs/HTML/Canvas">Canvas</a></li>
+					<li><a href="/de/docs/WebGL">WebGL</a></li>
+					<li><a href="/de/docs/SVG">SVG</a></li>
+					<li><a href="/de/docs/MathML">MathML</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#WebForms">WebForms</a></li>
+					<li><a href="/de/docs/HTML/Using_the_application_cache">AppCache</a></li>
+					<li><a href="/de/docs/Using_microformats">Microformats</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#Semantic_tags">SemanticTags</a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 150px; border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);"><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#JavaScript">JavaScript</a></td>
+			<td style="border-left: none; border-right: none; border-top: none; border-bottom: dotted 2px rgba(224,244,244,200);">
+				<ul>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#Client-Side_Storage">Storage</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#IndexedDB">IndexedDB</a></li>
+					<li><a href="/de/docs/WebSockets">WebSockets</a></li>
+					<li><a href="/de/docs/Using_web_workers">WebWorkers</a></li>
+					<li><a href="/de/docs/Online_and_offline_events">Events</a></li>
+					<li><a href="/de/docs/DragDrop/Drag_and_Drop">Drag/Drop</a></li>
+					<li><a href="/de/docs/Web-based_protocol_handlers">ProtocolHandler</a></li>
+					<li><a href="/de/docs/Using_geolocation">Geolocation</a></li>
+					<li><a href="/de/docs/Focus_management_in_HTML">Focus</a></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td style="border: none;"><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#CSS">CSS</a></td>
+			<td style="border: none;">
+				<ul>
+					<li><a href="/de/docs/Mozilla_CSS_support_chart">NewSelectors</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#Typography">Typography</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#Visual">Visual</a></li>
+					<li><a href="/de/docs/HTML/HTML5/HTML5_Thematic_Classification#Effects">Effects</a></li>
+				</ul>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</div><p></p>
+
+<p></p>
