@@ -1,0 +1,302 @@
+---
+title: Aplicar efeitos de SVG ao conteúdo HTML
+slug: Web/SVG/Applying_SVG_effects_to_HTML_content
+translation_of: Web/SVG/Applying_SVG_effects_to_HTML_content
+original_slug: Web/SVG/Aplicar_efeitos_SVG_conteudo_HTML
+---
+<p>Os navegadores modernos suportam a utilização de <a href="/en-US/docs/SVG">SVG</a> dentro dos estilos de <a href="/en-US/docs/Web/CSS" title="Cascading Style Sheets">CSS</a> para aplicar efeitos gráficos ao conteúdo HTML.</p>
+
+<p>You may specify SVG in styles either within the same document or an external style sheet. There are 3 properties you can use: <a href="/en-US/docs/Web/CSS/mask"><code>mask</code></a>, <a href="/en-US/docs/Web/CSS/clip-path"><code>clip-path</code></a>, and <a href="/en-US/docs/Web/CSS/filter"><code>filter</code></a>.</p>
+
+<div class="note notecard"><strong>Nota:</strong> as referências a SVG nos ficheiros externos devem ter a <a href="/pt-PT/docs/Web/Seguranca/politica_de_mesma_origem">mesma origem</a> como o documento de referência.</div>
+
+<h2 id="Using_embedded_SVG">Using embedded SVG</h2>
+
+<p>To apply an SVG effect using CSS styles, you first need to create the CSS style that references the SVG to apply.</p>
+
+<pre class="brush: html">&lt;style&gt;p { mask: url(#my-mask); }&lt;/style&gt;
+</pre>
+
+<p>In the above example, all paragraphs are masked by an <a href="/en-US/docs/Web/SVG/Element/mask">SVG <code>&lt;mask&gt;</code></a> with the <a href="/en-US/docs/Web/HTML/Global_attributes/id">ID</a> <code>my-mask</code>.</p>
+
+<h3 id="Example_Masking">Example: Masking</h3>
+
+<p>For example, you can make a gradient mask for HTML content using SVG and CSS code similar to the following, inside your HTML document:</p>
+
+<pre class="brush: html">&lt;svg height=&quot;0&quot;&gt;
+  &lt;mask id=&quot;mask-1&quot;&gt;
+    &lt;linearGradient id=&quot;gradient-1&quot; y2=&quot;1&quot;&gt;
+      &lt;stop stop-color=&quot;white&quot; offset=&quot;0&quot;/&gt;
+      &lt;stop stop-opacity=&quot;0&quot; offset=&quot;1&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;circle cx=&quot;0.25&quot; cy=&quot;0.25&quot; r=&quot;0.25&quot; id=&quot;circle&quot; fill=&quot;white&quot;/&gt;
+    &lt;rect x=&quot;0.5&quot; y=&quot;0.2&quot; width=&quot;300&quot; height=&quot;100&quot; fill=&quot;url(#gradient-1)&quot;/&gt;
+  &lt;/mask&gt;
+&lt;/svg&gt;
+</pre>
+
+<pre class="brush: css">.target {
+  mask: url(#mask-1);
+}
+p {
+  width: 300px;
+  border: 1px solid #000;
+  display: inline-block;
+}</pre>
+
+<p>Note that in the CSS, the mask is specified using a URL to the ID <code>#mask-1</code>, which is the ID of the SVG mask specified below it. Everything else specifies details about the gradient mask itself.</p>
+
+<p>Applying the SVG effect to (X)HTML is accomplished by assigning the <code>target</code> class defined above to an element, like this:</p>
+
+<pre class="brush: html">&lt;p class=&quot;target&quot; style=&quot;background:lime;&quot;&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+&lt;/p&gt;
+&lt;p&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing
+    &lt;b class=&quot;target&quot;&gt;elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua.&lt;/b&gt;
+    Ut enim ad minim veniam.
+&lt;/p&gt;
+</pre>
+
+<p>The above example would be rendered with the mask applied to it.</p>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-PT/docs/Web/SVG/Aplicar_efeitos_SVG_conteudo_HTML$samples/Example_Masking?revision=1332588" width="650" class="live-sample-frame sample-code-frame" height="200" frameborder="0" id="frame_Example_Masking"></iframe></p>
+
+<h3 id="Example_Clipping">Example: Clipping</h3>
+
+<p>This example demonstrates using SVG to clip HTML content. Notice that even the clickable areas for links are clipped.</p>
+
+<pre class="brush: html">&lt;p class=&quot;target&quot; style=&quot;background:lime;&quot;&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+&lt;/p&gt;
+&lt;p&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing
+    &lt;b class=&quot;target&quot;&gt;elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua.&lt;/b&gt;
+    Ut enim ad minim veniam.
+&lt;/p&gt;
+
+&lt;button onclick=&quot;toggleRadius()&quot;&gt;Toggle radius&lt;/button&gt;
+
+&lt;svg height=&quot;0&quot;&gt;
+  &lt;clipPath id=&quot;clipping-path-1&quot; clipPathUnits=&quot;objectBoundingBox&quot;&gt;
+    &lt;circle cx=&quot;0.25&quot; cy=&quot;0.25&quot; r=&quot;0.25&quot; id=&quot;circle&quot;/&gt;
+    &lt;rect x=&quot;0.5&quot; y=&quot;0.2&quot; width=&quot;0.5&quot; height=&quot;0.8&quot;/&gt;
+  &lt;/clipPath&gt;
+&lt;/svg&gt;
+</pre>
+
+<pre class="brush: css">.target {
+  clip-path: url(#clipping-path-1);
+}
+p {
+  width: 300px;
+  border: 1px solid #000;
+  display: inline-block;
+}</pre>
+
+<p>This establishes a clipping area made of a circle and rectangle, assigns it the ID <code>#clipping-path-1</code>, then references it in the CSS. The clip path can be assigned to any element with the <code>target</code> class.</p>
+
+<p>You can make changes to the SVG in real time and see them immediately affect the rendering of the HTML. For example, you can resize the circle in the clip path established above:</p>
+
+<pre class="brush: js">function toggleRadius() {
+  var circle = document.getElementById(&quot;circle&quot;);
+  circle.r.baseVal.value = 0.40 - circle.r.baseVal.value;
+}
+</pre>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-PT/docs/Web/SVG/Aplicar_efeitos_SVG_conteudo_HTML$samples/Example_Clipping?revision=1332588" width="650" class="live-sample-frame sample-code-frame" height="200" frameborder="0" id="frame_Example_Clipping"></iframe></p>
+
+<h3 id="Example_Filtering">Example: Filtering</h3>
+
+<p>This demonstrates applying a filter to HTML content using SVG. It establishes several filters, which are applied with CSS to three elements in both the normal and mouse <a href="/en-US/docs/Web/CSS/:hover">hover</a> states.</p>
+
+<pre class="brush: html">&lt;p class=&quot;target&quot; style=&quot;background: lime;&quot;&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+&lt;/p&gt;
+&lt;pre class=&quot;target&quot;&gt;lorem&lt;/pre&gt;
+&lt;p&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing
+    &lt;b class=&quot;target&quot;&gt;elit, sed do eiusmod tempor incididunt
+    ut labore et dolore magna aliqua.&lt;/b&gt;
+    Ut enim ad minim veniam.
+&lt;/p&gt;
+</pre>
+
+<p>Any SVG filter can be applied this way. For example, to apply a blur effect, you might use:</p>
+
+<pre class="brush: html">&lt;svg height=&quot;0&quot;&gt;
+  &lt;filter id=&quot;f1&quot;&gt;
+    &lt;feGaussianBlur stdDeviation=&quot;3&quot;/&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;</pre>
+
+<p>You could also apply a color matrix:</p>
+
+<pre class="brush: html">&lt;svg height=&quot;0&quot;&gt;
+  &lt;filter id=&quot;f2&quot;&gt;
+    &lt;feColorMatrix values=&quot;0.3333 0.3333 0.3333 0 0
+                           0.3333 0.3333 0.3333 0 0
+                           0.3333 0.3333 0.3333 0 0
+                           0      0      0      1 0&quot;/&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+</pre>
+
+<p>And some more filters:</p>
+
+<pre class="brush: html"><span>&lt;svg height=&quot;0&quot;&gt;
+</span>  &lt;filter id=&quot;f3&quot;&gt;
+    &lt;feConvolveMatrix filterRes=&quot;100 100&quot; style=&quot;color-interpolation-filters:sRGB&quot;
+      order=&quot;3&quot; kernelMatrix=&quot;0 -1 0   -1 4 -1   0 -1 0&quot; preserveAlpha=&quot;true&quot;/&gt;
+  &lt;/filter&gt;
+  &lt;filter id=&quot;f4&quot;&gt;
+    &lt;feSpecularLighting surfaceScale=&quot;5&quot; specularConstant=&quot;1&quot;
+                        specularExponent=&quot;10&quot; lighting-color=&quot;white&quot;&gt;
+      &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+    &lt;/feSpecularLighting&gt;
+  &lt;/filter&gt;
+  &lt;filter id=&quot;f5&quot;&gt;
+    &lt;feColorMatrix values=&quot;1 0 0 0 0
+                           0 1 0 0 0
+                           0 0 1 0 0
+                           0 1 0 0 0&quot; style=&quot;color-interpolation-filters:sRGB&quot;/&gt;
+  &lt;/filter&gt;
+<span>&lt;/svg&gt;</span></pre>
+
+<p>The five filters are applied using the following CSS:</p>
+
+<pre class="brush: css">p.target { filter:url(#f3); }
+p.target:hover { filter:url(#f5); }
+b.target { filter:url(#f1); }
+b.target:hover { filter:url(#f4); }
+pre.target { filter:url(#f2); }
+pre.target:hover { filter:url(#f3); }
+</pre>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-PT/docs/Web/SVG/Aplicar_efeitos_SVG_conteudo_HTML$samples/Example_Filtering?revision=1332588" width="650" class="live-sample-frame sample-code-frame" height="200" frameborder="0" id="frame_Example_Filtering"></iframe></p>
+
+<p style="display: none;"><a href="/files/3329/filterdemo.xhtml" class="button liveSample">View this example live</a></p>
+
+<h3 id="Example_Blurred_Text">Example: Blurred Text</h3>
+
+<p>In order to blur text, Webkit based browsers have a (prefixed) CSS filter called blur (see also <a href="/en-US/docs/Web/CSS/filter#blur%28%29_2">CSS filter</a>). You can achieve the same effect using SVG filters.</p>
+
+<pre class="brush: html">&lt;p class=&quot;blur&quot;&gt;Time to clean my glasses&lt;/p&gt;
+&lt;svg height=&quot;0&quot;&gt;
+  &lt;defs&gt;
+    &lt;filter id=&quot;wherearemyglasses&quot; x=&quot;0&quot; y=&quot;0&quot;&gt;
+    &lt;feGaussianBlur in=&quot;SourceGraphic&quot; stdDeviation=&quot;1&quot;/&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+&lt;/svg&gt;
+</pre>
+
+<p>You can apply the SVG and the CSS filter in the same class:</p>
+
+<pre class="brush: css">.blur { filter: url(#wherearemyglasses); }</pre>
+
+<p><iframe src="https://mdn.mozillademos.org/pt-PT/docs/Web/SVG/Aplicar_efeitos_SVG_conteudo_HTML$samples/Example_Blurred_Text?revision=1332588" width="300" class="live-sample-frame sample-code-frame" height="100" frameborder="0" id="frame_Example_Blurred_Text"></iframe></p>
+
+<p>Blurring is computation heavy, so ensure to use it sparingly, especially in elements that get scrolled or animated.</p>
+
+<h2 id="Using_external_references">Using external references</h2>
+
+<p>SVG used for clipping, masking, and filtering can be loaded from an external source, as long as that source comes from the same origin as the HTML document to which it&apos;s applied.</p>
+
+<p>For example, if your CSS is in a file named <code>default.css</code>, it can look like this:</p>
+
+<pre class="brush: css" id="line1">.target { clip-path: url(resources.svg#c1); }</pre>
+
+<p>The SVG is then imported from a file named <code>resources.svg</code>, using the clip path with the ID <code>c1</code>.</p>
+
+<h2 id="See_also">See also</h2>
+
+<ul>
+ <li><a href="/en-US/docs/SVG">SVG</a></li>
+ <li><a href="http://robert.ocallahan.org/2008/06/applying-svg-effects-to-html-content_04.html" class="external">SVG Effects for HTML Content</a> (blog post)</li>
+ <li><del><a href="/web-tech/2008/10/10/svg-external-document-references" class="external">SVG External Document References</a></del> (blog post) (<a href="http://web.archive.org/web/20120512132948/https://developer.mozilla.org/web-tech/2008/10/10/svg-external-document-references/">[archive.org] Web Tech Blog » Blog Archive » SVG External Document References</a>)</li>
+</ul>
+
+<div style="display: block;" id="SL_balloon_obj">
+<div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%; opacity: 0; display: block; left: -8px; top: -25px; transition: visibility 2s ease 0s, opacity 2s linear 0s;" class="SL_ImTranslatorLogo" id="SL_button"> </div>
+
+<div style="display: none;" id="SL_shadow_translation_result2"> </div>
+
+<div id="SL_shadow_translator">
+<div id="SL_planshet">
+<div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_arrow_up"> </div>
+
+<div id="SL_Bproviders">
+<div title="Google" class="SL_BL_LABLE_ON" id="SL_P0">G</div>
+
+<div title="Microsoft" class="SL_BL_LABLE_ON" id="SL_P1">M</div>
+
+<div title="Translator" class="SL_BL_LABLE_ON" id="SL_P2">T</div>
+</div>
+
+<div id="SL_alert_bbl">
+<div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SLHKclose"> </div>
+
+<div id="SL_alert_cont"> </div>
+</div>
+
+<div id="SL_TB">
+<table id="SL_tables">
+ <tbody><tr>
+  <td class="SL_td"><input></td>
+  <td class="SL_td"><select><option value="auto">Detectar idioma</option><option value="af">Africâner</option><option value="sq">Albanês</option><option value="de">Alemão</option><option value="ar">Arabe</option><option value="hy">Armênio</option><option value="az">Azerbaijano</option><option value="eu">Basco</option><option value="bn">Bengali</option><option value="be">Bielo-russo</option><option value="my">Birmanês</option><option value="bs">Bósnio</option><option value="bg">Búlgaro</option><option value="ca">Catalão</option><option value="kk">Cazaque</option><option value="ceb">Cebuano</option><option value="ny">Chichewa</option><option value="zh-CN">Chinês (Simp)</option><option value="zh-TW">Chinês (Trad)</option><option value="si">Cingalês</option><option value="ko">Coreano</option><option value="ht">Crioulo haitiano</option><option value="hr">Croata</option><option value="da">Dinamarquês</option><option value="sk">Eslovaco</option><option value="sl">Esloveno</option><option value="es">Espanhol</option><option value="eo">Esperanto</option><option value="et">Estoniano</option><option value="fi">Finlandês</option><option value="fr">Francês</option><option value="gl">Galego</option><option value="cy">Galês</option><option value="ka">Georgiano</option><option value="el">Grego</option><option value="gu">Gujarati</option><option value="ha">Hauça</option><option value="iw">Hebraico</option><option value="hi">Hindi</option><option value="hmn">Hmong</option><option value="nl">Holandês</option><option value="hu">Húngaro</option><option value="ig">Igbo</option><option value="id">Indonésio</option><option value="en">Inglês</option><option value="yo">Ioruba</option><option value="ga">Irlandês</option><option value="is">Islandês</option><option value="it">Italiano</option><option value="ja">Japonês</option><option value="jw">Javanês</option><option value="kn">Kannada</option><option value="km">Khmer</option><option value="lo">Laosiano</option><option value="la">Latim</option><option value="lv">Letão</option><option value="lt">Lituano</option><option value="mk">Macedônico</option><option value="ml">Malaiala</option><option value="ms">Malaio</option><option value="mg">Malgaxe</option><option value="mt">Maltês</option><option value="mi">Maori</option><option value="mr">Marathi</option><option value="mn">Mongol</option><option value="ne">Nepalês</option><option value="no">Norueguês</option><option value="fa">Persa</option><option value="pl">Polonês</option><option value="pt">Português</option><option value="pa">Punjabi</option><option value="ro">Romeno</option><option value="ru">Russo</option><option value="sr">Sérvio</option><option value="st">Sesotho</option><option value="so">Somália</option><option value="sw">Suaíli</option><option value="su">Sudanês</option><option value="sv">Sueco</option><option value="tg">Tadjique</option><option value="tl">Tagalo</option><option value="th">Tailandês</option><option value="ta">Tâmil</option><option value="cs">Tcheco</option><option value="te">Telugo</option><option value="tr">Turco</option><option value="uk">Ucraniano</option><option value="ur">Urdu</option><option value="uz">Uzbeque</option><option value="vi">Vietnamita</option><option value="yi">Yiddish</option><option value="zu">Zulu</option></select></td>
+  <td class="SL_td">
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_switch_b" title="Alternar Idiomas"> </div>
+  </td>
+  <td class="SL_td"><select><option value="af">Africâner</option><option value="sq">Albanês</option><option value="de">Alemão</option><option value="ar">Arabe</option><option value="hy">Armênio</option><option value="az">Azerbaijano</option><option value="eu">Basco</option><option value="bn">Bengali</option><option value="be">Bielo-russo</option><option value="my">Birmanês</option><option value="bs">Bósnio</option><option value="bg">Búlgaro</option><option value="ca">Catalão</option><option value="kk">Cazaque</option><option value="ceb">Cebuano</option><option value="ny">Chichewa</option><option value="zh-CN">Chinês (Simp)</option><option value="zh-TW">Chinês (Trad)</option><option value="si">Cingalês</option><option value="ko">Coreano</option><option value="ht">Crioulo haitiano</option><option value="hr">Croata</option><option value="da">Dinamarquês</option><option value="sk">Eslovaco</option><option value="sl">Esloveno</option><option value="es">Espanhol</option><option value="eo">Esperanto</option><option value="et">Estoniano</option><option value="fi">Finlandês</option><option value="fr">Francês</option><option value="gl">Galego</option><option value="cy">Galês</option><option value="ka">Georgiano</option><option value="el">Grego</option><option value="gu">Gujarati</option><option value="ha">Hauça</option><option value="iw">Hebraico</option><option value="hi">Hindi</option><option value="hmn">Hmong</option><option value="nl">Holandês</option><option value="hu">Húngaro</option><option value="ig">Igbo</option><option value="id">Indonésio</option><option selected value="en">Inglês</option><option value="yo">Ioruba</option><option value="ga">Irlandês</option><option value="is">Islandês</option><option value="it">Italiano</option><option value="ja">Japonês</option><option value="jw">Javanês</option><option value="kn">Kannada</option><option value="km">Khmer</option><option value="lo">Laosiano</option><option value="la">Latim</option><option value="lv">Letão</option><option value="lt">Lituano</option><option value="mk">Macedônico</option><option value="ml">Malaiala</option><option value="ms">Malaio</option><option value="mg">Malgaxe</option><option value="mt">Maltês</option><option value="mi">Maori</option><option value="mr">Marathi</option><option value="mn">Mongol</option><option value="ne">Nepalês</option><option value="no">Norueguês</option><option value="fa">Persa</option><option value="pl">Polonês</option><option value="pt">Português</option><option value="pa">Punjabi</option><option value="ro">Romeno</option><option value="ru">Russo</option><option value="sr">Sérvio</option><option value="st">Sesotho</option><option value="so">Somália</option><option value="sw">Suaíli</option><option value="su">Sudanês</option><option value="sv">Sueco</option><option value="tg">Tadjique</option><option value="tl">Tagalo</option><option value="th">Tailandês</option><option value="ta">Tâmil</option><option value="cs">Tcheco</option><option value="te">Telugo</option><option value="tr">Turco</option><option value="uk">Ucraniano</option><option value="ur">Urdu</option><option value="uz">Uzbeque</option><option value="vi">Vietnamita</option><option value="yi">Yiddish</option><option value="zu">Zulu</option></select></td>
+  <td class="SL_td">
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_TTS_voice" title="Ouça"> </div>
+  </td>
+  <td class="SL_td">
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" title="Copiar" class="SL_copy" id="SL_copy"> </div>
+  </td>
+  <td class="SL_td">
+   <div id="SL_bbl_font_patch"> </div>
+
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" title="Tamanho da fonte" class="SL_bbl_font" id="SL_bbl_font"> </div>
+  </td>
+  <td class="SL_td">
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_bbl_help" title="Ajuda"> </div>
+  </td>
+  <td class="SL_td">
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" title="Fixar a janela de pop-up" class="SL_pin_off" id="SL_pin"> </div>
+  </td>
+ </tr>
+</tbody></table>
+</div>
+</div>
+
+<div id="SL_shadow_translation_result"> </div>
+
+<div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" class="SL_loading" id="SL_loading"> </div>
+
+<div id="SL_player2"> </div>
+
+<div id="SL_alert100">A função de fala é limitada a 200 caracteres</div>
+
+<div style="background: rgb(255, 255, 255)  repeat scroll 0% 0%;" id="SL_Balloon_options">
+<div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_arrow_down"> </div>
+
+<table style="width: 100%;" id="SL_tbl_opt">
+ <tbody><tr>
+  <td><input></td>
+  <td>
+   <div style="background: rgba(0, 0, 0, 0)  repeat scroll 0% 0%;" id="SL_BBL_IMG" title="Mostrar o botão do ImTranslator 3 segundos"> </div>
+  </td>
+  <td><a class="SL_options">Opções</a> : <a class="SL_options">Histórico</a> : <a class="SL_options">Comentários</a> : <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=GD9D8CPW8HFA2" class="SL_options">Donate</a></td>
+  <td><span id="SL_Balloon_Close" title="Encerrar">Encerrar</span></td>
+ </tr>
+</tbody></table>
+</div>
+</div>
+</div>
