@@ -1,0 +1,254 @@
+---
+title: Éclairage en WebGL
+slug: Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
+translation_of: Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
+original_slug: Web/API/WebGL_API/Tutorial/Eclairage_en_WebGL
+---
+<p></p><section id="Quick_Links">
+ <ol>
+  <li><a href="/fr/docs/Web/API/WebGL_API"><strong>WebGL API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>WebGL tutoriel</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL">Commencer avec WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context">Ajouter du contenu à WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Using_shaders_to_apply_color_in_WebGL">Ajouter des couleurs avec les shaders</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Animating_objects_with_WebGL">Animer des objets avec WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Creating_3D_objects_using_WebGL">Créer des objets 3D avec WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL">Utiliser les textures avec WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL">Lighting in WebGL</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL">Animating textures in WebGL</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples and articles</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Matrix_math_for_the_web">Matrix math for the web</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/WebGL_model_view_projection">WebGL model view projection</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/WebGL_best_practices">WebGL best practices</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Using_Extensions">Using WebGL extensions</a></li>
+        <li><a href="/fr/docs/Web/API/WebGL_API/Basic_2D_animation_example">A basic 2D WebGL animation example</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/WebGLRenderingContext"><code>WebGLRenderingContext</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGL2RenderingContext"><code>WebGL2RenderingContext</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLActiveInfo"><code>WebGLActiveInfo</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLBuffer"><code>WebGLBuffer</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLContextEvent"><code>WebGLContextEvent</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLFramebuffer"><code>WebGLFramebuffer</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLProgram"><code>WebGLProgram</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLQuery"><code>WebGLQuery</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLRenderbuffer"><code>WebGLRenderbuffer</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLSampler"><code>WebGLSampler</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLShader"><code>WebGLShader</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLShaderPrecisionFormat"><code>WebGLShaderPrecisionFormat</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLSync"><code>WebGLSync</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLTexture"><code>WebGLTexture</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLTransformFeedback"><code>WebGLTransformFeedback</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLUniformLocation"><code>WebGLUniformLocation</code></a></li>
+        <li><a href="/fr/docs/Web/API/WebGLVertexArrayObject"><code>WebGLVertexArrayObject</code></a></li>
+      </ol>
+    </details>
+  </li>
+
+  <li><strong><a href="/fr/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Listes utiles</summary>
+      <ol>
+        <li><a href="/fr/docs/tag/WebGL">Pages étiquetées &quot;WebGL&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribuer</summary>
+      <ol>
+        <li><a href="/fr/docs/MDN/Doc_status/API/WebGL">Statut de la documentation</a></li>
+        <li><a href="/fr/docs/MDN">Le projet MDN</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Web/API/WebGL_API/Tutorial/Utiliser_les_textures_avec_WebGL" class="button">« Précédent</a><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p>La première chose à comprendre à propos de WebGL est que contrairement au standard OpenGL, WebGL n&apos;a pas de support pour l&apos;éclairage. Vous avez à le faire par vous même. Heureusement ce n&apos;est pas si dur à faire, et cet article va vous expliquer quelques bases.</p>
+
+<h2 id="Simuler_l&apos;éclairage_et_les_ombres_en_3D">Simuler l&apos;éclairage et les ombres en 3D</h2>
+
+<p>Rentrer dans les détails de la théorie derrière la simulation de l&apos;éclairage 3D est assez loin du sujet de cet article mais il vaut mieux en connaitre un minimum le sujet. Au lieu de rentrer dans le vif du sujet ici, jetez un coup d&apos;oeil sur <a href="https://fr.wikipedia.org/wiki/Ombrage_de_Phong">l&apos;ombrage de Phong</a> sur Wikipédia, qui fourni une bonne vue d&apos;ensemble comme modèle d&apos;éclairage.</p>
+
+<p>Il y a trois types basiques d&apos;éclairage :</p>
+
+<ol>
+ <li><strong>Ambient light (Lumière Ambiante) </strong>est la lumière qui imprègne, qui se répand sur la scène. Elle n&apos;a pas de direction et s&apos;applique sur toutes les faces de la scène de la même façon.</li>
+ <li><strong>Directional light (Lumière Directionnelle)</strong> est une lumière émise depuis une direction spécifique. Par exemple le soleil, est une lumière directionnelle.</li>
+ <li><strong>Point light</strong> <strong>(Point de lumière) </strong>est une lumière émise depuis un point, éméttant une lumière dans toutes les directions, contrairement à la Lumière Directionnelle. C&apos;est comme ceci que les lumières fonctionnent principalement dans notre monde, comme par exemple une ampoule.</li>
+</ol>
+
+<p>Pour notre tutorial, nous allons simplifier le model d&apos;éclairage, en considérant seulement une unique lumière directionnelle et une lumière ambiante. Nous allons réutiliser notre <a href="/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL">précédent exemple avec le cube en rotation</a>.</p>
+
+<p>Une fois que nous avons appréhendé le concept de source et de réfléction de la lumière, il y a deux choses que nous avons besoin d&apos;implémenter pour nos lumières directionnelles.</p>
+
+<ol>
+ <li>Nous avons besoin d&apos;associer la <strong>surface normale</strong> avec chaque sommet. C&apos;est un vecteur qui est perpendiculaire à la face associé à ce sommet.</li>
+ <li>Nous avons besoin de connaître la direction dans laquelle la lumière arrive. Ceci est défini par la direction du vecteur.</li>
+</ol>
+
+<p>Puis nous mettons à jour le vertex shader pour ajuster la couleur de chaque sommet. en prenant en compte la lumière ambiante ainsi que l&apos;effet de la lumière directionnelle donné par l&apos;angle qui rencontre la face du cube. Nous allons voir comment faire avec les shaders.</p>
+
+<h2 id="Créer_les_normales_pour_les_sommets">Créer les normales pour les sommets</h2>
+
+<p>La première chose dont nous avons besoin, est de générer le tableau des <strong>normales</strong> pour tous les sommets que constituent notre cube. Comme un cube est un simple objet, c&apos;est plutôt simple à faire, évidemment pour des objets plus complexe, calculer les normales sera plus compliqué.</p>
+
+<pre class="brush: js">cubeVerticesNormalBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+
+var vertexNormals = [
+  // Front
+   0.0,  0.0,  1.0,
+   0.0,  0.0,  1.0,
+   0.0,  0.0,  1.0,
+   0.0,  0.0,  1.0,
+
+  // Back
+   0.0,  0.0, -1.0,
+   0.0,  0.0, -1.0,
+   0.0,  0.0, -1.0,
+   0.0,  0.0, -1.0,
+
+  // Top
+   0.0,  1.0,  0.0,
+   0.0,  1.0,  0.0,
+   0.0,  1.0,  0.0,
+   0.0,  1.0,  0.0,
+
+  // Bottom
+   0.0, -1.0,  0.0,
+   0.0, -1.0,  0.0,
+   0.0, -1.0,  0.0,
+   0.0, -1.0,  0.0,
+
+  // Right
+   1.0,  0.0,  0.0,
+   1.0,  0.0,  0.0,
+   1.0,  0.0,  0.0,
+   1.0,  0.0,  0.0,
+
+  // Left
+  -1.0,  0.0,  0.0,
+  -1.0,  0.0,  0.0,
+  -1.0,  0.0,  0.0,
+  -1.0,  0.0,  0.0
+];
+
+gl.bufferData(gl.ARRAY_BUFFER, new WebGLFloatArray(vertexNormals), gl.STATIC_DRAW);
+</pre>
+
+<p>Ceci doit vous être plutôt familier maintenant. Nous créons un nouveau buffer, on le lie avec le tableau sur lequel nous allons travailler, puis nous allons envoyer l&apos;ensemble de notre tableau au buffer en appelant la méthode <code>bufferData()</code>.</p>
+
+<p>Ensuite nous allons ajouter le code à la fonction <code>drawScene() </code>pour attacher le tableau de normales à l&apos;attribut du shader, comme ça le code du shader y aura accès:</p>
+
+<pre class="brush: js">gl.bindBuffer(gl.ARRAY_BUFFER, cubeVerticesNormalBuffer);
+gl.vertexAttribPointer(vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+</pre>
+
+<p>Enfin, nous avons besoin de mettre à jour le code qui construit les matrices uniformes pour générer et livrer au shader une matrice normale, qui sera utilisée pour transformer les normales en fonction de l&apos;orientation actuelle du cube par rapport à la source de lumière.</p>
+
+<pre class="brush: js">var normalMatrix = mvMatrix.inverse();
+normalMatrix = normalMatrix.transpose();
+var nUniform = gl.getUniformLocation(shaderProgram, &apos;uNormalMatrix&apos;);
+gl.uniformMatrix4fv(nUniform, false, new WebGLFloatArray(normalMatrix.flatten()));
+</pre>
+
+<h2 id="Mettre_à_jour_les_shaders">Mettre à jour les shaders</h2>
+
+<p>Maintenant que les shaders ont toutes les données dont ils ont besoin, nous mettons à jour leur code.</p>
+
+<h3 id="Le_vertex_shader">Le vertex shader</h3>
+
+<p>La première chose à faire est de mettre à jour le vertex shader en générant une valeur pour l&apos;ombre de chaque sommet, en se basant sur l&apos;éclairage ambiant ainsi que la direction de la lumière. Jettons un oeil sur le code suivant:</p>
+
+<pre class="brush: html">&lt;script id=&quot;shader-vs&quot; type=&quot;x-shader/x-vertex&quot;&gt;
+  attribute highp vec3 aVertexNormal;
+  attribute highp vec3 aVertexPosition;
+  attribute highp vec2 aTextureCoord;
+
+  uniform highp mat4 uNormalMatrix;
+  uniform highp mat4 uMVMatrix;
+  uniform highp mat4 uPMatrix;
+
+  varying highp vec2 vTextureCoord;
+  varying highp vec3 vLighting;
+
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vTextureCoord = aTextureCoord;
+
+    // Apply lighting effect
+
+    highp vec3 ambientLight = vec3(0.6, 0.6, 0.6);
+    highp vec3 directionalLightColor = vec3(0.5, 0.5, 0.75);
+    highp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+
+    highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    vLighting = ambientLight + (directionalLightColor * directional);
+  }
+&lt;/script&gt;
+</pre>
+
+<p>Une fois que la position du sommet est calculée, et que nous obtenons les coordonnées des texels (tas de pixel pour une texture) correspondant au sommet, nous pouvons travailler sur le calcul de l&apos;ombre de chaque sommet.</p>
+
+<p>La première chose que nous allons faire est de transformer la base normale sur la position actuelle et l&apos;orientation du cube, en calculant les normales des sommets par la matrice normale. Nous pouvons alors calculer la quantité d&apos;éclairage qui doit être appliquée au sommet en calculant le produit de la normale transformée et du vecteur directionnel (la direction d&apos;où la lumière vient). Si le résultat est inférieur à zéro, alors on le met à 0. Car une lumière négative n&apos;a pas de sens dans notre cas.</p>
+
+<p>Une fois la quantité de lumière directionnelle calculée, nous pouvons générer la valeur d&apos;éclairage en prenant l&apos;éclairage ambiant et en y ajoutant le produit de la couleur de la lumière directionnelle, et aussi la quantité de la lumière directionnelle à fournir. Comme résultat, nous avons maintenant une valeur RGB qui sera utilisé par le fragment shader pour ajuster la couleur de chaque pixel.</p>
+
+<h3 id="Le_fragment_shader">Le fragment shader</h3>
+
+<p>Le fragment shader a maintenant besoin d&apos;être mis à jour en prenant en compte la quantité de lumière calculée précédemment par le vertex shader:</p>
+
+<pre class="brush: js">&lt;script id=&quot;shader-fs&quot; type=&quot;x-shader/x-fragment&quot;&gt;
+  varying highp vec2 vTextureCoord;
+  varying highp vec3 vLighting;
+
+  uniform sampler2D uSampler;
+
+  void main(void) {
+    mediump vec4 texelColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+  }
+&lt;/script&gt;
+</pre>
+
+<p>Ici nous récupérons la couleur de chaque texel (tas de pixel pour une texture) , comme nous avons fait pour l&apos;exemple précédent, mais avant d&apos;ajuster la couleur du fragment, nous multiplions la couleur des pixels par la quantité de lumière, pour appliquer l&apos;effet d&apos;éclairage.</p>
+
+<p>Et c&apos;est tout !</p>
+
+<p> </p>
+
+<p><iframe src="https://mdn.github.io/webgl-examples/tutorial/sample7/index.html" width="670" class="live-sample-frame" height="510" frameborder="0"></iframe></p>
+
+<p><a href="https://github.com/mdn/webgl-examples/tree/gh-pages/tutorial/sample7">Voir le code complet</a> | <a href="http://mdn.github.io/webgl-examples/tutorial/sample7/">Ouvrir cette démo dans une nouvelle page</a></p>
+
+<h2 id="Exercices">Exercices</h2>
+
+<p>Évidemment, ceci est un simple exemple, une implémentation basique de calcul de lumière par sommet. Pour aller plus loin, nous voulons implémenter un calcul de lumière par pixel, mais ceci vous mènera dans la bonne direction. </p>
+
+<p>Vous pouvez aussi implémenter avec la direction de source de lumière, la couleur de la source, la distance, etc..</p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL" class="button">« Précédent</a><a href="/fr/docs/Web/API/WebGL_API/Tutorial/Animating_textures_in_WebGL" class="button">Suivant  »</a></p>
+</div><p></p>

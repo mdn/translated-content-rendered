@@ -1,0 +1,152 @@
+---
+title: Filtres
+slug: Web/SVG/Tutorial/Filter_effects
+tags:
+  - SVG
+  - SVG:Tutoriel
+translation_of: Web/SVG/Tutorial/Filter_effects
+original_slug: Web/SVG/Tutoriel/filtres
+---
+<p></p><div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Web/SVG/Tutoriel/Contenu_embarque_SVG" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/SVG/Tutoriel/polices_SVG" class="button">Suivant  »</a></p>
+</div><p></p>
+
+<p>Dans certaines situations, les formes de base n&apos;offrent pas la flexibilité nécessaire pour obtenir un certain effet. Par exemple, les ombres portées ne peuvent raisonnablement pas être crées avec des gradients. Les filtres sont des mécanismes SVG qui permettent de créer effets plus sophistiqués.</p>
+
+<p>Un exemple de base consiste à ajouter un effet de flou au contenu du SVG. Bien que des effets de flou simples peuvent être obtenus avec les gradients, le filtre est nécessaire pour quelque chose de plus complexe.</p>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>Les filtres sont définis par l&apos;élément <a href="/fr/docs/Web/SVG/Element/filter" title="L&apos;élément SVG &lt;filter&gt; sert de conteneur pour définir des opérations de filtre. Il n&apos;est jamais affiché par lui-même, il est référencé en utilisant l&apos;attribut filter sur un élément SVG ou via la propriété  CSS filter."><code>&lt;filter&gt;</code></a>, qui doit ête placé dans la section <code>&lt;defs&gt;</code> de votre fichier SVG. Entre les balises du filtre, se placent une liste de <em>primitives</em>, des opérations basiques qui s&apos;ajoutent aux opérations précédentes (tel que du flou, de la lumière, etc). Pour appliquer le filtre créé sur un élément graphique, on définit l&apos;attribut <code><a href="/fr/docs/Web/SVG/Attribute/filter">filter</a></code>.</p>
+
+<pre class="brush: html">&lt;svg width=&quot;250&quot; viewBox=&quot;0 0 200 85&quot;
+     xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.1&quot;&gt;
+  &lt;defs&gt;
+    &lt;!-- Déclaration du filtre --&gt;
+    &lt;filter id=&quot;MyFilter&quot; filterUnits=&quot;userSpaceOnUse&quot;
+            x=&quot;0&quot; y=&quot;0&quot;
+            width=&quot;200&quot; height=&quot;120&quot;&gt;
+
+      &lt;!-- offsetBlur --&gt;
+      &lt;feGaussianBlur in=&quot;SourceAlpha&quot; stdDeviation=&quot;4&quot; result=&quot;blur&quot;/&gt;
+      &lt;feOffset in=&quot;blur&quot; dx=&quot;4&quot; dy=&quot;4&quot; result=&quot;offsetBlur&quot;/&gt;
+
+      &lt;!-- litPaint --&gt;
+      &lt;feSpecularLighting in=&quot;blur&quot; surfaceScale=&quot;5&quot; specularConstant=&quot;.75&quot;
+                          specularExponent=&quot;20&quot; lighting-color=&quot;#bbbbbb&quot;
+                          result=&quot;specOut&quot;&gt;
+        &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+      &lt;/feSpecularLighting&gt;
+      &lt;feComposite in=&quot;specOut&quot; in2=&quot;SourceAlpha&quot; operator=&quot;in&quot; result=&quot;specOut&quot;/&gt;
+      &lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;specOut&quot; operator=&quot;arithmetic&quot;
+                   k1=&quot;0&quot; k2=&quot;1&quot; k3=&quot;1&quot; k4=&quot;0&quot; result=&quot;litPaint&quot;/&gt;
+
+      &lt;!-- fusionne offsetBlur + litPaint --&gt;
+      &lt;feMerge&gt;
+        &lt;feMergeNode in=&quot;offsetBlur&quot;/&gt;
+        &lt;feMergeNode in=&quot;litPaint&quot;/&gt;
+      &lt;/feMerge&gt;
+    &lt;/filter&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- Éléments graphiques --&gt;
+  &lt;g filter=&quot;url(#MyFilter)&quot;&gt;
+      &lt;path fill=&quot;none&quot; stroke=&quot;#D90000&quot; stroke-width=&quot;10&quot;
+            d=&quot;M50,66 c-50,0 -50,-60 0,-60 h100 c50,0 50,60 0,60z&quot; /&gt;
+      &lt;path fill=&quot;#D90000&quot;
+            d=&quot;M60,56 c-30,0 -30,-40 0,-40 h80 c30,0 30,40 0,40z&quot; /&gt;
+      &lt;g fill=&quot;#FFFFFF&quot; stroke=&quot;black&quot; font-size=&quot;45&quot; font-family=&quot;Verdana&quot; &gt;
+        &lt;text x=&quot;52&quot; y=&quot;52&quot;&gt;SVG&lt;/text&gt;
+      &lt;/g&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;
+</pre>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="120" id="frame_Exemple" src="https://mdn.mozillademos.org/fr/docs/Web/SVG/Tutoriel/filtres$samples/Exemple?revision=1543616" width="100%"></iframe></p>
+
+<h3 id="Étape_1">Étape 1</h3>
+
+<pre class="brush: html">&lt;feGaussianBlur in=&quot;SourceAlpha&quot;
+                stdDeviation=&quot;4&quot;
+                result=&quot;blur&quot;/&gt;</pre>
+
+<p><a href="/fr/docs/Web/SVG/Element/feGaussianBlur" title="La primitive de filtre SVG &lt;feGaussianBlur&gt; applique un effet de flou à l&apos;image en entrée. La quantité de flou est contrôlée par stdDeviation."><code>&lt;feGaussianBlur&gt;</code></a> prend en entrée (<code>in</code>) &quot;SourceAlpha&quot;, qui est la couche alpha de l&apos;élément source, applique un flou de 4, et stocke le résultat (<code>result</code>) dans un buffer temporaire nommé &quot;blur&quot;.</p>
+
+<h3 id="Étape_2">Étape 2</h3>
+
+<pre class="brush: html">&lt;feOffset in=&quot;blur&quot;
+          dx=&quot;4&quot; dy=&quot;4&quot;
+          result=&quot;offsetBlur&quot;/&gt;</pre>
+
+<p><a href="/fr/docs/Web/SVG/Element/feOffset" title="La primitive de filtre &lt;feOffset&gt; permet de décaler l&apos;image qu&apos;elle a en entrée selon les attributs dx et dy."><code>&lt;feOffset&gt;</code></a> prend en entrée (<code>in</code>) &quot;blur&quot;, qu&apos;on a crée précedemment, le décale de 4 vers la droite et 4 vers le bas, et stocke le résultat (<code>result</code>) dans le buffer &quot;offsetBlur&quot;. Les deux premières primitives viennent de créer une ombre portée.</p>
+
+<h3 id="Étape_3">Étape 3</h3>
+
+<pre class="brush: html">&lt;feSpecularLighting in=&quot;blur&quot;
+                    surfaceScale=&quot;5&quot; specularConstant=&quot;.75&quot;
+                    specularExponent=&quot;20&quot; lighting-color=&quot;#bbbbbb&quot;
+                    result=&quot;specOut&quot;&gt;
+  &lt;fePointLight x=&quot;-5000&quot; y=&quot;-10000&quot; z=&quot;20000&quot;/&gt;
+&lt;/feSpecularLighting&gt;</pre>
+
+<p><a href="/fr/docs/Web/SVG/Element/feSpecularLighting" title="La primitive de filtre SVG &lt;feSpecularLighting&gt; éclaire une image en utilisant son canal alpha en tant que relief. L&apos;image résultante est une image RGBA qui dépend de la couleur de la lumière, de sa position et du relief de l&apos;image en entrée. Le calcul de l&apos;éclarage se fait suivant le modèle d&apos;illumination de Phong."><code>&lt;feSpecularLighting&gt;</code></a> prend en entrée (<code>in</code>) &quot;blur&quot;, génère un effet d&apos;éclairage, et stocke le résultat (<code>result</code>) dans le buffer &quot;specOut&quot;.</p>
+
+<h3 id="Étape_4">Étape 4</h3>
+
+<pre class="brush: html">&lt;feComposite in=&quot;specOut&quot; in2=&quot;SourceAlpha&quot;
+             operator=&quot;in&quot;
+             result=&quot;specOut&quot;/&gt;</pre>
+
+<p>Le premier <a href="/fr/docs/Web/SVG/Element/feComposite" title="La primitive de filtre SVG &lt;feComposite&gt; effectue la combinaison de deux images en entrée, pixel par pixel, en utilisant une des opérations de composition de Porter-Duff: over, in, atop, out, xor, et lighter. Il est également possible d&apos;appliquer une opération de type arithmetic (avec un résultat borné entre [0..1])."><code>&lt;feComposite&gt;</code></a> prend en entrée (<code>in</code>, <code>in2</code>) &quot;specOut&quot; et &quot;SourceAlpha&quot;, masque le résultat de &quot;specOut&quot; de telle sorte qu&apos;il ne soit pas plus grand que &quot;SourceAlpha&quot; (l&apos;élément graphique d&apos;origine), et remplace le résultat (<code>result</code>) &quot;specOut&quot;.</p>
+
+<h3 id="Étape_5">Étape 5</h3>
+
+<pre class="brush: html">&lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;specOut&quot;
+             operator=&quot;arithmetic&quot;
+             k1=&quot;0&quot; k2=&quot;1&quot; k3=&quot;1&quot; k4=&quot;0&quot;
+             result=&quot;litPaint&quot;/&gt;</pre>
+
+<p>Le second <a href="/fr/docs/Web/SVG/Element/feComposite" title="La primitive de filtre SVG &lt;feComposite&gt; effectue la combinaison de deux images en entrée, pixel par pixel, en utilisant une des opérations de composition de Porter-Duff: over, in, atop, out, xor, et lighter. Il est également possible d&apos;appliquer une opération de type arithmetic (avec un résultat borné entre [0..1])."><code>&lt;feComposite&gt;</code></a> prend en entrée (<code>in</code>, <code>in2</code>) &quot;SourceAlpha&quot; et &quot;specOut&quot;, ajoute le résultat &quot;specOut&quot; au-dessus de &quot;SourceAlpha&quot;, et stocke le résultat (<code>result</code>) dans &quot;litPaint&quot;.</p>
+
+<h3 id="Étape_6">Étape 6</h3>
+
+<pre class="brush: html">&lt;feMerge&gt;
+  &lt;feMergeNode in=&quot;offsetBlur&quot;/&gt;
+  &lt;feMergeNode in=&quot;litPaint&quot;/&gt;
+&lt;/feMerge&gt;</pre>
+
+<p>Finalement, <a href="/fr/docs/Web/SVG/Element/feMerge" title="La primitive de filtre SVG &lt;feMerge&gt; permet d&apos;empiler les résultats de différentes opérations de filtre les uns par dessus les autres. La liste des images à empiler est définit par une liste d&apos;élément &lt;feMergeNode&gt; à l&apos;intérieur de la balise. Pour y parvenir, stocker au préalable les résultats des filtres voulus dans un buffer temporaire grâce à l&apos;attribut result."><code>&lt;feMerge&gt;</code></a> fusionne ensemble &quot;offsetBlur&quot;, qui est l&apos;ombre portée, et &quot;litPaint&quot;, qui est l&apos;élément d&apos;origine avec l&apos;effet d&apos;éclairage.</p>
+
+<div style="display: flex; text-align: center;">
+<div><img alt="Source graphic" src="https://mdn.mozillademos.org/files/16310/filters01-0.png" style="height: 70px; width: 115px;">
+<p>Élément d&apos;origine</p>
+</div>
+
+<div><img alt="Primitive 1" src="https://mdn.mozillademos.org/files/16311/filters01-1.png" style="height: 70px; width: 115px;">
+<p>Primitive 1</p>
+</div>
+
+<div><img alt="Primitive 2" src="https://mdn.mozillademos.org/files/16312/filters01-2.png" style="height: 70px; width: 115px;">
+<p>Primitive 2</p>
+</div>
+
+<div><img alt="Primitive 3" src="https://mdn.mozillademos.org/files/16313/filters01-3.png" style="height: 70px; width: 115px;">
+<p>Primitive 3</p>
+</div>
+
+<div><img alt="Primitive 4" src="https://mdn.mozillademos.org/files/16314/filters01-4.png" style="height: 70px; width: 115px;">
+<p>Primitive 4</p>
+</div>
+
+<div><img alt="Primitive 5" src="https://mdn.mozillademos.org/files/16315/filters01-5.png" style="height: 70px; width: 115px;">
+<p>Primitive 5</p>
+</div>
+
+<div><img alt="Primitive 6" src="https://mdn.mozillademos.org/files/16316/filters01-6.png" style="height: 70px; width: 115px;">
+<p>Primitive 6</p>
+</div>
+</div>
+
+<p></p><div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Web/SVG/Tutoriel/Contenu_embarque_SVG" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/SVG/Tutoriel/polices_SVG" class="button">Suivant  »</a></p>
+</div><p></p>

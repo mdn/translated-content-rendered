@@ -1,0 +1,182 @@
+---
+title: Composition et découpe
+slug: Web/API/Canvas_API/Tutorial/Compositing
+tags:
+  - Canvas
+  - Composition
+  - dessin
+translation_of: Web/API/Canvas_API/Tutorial/Compositing
+original_slug: Web/API/Canvas_API/Tutoriel_canvas/Composition
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/fr/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/fr/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/fr/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/fr/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/fr/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/fr/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/fr/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/fr/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span> <a href="/fr/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/fr/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/fr/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/fr/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/fr/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Transformations" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">Suivant  »</a></p>
+</div></div>
+
+<div class="summary">
+<p>Dans tous nos <a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Transformations">exemples précédents</a>, les formes étaient toutes dessinées les unes au dessus des autres. C&apos;est plus que suffisant pour la plupart des situations, mais cela limite l&apos;ordre dans lequel les formes composées sont construites. Nous pouvons cependant changer ce comportement en définissant la propriété <code>globalCompositeOperation</code>. En complément, la propriété <code>clip</code> nous permet de cacher les parties des formes que nous ne désirons pas.</p>
+</div>
+
+<h2 id="globalCompositeOperation" name="globalCompositeOperation"><code>globalCompositeOperation</code></h2>
+
+<p>Nous pouvons non seulement dessiner de nouvelles formes derrière des formes existantes mais nous pouvons aussi les utiliser pour masquer certaines zones, supprimer des sections du canvas (ce n&apos;est pas limité aux rectangles comme pour la méthode <a href="/fr/docs/Web/API/CanvasRenderingContext2D/clearRect"><code>clearRect()</code></a>) et davantage.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation"><code>globalCompositeOperation = type</code></a></dt>
+ <dd>Cela configure le type d&apos;opération de composition à appliquer lorsqu&apos;on dessine de nouvelles formes, où le type correspond à une string qui fait référence à une des douze opérations de composition possibles.</dd>
+</dl>
+
+<p>Reportez-vous aux <a href="/fr/docs/Tutoriel_canvas/Composition/Example">exemples de compositon</a> pour le code des exemples suivants.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="6750" id="frame_Exemple_de_composition" src="https://mdn.mozillademos.org/fr/docs/Tutoriel_canvas/Composition/Example$samples/Exemple_de_composition?revision=1653489" width="750"></iframe></p>
+
+<h2 id="Clipping_paths" name="Clipping_paths">Détourage</h2>
+
+<p><img alt class="internal" src="https://mdn.mozillademos.org/files/209/Canvas_clipping_path.png" style="float: right;">Un détourage (<em>clipping path</em> en anglais) est comme une forme de canvas standard, à la différence près qu&apos;elle sert à masquer certaines parties du canvas. Voyez l&apos;image de droite, la forme rouge (en étoile) est un détourage du canvas. Tout ce qui est en dehors du chemin n&apos;est pas dessiné sur le canvas.</p>
+
+<p>Si nous comparons le détourage à la propriété <code>globalCompositeOperation</code> vue précédemment, nous voyons deux modes de composition qui ont plus ou moins les mémes effets qu&apos;avec <code>source-in</code> et <code>source-atop</code>. La différence la plus significative entre les deux est que le détourage n&apos;est jamais dessiné sur le canvas à proprement parler et il n&apos;est jamais affecté par l&apos;ajout de nouvelles formes. Ça le rend idéal pour dessiner plusieurs formes dans une zone restreinte.</p>
+
+<p>Dans le chapitre &quot;<a href="/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes" title="Web/Guide/HTML/Canvas_tutorial/Drawing_shapes#Drawing_paths">dessiner des formes avec le canevas</a>&quot;, nous n&apos;avions mentionné que les méthodes <code>stroke()</code> et <code>fill()</code>, mais il y en a une troisième: <code>clip()</code> — elle permet de faire des détourages.</p>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/CanvasRenderingContext2D/clip"><code>clip()</code></a></dt>
+ <dd>Transforme le chemin en cours de création en détourage effectif.</dd>
+</dl>
+
+<p>Il faut utiliser <code>clip()</code> plutot que <code>closePath()</code> pour fermer un chemin et enfaire un détourage.</p>
+
+<p>Par défault, l&apos;élément <a href="/fr/docs/Web/HTML/Element/canvas" title="L&apos;élément &lt;canvas&gt; permet de modifier une zone graphique via un script (habituellement en JavaScript ou grâce à WebGL). Il peut par exemple être utilisé afin de dessiner des graphiques, manipuler des images ou jouer des animations."><code>&lt;canvas&gt;</code></a> possède un détourage aux mêmes dimensions que le canvas lui-même. Donc, par défaut aucune découpe n&apos;est <span class="ht">apparente</span>.</p>
+
+<h3 id="A_clip_example" name="A_clip_example">Un exemple de <code>clip</code></h3>
+
+<p>Dans cet exemple, nous allons utiliser un détourage circulaire pour restreindre le dessin d&apos;un essemble d&apos;étoiles aléatoires à une zone particulière (et circulaire...).</p>
+
+<pre class="brush: js;highlight[9] notranslate">function draw() {
+  var ctx = document.getElementById(&apos;canvas&apos;).getContext(&apos;2d&apos;);
+  ctx.fillRect(0, 0, 150, 150);
+  ctx.translate(75, 75);
+
+  // Create a circular clipping path
+  ctx.beginPath();
+  ctx.arc(0, 0, 60, 0, Math.PI * 2, true);
+  ctx.clip();
+
+  // draw background
+  var lingrad = ctx.createLinearGradient(0, -75, 0, 75);
+  lingrad.addColorStop(0, &apos;#232256&apos;);
+  lingrad.addColorStop(1, &apos;#143778&apos;);
+
+  ctx.fillStyle = lingrad;
+  ctx.fillRect(-75, -75, 150, 150);
+
+  // draw stars
+  for (var j = 1; j &lt; 50; j++) {
+    ctx.save();
+    ctx.fillStyle = &apos;#fff&apos;;
+    ctx.translate(75 - Math.floor(Math.random() * 150),
+                  75 - Math.floor(Math.random() * 150));
+    drawStar(ctx, Math.floor(Math.random() * 4) + 2);
+    ctx.restore();
+  }
+
+}
+
+function drawStar(ctx, r) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  for (var i = 0; i &lt; 9; i++) {
+    ctx.rotate(Math.PI / 5);
+    if (i % 2 === 0) {
+      ctx.lineTo((r / 0.525731) * 0.200811, 0);
+    } else {
+      ctx.lineTo(r, 0);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+</pre>
+
+<div class="hidden">
+<pre class="brush: html notranslate">&lt;canvas id=&quot;canvas&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/canvas&gt;</pre>
+
+<pre class="brush: js notranslate">draw();</pre>
+</div>
+
+<p>Dans les premières lignes de code, nous dessinons un rectangle noir ayant la même taille que le canvas comme toile de fond puis nous déplaçons l&apos;origine au centre de l&apos;image. Ensuite, nous créons le détourage circulaire en dessinant un arc (complet) et en faisant appelle à <code>clip()</code>. Les détourages font aussi partie de l&apos;état de sauvegarde des canvas. Si on voulait garder le détourage d&apos;origine, on pourrait par exemple sauvegarder l&apos;état du canvas au préalable.</p>
+
+<p>Tout ce qui sera dessiné après la création du détourage n&apos;apparaîtra qu&apos;à l&apos;intérieur de ce chemin. Vous pouvez voir ça clairement avec le dégradé linéaire qui est dessiné après. Ensuite, un ensemble de 50 étoiles aléatoires est dessiné, en utilisant la fonction <code>drawStar()</code>. Nous pouvons voir, une fois de plus, que les éléments (ici les étoiles) n&apos;apparaissent qu&apos;à l&apos;intérieur du détourage.</p>
+
+<table class="sample-code-table"><thead><tr><th scope="col" style="text-align: center;">Screenshot</th><th scope="col" style="text-align: center;">Live sample</th></tr></thead><tbody><tr><td><img alt class="internal" src="https://mdn.mozillademos.org/files/208/Canvas_clip.png"></td><td><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="180" id="frame_A_clip_example" src="https://mdn.mozillademos.org/fr/docs/Web/API/Canvas_API/Tutoriel_canvas/Composition$samples/A_clip_example?revision=1653489" width="180"></iframe></td></tr></tbody></table>
+
+<div class="prevnext" style="text-align: right;">
+    <p><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Transformations" style="float: left;" class="button">« Précédent</a><a href="/fr/docs/Web/API/Canvas_API/Tutorial/Basic_animations" class="button">Suivant  »</a></p>
+</div>

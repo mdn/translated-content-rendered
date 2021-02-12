@@ -1,0 +1,266 @@
+---
+title: Guide des polices variables
+slug: Web/CSS/CSS_Fonts/Variable_Fonts_Guide
+tags:
+  - CSS
+  - Fonts
+  - Guide
+  - Polices
+translation_of: Web/CSS/CSS_Fonts/Variable_Fonts_Guide
+original_slug: Web/CSS/CSS_Fonts/Guide_polices_variables
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/Reference">Référence CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/CSS_Fonts">CSS Fonts</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/CSS/CSS_Fonts/Guide_caract%C3%A9ristiques_police_OpenType">Guide des caractéristiques de police OpenType</a></li><li><a href="/fr/docs/Web/CSS/CSS_Fonts/Guide_polices_variables">Guide des polices variables</a></li></ol></details></li><li class="toggle"><details open><summary>Règles @</summary><ol><li><a href="/fr/docs/Web/CSS/@font-face"><code>@font-face</code></a></li><li><a href="/fr/docs/Web/CSS/@font-feature-values"><code>@font-feature-values</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/CSS/font"><code>font</code></a></li><li><a href="/fr/docs/Web/CSS/font-family"><code>font-family</code></a></li><li><a href="/fr/docs/Web/CSS/font-feature-settings"><code>font-feature-settings</code></a></li><li><a href="/fr/docs/Web/CSS/font-kerning"><code>font-kerning</code></a></li><li><a href="/fr/docs/Web/CSS/font-language-override"><code>font-language-override</code></a></li><li><a href="/fr/docs/Web/CSS/font-optical-sizing"><code>font-optical-sizing</code></a></li><li><a href="/fr/docs/Web/CSS/font-size"><code>font-size</code></a></li><li><a href="/fr/docs/Web/CSS/font-size-adjust"><code>font-size-adjust</code></a></li><li><a href="/fr/docs/Web/CSS/font-stretch"><code>font-stretch</code></a></li><li><a href="/fr/docs/Web/CSS/font-style"><code>font-style</code></a></li><li><a href="/fr/docs/Web/CSS/font-synthesis"><code>font-synthesis</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant"><code>font-variant</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-alternates"><code>font-variant-alternates</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-caps"><code>font-variant-caps</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-east-asian"><code>font-variant-east-asian</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-ligatures"><code>font-variant-ligatures</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-numeric"><code>font-variant-numeric</code></a></li><li><a href="/fr/docs/Web/CSS/font-variant-position"><code>font-variant-position</code></a></li><li><a href="/fr/docs/Web/CSS/font-variation-settings"><code>font-variation-settings</code></a></li><li><a href="/fr/docs/Web/CSS/font-weight"><code>font-weight</code></a></li><li><a href="/fr/docs/Web/CSS/line-height"><code>line-height</code></a></li><li><a href="/fr/docs/Web/CSS/line-height-step"><code>line-height-step</code></a></li></ol></details></li></ol></section></div>
+
+<p class="summary"><strong>Les polices variables</strong> sont une évolution de la spécification OpenType et qui permet d&apos;activer différentes variations d&apos;une police dans un seul fichier plutôt que d&apos;avoir différents fichiers pour chaque taille, graisse ou style. En CSS, on peut accéder à l&apos;ensemble des variations en utilisant une seule référence <a href="/fr/docs/Web/CSS/@font-face" title="La règle @ @font-face permet de définir les polices d&apos;écriture à utiliser pour afficher le texte de pages web. Cette police peut être chargée depuis un serveur distant ou depuis l&apos;ordinateur de l&apos;utilisateur. Si la fonction local() est utilisée, elle indique à l&apos;agent utilisateur de prendre en compte une police présente sur le poste de l&apos;utilisateur."><code>@font-face</code></a>. Dans cet article, nous verrons tout ce qu&apos;il faut savoir pour commencer à utiliser les polices variables.</p>
+
+<div class="warning notecard">
+<p><strong>Attention !  </strong>Afin d&apos;utiliser les polices variables, il faut s&apos;assurer que son système d&apos;exploitation est à jour. Pour les systèmes basés sur GNU/Linux, il faut la version la plus récente de Linux Freetype. Pour macOS, les versions antérieures à 10.13 ne prennent pas en charge les polices variables. Si votre système d&apos;exploitation n&apos;est pas à jour ou ne prend pas en charge les polices variables, vous ne pourrez pas en bénéficier sur le Web ou dans les outils de développement Firefox par exemple.</p>
+</div>
+
+<h2 id="Qu&apos;est-ce_qu&apos;une_police_variable">Qu&apos;est-ce qu&apos;une police variable ?</h2>
+
+<p>Pour mieux comprendre le fonctionnement des polices variables, revenons sur les polices « statiques » et comparons les deux systèmes.</p>
+
+<h3 id="Les_polices_standard_ou_polices_statiques">Les polices standard ou polices statiques</h3>
+
+<p>Auparavant, une police de caractères était représentées par différents fichiers pour les différentes fontes. Aussi, on avait par exemple différents fichiers pour &apos;Roboto Regular&apos;, &apos;Roboto Bold&apos; et &apos;Roboto Bold Italic&apos; et on pouvait avoir 20 à 30 fichiers distincts pour représenter l&apos;intégralité d&apos;une police.</p>
+
+<p>Avec un tel scénario et pour utiliser une police de façon classique sur un site, il fallait au moins quatre fichier pour les différents styles : normal, italique, gras et gras-italique. Si on souhaitait ajouter un autre niveau de graisse (par exemple une fonte plus légère pour les légendes), il fallait rajouter un fichier. Sur le réseau, cela se traduisait par d&apos;autres requêtes HTTP et plus de données téléchargées (environ 20Ko pour chaque fichier).</p>
+
+<h3 id="Les_polices_variables">Les polices variables</h3>
+
+<p>Avec une police variable, toutes ces combinaisons de style et de graisse sont contenues dans un seul fichier. On a donc un fichier plus gros qu&apos;un fichier de police classique mais dont la taille est inférieure ou proche de celle des 4 fichiers qu&apos;on chargerait pour la police principale d&apos;un site. L&apos;avantage d&apos;une police variable est qu&apos;on peut accéder à l&apos;intégralité des corps, graisses et italiques sans être plus contraint par ceux du ou des fichiers chargés séparément.</p>
+
+<p>Cela permet d&apos;utiliser des techniques typographiques classiques pour avoir des niveaux de titre avec différents corps, d&apos;utiliser une fonte plus étroite lorsqu&apos;il y a plus de données à afficher, etc. Dans un magazine, par exemple, il n&apos;est pas rare d&apos;avoir un système typographique qui utilise 10 à 15 fontes qui sont autant de combinaisons de corps et de graisse.</p>
+
+<h4 id="Quelques_notes_à_propos_des_familles_de_polices_des_corps_et_des_variantes">Quelques notes à propos des familles de polices, des corps et des variantes</h4>
+
+<p>On a mentionné avant qu&apos;on avait différents fichiers pour chaque graisse et italique et qu&apos;on ne demandait pas au navigateur de synthétiser ces aspects. En effet, la plupart des polices ont des dessins spécifiques pour chaque graisse et chaque niveau d&apos;italique (le a et le g minuscule sont souvent assez différents en italique par exemple). Afin de respecter ces spécificités et d&apos;éviter les différences entre les implémentations des navigateurs, on préfèrera charger les fichiers correspondant à chaque graisse / italique lorsqu&apos;on n&apos;utilise pas de police variable.</p>
+
+<p>Vous pourrez aussi remarquer que certaines polices viennent avec deux fichiers : un contenant les caractères sans italique et leurs variations et un autre contenant les variations italiques. Cette méthode est parfois choisie afin de réduire la taille du fichier lorsqu&apos;on n&apos;a pas besoin des italiques. Dans tous les cas, il est toujours possible de les lier avec un nom <a href="/fr/docs/Web/CSS/font-family" title="La propriété font-family permet de définir une liste, ordonnée par priorité, de polices à utiliser pour mettre en forme le texte de l&apos;élément ciblé."><code>font-family</code></a> et d&apos;appeler chaque style avec la valeur pertinente pour <a href="/fr/docs/Web/CSS/font-style" title="La propriété font-style permet de sélectionner une fonte italique (italic) ou (oblique) parmi celles listées par font-family."><code>font-style</code></a>.</p>
+
+<h2 id="L&apos;axe_de_variation">L&apos;axe de variation</h2>
+
+<p>Le concept clé des polices variables est celui d&apos;<strong>axe de variation</strong> qui décrit l&apos;intervalle autorisé pour faire varier un aspect donné d&apos;une police. Ainsi, l&apos;axe de la graisse décrit l&apos;étendue entre les caractères les plus fins et les plus gras qui puissent être ; l&apos;axe de la largeur parcourt l&apos;étroitesse ou la largeur de la police ; l&apos;axe italique décrit si des formes italiques sont présentes, etc. Un axe peut être un intervalle ou un choix binaire. Ainsi, la graisse pourra varier entre 1 et 999 tandis que l&apos;italique pourrait être uniquement activable ou désactivable (1 ou 0 respectivement).</p>
+
+<p>Comme indiqué dans la spécification, deux types d&apos;axe existent : <strong>les axes enregistrés</strong> et <strong>les axes spécifiques</strong> (<em>custom axes</em>) :</p>
+
+<ul>
+ <li>
+  <p>Les axes enregistrés sont ceux que l&apos;on rencontre le plus souvent et qui ont donc été standardisés dans la spécification. À l&apos;heure actuelle, il existe 5 axes enregistrés : le corps, la largeur, la pente, l&apos;italique et la taille optique. Chacun de ces axes possède un attribut CSS correspondant.</p>
+ </li>
+ <li>
+  <p>Les axes spécifiques peuvent être n&apos;importe quel axe défini par le concepteur de la police. Chaque axe doit simplement être défini par une étiquette avec quatre lettres qui permettront de l&apos;identifier. Ces étiquettes pourront être utilisées dans le code CSS pour indiquer quel niveau de variation utiliser (cf. exemples ci-après).</p>
+ </li>
+</ul>
+
+<h3 id="Les_axes_enregistrés_et_les_attributs_CSS_existants">Les axes enregistrés et les attributs CSS existants</h3>
+
+<p>Dans cette section, nous verrons en détails les cinq axes enregistrés ainsi que des exemples CSS associés. Dans les cas où c&apos;est possible, nous inclurons la syntaxe standard et la syntaxe de plus bas niveau qui utilise (<a href="/fr/docs/Web/CSS/font-variation-settings" title="La propriété CSS font-variation-settings permet de contrôler les caractéristiques typographiques de bas niveau OpenType ou TrueType en utilisant les quatres lettres représentant les axes des caractéristiques qu&apos;on souhaite faire varier, ainsi que les valeurs pour les variations associées."><code>font-variation-settings</code></a>).</p>
+
+<p>Cette propriété fut le premier mécanisme implémenté pour tester les premières implémentations des polices variables et elle reste nécessaire pour utiliser de nouveaux axes ou des axes spécifiques au-delà des cinq axes enregistrés. Toutefois, lorsque c&apos;est possible, cette syntaxe ne doit pas être utilisée si une propriété de plus haut niveau est disponible. Autrement dit, <code>font-variation-settings</code> doit uniquement être utilisée afin de définir des valeurs pour des axes qui ne seraient pas accessibles autrement.</p>
+
+<h4 id="Notes">Notes</h4>
+
+<ol>
+ <li>
+  <p>Les noms d&apos;axes utilisés avec <code>font-variation-settings</code> sont sensibles à la casse. Les noms des axes enregistrés doivent être écrits en minuscules et les noms des axes spécifiques doivent être écrits en majuscules. Ainsi, dans ce cas :</p>
+
+  <pre class="brush: css">font-variation-settings: &apos;wght&apos; 375, &apos;GRAD&apos; 88;</pre>
+
+  <p><code>wght</code> correspondra à l&apos;axe enregistré du même nom et <code>GRAD</code> à un axe spécifique.</p>
+ </li>
+ <li>
+  <p>Si on a défini des valeurs avec <code>font-variation-settings</code> et qu&apos;on souhaite changer une de ces valeurs, il sera nécessaire de redéclarer l&apos;ensemble des valeurs (de la même façon qu&apos;on doit redéclarer l&apos;ensemble des caractéristiques OpenType avec <a href="/fr/docs/Web/CSS/font-feature-settings" title="La propriété font-feature-settings permet de contrôler les fonctionnalités typographiques des polices OpenType."><code>font-feature-settings</code></a>). Il est possible de contourner cet écueil en utilisant <a href="/fr/docs/Web/CSS/Les_variables_CSS">des propriétés CSS personnalisées</a> pour les valeurs individuelles et en modifiant uniquement la valeur d&apos;une des propriétés personnalisée (cf. l&apos;exemple en fin d&apos;article).</p>
+ </li>
+</ol>
+
+<h3 id="La_graisse_(weight)">La graisse (<em>weight</em>)</h3>
+
+<p>La graisse (représenté par l&apos;étiquette <code>wght</code>) définit l&apos;épaisseur des traits formants les caractères. En CSS, le descripteur <a href="/fr/docs/Web/CSS/font-weight" title="La propriété CSS font-weight permet de définir la graisse utilisée pour le texte. Les niveaux de graisse disponibles dépendent de la police (cf. font-family). Certaines fontes n&apos;existent qu&apos;avec les niveaux de graisses normal et bold."><code>font-weight</code></a> a depuis longtemps permis d&apos;utiliser différentes graisses avec des valeurs numériques comprises entre 100 et 900 (avec des incréments de 100) ou des mots-clés tels que <code>normal</code> ou <code>bold</code> qui étaient des alias pour une valeur numérique correspondante (400 et 700 ici). Ces valeurs sont toujours utilisables pour les polices statiques mais il est désormais possible d&apos;utiliser n&apos;importe quel entier entre 1 et 1000 dans le cas de polices variables.</p>
+
+<p>On notera qu&apos;il n&apos;est pas possible d&apos;utiliser la déclaration <code>@font-face</code> afin qu&apos;un point donné sur cet axe corresponde au mot-clé <code>bold</code> (ou tout autre mot-clé). Cela pourra généralement être résolu simplement mais nécessitera d&apos;écrire plus de CSS :</p>
+
+<pre class="brush: css">font-weight: 375;
+
+font-variation-settings: &apos;wght&apos; 375;</pre>
+
+<p>Vous pouvez éditer l&apos;exemple CSS suivant pour voir l&apos;effet sur la graisse de la police.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="520" src="https://mdn.github.io/css-examples/variable-fonts/weight.html" width="100%"></iframe></div>
+
+<h3 id="La_largeur_(width)">La largeur (<em>width</em>)</h3>
+
+<p>La largeur (indiquée par l&apos;étiquette <code>wdth</code>) correspond à l&apos;axe selon lequel les caractères sont plus ou moins étroits ou larges. En CSS, c&apos;est le descripteur <a href="/fr/docs/Web/CSS/font-stretch" title="La propriété font-stretch permet de choisir entre la forme normale, condensée ou étendue d&apos;une police."><code>font-stretch</code></a> qui peut être utilisé avec un pourcentage inférieur ou supérieur à 100% (la largeur « normale ») ou avec n&apos;importe quel nombre positif. Si une valeur numérique est fournie et se situe en dehors de l&apos;intervalle couvert par la police variable, le navigateur devra choisir la valeur la plus proche possible.</p>
+
+<div class="note notecard">
+<p><strong>Note :</strong> Lorsqu&apos;on utilise la notation « bas niveau » avec <code>font-variation-settings</code>, on n&apos;écrit pas le caractère %.</p>
+</div>
+
+<pre class="brush: css">font-stretch: 115%;
+
+font-variation-settings: &apos;wdth&apos; 115;
+</pre>
+
+<p>L&apos;exemple suivant peut être édité pour observer les modifications des valeurs sur cet axe.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="520" src="https://mdn.github.io/css-examples/variable-fonts/width.html" width="100%"></iframe></div>
+
+<h3 id="L&apos;italique">L&apos;italique</h3>
+
+<p>L&apos;axe italique (<code>ital</code>) fonctionne différemment car il ne s&apos;agit pas d&apos;un intervalle mais d&apos;une option activée ou désactivée : il n&apos;y a pas de valeurs intermédiaires. Les caractères en italique sont la plupart du temps très différents de leur équivalent sans italique et passer d&apos;un mode à l&apos;autre entraîne généralement l&apos;utilisation de glyphes différents. Attention à ne pas confondre l&apos;italique et l&apos;oblique (cf. l&apos;axe de pente ci-après) : une police aura une forme italique ou une variabilité sur l&apos;axe de pente mais rarement les deux.</p>
+
+<p>En CSS, l&apos;italique est appliqué grâce à la propriété <a href="/fr/docs/Web/CSS/font-style" title="La propriété font-style permet de sélectionner une fonte italique (italic) ou (oblique) parmi celles listées par font-family."><code>font-style</code></a> (qui permet aussi d&apos;appliquer l&apos;oblique). On notera l&apos;apparition de la propriété <code>font-synthesis: none;</code> qui empêche les navigateurs de synthétiser l&apos;italique en penchant les caractères (on pourra aussi utiliser cette valeur de façon équivalente pour éviter de synthétiser la graisse).</p>
+
+<pre class="brush: css">font-style: italic;
+
+font-variation-settings: &apos;ital&apos; 1;
+
+font-synthesis: none;</pre>
+
+<p>L&apos;exemple suivant peut être édité pour observer les modifications des valeurs sur cet axe.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="520" src="https://mdn.github.io/css-examples/variable-fonts/italic.html" width="100%"></iframe></div>
+
+<h3 id="La_pente_(slant)">La pente (<em>slant</em>)</h3>
+
+<p>La pente (indiquée par l&apos;étiquette <code>slnt</code>), également appelée « oblique », diffère de l&apos;italique car elle applique une pente sur les caractères mais ne change aucun des glyphes. Cet axe est un intervalle numérique allant généralement de 0 (droit) à 20 degrés. Toutefois, les valeurs allant de -90 et à 90 (degrés) sont autorisées. C&apos;est également le descripteur <code>font-style</code> qui peut être utilisé pour cet axe.</p>
+
+<div class="note notecard">
+<p><strong>Note :</strong> Le mot-clé <code>deg</code> ne doit pas être utilisé comme unité pour la notation avec <code>font-variation-settings</code>.</p>
+</div>
+
+<pre class="brush: css">font-style: oblique 14deg;
+
+font-variation-settings: &apos;slnt&apos; 14;</pre>
+
+<p>L&apos;exemple suivant peut être édité pour observer les modifications des valeurs sur cet axe.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="520" src="https://mdn.github.io/css-examples/variable-fonts/slant.html" width="100%"></iframe></div>
+
+<h3 id="La_taille_optique">La taille optique</h3>
+
+
+
+
+
+<p>La taille optique, indiquée par l&apos;étiquette <code>opsz</code>, correspond à la variation de l&apos;épaisseur des traits formants le caractère afin de s&apos;assurer que celui-ci puisse être lu avec un petit corps et ainsi de garantir une bonne impression ou un bon affichage à l&apos;écran.</p>
+
+<p>Ainsi, pour les petits corps, on pourra avoir des traits plus épais et pour des grands corps, on pourra avoir une variation d&apos;épaisseur plus importante entre les différents traits du caractères pour développer correctement le dessin de la police.</p>
+
+<p>La plupart du temps, les valeurs liées à la taille optique sont appliquées automatiquement avec les valeurs correspondantes de <code>font-size</code> mais on peut tout à fait les manipuler avec la syntaxe de bas niveau <code>font-variation-settings</code>.</p>
+
+<p>Une nouvelle propriété CSS a été créée afin de prendre en charge cet axe avec une syntaxe haut niveau pour les polices variables : <a href="/fr/docs/Web/CSS/font-optical-sizing" title="La propriété CSS font-optical-sizing permet de contrôler la façon dont l&apos;agent utilisateur rend le texte avec (ou non) différentes représentations visuelles en fonction de la taille.  Cette propriété ne fonctionne qu&apos;avec les polices qui disposent d&apos;un axe de variation pour la taille optique."><code>font-optical-sizing</code></a>. Le descripteur <code>font-optical-sizing</code> permet uniquement d&apos;utiliser les valeurs <code>auto</code> ou <code>none</code> et ainsi uniquement d&apos;activer ou de désactiver le dimensionnement optique. Toutefois, avec <code>font-variation-settings: &apos;opsz&apos; &lt;num&gt;</code>, on peut fournir une valeur numérique. Dans la plupart des cas, on utilisera la même valeur pour <code>font-size</code> et pour <code>opsz</code>. Il est ici permis d&apos;utiliser une autre valeur spécifique afin d&apos;améliorer la lisibilité ou d&apos;obtenir un effet esthétique.</p>
+
+<pre class="brush: css">font-optical-sizing: auto;
+
+font-variation-settings: &apos;opsz&apos; 36;</pre>
+
+<p>L&apos;exemple suivant peut être édité pour observer les modifications des valeurs sur cet axe.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="1020" src="https://mdn.github.io/css-examples/variable-fonts/optical-sizing.html" width="100%"></iframe></div>
+
+<h3 id="Les_axes_spécifiques">Les axes spécifiques</h3>
+
+<p>Les axes spécifiques sont introduits spécifiquement par les concepteurs de polices et peuvent correspondre à n&apos;importe quelle variation. Il est possible que certains axes spécifiques deviennent fréquemment utilisés voire finissent par être intégrés aux axes enregistrés mais seul l&apos;avenir le dira avec certitude.</p>
+
+<h3 id="Le_grade">Le grade</h3>
+
+<p>Le grade est une variation qui consiste à épaissir certains des traits des glyphes sans agrandir la largeur totale du glyphe. En augmentant le grade, on a ainsi un caractère plus « dense ». Il ne faut pas confondre le corps et le grade : le premier augmente la taille générale, largeur incluse, des glyphes tandis que le second ne modifie pas l&apos;espace physique occupé par le caractère. Le grade est un axe spécifique plutôt populaire car il permet de faire varier la densité apparente du texte sans modifier sa largeur et ainsi il évite de générer un décalage du texte.</p>
+
+<pre class="brush: css">font-variation-settings: &apos;GRAD&apos; 88;</pre>
+
+<p>L&apos;exemple suivant peut être édité pour observer les modifications des valeurs sur cet axe.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="520" src="https://mdn.github.io/css-examples/variable-fonts/grade.html" width="100%"></iframe></div>
+
+<h3 id="Utiliser_une_police_variable_les_changements_pour_font-face">Utiliser une police variable : les changements pour <code>@font-face</code></h3>
+
+<p>Pour charger une police variable, la syntaxe est proche de celle utilisée pour les polices statiques. Les quelques différences notables sont apportées par des ajouts à la syntaxe <a href="/fr/docs/Web/CSS/@font-face" title="La règle @ @font-face permet de définir les polices d&apos;écriture à utiliser pour afficher le texte de pages web. Cette police peut être chargée depuis un serveur distant ou depuis l&apos;ordinateur de l&apos;utilisateur. Si la fonction local() est utilisée, elle indique à l&apos;agent utilisateur de prendre en compte une police présente sur le poste de l&apos;utilisateur."><code>@font-face</code></a> disponible dans la plupart des navigateurs modernes.</p>
+
+<p>La syntaxe de base est la même mais on peut indiquer la technologie utilisée pour la police ainsi que les intervalles autorisés pour les descripteurs <code>font-weight</code> et <code>font-stretch</code>.</p>
+
+<h4 id="Exemple_d&apos;une_police_standard_réale_droite">Exemple d&apos;une police standard réale droite :</h4>
+
+<pre class="brush: css">@font-face {
+ font-family: &apos;MyVariableFontName&apos;;
+ src: &apos;path/to/font/file/myvariablefont.woff2&apos; format(&apos;woff2-variations&apos;);
+ font-weight: 125 950;
+ font-stretch: 75% 125%;
+ font-style: normal;
+}
+</pre>
+
+<h4 id="Exemple_d&apos;une_police_avec_une_forme_droite_et_une_forme_italique">Exemple d&apos;une police avec une forme droite et une forme italique :</h4>
+
+<pre class="brush: css">@font-face {
+ font-family: &apos;MyVariableFontName&apos;;
+ src: &apos;path/to/font/file/myvariablefont.woff2&apos; format(&apos;woff2-variations&apos;);
+ font-weight: 125 950;
+ font-stretch: 75% 125%;
+ font-style: oblique 0deg 20deg;
+}</pre>
+
+<div class="note notecard">
+<p><strong>Note :</strong> Il n&apos;existe pas de valeur spécifique pour la mesure du degré supérieur. Les valeurs fournies à <code>font-style</code> indiquent simplement qu&apos;un axe est présent afin que le navigateur puisse afficher correctement les caractères droits ou en italique.</p>
+</div>
+
+<h4 id="Exemple_d&apos;une_police_qui_ne_contient_que_des_italiques_et_aucun_caractère_droit">Exemple d&apos;une police qui ne contient que des italiques et aucun caractère droit :</h4>
+
+<pre class="brush: css">@font-face {
+ font-family: &apos;MyVariableFontName&apos;;
+ src: &apos;path/to/font/file/myvariablefont.woff2&apos; format(&apos;woff2-variations&apos;);
+ font-weight: 125 950;
+ font-stretch: 75% 125%;
+ font-style: italic;
+}</pre>
+
+<h4 id="Exemple_d&apos;une_police_avec_un_axe_de_pente">Exemple d&apos;une police avec un axe de pente :</h4>
+
+<pre class="brush: css">@font-face {
+ font-family: &apos;MyVariableFontName&apos;;
+ src: &apos;path/to/font/file/myvariablefont.woff2&apos; format(&apos;woff2-variations&apos;);
+ font-weight: 125 950;
+ font-stretch: 75% 125%;
+ font-style: oblique 0deg 12deg;
+}</pre>
+
+<div class="note notecard">
+<p><strong>Note :</strong> La syntaxe complète n&apos;est pas implémentée par l&apos;ensemble des navigateurs et il faudra donc tester avec précaution. Tous les navigateurs qui prennent en charge les polices variables sauront les afficher même si seul le format de fichier est indiqué (plutôt que le format complet : par exemple <code>woff2</code> à la place de <code>woff2-variations</code>), mais mieux vaut utiliser la syntaxe la plus précise si possible.</p>
+</div>
+
+<div class="note notecard">
+<p><strong>Note :</strong> Fournir des valeurs d&apos;intervalle pour <code>font-weight</code>, <code>font-stretch</code> et <code>font-style</code> empêchera le navigateur d&apos;afficher des polices en dehors de ces intervalles en utilisant les attributs <code>font-weight</code> ou <code>font-stretch</code>. En revanche, cela ne bloquera pas la syntaxe de plus bas niveau avec <code>font-variation-settings</code> !</p>
+</div>
+
+<h2 id="Amélioration_progressive_et_anciens_navigateurs">Amélioration progressive et anciens navigateurs</h2>
+
+<p>La prise en charge des polices variables peut être vérifié grâce à <a href="/fr/docs/Web/CSS/@supports" title="@supports permet ainsi au moteur de rendu de tester la présence d&apos;une fonctionnalité (on parle de feature query)."><code>@supports</code></a>. Il est donc possible d&apos;utiliser des polices variables en production et de limiter la portée des polices variables à l&apos;intérieur d&apos;une requête de prise en charge.</p>
+
+<pre class="brush: css">h1 {
+ font-family: some-non-variable-font-family;
+}
+
+@supports (font-variation-settings: &apos;wdth&apos; 115) {
+ h1 {
+    font-family: some-variable-font-family;
+ }
+}</pre>
+
+<h2 id="Pages_d&apos;exemples">Pages d&apos;exemples</h2>
+
+<p>Les pages d&apos;exemples suivantes illustrent deux façons pour structurer le CSS. La première utilise les attributs standards où c&apos;est possible et la seconde utilise les propriétés personnalisées afin de définir les valeur pour la chaîne de caractères fournie à <code>font-variation-settings</code> et montre comment mettre à jour une valeur plutôt que de redéfinir l&apos;intégralité de la chaîne de caractères. On notera aussi l&apos;effet au survol (<em>hover</em>) sur l&apos;élément <code>h2</code> qui ne joue que sur l&apos;axe de grade.</p>
+
+<div><iframe class="live-sample-frame" frameborder="0" height="1220" src="https://mdn.github.io/css-examples/variable-fonts/sample-page.html" width="100%"></iframe></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="https://drafts.csswg.org/css-fonts-4">Module de spécification CSS Fonts de niveau 4 (au stade de brouillon) (en anglais)</a></li>
+ <li><a href="https://docs.microsoft.com/en-us/typography/opentype/spec/otvaroverview">Introduction Microsoft aux variations Open Type (en anglais)</a></li>
+ <li><a href="https://docs.microsoft.com/en-us/typography/opentype/spec/dvaraxisreg">Registre des étiquettes d&apos;axe de variation - Microsoft OpenType Design (en anglais)</a></li>
+ <li><a href="https://wakamaifondue.com">Wakamai Fondue (en anglais)</a> (un site qui permet d&apos;explorer les axes et caractéristiques d&apos;une police)</li>
+ <li><a href="https://www.axis-praxis.org">Axis Praxis (en anglais)</a> (une site qui permet de manipuler les axes de polices variables)</li>
+ <li><a href="https://v-fonts.com">V-Fonts.com (en anglais)</a> (un catalogue de polices variables)</li>
+ <li><a href="https://play.typedetail.com">Font Playground (en anglais)</a> (un autre site de manipulation des polices variables)</li>
+</ul>

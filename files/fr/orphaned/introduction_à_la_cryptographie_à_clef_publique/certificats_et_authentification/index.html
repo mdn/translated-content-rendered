@@ -1,0 +1,399 @@
+---
+title: Certificats et authentification
+slug: >-
+  orphaned/Introduction_à_la_cryptographie_à_clef_publique/Certificats_et_authentification
+tags:
+  - Sécurité
+original_slug: >-
+  Introduction_à_la_cryptographie_à_clef_publique/Certificats_et_authentification
+---
+<h3 id="Certificat_identifiant_une_personne_ou_une_entité">Certificat identifiant une personne ou une entité</h3>
+
+<p>Un <em>certificat</em> est un document électronique utilisé pour identifier un individu, un serveur, une entreprise ou toute autre entité et pour associer une clef publique à cette identité. Tout comme un permis de conduire, un passeport, ou tout autre moyen d&apos;identification personnelle couramment utilisé, un certificat fournit généralement une preuve reconnue de l&apos;identité de la personne. La cryptographie à clef publique utilise les certificats pour éviter les problèmes d&apos;usurpation d&apos;identité (voir <a href="#Probl.C3.A8mes_de_s.C3.A9curit.C3.A9_sur_Internet">Problèmes de sécurité sur Internet</a>).</p>
+
+<p>Pour obtenir un permis de conduire, il faut s&apos;inscrire dans une agence gouvernementale, telle que le <em>Department of Motor Vehicles</em>, qui vérifie votre identité, votre capacité à conduire, votre adresse, et d&apos;autres information avant de délivrer le permis. Pour obtenir une carte d&apos;étudiant, il faut s&apos;adresser à une université ou une école, qui contrôle certaines informations (comme le paiement des frais d&apos;inscription) avant de délivrer la carte d&apos;étudiant. Pour obtenir une carte de bibliothèque, il faut uniquement fournir votre nom et une attestation de logement à vos nom et adresse.</p>
+
+<p>Les certificats fonctionnent sur les mêmes principes que ces différents documents d&apos;identité. Les autorités de certification (AC ou CA) sont des entités qui valident les identités et émettent les certificats. Elles peuvent être des tierces-parties indépendantes ou des organisations possédant leur propre serveur d&apos;émission de certificats (tel que <em>Red Hat Certificate System</em>). Les méthodes utilisées pour valider une identité varient selon les politiques d&apos;émission d&apos;une AC donnée — tout comme les méthodes de validation des autres formulaires d&apos;identification varient selon les organismes d&apos;émission et leurs domaines d&apos;application. En général, avant d&apos;émettre un certificat, une AC doit utiliser ses procédures de vérification publiées pour un type de certificat afin de s&apos;assurer que l&apos;entité demandant le certificat est bien celle qu&apos;elle prétend être.</p>
+
+<p>Le certificat émis par l&apos;AC lie une clef publique particulière au nom de l&apos;entité qu&apos;il identifie (tel qu&apos;un nom d&apos;employé ou de serveur). Les certificats aident à prévenir l&apos;utilisation de fausses clefs publiques pour l&apos;usurpation d&apos;identité. Seule la clef publique certifiée dans le certificat fonctionnera avec la clef privée correspondante possédée par l&apos;entité identifiée par le certificat.</p>
+
+<p>En plus de la clef publique, un certificat contient toujours le nom de l&apos;entité qu&apos;il identifie, une date d&apos;expiration, le nom de son AC émettrice, un numéro de série et d&apos;éventuelles autres informations utiles. Plus important, un certificat contient toujours la signature numérique de l&apos;AC émettrice. La signature numérique de l&apos;AC émettrice permet au certificat de fonctionner comme une <em>lettre d&apos;introduction</em> pour les utilisateurs qui connaissent l&apos;AC et lui font confiance mais qui ne connaissent pas l&apos;entité identifiée par le certificat.</p>
+
+<p>Pour plus d&apos;informations concernant le rôle des autorités de certification (AC), voir « <a href="#Comment_les_certificats_d.27AC_sont_utilis.C3.A9s_pour_.C3.A9tablir_une_relation_de_confiance">Comment les certificats d&apos;AC sont utilisés pour établir une relation de confiance</a> ».</p>
+
+<h3 id="L&apos;authentification_confirme_une_identité">L&apos;authentification confirme une identité</h3>
+
+<p>L&apos;<em>authentification</em> est le processus de confirmation d&apos;une identité. Dans le contexte d&apos;interactions entre les réseaux, l&apos;authentification comporte l&apos;identification confiante d&apos;une partie par une autre. L&apos;authentification sur les réseaux peut avoir plusieurs formes. Les certificats sont un moyen d&apos;authentification.</p>
+
+<p>Les interactions entre les réseaux se font généralement entre un client, tel que le navigateur d&apos;un ordinateur personnel, et un serveur, tel que le matériel et le logiciel hébergeant un site Web. L&apos;<em>authentification cliente</em> se réfère à l&apos;identification confiante d&apos;un client par un serveur (c&apos;est-à-dire, l&apos;identification de la personne supposée utiliser le logiciel client). <em>L&apos;authentification serveur</em> se réfère à l&apos;identification confiante d&apos;un serveur par le client (c&apos;est-à-dire, l&apos;identification de l&apos;organisation supposée être responsable du serveur à une adresse réseau particulière).</p>
+
+<p>Les authentifications cliente et serveur ne sont pas les seules formes d&apos;authentification permises par les certificats. Par exemple, la signature numérique d&apos;un courriel combinée au certificat identifiant l&apos;expéditeur fournissent une forte preuve que la personne identifiée par le certificat a bien envoyé le message. De même, une signature numérique dans un formulaire HTML combinée à un certificat identifiant le signataire peut fournir une preuve, après coup, que la personne identifiée par le certificat est d&apos;accord avec le contenu du formulaire. En plus de l&apos;authentification, la signature numérique assure, dans les deux cas, un degré de non répudiation (c&apos;est-à-dire que la signature numérique rend difficile la négation ultérieure par le signataire des informations présentes dans le message électronique ou le formulaire).</p>
+
+<p>L&apos;authentification cliente est un élément essentiel de la sécurité réseau, sur les intranets ou les extranets. Les sections qui suivent présentes deux formes d&apos;authentification cliente :</p>
+
+<ul>
+ <li><strong>Authentification basée sur un mot de passe</strong> : Presque tous les serveurs permettent l&apos;authentification cliente à l&apos;aide d&apos;un nom, ou pseudonyme, et d&apos;un mot de passe. Par exemple, un serveur pour demander à un utilisateur de fournir un nom et un mot de passe avant de donner des droits d&apos;accès à certaines parties du serveur. Le serveur maintient une liste des noms et des mots de passe ; si un nom particulier est dans cette liste, et que l&apos;utilisateur fournit le bon mot de passe, le serveur donne des droit d&apos;accès.</li>
+ <li><strong>Authentification basée sur un certificat</strong> : L&apos;authentification basée sur les certificats est une étape du protocole SSL. Le client signe numériquement des données générées aléatoirement et envoie à la fois ces données signées et le certificat sur le réseau. Le serveur utilise les techniques de cryptographie à clef publique pour valider la signature et confirmer la validité du certificat.</li>
+</ul>
+
+<h4 id="L&apos;authentification_par_mot_de_passe">L&apos;authentification par mot de passe</h4>
+
+<p>La figure 4 montre les étapes basiques mise en œuvre dans l&apos;authentification d&apos;un client à l&apos;aide d&apos;un nom et d&apos;un mot de passe. Cette figure suppose que :</p>
+
+<ul>
+ <li>L&apos;utilisateur a déjà décidé de faire confiance au serveur, sans authentification ou sur la base d&apos;une authentification de serveur via SSL.</li>
+ <li>L&apos;utilisateur a demandé une ressource contrôlée par le serveur.</li>
+ <li>Le serveur demande une authentification client avant de donner les droits d&apos;accès aux ressources demandées.</li>
+</ul>
+
+<p><img src="/@api/deki/files/1157/=01pswd.png" alt="Figure 4. Utilisation d&apos;un mot de passe pour authentifier un client auprès d&apos;un serveur" class="internal"></p>
+
+<p>Voici les étapes décrites dans la figure 4 :</p>
+
+<ol>
+ <li>En réponse à une demande d&apos;authentification de la part du serveur, le client affiche une boîte de dialogue demandant le nom de l&apos;utilisateur et son mot de passe pour accéder à ce serveur. L&apos;utilisateur doit fournir séparément un nom et un mot de passe pour chaque nouveau serveur qu&apos;il désire utiliser pendant sa session de travail.</li>
+ <li>Le client envoie le nom et le mot de passe par le réseau, en clair ou par une connexion SSL chiffrée.</li>
+ <li>Le serveur vérifie le nom et le mot de passe dans sa base de données locale et, s&apos;ils correspondent, il les accepte comme preuves authentifiant l&apos;identité de l&apos;utilisateur.</li>
+ <li>Le serveur détermine si l&apos;utilisateur est autorisé à accéder aux ressources demandées, et si oui, autorise le client à y accéder.</li>
+</ol>
+
+<p>Avec cet arrangement, l&apos;utilisateur doit fournir un mot de passe pour chaque serveur, et l&apos;administrateur doit conserver les noms et les mots de passe de chaque utilisateur, généralement sur des serveurs distincts.</p>
+
+<p>Une implémentation propre ne mémorise pas les mots de passe en texte simple. À la place, il concatène le mot de passe avec une valeur aléatoire propre à chaque utilisateur (également appelée « <em>salt</em> ») et mémorise la valeur hachée du résultat avec le « <em>salt</em> ». Ceci rend plus difficile des attaques de force brute.</p>
+
+<p>Comme expliqué dans la section suivante, un des avantages de l&apos;authentification par certificat est qu&apos;elle peut être utilisée pour remplacer les trois premières étapes décrites à la figure 4 avec un mécanisme qui permet à l&apos;utilisateur de fournir un seul mot de passe (qui n&apos;est pas transmis à travers le réseau) et permet à l&apos;administrateur de centraliser le contrôle de l&apos;authentification des utilisateurs.</p>
+
+<h4 id="L&apos;authentification_par_certificat">L&apos;authentification par certificat</h4>
+
+<p>La figure 5 décrit le fonctionnement d&apos;une authentification client à l&apos;aide des certificats et du protocole SSL. Pour authentifier un utilisateur auprès d&apos;un serveur, Le client signe numériquement des données générées aléatoirement et envoie à la fois ces données signées et le certificat sur le réseau. Pour les besoins de cette discussion, la signature numérique associée aux données signées peut être considérée comme une preuve fournie par le client au serveur. Le serveur authentifie l&apos;identité de l&apos;utilisateur en se basant sur la force de cette preuve.</p>
+
+<p>Comme pour la figure 4, la figure 5 suppose que l&apos;utilisateur a déjà décidé de faire confiance au serveur et qu&apos;il a demandé une ressource, et que le serveur a demandé une authentification client lors du processus d&apos;évaluation des droits à accéder à la ressource demandée.</p>
+
+<p><img src="/@api/deki/files/1159/=02cert.png" alt="Figure 5. Utilisation d&apos;une authentification par certificat d&apos;un client auprès d&apos;un serveur" class="internal"></p>
+
+<p>Contrairement au processus décrit à la figure 4, celui de la figure 5 nécessite d&apos;utiliser SSL. La figure 5 suppose également que le client possède un certificat valide qui peut être utilisé pour l&apos;identifier auprès du serveur. L&apos;authentification par certificat est généralement considérée comme préférable à l&apos;authentification par mot de passe car elle est basée sur ce que l&apos;utilisateur a (la clef privée) aussi bien que sur ce que l&apos;utilisateur sait (le mot de passe qui protège cette clef privée). Cependant, il est important de remarquer que ces deux affirmations ne sont vraies que si aucune personne non autorisée n&apos;a accès à l&apos;ordinateur de l&apos;utilisateur ou a son mot de passe, si le mot de passe de la base de données des clefs privées du logiciel client a été défini, et si le logiciel est paramétré pour demander le mot de passe à intervalles raisonnablement fréquents.</p>
+
+<p>Ni l&apos;authentification par mot de passe, ni l&apos;authentification par certificat ne répondent aux questions de sécurité soulevées par l&apos;accès physique à l&apos;ordinateur d&apos;un individu ou à ses mots de passe. La cryptographie à clef publique peut uniquement vérifier qu&apos;une clef privée utilisée pour signer des données, correspond à la clef publique présente dans un certificat. Il est de la responsabilité de l&apos;utilisateur de protéger physiquement son ordinateur et de conserver secret le mot de passe de sa clef privée.</p>
+
+<p>Voici les étapes décrites dans la figure 5 :</p>
+
+<ol>
+ <li>Le logiciel client, tel que le navigateur, maintient une base de données des clefs privées correspondantes aux clefs publiques publiées avec tous les certificats émis pour ce client. Le client demande le mot de passe de cette base de données la première fois qu&apos;il a besoin d&apos;y accéder lors d&apos;une session donnée — par exemple, la première fois que l&apos;utilisateur essaie d&apos;accéder à un serveur SSL qui requiert une authentification par certificat. Après avoir renseigné une première fois ce mot de passe, l&apos;utilisateur n&apos;en a plus besoin pour la durée de la session, même en accédant à d&apos;autres serveurs SSL.</li>
+ <li>Le client débloque la base de données des clefs privées, récupère la clef privée du certificat de l&apos;utilisateur et utilise cette clef privée pour signer numériquement des données générées aléatoirement dans ce but en se basant sur des entrées du client et du serveur. Ces données et la signature numérique constituent une « preuve » de la validité de la clef privée. La signature numérique peut uniquement être créée avec la clef privée et peut être validée par la clef publique associée aux données signées, ce qui est réservé à la session SSL.</li>
+ <li>Le client envoie le certificat de l&apos;utilisateur et la <em>preuve</em> (les données générées aléatoirement signées numériquement) par le réseau.</li>
+ <li>Le serveur utilise le certificat et la <em>preuve</em> pour authentifier l&apos;identité de l&apos;utilisateur (pour plus de détails sur ce fonctionnement, voir « <a href="/fr/Introduction_à_SSL" title="fr/Introduction_à_SSL">Introduction à SSL</a> »).</li>
+ <li>À ce moment, le serveur peut éventuellement exécuter des tâches d&apos;authentification supplémentaires, comme vérifier si le certificat présenté par le client est stocké dans l&apos;entrée de l&apos;utilisateur d&apos;un annuaire LDAP. Le serveur continue alors à évaluer si l&apos;utilisateur identifié est autorisé ou non à accéder à la ressource demandée. Ce processus d&apos;évaluation peut employer une variété de mécanismes standards d&apos;autorisation, en utilisant éventuellement des informations présentes dans un annuaire LDAP, des bases de données d&apos;entreprises, etc. Si le résultat de l&apos;évaluation est positif, le serveur autorise le client à accéder à la ressource demandée.</li>
+</ol>
+
+<p>Comme on peut le voir en comparant les figures 4 et 5, les certificats remplacent la portion de l&apos;authentification correspondant à l&apos;interaction entre le client et le serveur. Plutôt que de demander à l&apos;utilisateur d&apos;envoyer des mots de passe par le réseau à longueur de journée, l&apos;ouverture de session unique demande une seule fois à l&apos;utilisateur de saisir son mot de passe de base de données de clefs privée, sans l&apos;envoyer par le réseau. Pour la suite de la session, le client présente le certificat de l&apos;utilisateur pour authentifier l&apos;utilisateur auprès de chaque serveur auquel il se connecte. Les mécanismes d&apos;autorisation existants basés sur l&apos;authentification de l&apos;identité du l&apos;utilisateur ne sont pas concernés.</p>
+
+<h3 id="Comment_utiliser_les_certificats">Comment utiliser les certificats</h3>
+
+<ul>
+ <li><a href="#Types_de_certificats">Types de certificats</a></li>
+ <li><a href="#Le_protocole_SSL">Le protocole SSL</a></li>
+ <li><a href="#Messages_sign.C3.A9s_et_encrypt.C3.A9s">Messages signés et encryptés</a></li>
+ <li><a href="#Signature_de_formulaire">Signature de formulaire</a></li>
+ <li><a href="#Ouverture_unique_de_session">Ouverture unique de session</a></li>
+ <li><a href="#Signature_d.27objet">Signature d&apos;objet</a></li>
+</ul>
+
+<h4 id="Types_de_certificats">Types de certificats</h4>
+
+<p>Cinq types de certificats sont couramment utilisé avec les produits Red Hat :</p>
+
+<ul>
+ <li><strong>Certificats de client SSL</strong> : Utilisés pour identifier des client auprès de serveurs via SSL (authentification client). Généralement, l&apos;identité du client est présumée être la même que celle d&apos;un être humain, tel qu&apos;un employé dans une entreprise. Voir <a href="#_L.27authentification_par_certificat"> L&apos;authentification par certificat</a>, pour une description de la façon dont les certificats d&apos;un client SSL sont utilisés pour l&apos;authentification client. Les certificats d&apos;un client SSL peuvent également être utilisés pour la signature de formulaires et comme composante d&apos;une solution de l&apos;ouverture de session unique.</li>
+</ul>
+
+<dl>
+ <dt>Exemples </dt>
+ <dd>Une banque donne un certificat client SSL à l&apos;un de ses usagers qui lui permet de s&apos;identifier auprès du serveur de la banque et d&apos;accéder à ses comptes. Une compagnie peut donner un certificat client SSL à l&apos;un de ses nouveaux employés qui lui permet de s&apos;identifier auprès du serveur de l&apos;entreprise et d&apos;obtenir accès aux ressources disponibles sur ce serveur.</dd>
+</dl>
+
+<ul>
+ <li><strong>Certificats de serveur SSL</strong> : Utilisé pour identifier les serveurs auprès des client via SSL (authentification serveur). L&apos;authentification serveur peut être utilisée avec ou sans authentification client. L&apos;authentification serveur est obligatoire lors de l&apos;établissement d&apos;une connexion SSL chiffrée. Pour plus d&apos;informations, voir <a href="#Le_protocole_SSL">Le protocole SSL</a>.</li>
+</ul>
+
+<dl>
+ <dt>Exemple </dt>
+ <dd>Les sites internet de commerce électronique (communément appelé e-commerce) supportent habituellement l&apos;authentification serveur par certificat, au minimum, pour établir une session SSL chiffrée et assure les clients qu&apos;ils traitent avec un site identifié comme étant celui d&apos;une entreprise donnée. La session SSL assure que les informations personnelles renseignées par le client et transmises par le réseau, telles que son numéro de carte de crédit, ne seront pas aisément interceptées.</dd>
+</dl>
+
+<ul>
+ <li><strong>Certificats S/MIME</strong> : Utilisés pour signer et chiffrer les courriels. Comme pour les certificats client SSL, l&apos;identité du client est généralement présumé être la même que celle d&apos;un être humain, tel qu&apos;un employé d&apos;une entreprise. Un certificat unique peut être utilisé comme certificat S/MIME et comme certificat SSL (voir <a href="#Messages_sign.C3.A9s_et_chiffr.C3.A9s">Messages signés et chiffrés</a>). Les certificats S/MIME peuvent également être utilisés pour la signature de formulaires et comme composante d&apos;une solution de l&apos;ouverture de session unique.</li>
+</ul>
+
+<dl>
+ <dt>Exemples </dt>
+ <dd>Une entreprise déploie des certificats combinés S/MIME et SSL dans l&apos;unique but d&apos;authentifier l&apos;identité des employés, permettant ainsi la signature de messages et l&apos;authentification de client SSL, mais pas le chiffrage des messages. Une autre entreprise émet des certificats S/MIME uniquement dans le but de signer et de chiffrer les messages de natures financière ou légale qu&apos;elle envoie.</dd>
+</dl>
+
+<ul>
+ <li><strong>Certificats de signature d&apos;objet</strong> : Utilisés pour identifier les signataires de code Java, de scripts JavaScript, ou d&apos;autres fichiers signés. Pour plus d&apos;informations, voir <a href="#Signature_d.27objets">Signature d&apos;objets</a>.</li>
+</ul>
+
+<dl>
+ <dt>Exemple </dt>
+ <dd>Une entreprise de logiciel signe les logiciels qu&apos;elle distribue par Internet pour fournir l&apos;assurance à ses utilisateurs que le logiciel est un produit légitime. L&apos;utilisation des certificats et des signatures numériques de cette façon peut également servir pour que les utilisateurs identifient et contrôlent l&apos;accès à leurs ordinateurs des logiciels téléchargés.</dd>
+</dl>
+
+<ul>
+ <li><strong>Certificats d&apos;AC</strong> : Utilisés pour identifier les autorités de certification (AC). Les logiciels client et serveur utilisent les certificats d&apos;AC pour déterminer quelles autres certifications peuvent être de confiance. Pour plus d&apos;informations, voir <a href="#Utilisation_des_certificats_d.27AC_pour_.C3.A9tablir_la_confiance">Utilisation des certificats d&apos;AC pour établir la confiance</a>.</li>
+</ul>
+
+<dl>
+ <dt>Exemple </dt>
+ <dd>Les certificats d&apos;AC stockés dans <em>Communicator</em> déterminent quels autres certificats peuvent être utilisés pour l&apos;authentification. Un administrateur peut implémenter certains aspects de la politique de sécurité de son entreprise en contrôlant les certificats d&apos;AC stockés dans les <em>Communicator</em> de chaque utilisateur.</dd>
+</dl>
+
+<p>Les sections ci-dessous décrivent l&apos;utilisation des certificats dans les produits Red Hat.</p>
+
+<h4 id="Le_protocole_SSL">Le protocole SSL</h4>
+
+<p>Le protocole <em>Secure Sockets Layer</em> (SSL) est un ensemble de règles gouvernant l&apos;authentification serveur, l&apos;authentification client et les communications encryptées entre des serveurs et des clients. SSL est largement utilisé sur Internet, particulièrement pour les interactions mettant en œuvre l&apos;échange d&apos;informations confidentielles telles que les numéros de cartes de crédit.</p>
+
+<p>SSL requiert un certificat SSL serveur, au minimum. Comme partie du processus de négociation, le serveur présente son certificat au client afin d&apos;authentifier son identité. Le processus d&apos;authentification utilise le chiffrement par clef privée et les signatures numériques pour confirmer que ce serveur est bien celui-ci qu&apos;il prétend être. Une fois le serveur authentifié, le client et le serveur utilisent des techniques de chiffrement à clefs symétriques, ce qui est rapide, pour chiffrer toutes les informations qu&apos;ils échangent pour le reste de la session et pour détecter toutes tentatives d&apos;altération des données qui peuvent arriver.</p>
+
+<p>Les serveurs peuvent éventuellement être configurés pour demander l&apos;authentification client aussi bien que l&apos;authentification serveur. Dans ce cas, après le succès de l&apos;authentification serveur, le client doit à son tour présenter son certificat au serveur afin d&apos;authentifier son identité avant qu&apos;une connexion SSL ne puisse s&apos;établir.</p>
+
+<p>Pour une présentation de l&apos;authentification client avec SSL et ses différences par rapport à authentification par mot de passe, voir « <a href="#L.27authentification_confirme_une_identit.C3.A9"> L&apos;authentification confirme une identité</a> ». Pour des informations plus détaillées à propos de SSL, voir « <a href="/fr/Introduction_à_SSL" title="fr/Introduction_à_SSL">Introduction à SSL</a> ».</p>
+
+<h4 id="Messages_signés_et_encryptés">Messages signés et encryptés</h4>
+
+<p>Certains logiciels de courriers électroniques (y compris Messenger, qui fait parti de Communicator) supportent les messages chiffrés et numériquement signés suivant un protocole largement accepté connu sous le nom de <em>Secure Multipurpose Internet Mail Extension</em> (S/MIME). L&apos;utilisation de S/MIME pour signer et chiffrer des messages requiert que l&apos;expéditeur possède un certificat S/MIME.</p>
+
+<p>Un message électronique qui comprend une signature numérique fournit l&apos;assurance qu&apos;il a bien été envoyé par la personne dont le nom apparaît dans l&apos;en-tête du message, authentifiant ainsi l&apos;expéditeur. Si la signature numérique ne peut pas être validée pour le courrieleur à la fin de la réception, l&apos;utilisateur est alerté.</p>
+
+<p>La signature numérique est unique au message qu&apos;elle accompagne. Si le message reçu diffère de quelque manière que se soit du message qui a été envoyé - même par l&apos;ajout ou la suppression d&apos;une virgule - la signature numérique ne peut pas être validée. Par conséquent un message signé fournit aussi une certaine assurance que les données qu&apos;il contient n&apos;ont pas été altérées. Comme on l&apos;a vu au début de ce document, cette sorte d&apos;assurance est connue sous le nom de non répudiation. En d&apos;autres termes, lorsqu&apos;un message est signé, il est très difficile à l&apos;expéditeur de nier l&apos;avoir envoyé. Ceci est capital pour de nombreuses formes de communications commerciales. Pour plus d&apos;informations à propose du mécanisme de signature numérique, voir « <a href="/fr/Introduction_à_la_cryptographie_à_clef_publique/Signatures_numériques" title="fr/Introduction_à_la_cryptographie_à_clef_publique/Signatures_numériques">Signatures numériques</a> ».</p>
+
+<p>S/MIME rend également possible le chiffrement symétrique (chiffrement à clefs publiques) des messages électroniques. C&apos;est aussi important pour certains utilisateur professionnels. Cependant, l&apos;utilisation du chiffrement pour les messages requiert une gestion soigneuse. Si le destinataire des messages chiffrés perd sa clef et qu&apos;il n&apos;a pas de sauvegarde de la clef, par exemple, les messages chiffrés ne pourront jamais être déchiffrés.</p>
+
+<h4 id="Signature_de_formulaire">Signature de formulaire</h4>
+
+<p>De nombreuses formes de e-commerce requièrent la possibilité de fournir une preuve persistante qu&apos;une personne a autorisé une transaction. Bien que SSL fournisse une authentification cliente limitée à la durée de la connexion, il ne fournit pas d&apos;authentification persistante pour les transactions pouvant intervenir pendant cette connexion SSL. S/MIME fournit une authentification persistante pour les messages électroniques, mais le e-commerce utilise souvent des formulaires dans des pages Web plutôt que l&apos;échange de courriel.</p>
+
+<p>La technologie Red Hat connue sous le nom de <em>signature de formulaire</em> répond au besoin de l&apos;authentification persistante des transactions financières. La signature de formulaire permet à un utilisateur d&apos;associer une signature numérique avec les données Web générées comme résultat d&apos;une transaction, telles qu&apos;un ordre d&apos;achat ou tout autre document financier. La clef privée associée avec soit le certificat SSL client, soit un certificat S/MIME peut être utilisée dans ce but.</p>
+
+<p>Lorsqu&apos;un utilisateur clique sur le bouton « soumettre » d&apos;un formulaire Web qui supporte la signature de formulaire, une boîte de dialogue affiche le texte exacte à signer. L&apos;auteur du formulaire peut soit spécifier le certificat à utiliser soit sélectionner un certificat SSL ou S/MIME parmi ceux du client installés dans Communicator. Lorsque l&apos;utilisateur clique sur « OK », le texte est signé et les deux (le texte et la signature numérique) sont envoyés au serveur. Le serveur peut alors utiliser un utilitaire Red Hat appelé <em>Signature Verification Tool</em> (Outil de Vérification de Signature) pour valider la signature numérique.</p>
+
+<p>Pour plus d&apos;informations sur le support des signatures de formulaires dans les produits Red Hat, voir <em>Red Hat Form Signing</em>.</p>
+
+<h4 id="Ouverture_unique_de_session">Ouverture unique de session</h4>
+
+<p>Les utilisateurs doivent souvent retenir plusieurs mots de passe pour les différents services qu&apos;ils utilisent. Par exemple, un utilisateur peut devoir saisir des mots de passe différents pour accéder au réseau, collecter ses messages, accéder à un répertoire, utiliser le service d&apos;agenda de son entreprise et accéder à une grande variété de serveurs. La multiplication des mots de passe devient vite un casse-tête pour les utilisateurs comme pour les administrateurs. Les utilisateurs ayant des difficultés à retenir leurs mots de passe ont tendances à en choisir de faible force et à les écrire dans des endroits accessibles. Les administrateurs doivent maintenir une base de données séparée de mot de passe sur chaque serveur et traiter des problèmes potentiels de sécurité liés au fait que des mots de passe sont envoyés sur le réseau par habitude et fréquemment.</p>
+
+<p>La solution à ce problème requiert un moyen pour l&apos;utilisateur d&apos;ouvrir une session unique, en utilisant un mot de passe unique, et d&apos;obtenir un accès authentifié à toutes les ressources du réseau que l&apos;utilisateur est autorisé à employer - sans envoyer aucun autre mot de passe. Cette possibilité est connue comme <em>ouverture de session unique</em>.</p>
+
+<p>Both client SSL certificates and S/MIME certificates can play a significant role in a</p>
+
+<p>Les  certificats clients SSL et S/MIME permettent tous deux d&apos;implémenter une ouverture de session unique, voir &quot;<a href="#_L.27authentification_par_certificat">L&apos;authentification par certificat</a>&quot; pour un exemple d&apos;ouverture de session unique basée sur SSL.</p>
+
+<p>L&apos;utilisateur se connecte à sa base de donnée locale de clé privée à l&apos;aide d&apos;un mot de passe. Puis utilise une clé privée pour signer ses messages et ainsi s&apos;authentifier auprès de tous les serveurs nécessitant une authentification client SSL. Remarquez que dans ce processus le mot de passe n&apos;est pas envoyé à travers le réseau. Cela simplifie l&apos;accès du client au serveur d&apos;une part et la gestion d&apos;authentification côté serveur d&apos;autre part. </p>
+
+<p>En plus de l&apos;utilisation des certificats, une solution d&apos;ouverture de session unique complète doit être capable d&apos;interopérer avec les systèmes d&apos;entreprise, tels que les systèmes d&apos;exploitation sous-jacents qui s&apos;appuient sur les mots de passe ou toutes autres formes d&apos;authentification.</p>
+
+<h4 id="Signature_d&apos;objet">Signature d&apos;objet</h4>
+
+<p>Communicator supporte un ensemble d&apos;outils et de technologies appelés <em>signature d&apos;objet</em>. La signature d&apos;objet utilise des techniques standard de cryptographie à clef publique pour permettre aux utilisateurs d&apos;obtenir des informations fiables à propos du code qu&apos;ils téléchargent de la même façon qu&apos;ils peuvent obtenir des informations fiables à propos des logiciels <em>prêt-à-installer</em>.</p>
+
+<p>Plus important, la signature d&apos;objet aide les utilisateurs et les administrateurs réseaux à prendre des décisions concernant les logiciels distribués par Internet ou intranet — par exemple, autoriser ou non les applets Java signés par une entité donnée à utiliser certaines fonctionnalités spécifiques d&apos;un ordinateur.</p>
+
+<p>Les « objets » signés avec les technologies de signature d&apos;objet peuvent être des applets ou tout autre code Java, scripts JavaScript, plugins, ou tout autre type de fichiers. La « signature » est une signature numérique. Les objets signés et leur signature sont généralement stockés dans une archive spéciale appelé archive <code>JAR</code>.</p>
+
+<p>Les développeurs de logiciels et toute personne désireuse de signer des fichiers à l&apos;aide de cette technique doit tout d&apos;abord obtenir un certificat de signature d&apos;objet.</p>
+
+<h3 id="Contenu_d&apos;un_certificat">Contenu d&apos;un certificat</h3>
+
+<p>Le contenu des certificats supportés par Red Hat et de nombreuses autres éditeurs de logiciels sont organisés selon la spécification de certificat X.509 v3, qui a été recommandée par l&apos;International Telecommunications Union (ITU), une organisation de standardisation internationale, depuis 1988.</p>
+
+<p>Les utilisateurs n&apos;ont généralement pas besoin de connaître le contenu exact d&apos;un certificat. Cependant les administrateurs système travaillant avec les certificats peuvent avoir besoin de se familiariser avec les informations qu&apos;il contient.</p>
+
+<h4 id="Noms_distincts">Noms distincts</h4>
+
+<p>Un certificat X.509 v3 relie un nom distinct (<em>distinguished name</em> ou DN en anglais) à une clef publique. Un DN est une série de paires nom-valeur, telle que <code>uid=martin</code>, qui identifie de façon unique une entité (qui est le « sujet » du certificat).</p>
+
+<p>Par exemple, voici ce que donnerait le DN typique d&apos;un employé de Red Hat, Inc.:</p>
+
+<pre>uid=martin,e=martin@<code>exemple.net</code>,cn=Jean Martin,o=Red Hat, Inc.,c=FR
+</pre>
+
+<p>Les abréviation devant chaque signe égale « = » de cet exemple on les significations suivantes :</p>
+
+<ul>
+ <li><code>uid</code> : ID utilisateur</li>
+ <li><code>e</code> : adresse électronique</li>
+ <li><code>cn</code> : le nom courant de l&apos;utilisateur</li>
+ <li><code>o</code> : organisation</li>
+ <li><code>c</code> : pays</li>
+</ul>
+
+<p>Les DN peuvent inclure une grande variété d&apos;autres paires nom-valeur. Elles sont utilisées pour identifier à la fois les sujets du certificat et les entrés dans les annuaires qui supportent LDAP (Lightweight Directory Access Protocol).</p>
+
+<p>Les règles régissant la construction des DN peuvent parfois être complexes et ne font pas parties de l&apos;objectif de ce document. Pour de plus amples informations à propos des DN, voir <em><a href="http://www.ietf.org/rfc/rfc1485.txt" class="external">A String Representation of Distinguished Names (en)</a></em>.</p>
+
+<h4 id="Un_certificat_typique">Un certificat typique</h4>
+
+<p>Chaque certificat de type X.509 comprend deux sections :</p>
+
+<ul>
+ <li>La section <em>données</em> inclut les informations suivantes :
+
+  <ul>
+   <li>Le numéro de version du standard X.509 supporté par le certificat.</li>
+   <li>Le numéro de série du certificat. Chaque certificat émis par une autorité de certification (AC) a un numéro de série unique parmi les certificats émis par cette AC.</li>
+   <li>Informations</li>
+   <li>Informations concernant la clef publique de l&apos;utilisateur, comprenant l&apos;algorithme utilisé et une représentation de la clef elle-même.</li>
+   <li>Le DN de l&apos;AC émettrice du certificat.</li>
+   <li>La période de validité du certificat (par exemple, entre le 15 novembre 1999 à 13 h 00 et le 15 novembre 2000 à 13 h 00).</li>
+   <li>Le DN du sujet du certificat (par exemple, dans un certificat client SSL, le DN de l&apos;utilisateur), également appelé le nom du sujet.</li>
+   <li>Des <em>extensions de certificat</em> optionnelles, pouvant fournir des données supplémentaires utilisées par le client ou le serveur. Par exemple, l&apos;extension de certificat <em>type</em> indique le type auquel appartient le certificat : un certificat client SSL, un certificat serveur SSL, un certificat de signature de message, etc. Les extensions de certificat peuvent également être utilisées pour d&apos;autres raisons.</li>
+  </ul>
+ </li>
+ <li>La section <em>signature</em> inclut les informations suivantes :
+  <ul>
+   <li>L&apos;algorithme de cryptographie, ou chiffrement, utilisé par l&apos;AC émettrice pour créer sa propre signature numérique. Pour plus d&apos;informations à propos des chiffrements, voir &quot;<a href="/fr/Introduction_à_SSL">Introduction à SSL</a>.&quot;</li>
+   <li>La signature numérique de l&apos;AC, obtenue par le hachage de toutes les données contenues dans le certificat et chiffrée avec la clef privée de l&apos;AC.</li>
+  </ul>
+ </li>
+</ul>
+
+<p>Voici les sections de données et de signature d&apos;un certificat dans un format lisible par un être humain :</p>
+
+<pre>Certificate:
+Data:
+ Version: v3 (0x2)
+ Serial Number: 3 (0x3)
+ Signature Algorithm: PKCS #1 MD5 With RSA Encryption
+ Issuer: OU=Ace Certificate Authority, O=Ace Industry, C=US
+ Validity:
+  Not Before: Fri Oct 17 18:36:25 1997
+  Not  After: Sun Oct 17 18:36:25 1999
+ Subject: CN=Jane Doe, OU=Finance, O=Ace Industry, C=US
+ Subject Public Key Info:
+  Algorithm: PKCS #1 RSA Encryption
+  Public Key:
+   Modulus:
+    00:ca:fa:79:98:8f:19:f8:d7:de:e4:49:80:48:e6:2a:2a:86:
+    ed:27:40:4d:86:b3:05:c0:01:bb:50:15:c9:de:dc:85:19:22:
+    43:7d:45:6d:71:4e:17:3d:f0:36:4b:5b:7f:a8:51:a3:a1:00:
+    98:ce:7f:47:50:2c:93:36:7c:01:6e:cb:89:06:41:72:b5:e9:
+    73:49:38:76:ef:b6:8f:ac:49:bb:63:0f:9b:ff:16:2a:e3:0e:
+    9d:3b:af:ce:9a:3e:48:65:de:96:61:d5:0a:11:2a:a2:80:b0:
+    7d:d8:99:cb:0c:99:34:c9:ab:25:06:a8:31:ad:8c:4b:aa:54:
+    91:f4:15
+   Public Exponent: 65537 (0x10001)
+  Extensions:
+   Identifier: Certificate Type
+    Critical: no
+    Certified Usage:
+     SSL Client
+   Identifier: Authority Key Identifier
+    Critical: no
+    Key Identifier:
+     f2:f2:06:59:90:18:47:51:f5:89:33:5a:31:7a:e6:5c:fb:36:
+     26:c9
+  Signature:
+   Algorithm: PKCS #1 MD5 With RSA Encryption
+   Signature:
+    6d:23:af:f3:d3:b6:7a:df:90:df:cd:7e:18:6c:01:69:8e:54:65:fc:06:
+    30:43:34:d1:63:1f:06:7d:c3:40:a8:2a:82:c1:a4:83:2a:fb:2e:8f:fb:
+    f0:6d:ff:75:a3:78:f7:52:47:46:62:97:1d:d9:c6:11:0a:02:a2:e0:cc:
+    2a:75:6c:8b:b6:9b:87:00:7d:7c:84:76:79:ba:f8:b4:d2:62:58:c3:c5:
+    b6:c1:43:ac:63:44:42:fd:af:c8:0f:2f:38:85:6d:d6:59:e8:41:42:a5:
+    4a:e5:26:38:ff:32:78:a1:38:f1:ed:dc:0d:31:d1:b0:6d:67:e9:46:a8:
+    d:c4
+</pre>
+
+<p>Voici le même certificat affiché au format d&apos;encodage 64 bytes interprété par un logiciel :</p>
+
+<pre> -----BEGIN CERTIFICATE-----
+ MIICKzCCAZSgAwIBAgIBAzANBgkqhkiG9w0BAQQFADA3MQswCQYDVQQGEwJVUzER
+ MA8GA1UEChMITmV0c2NhcGUxFTATBgNVBAsTDFN1cHJpeWEncyBDQTAeFw05NzEw
+ MTgwMTM2MjVaFw05OTEwMTgwMTM2MjVaMEgxCzAJBgNVBAYTAlVTMREwDwYDVQQK
+ EwhOZXRzY2FwZTENMAsGA1UECxMEUHViczEXMBUGA1UEAxMOU3Vwcml5YSBTaGV0
+ dHkwgZ8wDQYJKoZIhvcNAQEFBQADgY0AMIGJAoGBAMr6eZiPGfjX3uRJgEjmKiqG
+ 7SdATYazBcABu1AVyd7chRkiQ31FbXFOGD3wNktbf6hRo6EAmM5/R1AskzZ8AW7L
+ iQZBcrXpc0k4du+2Q6xJu2MPm/8WKuMOnTuvzpo+SGXelmHVChEqooCwfdiZywyZ
+ NMmrJgaoMa2MS6pUkfQVAgMBAAGjNjA0MBEGCWCGSAGG+EIBAQQEAwIAgDAfBgNV
+ HSMEGDAWgBTy8gZZkBhHUfWJM1oxeuZc+zYmyTANBgkqhkiG9w0BAQQFAAOBgQBt
+ I6/z07Z635DfzX4XbAFpjlRl/AYwQzTSYx8GfcNAqCqCwaSDKvsuj/vwbf91o3j3
+ UkdGYpcd2cYRCgKi4MwqdWyLtpuHAH18hHZ5uvi00mJYw8W2wUOsY0RC/a/IDy84
+ hW3WWehBUqVK5SY4/zJ4oTjx7dwNMdGwbWfpRqjd1A==
+ -----END CERTIFICATE-----
+
+</pre>
+
+<h3 id="Utiliser_les_certificats_pour_établir_la_confiance">Utiliser les certificats pour établir la confiance</h3>
+
+<p>Les autorités de certification (AC) sont des entités qui valident l&apos;identité et l&apos;émission des certificats. Elles peuvent être des organismes indépendants ou des entreprises qui utilisent leur propre logiciel d&apos;émission de certificats (tel que <em>Red Hat Certificate System</em>).</p>
+
+<p>Tout logiciel client ou serveur qui supporte les certificats maintient une liste des certificats d&apos;AC de confiance. Ces certificats d&apos;AC déterminent quels autres certificats le logiciel peut valider - en d&apos;autres mots, dans quels émetteurs de certificats le logiciel peut avoir confiance. Dans le cas le plus simple, le logiciel ne peut valider que les certificats émis par une des AC pour lesquelles il possède le certificat. Il est également possible pour un certificat d&apos;une AC de confiance de faire parti d&apos;une chaîne de certificats d&apos;AC, chacun émis par l&apos;AC parente dans la hiérarchie de certificat.</p>
+
+<p>Les sections suivantes expliquent comment les hiérarchies et les chaînes de certificats déterminent les logiciels de confiance.</p>
+
+<ul>
+ <li><a href="#Hi.C3.A9rarchies_d.27AC">Hiérarchies d&apos;AC</a></li>
+ <li><a href="#Cha.C3.AEnes_de_certificat">Chaînes de certificat</a></li>
+ <li><a href="#V.C3.A9rification_d.27une_cha.C3.AEne_de_certificat">Vérification d&apos;une chaîne de certificat</a></li>
+</ul>
+
+<h4 id="Hiérarchies_d&apos;AC">Hiérarchies d&apos;AC</h4>
+
+<p>Dans les grandes organisations, il peut être judicieux de déléguer la responsabilité de l&apos;émission des certificats à plusieurs autorités de certification. Par exemple, le nombre de certificats requis peut être trop important à maintenir par une seule AC ; les différents services de l&apos;organisation peuvent avoir différentes politiques d&apos;attribution des certificats ; ou il peut être important pour l&apos;AC d&apos;être physiquement localisée dans la même zone géographique que les personnes auxquelles elle délivre les certificats.</p>
+
+<p>Il est possible de déléguer la responsabilité de l&apos;émission de certificats à des AC subordonnées. Le standard X.509 inclus un modèle de paramétrage d&apos;une hiérarchie d&apos;AC telle celle montrée à la Figure 6.</p>
+
+<p><img src="/@api/deki/files/1166/=14HIER.gif" alt="Figure 6. Exemple de hiérarchie d&apos;AC" class="internal"></p>
+
+<p>Dans ce modèle, l&apos;AC racine est au sommet de la hiérarchie. Le certificat de l&apos;AC racine est un « certificat auto-signé » : c&apos;est-à-dire que le certificat est signé numériquement par la même entité — L&apos;AC racine — que celle que le certificat identifie. Les AC directement subordonnées à l&apos;AC racine on des certificats d&apos;AC signés par l&apos;AC racine. Les AC se trouvant sous les AC subordonnées dans la hiérarchie ont leurs certificats signés par les plus hautes AC subordonnées.</p>
+
+<p>Les organisations ont une grande flexibilité quant à l&apos;établissement de leurs hiérarchies d&apos;AC. La figure 6 ne montre qu&apos;un exemple ; beaucoup d&apos;autres hiérarchies sont possibles.</p>
+
+<h4 id="Chaînes_de_certificat">Chaînes de certificat</h4>
+
+<p>Les hiérarchie d&apos;AC se reflètent dans les chaînes de certificats. Une <em>chaîne de certificats</em> est une série de certificats émis par des AC successives. La figure 7 montre une chaîne de certificats <strong>leading from a certificate that identifies some entity through two subordinate CA certificates to the CA certificate for the root CA (based on the CA hierarchy shown in Figure 6).</strong></p>
+
+<p><img src="/@api/deki/files/1167/=15chn.gif" alt="Figure 7. Exemple de chaîne de certificat" class="internal"></p>
+
+<p>Une chaîne de certificats trace le chemin des certificats d&apos;une branche de la hiérarchie jusqu&apos;à la racine. Dans une chaîne de certificats, on a donc :</p>
+
+<ul>
+ <li>chaque certificat est suivi par le certificat de son émetteur.</li>
+ <li>chaque certificat contient le nom (DN) de l&apos;émetteur du certificat, qui est identique à celui du nom du sujet du certificat suivant dans la chaîne.</li>
+</ul>
+
+<p>Dans la figure 7, Le certificat <em>Engineering CA</em> contient le DN de l&apos;AC (qui est <em>USA CA</em>), qui a émis le certificat. Le DN de <em>USA CA</em> est également le nom du sujet du prochain certificat dans la chaîne.</p>
+
+<ul>
+ <li>Chaque certificat est signé avec la clef privée de son émetteur. La signature peut être vérifiée avec la clef publique du certificat de l&apos;émetteur, qui est le prochain certificat dans la chaîne.</li>
+</ul>
+
+<p>Dans la figure 7, la clef publique dans le certificat de <em>USA CA</em> peut être utilisée pour vérifier que la signature numérique de <em>USA CA</em> dans le certificat de <em>Engineering CA</em>.</p>
+
+<h4 id="Vérification_d&apos;une_chaîne_de_certificat">Vérification d&apos;une chaîne de certificat</h4>
+
+<p>La vérification de la chaîne de certificats est le processus permettant de s&apos;assurer que la chaîne de certificats donnée est bien formée, proprement signée et sécurisée. Les logiciels Red Hat utilisent la procédure suivante pour former et vérifier une chaîne de certificats, en commençant par le certificat présenté pour l&apos;authentification :</p>
+
+<ol>
+ <li>La période de validité du certificat est vérifiée par rapport à la date actuelle fournie par l&apos;horloge système du vérificateur.</li>
+ <li>Le certificat de l&apos;émetteur est localisé. La source peut être une base de certificats locale du vérificateur (du client ou du serveur) ou une chaîne de certificats fournit par le sujet (par exemple, par une connexion SSL).</li>
+ <li>La signature du certificat est vérifiée à l&apos;aide de la clef publique du certificat de l&apos;émetteur.</li>
+ <li>Si le certificat de l&apos;émetteur est présent dans les certificats de confiance du vérificateur, la vérification s&apos;arrête avec succès à cette étape. Autrement, le certificat de l&apos;émetteur est vérifié pour être certain qu&apos;il contient les indications appropriées concernant les AC subordonnées dans l&apos;extension du type de certificat de Red Hat, et la chaîne de vérification recommence depuis l&apos;étape 1, mais avec le nouveau certificat. La figure 8 présente un exemple de ce processus.</li>
+</ol>
+
+<p><img src="/@api/deki/files/1168/=16chver.gif" alt="Figure 8. Vérification d&apos;un chaîne de certificats complète, jusqu&apos;à l&apos;AC racine" class="internal"></p>
+
+<p>La figure 8 décrit ce qui se passe lorsque seule l&apos;AC racine est incluse dans la base locale de certificats du vérificateur. Si un certificat d&apos;une des AC intermédiaires présentes dans cette figure, telle que <em>Engineering CA</em>, est trouvé dans la base locale de certificats du vérificateur, la vérification s&apos;arrête à ce certificat, comme décrit à la figure 9.</p>
+
+<p><img src="/@api/deki/files/1169/=19chver.gif" alt="Figure 9. Vérification d&apos;une chaîne de certificats, jusqu&apos;à une AC intermédiaire" class="internal"></p>
+
+<p>Des dates de validité expirées, une signature invalide ou l&apos;absence d&apos;un certificat pour l&apos;AC émettrice à n&apos;importe quelle étape de la chaîne de certificats provoquera un échec de l&apos;authentification. Par exemple, la figure 10 montre l&apos;échec d&apos;une vérification si le certificat de l&apos;AC racine ou celui d&apos;une AC intermédiaire ne sont pas présent dans la base locale de certificats du vérificateur.</p>
+
+<p><img src="/@api/deki/files/1170/=20chver.gif" alt="Figure 10. Une chaîne de certificat qui ne peut pas être vérifiée" class="internal"></p>
+
+<p>Pour des informations générales sur le fonctionnement des signatures numériques, voir « <a href="/fr/Introduction_à_la_cryptographie_à_clef_publique/Signatures_numériques" title="fr/Introduction_à_la_cryptographie_à_clef_publique/Signatures_numériques">Signatures numériques</a> ». Pour une description plus détaillée sur le processus de vérification des signatures dans le contexte d&apos;une authentification SSL client-serveur, voir « <a href="/fr/Introduction_à_SSL" title="fr/Introduction_à_SSL">Introduction à SSL</a> ».</p>
+
+<p></p><div style="text-align: right;" class="prevnext">
+    <p><a style="float: left;" href="/fr/docs/Introduction_à_la_cryptographie_à_clef_publique:Signatures_numériques" class="button">« Précédent</a><a href="/fr/docs/Introduction_à_la_cryptographie_à_clef_publique:Gestion_des_certificats" class="button">Suivant  »</a></p>
+</div><p></p>

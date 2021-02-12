@@ -1,0 +1,137 @@
+---
+title: handler.get()
+slug: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/get
+tags:
+  - ECMAScript 2015
+  - JavaScript
+  - Méthode
+  - Proxy
+  - Reference
+translation_of: Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/get
+original_slug: Web/JavaScript/Reference/Objets_globaux/Proxy/handler/get
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux">Objets standards</a></strong></li><li><strong><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy/handler"><code>Proxy/handler</code></a></strong></li></ol></section></div>
+
+<p>La méthode <strong><code>handler.get()</code></strong> est une trappe pour intercepter l&apos;accès à la valeur d&apos;une propriété.</p>
+
+<div><iframe class="interactive interactive-js taller" frameborder="0" height="250" src="https://interactive-examples.mdn.mozilla.net/pages/js/proxyhandler-get.html" title="MDN Web Docs Interactive Example" width="100%"></iframe></div>
+
+<p class="hidden">Le code source de cet exemple interactif est disponible dans un dépôt GitHub. Si vous souhaitez contribuez à ces exemples, n&apos;hésitez pas à cloner <a href="https://github.com/mdn/interactive-examples">https://github.com/mdn/interactive-examples</a> et à envoyer une <em>pull request</em> !</p>
+
+<h2 id="Syntaxe">Syntaxe</h2>
+
+<pre class="brush: js notranslate">var p = new Proxy(cible, {
+  get: function(cible, propriété, récepteur) {
+  }
+});
+</pre>
+
+<h3 id="Paramètres">Paramètres</h3>
+
+<p>Les paramètres suivants sont passés à la méthode <code>get</code>. <code>this</code> est lié au gestionnaire.</p>
+
+<dl>
+ <dt><code>cible</code></dt>
+ <dd>L&apos;objet cible.</dd>
+ <dt><code>propriété</code></dt>
+ <dd>Le nom ou le symbole (<a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Symbol"><code>Symbol</code></a>) de la propriété qu&apos;on souhaite obtenir.</dd>
+ <dt><code>récepteur</code></dt>
+ <dd>Le proxy ou un objet qui hérite du proxy.</dd>
+</dl>
+
+<h3 id="Valeur_de_retour">Valeur de retour</h3>
+
+<p>La méthode <code>get</code> peut renvoyer n&apos;importe quelle valeur.</p>
+
+<h2 id="Description">Description</h2>
+
+<p>La méthode <code><strong>handler.get</strong></code> est une trappe pour intercepter l&apos;accès à une propriété.</p>
+
+<h3 id="Interceptions">Interceptions</h3>
+
+<p>Cette trappe permet d&apos;intercepter les opérations suivantes :</p>
+
+<ul>
+ <li>l&apos;accès à une propriété : <code>proxy[toto]</code> et <code>proxy.truc</code></li>
+ <li>L&apos;accès aux propriétés héritées : <code>Object.create(proxy)[toto]</code></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Reflect/get"><code>Reflect.get()</code></a></li>
+</ul>
+
+<h3 id="Invariants">Invariants</h3>
+
+<p>Si les invariants suivants ne sont pas respectés, le proxy renverra une exception <a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/TypeError"><code>TypeError</code></a> :</p>
+
+<ul>
+ <li>La valeur renvoyée pour la propriété doit être la même que la valeur de la propriété correspondante de l&apos;objet cible si celle-ci est non-configurable et non accessible en lecture.</li>
+ <li>La valeur renvoyée doit valoir <code>undefined</code> si la propriété correspondante de l&apos;objet cible est une propriété d&apos;accesseur non-configurable dont l&apos;attribut [[Get]] vaut <code>undefined</code>.</li>
+</ul>
+
+<h2 id="Exemples">Exemples</h2>
+
+<p>Dans l&apos;exemple suivant, on intercepte les accès aux propriétés :</p>
+
+<pre class="brush: js notranslate">var p = new Proxy({}, {
+  get: function(cible, propriété, récepteur) {
+    console.log(&quot;appelée : &quot; + propriété);
+    return 10;
+  }
+});
+
+console.log(p.a); // &quot;appelée : a&quot;
+                  // 10
+</pre>
+
+<p>Le code suivant ne respecte pas l&apos;invariant :</p>
+
+<pre class="brush: js notranslate">var obj = {};
+Object.defineProperty(obj, &quot;a&quot;, {
+  configurable: false,
+  enumerable: false,
+  value: 10,
+  writable: false
+});
+
+var p = new Proxy(obj, {
+  get: function(cible, propriété) {
+    return 20;
+  }
+});
+
+p.a; // exception TypeError levée
+</pre>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver" hreflang="en" lang="en">ECMAScript 2015 (6th Edition, ECMA-262)<br><small lang="fr">La définition de &apos;[[Get]]&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Standard">Standard</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+  <tr>
+   <td><a class="external" href="https://tc39.es/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver" hreflang="en" lang="en">ECMAScript (ECMA-262)<br><small lang="fr">La définition de &apos;[[Get]]&apos; dans cette spécification.</small></a></td>
+   <td><span class="spec-Living">Standard évolutif</span></td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatiblité_des_navigateurs">Compatiblité des navigateurs</h2>
+
+<div class="hidden">Ce tableau de compatibilité a été généré à partir de données structurées. Si vous souhaitez contribuer à ces données, n&apos;hésitez pas à envoyer une <em>pull request</em> sur <a href="https://github.com/mdn/browser-compat-data">https://github.com/mdn/browser-compat-data</a>.</div>
+
+<div class="bc-data" id="bcd:javascript.builtins.Proxy.handler.get"></div>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy"><code>Proxy</code></a></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy/handler"><code>handler</code></a></li>
+ <li><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Reflect/get"><code>Reflect.get()</code></a></li>
+</ul>

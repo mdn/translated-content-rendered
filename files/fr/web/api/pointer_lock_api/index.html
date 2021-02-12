@@ -1,0 +1,331 @@
+---
+title: Pointer Lock API
+slug: Web/API/Pointer_Lock_API
+tags:
+  - API
+  - Avancé
+  - Jeux
+  - Reference
+  - mouse lock
+  - pointer lock
+translation_of: Web/API/Pointer_Lock_API
+original_slug: WebAPI/Pointer_Lock
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Pointer_Lock_API">Pointer Lock API</a></strong></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/Document/pointerLockElement"><code>Document.pointerLockElement</code></a></li><li><a href="/fr/docs/Web/API/Document/onpointerlockchange"><code>Document.onpointerlockchange</code></a></li><li><a href="/fr/docs/Web/API/Document/onpointerlockerror"><code>Document.onpointerlockerror</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/Element/requestPointerLock"><code>Element.requestPointerLock()</code></a></li><li><a href="/fr/docs/Web/API/Document/exitPointerLock"><code>Document.exitPointerLock()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/Events/pointerlockchange"><code>pointerlockchange</code></a></li><li><a href="/fr/docs/Web/Events/pointerlockerror"><code>pointerlockerror</code></a></li></ol></details></li></ol></section></div>
+
+<p><strong>Pointer lock</strong> (en français <em>Verrouillage du pointeur</em>, précedement appelé mouse lock) permet d&apos;obtenir des informations sur le déplacement de la souris à travers le temps, et ne se cantonne pas à fournir la position absolue du curseur sur l&apos;écran. Cette interface donne accès aux données brutes de la souris, permet de verrouiller la cible des évènements à un élément unique, limiter jusqu&apos;où le mouvement de la souris peut aller dans une direction donnée et cacher le curseur de la vue.<br>
+ <br>
+ Cette API est utile pour les applications qui ont besoin d&apos;écouter la souris pour contrôler des mouvements ou faire pivoter des objets sur leurs axes. Les jeux 3D de type FPS (First Person Shooter), les outils de modelisation, les vidéos immersives ou encore les cartes satellites sont autant de candidats idéals. L&apos;utilisateur peut en effet changer l&apos;angle de vue en bougeant simplement sa souris et sans cliquer sur aucun bouton ce qui les laisse donc disponibles pour effectuer d&apos;autres actions.<br>
+ <br>
+ Comme Pointer lock continue de déclencher des évènements même quand le curseur est en dehors des limites du navigateur ou de l&apos;écran, les joueurs peuvent cliquer sur les boutons et déplacer le curseur de la souris sans se soucier de quitter la zone de jeu et de cliquer accidentellement sur une autre application qui changerait le focus de la souris en dehors du jeu.</p>
+
+<h2 id="basics" name="basics">Concepts de base</h2>
+
+<p>Pointer Lock partage des similtudes avec la <a href="/fr/docs/Web/API/Element/setCapture" title="element.setCapture">capture de souris</a>. La capture de souris offre un flot ininterrompu d&apos;évènements sur un élément cible quand la souris glisse mais s&apos;arrête quand le bouton est relaché. Pour cette raison, Pointer lock diffère de la capture de souris sur les points suivants :</p>
+
+<ul>
+ <li>Persistance. Pointer lock ne libère pas la souris tant qu&apos;un appel explicite à l&apos;API n&apos;a pas été effectué ou que l&apos;utilisateur n&apos;a pas fait un mouvement spécifique.</li>
+ <li>Ne se limite pas aux bordures du navigateur ou de l&apos;écran.</li>
+ <li>Continue de déclencher des évènements peu importe l&apos;état des boutons de la souris.</li>
+ <li>Cache le curseur.</li>
+</ul>
+
+<h2 id="method_overview" name="method_overview">Vue d&apos;ensemble des méthodes/propriétées</h2>
+
+<p>Cette section fournit une brève description de chaque propriété et méthode associée à la spécification de Pointer Lock.</p>
+
+<h3 id="requestPointerLock()">requestPointerLock()</h3>
+
+<p>L&apos;API Pointer lock, de manière similaire à l&apos;<a href="/fr/docs/Web/Guide/DOM/Using_full_screen_mode">API Fullscreen</a>, étend les les éléments DOM en ajoutant une nouvelle méthode, <a href="/fr/docs/Web/API/Element/requestPointerLock" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>requestPointerLock()</code></a>. Comme le préfixe fournisseur a récemment été retiré, vous devriez utiliser la syntaxe ci-dessous, par exemple pour demander un verrouillage deu pointeur sur un élément <code>canvas</code>:</p>
+
+<pre class="brush: js">canvas.requestPointerLock = canvas.requestPointerLock ||
+                            canvas.mozRequestPointerLock ||
+                            canvas.webkitPointerLockElement;
+
+canvas.requestPointerLock()</pre>
+
+<h3 id="pointerLockElement_et_exitPointerLock()">pointerLockElement et exitPointerLock()</h3>
+
+<p>L&apos;API Pointer Lock étend également l&apos;interface <a href="/fr/docs/Web/API/Document" title="L&apos;interface Document représente n&apos;importe quelle page Web chargée dans le navigateur et sert de point d&apos;entrée dans le contenu de la page Web, qui est l&apos;arborescence DOM. L&apos;arborescence DOM inclut des éléments tels que &lt;body&gt; (corps) et &lt;table&gt; (tableau), parmi beaucoup d&apos;autres. Il fournit des fonctionnalités globales au document, comme le moyen d&apos;obtenir l&apos;URL de la page et de créer de nouveaux éléments dans le document."><code>Document</code></a>, ajoutant à la fois une nouvelle propriété et une nouvelle méthode. La propriété <a href="/fr/docs/Web/API/Document/pointerLockElement" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>pointerLockElement</code></a>  est utilisée pour accéder à l&apos;élément actuellement verrouillé (s&apos;il y en a). La méthode <a href="/fr/docs/Web/API/Document/exitPointerLock" title="La méthode exitPointerLock() permet de relâcher un pointeur de façon asynchrone lorsque le pointeur était auparavant mobilisé par la méthode Element.requestPointerLock()."><code>exitPointerLock()</code></a>  est utilisée pour libérer le verrou du pointeur.</p>
+
+<p>La propriété <a href="/fr/docs/Web/API/Document/pointerLockElement" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>pointerLockElement</code></a>  est utile pour déterminer si un élément est actuellement verrouillé (pour une vérification booléenne par exemple) et également pour obtenir une référence vers l&apos;élément s&apos;il existe.</p>
+
+<p>Voici un exemple d&apos;utilisation de <code>pointerLockElement</code>:</p>
+
+<pre class="brush: js">document.pointerLockElement = document.pointerLockElement    ||
+                              document.mozPointerLockElement ||
+                              document.webkitPointerLockElement;
+
+// 1) Utiliser une vérification booléenne--le pointeur est-il verrouillé?
+if (!!document.pointerLockElement) {
+  // pointeur verrouillé
+} else {
+  // pointeur non verrouillé
+}
+
+// 2) Accéder à l&apos;élément verrouillé
+if (document.pointerLockElement === someElement) {
+  // someElement est l&apos;élément sur lequel le pointeur est verrouillé
+}
+</pre>
+
+<p>La méthode <a href="/fr/docs/Web/API/Document/exitPointerLock" title="La méthode exitPointerLock() permet de relâcher un pointeur de façon asynchrone lorsque le pointeur était auparavant mobilisé par la méthode Element.requestPointerLock()."><code>Document.exitPointerLock()</code></a> est utilisée pour libérer le verrouillage du pinteur, et, comme <a href="/fr/docs/Web/API/Element/requestPointerLock" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>requestPointerLock</code></a>, marche de manière asynchrone, on utilise les événements <code><a href="/fr/docs/Web/Reference/Events/pointerlockchange" title="/fr/docs/Web/Reference/Events/pointerlockchange">pointerlockchange</a></code> et <code><a href="/fr/docs/Web/Reference/Events/pointerlockerror" title="/fr/docs/Web/Reference/Events/pointerlockerror">pointerlockerror</a></code>, que vous verrez plus en détails ci-dessous.</p>
+
+<pre class="brush: js">document.exitPointerLock = document.exitPointerLock    ||
+                           document.mozExitPointerLock ||
+                           document.webkitExitPointerLock;
+
+// Essaie de déverrouiller
+document.exitPointerLock();
+</pre>
+
+<h2 id="mouselocklostevent" name="mouselocklostevent">Événement pointerlockchange</h2>
+
+<p>Quand l&apos;état de verrouillage du pointeur change — par exemple quand on appelle <a href="/fr/docs/Web/API/Element/requestPointerLock" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>requestPointerLock()</code></a>, <a href="/fr/docs/Web/API/Document/exitPointerLock" title="La méthode exitPointerLock() permet de relâcher un pointeur de façon asynchrone lorsque le pointeur était auparavant mobilisé par la méthode Element.requestPointerLock()."><code>exitPointerLock()</code></a>, que l&apos;utilisateur presse la touche ECHAP, etc.—l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/pointerlockchange" title="/fr/docs/Web/Reference/Events/pointerlockchange">pointerlockchange</a></code> est envoyé au <code>document</code>. C&apos;est un simple événement qui ne contient pas de données supplémentaires.</p>
+
+<pre class="brush: js">document.pointerLockElement = document.pointerLockElement    ||
+                              document.mozPointerLockElement ||
+                              document.webkitPointerLockElement;
+
+function pointerLockChange() {
+  if (!!document.pointerLockElement) {
+    console.log(&quot;Verrouillé.&quot;);
+  } else {
+    console.log(&quot;Non verrouillé.&quot;);
+  }
+}
+
+document.addEventListener(&apos;pointerlockchange&apos;, pointerLockChange, false);
+document.addEventListener(&apos;mozpointerlockchange&apos;, pointerLockChange, false);
+document.addEventListener(&apos;webkitpointerlockchange&apos;, pointerLockChange, false);
+</pre>
+
+<h2 id="mouselocklostevent" name="mouselocklostevent">Événement pointerlockerror</h2>
+
+<p>Quand une erreur est causée par l&apos;appel de <a href="/fr/docs/Web/API/Element/requestPointerLock" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>requestPointerLock()</code></a> ou <a href="/fr/docs/Web/API/Document/exitPointerLock" title="La méthode exitPointerLock() permet de relâcher un pointeur de façon asynchrone lorsque le pointeur était auparavant mobilisé par la méthode Element.requestPointerLock()."><code>exitPointerLock()</code></a>, l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/pointerlockerror" title="/fr/docs/Web/Reference/Events/pointerlockerror">pointerlockerror</a></code> est envoyé au <code>document</code>. C&apos;est un simple événement qui ne contient pas de données supplémentaires.</p>
+
+<pre class="brush: js">document.addEventListener(&apos;pointerlockerror&apos;, lockError, false);
+document.addEventListener(&apos;mozpointerlockerror&apos;, lockError, false);
+document.addEventListener(&apos;webkitpointerlockerror&apos;, pointerLockChange, false);
+
+function lockError(e) {
+  alert(&quot;Pointer lock failed&quot;);
+}
+</pre>
+
+<div class="note notecard"><strong>Note</strong>: Jusqu&apos;à Firefox 50, les événements ci-dessus étaient préfixés avec <code>moz</code>.</div>
+
+<h2 id="extensions" name="extensions">Extensions aux événements de souris</h2>
+
+<p>L&apos;API Pointer lock étend l&apos;interface <a href="/fr/docs/Web/API/MouseEvent" title="L&apos;interface MouseEvent représente les événements qui se produisent lors d&apos;une interaction de l&apos;utilisateur avec un appareil de pointage (tel qu&apos;une souris). Les événements communs utilisant cette interface incluent click, dblclick, mouseup et mousedown."><code>MouseEvent</code></a> normale avec les attributs de mouvement. Deux nouveaux attributs sont ajoutés aux événements de souris —<a href="/fr/docs/Web/API/MouseEvent/movementX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementX</code></a> et <a href="/fr/docs/Web/API/MouseEvent/movementY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementY</code></a>— fournissant le changement de position de la souris. Ces paramètres ont pour valeur les différences entre les valeurs des propriétés de <a href="/fr/docs/Web/API/MouseEvent/screenX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>screenX</code></a> / <a href="/fr/docs/Web/API/MouseEvent/screenY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>screenY</code></a> stockées dans les événements <code><a href="/fr/docs/Web/Reference/Events/mousemove" title="/fr/docs/Web/Reference/Events/mousemove">mousemove</a></code>, <code>eNow</code> et <code>ePrevious</code>. En d&apos;autres termes, <code>movementX = eNow.screenX - ePrevious.screenX</code>.</p>
+
+<h3 id="locked_state" name="locked_state">État verrouillé</h3>
+
+<p>Quand le verrouillage du pointeur est activé, les propriétés standard <a href="/fr/docs/Web/API/MouseEvent/clientX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>clientX</code></a>, <a href="/fr/docs/Web/API/MouseEvent/clientY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>clientY</code></a>, <a href="/fr/docs/Web/API/MouseEvent/screenX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>screenX</code></a>, et <a href="/fr/docs/Web/API/MouseEvent/screenY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>screenY</code></a> sont gardées constantes, comme si la souris ne bougeait pas. Les propriétés <a href="/fr/docs/Web/API/MouseEvent/movementX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementX</code></a> et <a href="/fr/docs/Web/API/MouseEvent/movementY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementY</code></a> continuent de fournir le changement de position de la souris. Il n&apos;y a pas de limite aux valeurs <a href="/fr/docs/Web/API/MouseEvent/movementX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementX</code></a> et <a href="/fr/docs/Web/API/MouseEvent/movementY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementY</code></a>, si la souris continue de bouger toujours dans la même direction. Le curseur de la souris n&apos;existe pas et il ne peut pas sortir de la fenêtre ou être bloqué par un bord de l&apos;écran.</p>
+
+<h3 id="unlocked_state" name="unlocked_state">État déverrouillé</h3>
+
+<p>Les paramètres <a href="/fr/docs/Web/API/MouseEvent/movementX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementX</code></a> et <a href="/fr/docs/Web/API/MouseEvent/movementY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementY</code></a> sont disponibles quel que soit l&apos;état de la souris, verrou ou non.</p>
+
+<p>Quand la souris est déverrouillée, il est possible que le curseur soit en dehors de la fenêtre et il est alors remis automatiquement à l&apos;intérieur. Si cela arrive, <a href="/fr/docs/Web/API/MouseEvent/movementX" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementX</code></a> et <a href="/fr/docs/Web/API/MouseEvent/movementY" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>movementY</code></a> sont définis à zéro.</p>
+
+<h2 id="example" name="example">Simple exemple pas à pas</h2>
+
+<p>Nous avons écrit une <a href="https://mdn.github.io/dom-examples/pointer-lock/">démo de verrouillage de pointer</a> pour vous montrer comment l&apos;utiliser pour mettre en place un système de contrôle simple (<a href="https://github.com/mdn/dom-examples/tree/master/pointer-lock">voir le code source</a>). La démo ressemble à ça:</p>
+
+<p><img src="https://mdn.mozillademos.org/files/7953/pointer-lock.png" alt="A red circle on top of a black background." style="display: block; height: 362px; margin: 0px auto; width: 640px;"></p>
+
+<p>Cette démo utilise JavaScript pour dessiner une balle dans un élément <a href="/fr/docs/Web/HTML/Element/canvas" title="L&apos;élément &lt;canvas&gt; permet de modifier une zone graphique via un script (habituellement en JavaScript ou grâce à WebGL). Il peut par exemple être utilisé afin de dessiner des graphiques, manipuler des images ou jouer des animations."><code>&lt;canvas&gt;</code></a>. Quand vous cliquez sur le canvas, le verrouillage du pointeur est utilisé pour supprimer le curseur de la souris à l&apos;écran et vous permettre de déplacer la balle avec la souris. Voyons comment cela fonctionne.</p>
+
+<p>On définit les positions initiales x et y sur le canvas:</p>
+
+<pre class="brush: js">var x = 50;
+var y = 50;</pre>
+
+<p>Les méthodes de verrouillage de pointeur sont préfixées dans les anciennes versions des navigateurs, on prend donc en compte les différentes implémentations des navigateurs:</p>
+
+<pre class="brush: js">canvas.requestPointerLock = canvas.requestPointerLock ||
+                            canvas.mozRequestPointerLock ||
+                            canvas.webkitRequestPointerLock;
+
+document.exitPointerLock = document.exitPointerLock ||
+                           document.mozExitPointerLock ||
+                           document.webkitExitPointerLock;</pre>
+
+<p>Maintenant, on définit un gestionnaire d&apos;événement qui appelle la méthode <code>requestPointerLock()</code> quand le canvas est cliqué, ce qui déclenche le verrouillage du pointeur.</p>
+
+<pre class="brush: js">canvas.onclick = function() {
+  canvas.requestPointerLock();
+}</pre>
+
+<p>Et maintenant le gestionnaire d&apos;événement pour le verrouillage: <code>pointerlockchange</code>. Quand cet événement se déclenche, on appelle <code>lockChangeAlert()</code> pour gérer le changement.</p>
+
+<pre class="brush: js">// Gestionnaire d&apos;événement de changement d&apos;état du verrouilllage pour les différents navigateurs
+document.addEventListener(&apos;pointerlockchange&apos;, lockChangeAlert, false);
+document.addEventListener(&apos;mozpointerlockchange&apos;, lockChangeAlert, false);
+document.addEventListener(&apos;webkitpointerlockchange&apos;, lockChangeAlert, false);
+</pre>
+
+<p>La fonction suivante vérifie si la propriété <code>pointLockElement</code> est sur notre canvas. Si c&apos;est le cas, on attache un gestionnaire d&apos;événement pour gérer les mouvements de la souris avec la fonction <code>updatePosition()</code>. Sinon, elle enlève le gestionnaire d&apos;événement.</p>
+
+<pre class="brush: js">function lockChangeAlert() {
+  if (document.pointerLockElement === canvas) {
+    console.log(&apos;The pointer lock status is now locked&apos;);
+    document.addEventListener(&quot;mousemove&quot;, updatePosition, false);
+  } else {
+    console.log(&apos;The pointer lock status is now unlocked&apos;);
+    document.removeEventListener(&quot;mousemove&quot;, updatePosition, false);
+  }
+}</pre>
+
+<p>La fonction <code>updatePosition()</code> met à jour la position de la balle sur le canvas (les valeurs <code>x</code> et <code>y</code>), et inclut également des instructions <code>if()</code> pour vérifier si la balle est sortie des bords du canvas. Dans ce cas, la balle se ressort au bord opposé. Elle vérifie également si un appel à <code><a href="/fr/docs/Web/API/Window/requestAnimationFrame">requestAnimationFrame()</a></code> a été effectué et si ce n&apos;est pas le cas, l&apos;appelle pour qu&apos;elle déclenche la fonction <code>canvasDraw()</code> et mette à jour le canvas. Un tracker est mis en place pour afficher les valeurs X et Y à l&apos;écran, pour référence.</p>
+
+<pre class="brush: js">var tracker = document.getElementById(&apos;tracker&apos;);
+
+var animation;
+function updatePosition(e) {
+  x += e.movementX;
+  y += e.movementY;
+  if (x &gt; canvas.width + RADIUS) {
+    x = -RADIUS;
+  }
+  if (y &gt; canvas.height + RADIUS) {
+    y = -RADIUS;
+  }
+  if (x &lt; -RADIUS) {
+    x = canvas.width + RADIUS;
+  }
+  if (y &lt; -RADIUS) {
+    y = canvas.height + RADIUS;
+  }
+  tracker.textContent = &quot;X position: &quot; + x + &quot;, Y position: &quot; + y;
+
+  if (!animation) {
+    animation = requestAnimationFrame(function() {
+      animation = null;
+      canvasDraw();
+    });
+  }
+}</pre>
+
+<p>La fonction <code>canvasDraw()</code> affiche la balle aux position <code>x</code> et <code>y</code> en cours:</p>
+
+<pre class="brush: js">function canvasDraw() {
+  ctx.fillStyle = &quot;black&quot;;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = &quot;#f00&quot;;
+  ctx.beginPath();
+  ctx.arc(x, y, RADIUS, 0, degToRad(360), true);
+  ctx.fill();
+}</pre>
+
+<h2 id="iframe_limitations">iframe limitations</h2>
+
+<p>Le verrouilage du pointeur ne peut concerner qu&apos;une seule iframe à la fois. Quand vous verrouillez une iframe, vous ne pouvez pas essayer de verrouiller une autre iframe et y transférer la cible; une erreur sera levée. Pour éviter cette limitation, déverrouillez d&apos;abord la première iframe, puis verrouillez la seconde.</p>
+
+<p>Tandis que cela fonctionne pour les iframes par défaut, les iframes en &quot;sandbox&quot; bloquent le verrouillage. La possibilité d&apos;éviter cette limitation, sous la forme de la combinaison attribut/valeur <code>&lt;iframe sandbox=&quot;allow-pointer-lock&quot;&gt;</code>, devrait bientôt apparaître dans Chrome.</p>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Etat</th>
+   <th scope="col">Commentaire</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a lang="en" href="https://w3c.github.io/pointerlock/" class="external" hreflang="en">Pointer Lock</a></td>
+   <td><span class="spec-CR">Candidat au statut de recommandation</span></td>
+   <td>Initial specification.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Browser_compatibility" name="Browser_compatibility">Compatibilité navigateur</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Edge</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td>
+    <p><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></p>
+   </td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>
+    <p><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span> <span class="prefixBox prefixBoxInline notecard inline" title="prefix"><a href="/fr/docs/Web/Guide/Prefixes">-moz</a></span></p>
+   </td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>10.1</td>
+  </tr>
+  <tr>
+   <td>Unprefixed support</td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><a href="/en-US/Firefox/Releases/50">50</a> (50)</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td>10.1</td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Edge</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>Firefox OS</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="See_also" name="See_also">Voir aussi</h2>
+
+<ul>
+ <li><a href="/fr/docs/Web/API/MouseEvent"><code>MouseEvent</code></a></li>
+</ul>

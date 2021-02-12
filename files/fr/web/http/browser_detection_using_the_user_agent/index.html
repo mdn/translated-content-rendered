@@ -1,0 +1,336 @@
+---
+title: Détection du navigateur à l'aide du User-Agent
+slug: Web/HTTP/Browser_detection_using_the_user_agent
+tags:
+  - Compatibilité
+  - Développement Web
+translation_of: Web/HTTP/Browser_detection_using_the_user_agent
+original_slug: Web/HTTP/Detection_du_navigateur_en_utilisant_le_user_agent
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li><a href="/fr/docs/Web/HTTP"><strong><em>HTTP</em></strong></a></li>
+    <li><strong>Guides:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>Resources and URIs</summary>
+            <ol>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web">Identifying resources on the Web</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Data URIs</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_Types">Introduction to MIME Types</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">Complete list of MIME Types</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs">Choosing between www and non-www URLs</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP guide</summary>
+            <ol>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP">Basics of HTTP</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Overview">Overview of HTTP</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP">Evolution of HTTP</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Messages">HTTP Messages</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Session">A typical HTTP session</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Connection_management_in_HTTP_1.x">Connection management in HTTP/1.x</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Protocol_upgrade_mechanism">Protocol upgrade mechanism</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP security</summary>
+            <ol>
+                <li><a href="/fr/docs/Web/HTTP/CSP">Content Security Policy (CSP)</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Public_Key_Pinning">HTTP Public Key Pinning (HPKP)</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Headers/Strict-Transport-Security">HTTP Strict Transport Security (HSTS)</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies">Cookie security</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+                <li><a href="/fr/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+                <li><a href="https://wiki.mozilla.org/Security/Guidelines/Web_Security">Mozilla web security guidelines</a></li>
+                <li><a href="https://observatory.mozilla.org/">Mozilla Observatory</a></li>
+            </ol>
+        </details>
+    </li>
+
+    <li><a href="/fr/docs/Web/HTTP/CORS">HTTP access control (CORS)</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Authentication">HTTP authentication</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Caching">HTTP caching</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Compression">HTTP compression</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Conditional_requests">HTTP conditional requests</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Content_negotiation">HTTP content negotiation</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Cookies">HTTP cookies</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Range_requests">HTTP range requests</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Redirections">HTTP redirects</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Resources_and_specifications">HTTP specifications</a></li>
+    <li><a href="/fr/docs/Web/HTTP/Feature_Policy">Feature policy</a></li>
+    <li><strong>References:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP headers</summary>
+            <ol><li><a href="/fr/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Accept-Charset"><code>Accept-Charset</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Accept-Charset$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Accept-Encoding"><code>Accept-Encoding</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Accept-Ranges"><code>Accept-Ranges</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Accept-Ranges$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Headers$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Methods$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Expose-Headers"><code>Access-Control-Expose-Headers</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Expose-Headers$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Max-Age"><code>Access-Control-Max-Age</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Max-Age$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Request-Headers"><code>Access-Control-Request-Headers</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Access-Control-Request-Method"><code>Access-Control-Request-Method</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Access-Control-Request-Method$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Age"><code>Age</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Allow"><code>Allow</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Allow$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Alt-Svc"><code>Alt-Svc</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Alt-Svc$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Authorization"><code>Authorization</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Authorization$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Clear-Site-Data"><code>Clear-Site-Data</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Clear-Site-Data$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Connection$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Disposition"><code>Content-Disposition</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Encoding"><code>Content-Encoding</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Encoding$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Length"><code>Content-Length</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Location$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Range"><code>Content-Range</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Range$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy"><code>Politique de sécurité de contenu</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only"><code>Content-Security-Policy-Report-Only</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Cookie$translate">[Traduire]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Cookie2"><code>Cookie2</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Cookie2$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/DNT"><code>DNT</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Date"><code>Date</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/ETag"><code>ETag</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Early-Data"><code>Early-Data</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Early-Data$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Expect"><code>Expect</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Expect$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Expect-CT"><code>Expect-CT</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Expect-CT$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Expires"><code>Expires</code></a></li><li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy"><code>Feature-Policy</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Forwarded"><code>Forwarded</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Forwarded$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/From"><code>From</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/From$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Host"><code>Host</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/If-Match"><code>If-Match</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/If-Match$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/If-Modified-Since"><code>If-Modified-Since</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/If-None-Match"><code>If-None-Match</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/If-Range"><code>If-Range</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/If-Range$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/If-Unmodified-Since"><code>If-Unmodified-Since</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/If-Unmodified-Since$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Index"><code>Index</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Index$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Keep-Alive"><code>Keep-Alive</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API n&apos;a pas été standardisée."><i class="icon-warning-sign"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Large-Allocation"><code>Large-Allocation</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Large-Allocation$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Last-Modified"><code>Last-Modified</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Location"><code>Location</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Location$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a></li><li><span class="sidebar-icon"><span title="Cette API obsolète ne doit plus être utilisée, mais elle peut continuer à fonctionner."><i class="icon-thumbs-down-alt"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Pragma"><code>Pragma</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Proxy-Authenticate"><code>Proxy-Authenticate</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Proxy-Authenticate$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Proxy-Authorization"><code>Proxy-Authorization</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Proxy-Authorization$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Public-Key-Pins"><code>Public-Key-Pins</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Public-Key-Pins$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only"><code>Public-Key-Pins-Report-Only</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Range"><code>Range</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Range$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Referer"><code>Referer</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Referrer-Policy"><code>Referrer-Policy</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Referrer-Policy$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Retry-After"><code>Retry-After</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Retry-After$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Sec-WebSocket-Accept"><code>Sec-WebSocket-Accept</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Sec-WebSocket-Accept$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Serveur"><code>Serveur</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Server-Timing"><code>Server-Timing</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Server-Timing$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="This is an obsolete API and is no longer guaranteed to work."><i class="icon-trash"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Set-Cookie2"><code>Set-Cookie2</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Set-Cookie2$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/SourceMap"><code>SourceMap</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/SourceMap$translate">[Traduire]</a></li><li><a href="/fr/docs/S%C3%A9curit%C3%A9/HTTP_Strict_Transport_Security"><code>HTTP Strict Transport Security</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/TE"><code>TE</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/TE$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Timing-Allow-Origin"><code>Timing-Allow-Origin</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Timing-Allow-Origin$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Tk"><code>Tk</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Tk$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Trailer"><code>Trailer</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Transfer-Encoding"><code>Transfer-Encoding</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Transfer-Encoding$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests"><code>Upgrade-Insecure-Requests</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/User-Agent"><code>User-Agent</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/User-Agent$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Vary"><code>Vary</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Via"><code>Via</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Via$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/WWW-Authenticate"><code>WWW-Authenticate</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Warning"><code>Warning</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Warning$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/X-Content-Type-Options"><code>X-Content-Type-Options</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-Content-Type-Options$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control"><code>X-DNS-Prefetch-Control</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control$translate">[Traduire]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API n&apos;a pas été standardisée."><i class="icon-warning-sign"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/X-Forwarded-For"><code>X-Forwarded-For</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-Forwarded-For$translate">[Traduire]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API n&apos;a pas été standardisée."><i class="icon-warning-sign"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/X-Forwarded-Host"><code>X-Forwarded-Host</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-Forwarded-Host$translate">[Traduire]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="Cette API n&apos;a pas été standardisée."><i class="icon-warning-sign"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/X-Forwarded-Proto"><code>X-Forwarded-Proto</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-Forwarded-Proto$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/X-Frame-Options"><code>X-Frame-Options</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/X-XSS-Protection"><code>X-XSS-Protection</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/X-XSS-Protection$translate">[Traduire]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP request methods</summary>
+            <ol><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/CONNECT"><code>CONNECT</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/DELETE"><code>DELETE</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/GET"><code>GET</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/HEAD"><code>HEAD</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/OPTIONS"><code>OPTIONS</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/PATCH"><code>PATCH</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/POST"><code>POST</code></a></li><li><a href="/fr/docs/Web/HTTP/M%C3%A9thode/PUT"><code>PUT</code></a></li><li><a href="/fr/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Methods/TRACE$translate">[Traduire]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>HTTP response status codes</summary>
+          <ol><li><a href="/fr/docs/Web/HTTP/Status/100"><code>100 Continue</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/101"><code>101 Switching Protocol</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/200"><code>200 OK</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/201"><code>201 Created</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/202"><code>202 Accepted</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/203"><code>203 Non-Authoritative Information</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/204"><code>204 No Content</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/205"><code>205 Reset Content</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/206"><code>206 Partial Content</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/300"><code>300 Multiple Choices</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/301"><code>301 Moved Permanently</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/302"><code>302 Found</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/303"><code>303 See Other</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/304"><code>304 Not Modified</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/307"><code>307 Temporary Redirect</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/308"><code>308 Permanent Redirect</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/400"><code>400 Bad Request</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/401"><code>401 Unauthorized</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/403"><code>403 Forbidden</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/404"><code>404 Not Found</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/405"><code>405 Method Not Allowed</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/406"><code>406 Not Acceptable</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/407"><code>407 Proxy Authentication Required</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/408"><code>408 Request Timeout</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/409"><code>409 Conflict</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/410"><code>410 Gone</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/411"><code>411 Length Required</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/412"><code>412 Precondition Failed</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/413"><code>413 Payload Too Large</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/414"><code>414 URI Too Long</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/415"><code>415 Unsupported Media Type</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/416"><code>416 Range Not Satisfiable</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/417"><code>417 Expectation Failed</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/418"><code>418 I&apos;m a teapot (je suis une théière)</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/422"><code>422 Unprocessable Entity</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/425"><code>425 Too Early</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/426"><code>426 Upgrade Required</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/428"><code>428 Precondition Required</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/429"><code>429 Too Many Requests</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/431"><code>431 Request Header Fields Too Large</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/451"><code>451 Unavailable For Legal Reasons</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/500"><code>500 Internal Server Error</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/501"><code>501 Not Implemented</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/502"><code>502 Bad Gateway</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/503"><code>503 Service Unavailable</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/504"><code>504 Gateway Timeout</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/505"><code>505 HTTP Version Not Supported</code></a></li><li><a href="/fr/docs/Web/HTTP/Status/511"><code>511 Network Authentication Required</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CSP directives</summary>
+          <ol><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri"><code>CSP: base-uri</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content"><code>CSP: block-all-mixed-content</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/child-src"><code>CSP: child-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/child-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src"><code>CSP: connect-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/default-src"><code>CSP: default-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/default-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/font-src"><code>CSP: font-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/font-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/form-action"><code>CSP: form-action</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/form-action$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors"><code>CSP: frame-ancestors</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src"><code>CSP: frame-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/img-src"><code>CSP: img-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/img-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src"><code>CSP: manifest-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/media-src"><code>CSP: media-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/media-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/object-src"><code>CSP: object-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/object-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types"><code>CSP: plugin-types</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/referrer"><code>CSP: referrer</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/referrer$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri"><code>CSP: report-uri</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for"><code>CSP: require-sri-for</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox"><code>CSP: sandbox</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"><code>CSP: script-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/script-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/style-src"><code>CSP: style-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/style-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests"><code>CSP: upgrade-insecure-requests</code></a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src"><code>CSP: worker-src</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/report-to"><code>report-to</code></a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Content-Security-Policy/report-to$translate">[Traduire]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CORS errors</summary>
+          <ol><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSDesactive">Raison: CORS désactiver</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; does not match &apos;xyz&apos;</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSAllowOriginManquant">Raison : l’en-tête CORS « Access-Control-Allow-Origin » est manquant.</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded">Reason: CORS header ‘Origin’ cannot be added</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed">Reason: CORS preflight channel did not succeed</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSNAPasR%C3%A9ussi">Raison: la requête CORS a échoué</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed">Reason: CORS request external redirect not allowed</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp">Reason: CORS request not HTTP</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials">Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound">Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed">Reason: Multiple CORS header &apos;Access-Control-Allow-Origin&apos; not allowed</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials">Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Methods’</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight">Reason: missing token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight$translate">[Traduire]</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>Feature-Policy directives</summary>
+          <ol><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/autoplay">Feature-Policy: autoplay</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/autoplay$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/camera">Feature-Policy: camera</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/camera$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media">Feature-Policy: encrypted-media</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/fullscreen">Feature-Policy: fullscreen</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/fullscreen$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/geolocation">Feature-Policy: geolocation</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/geolocation$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/microphone">Feature-Policy: microphone</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/microphone$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/midi">Feature-Policy: midi</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/midi$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/payment">Feature-Policy: payment</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/payment$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/vr">Feature-Policy: vr</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/vr$translate">[Traduire]</a></li><li><span class="sidebar-icon"><span title="This is an experimental API that should not be used in production code."><i class="icon-beaker"> </i></span></span><a href="/fr/docs/Web/HTTP/Headers/Feature-Policy/document-domain">document-domain</a> <a style="opacity: 0.5;" href="/fr/docs/Web/HTTP/Headers/Feature-Policy/document-domain$translate">[Traduire]</a></li></ol>
+        </details>
+    </li>
+  </ol>
+</section></div>
+
+<p>Afficher des pages web ou des services en fonction du navigateur est généralement une mauvaise idée. Le Web se doit d&apos;être accessible à tout le monde, sans prendre en compte le navigateur ou l&apos;appareil utilisé. Il existe différentes façons de développer votre site web afin de l&apos;améliorer progressivement en se basant sur des fonctionnalités standard plutôt qu&apos;en traitant chaque navigateur de manière spécifique.</p>
+
+<p>Les navigateurs et les standards ne sont cependant pas parfaits, il reste certains cas limites pour lesquels connaître le navigateur utilisé peut s&apos;avérer utile. Utiliser le User-Agent dans ce but paraît simple mais le faire de manière fiable est en réalité très difficile. Ce document va vous guider pour lire le User-Agent aussi précisément que possible.</p>
+
+<div class="note notecard">
+<p>Il est important de rappeler que contrôler le contenu du User-Agent est rarement une bonne idée. Il est presque toujours possible de trouver une solution plus générique et compatible avec un plus grand nombre de navigateurs et d&apos;appareils !</p>
+</div>
+
+<h2 id="A_prendre_en_compte_avant_d&apos;identifier_le_navigateur">A prendre en compte avant d&apos;identifier le navigateur</h2>
+
+<p>Lorsque vous cherchez à contrôler le contenu de la chaîne de caractères User-Agent pour détecter le navigateur utilisé, la première étape consiste à éviter cette méthode autant que possible. Commencez par identifier <strong>pourquoi</strong> vous souhaitez le faire.</p>
+
+<dl>
+ <dt>Êtes-vous en train d&apos;essayer de corriger un bug pour une version spécifique d&apos;un navigateur ?</dt>
+ <dd>Recherchez ou demandez sur les forums spécialisés : vous n&apos;êtes certainement pas le premier à rencontrer le problème. Des experts ou d&apos;autres personnes avec un point de vue différent peuvent vous donner des idées pour contourner le problème. Si le bug n&apos;est pas fréquent, il peut être utile de vérifier s&apos;il a déjà été signalé au fournisseur du navigateur dans son système de suivi des bugs (<a href="https://bugzilla.mozilla.org/">Mozilla</a>, <a href="https://bugs.webkit.org/">WebKit</a>, <a href="https://bugs.opera.com">Opera</a>). Les fournisseurs sont attentifs aux bugs signalés, leur analyse du problème peut apporter un éclairage nouveau permettant de contourner le bug.</dd>
+ <dt>Cherchez-vous à vérifier l&apos;existence d&apos;une fonctionnalité particulière ?</dt>
+ <dd>Votre site a besoin d&apos;une fonctionnalité qui n&apos;est pas encore supportée par certains navigateurs et vous souhaitez servir à leurs utilisateurs une version plus ancienne du site, avec moins de fonctionnalités mais dont vous êtes certain qu&apos;elle va fonctionner. Il s&apos;agit de la pire raison de détecter le User-Agent car il y a de grandes chances que ces navigateurs finissent par rattraper leur retard. Dans ce cas, le mieux est d&apos;éviter de recourir au User-Agent et de détecter les fonctionnalités disponibles.</dd>
+</dl>
+
+<dl>
+<dt>Voulez-vous servir un code HTML différent selon le navigateur utilisé ?</dt>
+ <dd>Il s&apos;agit généralement d&apos;une mauvaise pratique mais nécessaire dans certains cas. Vous devez alors analyser la situation pour vous assurer que c&apos;est absolument nécessaire. Pouvez-vous l&apos;éviter en ajoutant des éléments non sémantiques tels que <a href="/fr/docs/Web/HTML/Element/div" title="L&apos;élément HTML &lt;div&gt; (qui signifie division du document) est un conteneur générique qui permet d&apos;organiser le contenu sans représenter rien de particulier. Il peut être utilisé afin de grouper d&apos;autres éléments pour leur appliquer un style (en utilisant les attributs class ou id) ou parce qu&apos;ils partagent des attributs aux valeurs communes, tel que lang. Il doit uniquement être utilisé lorsqu&apos;aucun autre élément sémantique (par exemple &lt;article&gt; ou &lt;nav&gt;) n&apos;est approprié."><code>&lt;div&gt;</code></a> ou <a href="/fr/docs/Web/HTML/Element/span" title="L&apos;élément HTML &lt;span&gt; est un conteneur générique en ligne (inline) pour les contenus phrasés. Il ne représente rien de particulier. Il peut être utilisé pour grouper des éléments afin de les mettre en forme (grâce aux attributs class ou id et aux règles CSS) ou parce qu&apos;ils partagent certaines valeurs d&apos;attribut comme lang. Il doit uniquement être utilisé lorsqu&apos;aucun autre élément sémantique n&apos;est approprié. &lt;span&gt; est très proche de l&apos;élément &lt;div&gt;, mais l&apos;élément &lt;div&gt; est un élément de bloc, alors que &lt;span&gt; est un élément en ligne."><code>&lt;span&gt;</code></a> ? La difficulté à détecter le User-Agent justifie des exceptions à la pureté du code HTML. Vous pouvez aussi repenser le design : pouvez-vous plutôt utiliser l&apos;amélioration progressives ou utiliser une grille fluide pour éviter d&apos;avoir recours au User-Agent ?</dd>
+</dl>
+
+<h2 id="Éviter_de_détecter_l&apos;agent_utilisateur">Éviter de détecter l&apos;agent utilisateur</h2>
+
+<p>Il existe des options possibles à considérer pour éviter d&apos;avoir à détecter l&apos;agent utilisateur.</p>
+
+<dl>
+ <dt>Détection de fonctionnalités</dt>
+ <dd>La détection de fonctionnalités consiste à ne pas détecter quel navigateur affiche la page mais plutôt à vérifier qu&apos;une fonctionnalité est disponible. Dans le cas contraire vous pouvez utiliser une solution de contournement. Cependant, n&apos;utilisez pas la détection de fonctionnalité dans les rares cas où la détection de l&apos;agent utilisateur est utile car les autres navigateurs pourraient dans le futur implémenter la fonctionnalité manquante d&apos;une manière différente. Il pourrait en résulter des bugs particulièrement difficiles à détecter et à corriger.</dd>
+ <dt>Amélioration progressive</dt>
+ <dd>Cette technique de design signifie séparer la page web en couches, en utilisant une approche ascendante (ou bottom-up), en commençant par une couche simple (avec peu ou pas de fonctionnalités) puis en améliorant les capacités par couches successives, chacune comportant plus de fonctionnalités.</dd>
+ <dt>Dégradation élégante</dt>
+ <dd>Il s&apos;agit d&apos;une approche descendante (ou top-down), avec laquelle on construit le site avec toutes les fonctionalités souhaitées, pour ensuite le faire fonctionner sur des navigateurs plus anciens. Cette technique est plus difficile et moins efficace que l&apos;amélioration progressive mais s&apos;avère utile dans certains cas.</dd>
+</dl>
+
+<h2 id="Où_se_trouve_l&apos;information_recherchée_dans_le_User-Agent">Où se trouve l&apos;information recherchée dans le User-Agent</h2>
+
+<p>C&apos;est la partie difficile, puisque les différentes sections de la chaîne User-Agent ne sont pas standardisées.</p>
+
+<h3 id="Nom_du_navigateur">Nom du navigateur</h3>
+
+<p>Souvent ceux qui disent vouloir détecter le navigateur veulent en fait détecter le moteur de rendu. Souhaitez-vous détecter Firefox et non Seamonkey, ou Chrome et non Chromium ? Ou seulement savoir si le navigateur utilise le moteur de rendu Gecko ou Webkit ? Dans ce dernier cas, réferrez vous plus bas dans cette page.</p>
+
+<p>La plupart des navigateurs notent leur nom et version suivant le format <em>NomDuNavigateur/NuméroDeVersion</em>, à l&apos;exception notable d&apos;Internet Explorer. Le nom n&apos;est cependant pas la seule information du User-Agent qui respecte ce format, il n&apos;est donc pas possible d&apos;y trouver directement le nom du navigateur, seulement de vérifier si le nom recherché est présent ou non. Attention certains navigateurs mentent : par exemple, Chrome mentionne à la fois Chrome et Safari dans le User-Agent. Pour détecter Safari il faut donc vérifier que la chaîne &quot;Safari&quot; est présente et &quot;Chrome&quot; est absent. De la même façon, Chromium se présente souvent comme Chrome et Seamonkey comme Firefox.</p>
+
+<p>Faites aussi attention à ne pas utiliser une expression régulière trop simple sur le nom du navigateur car le User-Agent contient d&apos;autres chaînes de caractères ne respectant pas le format clé/valeur. Par exemple, le User-Agent de Safari et Chrome contient une chaîne &quot;like Gecko&quot;.</p>
+
+<table style="height: 585px; width: 852px;">
+ <thead>
+  <tr>
+   <th scope="col"> </th>
+   <th scope="col">Doit contenir</th>
+   <th scope="col">Ne doit pas contenir</th>
+   <th scope="col"> </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Firefox</td>
+   <td>Firefox/xyz</td>
+   <td>Seamonkey/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Seamonkey</td>
+   <td>Seamonkey/xyz</td>
+   <td> </td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Chrome</td>
+   <td>Chrome/xyz</td>
+   <td>Chromium/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Chromium</td>
+   <td>Chromium/xyz</td>
+   <td> </td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>Safari</td>
+   <td>Safari/xyz</td>
+   <td>Chrome/xyz ou Chromium/xyz</td>
+   <td>Safari donne deux numéros de version, l&apos;un technique au format Safari/xyz, l&apos;autre plus convivial su format Version/xyz</td>
+  </tr>
+  <tr>
+   <td>Opera</td>
+   <td>
+    <p>OPR/xyz <sup>[1]</sup></p>
+
+    <p>Opera/xyz <sup>[2]</sup></p>
+   </td>
+   <td> </td>
+   <td>
+    <p><sup>[1]</sup>  Opera 15+ (moteur de rendu Blink) </p>
+
+    <p><sup>[2]</sup><span style="line-height: 1.5;"> Opera 12- (moteur de rendu Presto)</span></p>
+   </td>
+  </tr>
+  <tr>
+   <td>Internet Explorer</td>
+   <td>;MSIE xyz;</td>
+   <td> </td>
+   <td>Internet Explorer n&apos;utilise pas le format <em>NomDuNavigateur/NuméroDeVersion</em></td>
+  </tr>
+ </tbody>
+</table>
+
+<p>Il n&apos;y a évidemment aucune garantie qu&apos;aucun autre navigateur ne va utiliser ces notations (comme Chrome qui mentionne &quot;Safari&quot; dans son User-Agent). C&apos;est pourquoi la détection du navigateur par ce moyen n&apos;est pas fiable et ne doit être fait qu&apos;en vérifiant aussi le numéro de version (il est peu probable qu&apos;un navigateur mentionne dans son User-Agent le nom d&apos;un autre navigateur dans une version plus ancienne).</p>
+
+<h3 id="Version_du_navigateur">Version du navigateur</h3>
+
+<p>La version du navigateur est souvent, mais pas toujours, écrite dans la valeur d&apos;un ensemble clé/valeur <em>NomDuNavigateur/NuméroDeVersion</em> dans la chaîne de caractères du User-Agent. Ce n&apos;est pas le cas d&apos;Internet Explorer (qui écrit son numéro de version juste après la chaîne &quot;MSIE&quot;), et d&apos;Opera après la version 10, qui ajoute une section <em>Version/NuméroDeVersion</em>.</p>
+
+<p>Encore une fois, assurez vous de regarder au bon endroit selon le navigateur visé car il n&apos;y a aucune garantie de trouver un numéro de version valide dans le reste du User-Agent.</p>
+
+<h3 id="Moteur_de_rendu">Moteur de rendu</h3>
+
+<p>Comme indiqué plus haut, chercher le nom du moteur de recherche est la plupart du temps la meilleure solution. Cela permet de ne pas exclure des navigateurs peu connus basés sur le même moteur de rendu qu&apos;un autre plus connu. Les navigateurs qui utilisent le même moteur de rendu affichent les pages de la même façon : on peut partir du principe que ce qui va fonctionner avec l&apos;un fonctionnera avec l&apos;autre.</p>
+
+<p>Il y a cinq principaux moteurs de rendu : Trident, Gecko, Presto, Blink et Webkit. Puisque détecter le nom du moteur de rendu est courant, d&apos;autres noms sont ajoutés dans beaucoup d&apos;autres User-Agents. Il est donc important de faire attention aux faux positifs lorsqu&apos;on cherche à détecter le moteur de rendu.</p>
+
+<table style="width: 100%;">
+ <thead>
+  <tr>
+   <th scope="col"> </th>
+   <th scope="col">Doit contenir</th>
+   <th scope="col"> </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Gecko</td>
+   <td>Gecko/xyz</td>
+   <td> </td>
+  </tr>
+  <tr>
+   <td>WebKit</td>
+   <td>AppleWebKit/xyz</td>
+   <td>Attention : les navigateurs qui utilisent Webkit ajoutent &quot;like Gecko&quot;, ce qui peut déclencher de faux positifs</td>
+  </tr>
+  <tr>
+   <td>Presto</td>
+   <td>Opera/xyz</td>
+   <td><strong>Note :</strong> Presto n&apos;est plus utilisé par Opera pour les versions &gt;= 15 (voir &quot;Blink&quot;)</td>
+  </tr>
+  <tr>
+   <td>Trident</td>
+   <td>Trident/xyz</td>
+   <td>Internet Explorer place cette chaîne dans la partie <em>commentaire</em> du User-Agent</td>
+  </tr>
+  <tr>
+   <td>Blink</td>
+   <td>Chrome/xyz</td>
+   <td> </td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Version_du_moteur_de_rendu">Version du moteur de rendu</h2>
+
+<p>La plupart des moteurs de rendu placent leur numéro de version dans la section <em>MoteurDeRendu/NuméroDeVersion</em>, à l&apos;exception notable de Gecko. Gecko place le numéro de version dans la partie commentaire après la chaîne <code>rv:</code>. Depuis la version 14 pour mobile et 17 pour les ordinateurs, il pace aussi cette valeur dans la section <code>Gecko/version</code> (les versions précédentes y plaçaient la date de compilation, puis une date fixe appelée &quot;Gecko Trail&quot;).</p>
+
+<h2 id="Système_d&apos;Exploitation">Système d&apos;Exploitation</h2>
+
+<p>Le système d&apos;exploitation est dans la plupart des cas donné dans le User-Agent (il n&apos;est pas donné dans des systèmes orientés web tels que Firefox OS) mais sous un format très variable. C&apos;est une chaîne encadrée par des point-virgules, dans la partie commentaire du User-Agent. Cette chaîne est spécifique à chaque navigateur. Elle indique le nom du système d&apos;exploitation et souvent sa version et des informations sur le matériel (32 ou 64 bits, ou Intel/PPC pour Mac).</p>
+
+<p>Comme pour le reste, ces chaînes peuvent changer dans le futur, elles doivent seulement être utilisées en conjonction avec la détection de navigateurs existants. Une veille technologique doit s&apos;effectuer pour adapter le script de détection lorsque de nouvelles versions des navigateurs sortent.</p>
+
+<h3 id="Mobile_tablette_ou_ordinateur">Mobile, tablette ou ordinateur</h3>
+
+<p>La raison la plus courante de détecter le User-Agent et de déterminer sur quel type d&apos;appareil fonctionne le navigateur. Le but est de servir un code HTML différent selon le type d&apos;appareil.</p>
+
+<ul>
+ <li>Ne partez jamais du principe qu&apos;un navigateur ne fonctionne que sur un seul type d&apos;appareil. En particulier, ne pas définir de paramètre par défaut selon le navigateur.</li>
+ <li>N&apos;utilisez jamais la chaîne dédiée au système d&apos;exploitation pour déterminer si le navigateur est sur un mobile, une tablette ou un ordinateur. Le même système d&apos;exploitation peut fonctionner sur plusieurs types d&apos;appareil (par exemple, Android fonctionne aussi bien sur des tablettes que sur des téléphones).</li>
+</ul>
+
+<p>Le tableau suivant résume de quelle façon les principaux navigateurs indiquent qu&apos;ils fonctionnent sur un appareil mobile :</p>
+
+<table>
+ <caption>User Agent des navigateurs courants</caption>
+ <thead>
+  <tr>
+   <th scope="col">Navigateur</th>
+   <th scope="col">Règle</th>
+   <th scope="col">Exemple</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>Mozilla (Gecko, Firefox)</td>
+   <td><a href="/en-US/docs/Gecko_user_agent_string_reference">Chaîne <strong>Mobile</strong> ou <strong>Tablet</strong></a> dans le commentaire</td>
+   <td>Mozilla/5.0 (Android; Mobile; rv:13.0) Gecko/13.0<span class="Object" id="OBJ_PREFIX_DWT935_com_zimbra_ymaps"><span class="Object" id="OBJ_PREFIX_DWT936_com_zimbra_ymaps"> Firefox/13.0</span></span></td>
+  </tr>
+  <tr>
+   <td>Basé sur WebKit (Android, Safari)</td>
+   <td><a href="https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/OptimizingforSafarioniPhone/OptimizingforSafarioniPhone.html#//apple_ref/doc/uid/TP40006517-SW3">Chaîne <strong>Mobile Safari</strong></a> hors du commentaire</td>
+   <td>Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30</td>
+  </tr>
+  <tr>
+   <td>Basé sur Blink (Chromium, Google Chrome, Opera 15+)</td>
+   <td><a href="https://developers.google.com/chrome/mobile/docs/user-agent">Chaîne <strong>Mobile Safari</strong> token</a> hors du commentaire</td>
+   <td>Mozilla/5.0 (Linux; Android 4.4.2); Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Mobile Safari/537.36 OPR/20.0.1396.72047</td>
+  </tr>
+  <tr>
+   <td>Basé sur Presto (Opera 12-)</td>
+   <td>
+    <p><a style="line-height: 1.5;" href="http://my.opera.com/community/openweb/idopera/">Chaîne <strong>Opera Mobi/xyz</strong></a><span style="line-height: 1.5;"> dans le commentaire (Opera 12-)</span></p>
+   </td>
+   <td>
+    <p><span style="line-height: 1.5;">Opera/9.80 (Android 2.3.3; Linux; Opera Mobi/ADR-1111101157; U; es-ES) Presto/2.9.201 Version/11.50</span></p>
+   </td>
+  </tr>
+  <tr>
+   <td>Internet Explorer</td>
+   <td>Chaîne <strong>IEMobile/xyz</strong> dans le commentaire</td>
+   <td>Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>En résumé, nous recommandons de chercher la chaîne &quot;Mobi&quot; dans le User-Agent pour détecter un appareil mobile.</p>
+
+<p></p><div class="note notecard"><strong>Note :</strong> Si l&apos;appareil est suffisamment grand pour ne pas être indiqué “Mobi“, il est préférable de servir la version du site pour ordinateur. De toute manière, supporter les interactions tactiles pour un site “pour ordinateur“ est une bonne pratique. En effet, de plus en plus d&apos;ordinateurs sont équipés d&apos;écrans tactiles.</div><p></p>

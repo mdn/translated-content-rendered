@@ -1,0 +1,221 @@
+---
+title: Gestes pincer et zoomer
+slug: Web/API/Pointer_events/Pinch_zoom_gestures
+tags:
+  - Guide
+  - PointerEvent
+  - touch
+translation_of: Web/API/Pointer_events/Pinch_zoom_gestures
+original_slug: Web/API/Pointer_events/gestes_pincer_zoom
+---
+<p></p><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Pointer_events">Pointer events</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/Pointer_events/Multi-touch_interaction">Multi-touch interaction</a> <a style="opacity: 0.5;" href="/fr/docs/Web/API/Pointer_events/Multi-touch_interaction$translate">[Traduire]</a></li><li><a href="/fr/docs/Web/API/Pointer_events/gestes_pincer_zoom">Gestes pincer et zoomer</a></li><li><a href="/fr/docs/Web/API/Pointer_events/Using_Pointer_Events">Using Pointer Events</a> <a style="opacity: 0.5;" href="/fr/docs/Web/API/Pointer_events/Using_Pointer_Events$translate">[Traduire]</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/PointerEvent"><code>PointerEvent</code></a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/API/Element/ongotpointercapture"><code>Element.ongotpointercapture</code></a></li><li><a href="/fr/docs/Web/API/Element/onlostpointercapture"><code>Element.onlostpointercapture</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerdown"><code>GlobalEventHandlers.onpointerdown</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointermove"><code>GlobalEventHandlers.onpointermove</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerup"><code>GlobalEventHandlers.onpointerup</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointercancel"><code>GlobalEventHandlers.onpointercancel</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerover"><code>GlobalEventHandlers.onpointerover</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerout"><code>GlobalEventHandlers.onpointerout</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerenter"><code>GlobalEventHandlers.onpointerenter</code></a></li><li><a href="/fr/docs/Web/API/GlobalEventHandlers/onpointerleave"><code>GlobalEventHandlers.onpointerleave</code></a></li><li><a href="/fr/docs/Web/API/Navigator/maxTouchPoints"><code>Navigator.maxTouchPoints</code></a></li></ol></details></li><li class="toggle"><details open><summary>Méthodes</summary><ol><li><a href="/fr/docs/Web/API/Element/setPointerCapture"><code>Element.setPointerCapture()</code></a></li><li><a href="/fr/docs/Web/API/Element/releasePointerCapture"><code>Element.releasePointerCapture()</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/Events/pointerover"><code>pointerover</code></a></li><li><a href="/fr/docs/Web/Events/pointerenter"><code>pointerenter</code></a></li><li><a href="/fr/docs/Web/Events/pointerdown"><code>pointerdown</code></a></li><li><a href="/fr/docs/Web/Events/pointermove"><code>pointermove</code></a></li><li><a href="/fr/docs/Web/Events/pointerup"><code>pointerup</code></a></li><li><a href="/fr/docs/Web/Events/pointercancel"><code>pointercancel</code></a></li><li><a href="/fr/docs/Web/Events/pointerout"><code>pointerout</code></a></li><li><a href="/fr/docs/Web/Events/pointerleave"><code>pointerleave</code></a></li><li><a href="/fr/docs/Web/Events/gotpointercapture"><code>gotpointercapture</code></a></li><li><a href="/fr/docs/Web/Events/lostpointercapture"><code>lostpointercapture</code></a></li></ol></details></li></ol></section><p></p>
+
+<p>Ajouter la gestion des <em>gestes</em> à une application peut améliorer de manière significative l&apos;expérience utilisateur. Il existe de nombreux types de gestes, du simple geste <em>swipe</em> (balayage de l&apos;écran) aux gestes plus complexes avec plusieurs doigts comme le <em>twist</em> (rotation), où les points de contact (dits <em>pointeurs</em>) bougent dans des directions différentes.</p>
+
+<p>Cet exemple montre comment détecter les gestes de <em>pinch/zoom</em> (pincer/zoomer), en utilisant les <a href="/fr/docs/Web/API/Pointer_events" title="La plupart du contenu web d&apos;aujourd&apos;hui suppose que le périphérique de pointage de l&apos;utilisateur sera une souris. Cependant, beaucoup d&apos;appareils prennent en charge d&apos;autres types de d&apos;entrée pour pointeur, comme le stylet ou les doigts pour les écrans tactiles. Des extensions aux modèles d&apos;événement de pointage sont nécessaires et les événements de pointeur répondent à ce besoin."><code>événements de pointeur</code></a> pour détecter si l&apos;utilisateur bouge deux pointeurs plus proches ou plus loin l&apos;un de l&apos;autre. </p>
+
+<div class="note notecard">
+<p><strong>Note</strong>: Une version <em>en direct</em> de cette application est disponible sur <a href="https://mdn.github.io/dom-examples/pointerevents/Pinch_zoom_gestures.html">Github</a>. Le <a href="https://github.com/mdn/dom-examples/blob/master/pointerevents/Pinch_zoom_gestures.html">code source est également disponible sur Github</a>; les pull requests et <a href="https://github.com/mdn/dom-examples/issues">bug reports</a> sont les bienvenus.</p>
+</div>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>Dans cet exemple, on utilise les <a href="/fr/docs/Web/API/Pointer_events" title="La plupart du contenu web d&apos;aujourd&apos;hui suppose que le périphérique de pointage de l&apos;utilisateur sera une souris. Cependant, beaucoup d&apos;appareils prennent en charge d&apos;autres types de d&apos;entrée pour pointeur, comme le stylet ou les doigts pour les écrans tactiles. Des extensions aux modèles d&apos;événement de pointage sont nécessaires et les événements de pointeur répondent à ce besoin."><code>événement de pointeur</code></a> pour détecter simultanément plusieurs appareils de pointage quel qu&apos;en soit le type, comme les doigts, la souris, et le stylet. Le geste de pincer (zoomer), qui consiste à déplacer deux pointeurs plus près l&apos;un vers l&apos;autre, change la couleur d&apos;arrière-plan de l&apos;élément cible en  <code>lightblue</code>. Le geste d&apos;étirer (dézoomer), qui consiste à déplacer deux pointeur plus loin l&apos;un de l&apos;autre, change la couleur d&apos;arrière-plan de l&apos;élément cible en <code>pink</code>.</p>
+
+<h3 id="Définir_la_cible_du_toucher">Définir la cible du toucher</h3>
+
+<p>L&apos;application utilise un <a href="/fr/docs/Web/HTML/Element/div" title="L&apos;élément HTML &lt;div&gt; (qui signifie division du document) est un conteneur générique qui permet d&apos;organiser le contenu sans représenter rien de particulier. Il peut être utilisé afin de grouper d&apos;autres éléments pour leur appliquer un style (en utilisant les attributs class ou id) ou parce qu&apos;ils partagent des attributs aux valeurs communes, tel que lang. Il doit uniquement être utilisé lorsqu&apos;aucun autre élément sémantique (par exemple &lt;article&gt; ou &lt;nav&gt;) n&apos;est approprié."><code>&lt;div&gt;</code></a> pour définir la zone cible du pointeur.</p>
+
+<pre class="brush: html">&lt;style&gt;
+  div {
+    margin: 0em;
+    padding: 2em;
+  }
+  #target {
+    background: white;
+    border: 1px solid black;
+  }
+&lt;/style&gt;
+</pre>
+
+<h3 id="État_global">État global</h3>
+
+<p>Prendre en charge un mouvement à deux pointeurs nécessite de conserver un état des événements du pointeur durant les différentes phases de l&apos;événement. Cette application utilise deux variables globales pour mettre en cache l&apos;état de l&apos;événement.</p>
+
+<pre class="brush: js">// Variables globales pour mettre en cache l&apos;état de l&apos;événement
+var evCache = new Array();
+var prevDiff = -1;
+</pre>
+
+<h3 id="Enregistrer_les_gestionnaires_d&apos;événement">Enregistrer les gestionnaires d&apos;événement</h3>
+
+<p>Les gestionnaires d&apos;événement sont enregistrés pour les événements de pointeur suivants: <code><a href="/fr/docs/Web/Reference/Events/pointerdown" title="/fr/docs/Web/Reference/Events/pointerdown">pointerdown</a></code>, <code><a href="/fr/docs/Web/Reference/Events/pointermove" title="/fr/docs/Web/Reference/Events/pointermove">pointermove</a></code> et <code><a href="/fr/docs/Web/Reference/Events/pointerup" title="/fr/docs/Web/Reference/Events/pointerup">pointerup</a></code>. Le gestionnaire pour <code><a href="/fr/docs/Web/Reference/Events/pointerup" title="/fr/docs/Web/Reference/Events/pointerup">pointerup</a></code> est utilisé pour les événements <code><a href="/fr/docs/Web/Reference/Events/pointercancel" title="/fr/docs/Web/Reference/Events/pointercancel">pointercancel</a></code>, <code><a href="/fr/docs/Web/Reference/Events/pointerout" title="/fr/docs/Web/Reference/Events/pointerout">pointerout</a></code> et <code><a href="/fr/docs/Web/Reference/Events/pointerleave" title="/fr/docs/Web/Reference/Events/pointerleave">pointerleave</a></code> puisque ces quatre événements ont la même sémantique dans cette application.</p>
+
+<pre class="brush: js">function init() {
+ // Ajoute les gestionnaires d&apos;événements pour la cible du pointeur
+ var el=document.getElementById(&quot;target&quot;);
+ el.onpointerdown = pointerdown_handler;
+ el.onpointermove = pointermove_handler;
+
+ // Même chose pour les événements pointer{up,cancel,out,leave} puisque
+ // la sémantique pour ces événements - dans cette appli - est identique.
+ el.onpointerup = pointerup_handler;
+ el.onpointercancel = pointerup_handler;
+ el.onpointerout = pointerup_handler;
+ el.onpointerleave = pointerup_handler;
+}
+</pre>
+
+<h3 id="Pointer_down">Pointer down</h3>
+
+<p>L&apos;événement <code><a href="/fr/docs/Web/Reference/Events/pointerdown" title="/fr/docs/Web/Reference/Events/pointerdown">pointerdown</a></code> est déclenché quand un pointeur (souris, stylo/stylet ou point de contact sur un écran tactile) entre en contact avec la <em>surface de contact</em>. Dans cette application, l&apos;état de l&apos;événement doit être mis en cache dans le cas où il fait partie d&apos;un geste à deux pointeurs pour pincer/zoomer.</p>
+
+<pre class="brush: js">function pointerdown_handler(ev) {
+ // L&apos;événement pointerdown signale le début d&apos;une interraction de toucher.
+ // L&apos;événement est mis en cache pour prendre en charge les gestes à 2 doigts
+ evCache.push(ev);
+ log(&quot;pointerDown&quot;, ev);
+}
+</pre>
+
+<h3 id="Pointer_move">Pointer move</h3>
+
+<p>Le gestionnaire d&apos;événement <code><a href="/fr/docs/Web/Reference/Events/pointermove" title="/fr/docs/Web/Reference/Events/pointermove">pointermove</a></code> détecte si un utilisateur est en train d&apos;effectuer le geste de pincer/zoomer. Si deux pointeurs sont utilisés, et que la distance entre les pointeurs augmente (ce qui signifie qu&apos;on étire ou dézoome), la couleur d&apos;arrière-plan est changée en <code>pink</code>, et si la distance entre les pointeurs diminue (ce qui signifie qu&apos;on pince ou dézoome), la couleur d&apos;arrière-plan est changée en <code>lightblue</code>. Dans une application plus sophistiquée, le pincement ou l&apos;étirement pourrait être utilisé pour appliquer une sémantique spécifique à l&apos;application.</p>
+
+<p>Quand cet événement est traité, la bordure de la cible est définie à <code>dashed</code> pour fournir une indication visuelle claire que l&apos;élément a reçu un événement de déplacement.</p>
+
+<pre class="brush: js">function pointermove_handler(ev) {
+ // Cette fonction implémente la détection du mouvement horizontal pincer/zoomer.
+ //
+ // Si la distance entre les deux pointeurs augmente (zoomer),
+ // l&apos;arrière-plan de l&apos;élément cible est changé en &quot;pink&quot; et si la
+ // distance diminue (dezoomer), la couleur est changée en &quot;lightblue&quot;.
+ //
+ // Cette fonctionne définie la bordure de l&apos;élément cible à &quot;dashed&quot; pour indiquer
+ // visuellement que la cible du pointeur a reçu un événement de déplacement.
+ log(&quot;pointerMove&quot;, ev);
+ ev.target.style.border = &quot;dashed&quot;;
+
+ // Trouve le pointeur en cours dans le cache et le met à jour avec cet événement
+ for (var i = 0; i &lt; evCache.length; i++) {
+   if (ev.pointerId == evCache[i].pointerId) {
+      evCache[i] = ev;
+      break;
+   }
+ }
+
+ // Si deux pointeurs sont utilisés, vérifie le geste de pincement
+ if (evCache.length == 2) {
+   // Calcule la distance entre les deux pointeurs
+   var curDiff = Math.abs(evCache[0].clientX - evCache[1].clientX);
+
+   if (prevDiff &gt; 0) {
+     if (curDiff &gt; prevDiff) {
+       // La distance entre les deux pointeurs a augmenté
+       log(&quot;Pinch moving OUT -&gt; Zoom in&quot;, ev);
+       ev.target.style.background = &quot;pink&quot;;
+     }
+     if (curDiff &lt; prevDiff) {
+       // La distance entre les deux pointeurs a diminué
+       log(&quot;Pinch moving IN -&gt; Zoom out&quot;,ev);
+       ev.target.style.background = &quot;lightblue&quot;;
+     }
+   }
+
+   // Met en cache la distance pour les événements suivants
+   prevDiff = curDiff;
+ }
+}
+</pre>
+
+<h3 id="Pointer_up">Pointer up</h3>
+
+<p>L&apos;événement <code><a href="/fr/docs/Web/Reference/Events/pointerup" title="/fr/docs/Web/Reference/Events/pointerup">pointerup</a></code> est déclenché quand le pointeur est levé de la <em>surface de contact</em>. Quand cela arrive, l&apos;événement est retiré du cache et la couleur d&apos;arrière-plan et bordure de la cible sont rétablies à leur valeur d&apos;origine.</p>
+
+<p>Dans cette application, ce gestionnaire est également utilisé pour les événements <code><a href="/fr/docs/Web/Reference/Events/pointercancel" title="/fr/docs/Web/Reference/Events/pointercancel">pointercancel</a></code>, <code><a href="/fr/docs/Web/Reference/Events/pointerleave" title="/fr/docs/Web/Reference/Events/pointerleave">pointerleave</a></code> et <code><a href="/fr/docs/Web/Reference/Events/pointerout" title="/fr/docs/Web/Reference/Events/pointerout">pointerout</a></code>.</p>
+
+<pre class="brush: js">function pointerup_handler(ev) {
+  log(ev.type, ev);
+  // Retire ce pointeur du cache et rétablit l&apos;arrière-plan et
+  // et bordure de la cible
+  remove_event(ev);
+  ev.target.style.background = &quot;white&quot;;
+  ev.target.style.border = &quot;1px solid black&quot;;
+
+  // Si le nombre de pointeurs restant est inférieur à deux, remet à zéro la différence
+  if (evCache.length &lt; 2) prevDiff = -1;
+}
+</pre>
+
+<h3 id="Application_UI">Application UI</h3>
+
+<p>Cette application utilise un élément <a href="/fr/docs/Web/HTML/Element/div" title="L&apos;élément HTML &lt;div&gt; (qui signifie division du document) est un conteneur générique qui permet d&apos;organiser le contenu sans représenter rien de particulier. Il peut être utilisé afin de grouper d&apos;autres éléments pour leur appliquer un style (en utilisant les attributs class ou id) ou parce qu&apos;ils partagent des attributs aux valeurs communes, tel que lang. Il doit uniquement être utilisé lorsqu&apos;aucun autre élément sémantique (par exemple &lt;article&gt; ou &lt;nav&gt;) n&apos;est approprié."><code>&lt;div&gt;</code></a> comme zone de toucher et fournit des boutons pour activer et nettoyer les logs.</p>
+
+<p class="note">Pour empêcher que le comportement par défaut du navigateur au toucher surcharge le gestionnaire de l&apos;application, la propriété <a href="/fr/docs/Web/CSS/touch-action" title="La propriété touch-action définit si une région donnée peut être manipulée par l&apos;utilisateur grâce à des interactions tactiles (en déplaçant ou en zoomant) et comment cette interaction fonctionnera."><code>touch-action</code></a> est appliquée à l&apos;élément <a href="/fr/docs/Web/HTML/Element/body" title="L&apos;élément &lt;body&gt; représente le contenu principal du document HTML. Il ne peut y avoir qu&apos;un élément &lt;body&gt; par document."><code>&lt;body&gt;</code></a>.</p>
+
+<pre class="brush: html">&lt;body onload=&quot;init();&quot; style=&quot;touch-action:none&quot;&gt;
+ &lt;div id=&quot;target&quot;&gt;Touchez l&apos;écran avec deux pointeurs, puis pincez ou étirez.&lt;br/&gt;
+    La couleur d&apos;arrière-plan changera en rose au pincement (Zoomer)
+    ou en bleu clair à l&apos;étirement (Dézoomer).&lt;/div&gt;
+ &lt;!-- UI pour log/debug --&gt;
+ &lt;button id=&quot;log&quot; onclick=&quot;enableLog(event);&quot;&gt;Démarrer/Stopper les logs&lt;/button&gt;
+ &lt;button id=&quot;clearlog&quot; onclick=&quot;clearLog(event);&quot;&gt;Nettoyer les logs&lt;/button&gt;
+ &lt;p&gt;&lt;/p&gt;
+ &lt;output&gt;&lt;/output&gt;
+&lt;/body&gt;
+</pre>
+
+<h3 id="Fonctions_diverses">Fonctions diverses</h3>
+
+<p>Ces fonctions prennent en charge l&apos;application mais ne sont pas directement impliquées dans le flux des événements.</p>
+
+<h4 id="Gestion_du_Cache">Gestion du Cache</h4>
+
+<p>Cette fonction aide à gérer le cache global des événements, <code>evCache</code>.</p>
+
+<pre class="brush: js">function remove_event(ev) {
+ // Supprime l&apos;événement du cache
+ for (var i = 0; i &lt; evCache.length; i++) {
+   if (evCache[i].pointerId == ev.pointerId) {
+     evCache.splice(i, 1);
+     break;
+   }
+ }
+}
+</pre>
+
+<h4 id="Log_des_événements">Log des événements</h4>
+
+<p>Ces fonctions sont utilisées pour afficher l&apos;activité du pointeur dans la fenêtre de l&apos;application (pour aider à debugger et à apprendre le flux des événements).</p>
+
+<pre class="brush: js">// Flag log
+var logEvents = false;
+
+// Fonctions Log/debug
+function enableLog(ev) {
+  logEvents = logEvents ? false : true;
+}
+
+function log(prefix, ev) {
+  if (!logEvents) return;
+  var o = document.getElementsByTagName(&apos;output&apos;)[0];
+  var s = prefix + &quot;: pointerID = &quot; + ev.pointerId +
+                &quot; ; pointerType = &quot; + ev.pointerType +
+                &quot; ; isPrimary = &quot; + ev.isPrimary;
+  o.innerHTML += s + &quot;
+&quot;;
+}
+
+function clearLog(event) {
+ var o = document.getElementsByTagName(&apos;output&apos;)[0];
+ o.innerHTML = &quot;&quot;;
+}
+</pre>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="https://hacks.mozilla.org/2015/08/pointer-events-now-in-firefox-nightly/">Pointer Events now in Firefox Nightly</a>; Mozilla Hacks; by Matt Brubeck and Jason Weathersby; 2015-Aug-04</li>
+ <li><a href="https://github.com/jquery/PEP">jQuery Pointer Events Polyfill</a></li>
+ <li><a href="http://www.google.com/design/spec/patterns/gestures.html">Gestures</a>; Google Design Patterns</li>
+</ul>

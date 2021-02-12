@@ -1,0 +1,160 @@
+---
+title: copy
+slug: Web/API/Element/copy_event
+translation_of: Web/API/Element/copy_event
+original_slug: Web/Events/copy
+---
+<p>L&apos;événement <strong>copy</strong> est déclenché lorsque l&apos;utilisateur initie une copie par le biais de l&apos;interface du navigateur (par exemple, Ctrl/Cmd+C ou &quot;copier&quot; du menu contextuel) et en réponse d&apos;un appel de <a href="/fr/docs/Web/API/Document/execCommand" title="La plupart des commandes affectent la sélection du document (gras, italique, etc.), tandis que d&apos;autres ajoutent de nouveaux éléments (ajout d&apos;un lien) ou affectent une ligne entière (indentation). Lorsque vous utilisez contentEditable, l&apos;appel execCommand() affectera l&apos;élément modifiable actuellement actif."><code>document.execCommand(&apos;copy&apos;)</code></a> autorisé.</p>
+
+<h2 id="Informations_générales">Informations générales</h2>
+
+<dl>
+ <dt style="float: left; text-align: right; width: 120px;">Spécification</dt>
+ <dd style="margin: 0 0 0 120px;"><a href="https://www.w3.org/TR/clipboard-apis/#the-copy-action" class="external">Clipboard</a></dd>
+ <dt style="float: left; text-align: right; width: 120px;">Interface</dt>
+ <dd style="margin: 0 0 0 120px;"><a href="/fr/docs/Web/API/ClipboardEvent" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ClipboardEvent</code></a></dd>
+ <dt style="float: left; text-align: right; width: 120px;">Propagation</dt>
+ <dd style="margin: 0 0 0 120px;">Oui</dd>
+ <dt style="float: left; text-align: right; width: 120px;">Annulable</dt>
+ <dd style="margin: 0 0 0 120px;">Oui</dd>
+ <dt style="float: left; text-align: right; width: 120px;">Cible</dt>
+ <dd style="margin: 0 0 0 120px;"><a href="/fr/docs/Web/API/Element" title="Element est la classe de base la plus générale à partir de laquelle tous les objets d&apos;un Document héritent. Il n&apos;a que des méthodes et des propriétés communes à tous les types d&apos;éléments. Les classes plus spécifiques héritent d&apos;Element. Par exemple, l&apos;interface HTMLElement est l&apos;interface de base pour les éléments HTML, tandis que l&apos;interface SVGElement est la base de tous les éléments SVG. La plupart des fonctionnalités sont spécifiées plus bas dans la hiérarchie des classes."><code>Element</code></a>: L&apos;élément ayant le focus (pour les éléments <a href="/fr/docs/Web/API/HTMLElement/contentEditable" title="La propriété HTMLElement.contentEditable est utilisée pour indiquer si un élément HTML est ou non éditable. Cet attribut peut avoir 3 valeurs :"><code>contentEditable</code></a> - l&apos;élément contenant le début de la sélection), ou l&apos;élément <a href="/fr/docs/Web/HTML/Element/body" title="L&apos;élément &lt;body&gt; représente le contenu principal du document HTML. Il ne peut y avoir qu&apos;un élément &lt;body&gt; par document."><code>&lt;body&gt;</code></a></dd>
+ <dt style="float: left; text-align: right; width: 120px;">Action par défaut</dt>
+ <dd style="margin: 0 0 0 120px;">Voir ce-dessous</dd>
+</dl>
+
+<p>Un gestionnaire de cet événement peut modifier l&apos;objet <a href="/fr/docs/Web/API/ClipboardEvent/clipboardData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>ClipboardEvent.clipboardData</code></a> en appellant <a href="/fr/docs/Web/API/DataTransfer/setData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>setData(format, data)</code></a>:</p>
+
+<pre class="javascript">document.addEventListener(&apos;copy&apos;, function(e){
+    e.clipboardData.setData(&apos;text/plain&apos;, &apos;Hello, world!&apos;);
+    e.clipboardData.setData(&apos;text/html&apos;, &apos;&lt;b&gt;Hello, world!&lt;/b&gt;&apos;);
+    e.preventDefault(); // We want our data, not data from any selection, to be written to the clipboard
+});</pre>
+
+<p>Un gestionnaire de cet événement ne peut pas lire les données du presse-papiers en utilisant <a href="/fr/docs/Web/API/DataTransfer/getData" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>clipboardData.getData()</code></a>.</p>
+
+<p>L&apos;action par défaut de l&apos;événement dépend de la source de celui-ci et du comportement du gestionnaire:</p>
+
+<ul>
+ <li>Un événement de copie <a href="/fr/docs/Web/Guide/Events/Creating_and_triggering_events">synthétique</a> n&apos;a pas d&apos;action par défaut;</li>
+ <li>Si l&apos;événement n&apos;a pas été annulé: Copie de la sélection (s&apos;il y a) dans le presse-papiers;</li>
+ <li>Si le gestionnaire a annulé l&apos;événement et appelé setData(): Copie le contenu de <em>clipboardData</em> de <a href="/fr/docs/Web/API/ClipboardEvent"><code>ClipboardEvent</code></a>;</li>
+ <li>Si le gestionnaire a annulé l&apos;événement sans appelé setData(): Aucune action.</li>
+</ul>
+
+<h2 id="Propriétés">Propriétés</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Property</th>
+   <th scope="col">Type</th>
+   <th scope="col">Description</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><code>target</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/API/EventTarget"><code>EventTarget</code></a></td>
+   <td>The event target (the topmost target in the DOM tree).</td>
+  </tr>
+  <tr>
+   <td><code>type</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/API/DOMString"><code>DOMString</code></a></td>
+   <td>The type of event.</td>
+  </tr>
+  <tr>
+   <td><code>bubbles</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event normally bubbles or not.</td>
+  </tr>
+  <tr>
+   <td><code>cancelable</code> <span class="readOnly readOnlyInline notecard inline" title="Cette valeur ne peut pas être changée.">Lecture seule </span></td>
+   <td><a href="/fr/docs/Web/JavaScript/Reference/Objets_globaux/Boolean"><code>Boolean</code></a></td>
+   <td>Whether the event is cancellable or not.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Compatibilités_navigateur">Compatibilités navigateur</h2>
+
+<p></p><div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">Nous convertissons les données de compatibilité dans un format JSON</a></strong>.
+            Ce tableau de compatibilité utilise encore l&apos;ancien format
+            car nous n&apos;avons pas encore converti les données qu&apos;il contient.
+            <strong><a href="/fr/docs/MDN/Contribute/Structures/Compatibility_tables">Vous pouvez nous aider en contribuant !</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>Ordinateur</a></li>
+        <li><a>Mobile</a></li>
+    </ul>
+</div><p></p>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Navigateur</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>clipboardData</code></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><a href="/en-US/Firefox/Releases/22">22</a> (22)</td>
+   <td><span style="color: #f00;">Pas de support</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Navigateur</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+  </tr>
+  <tr>
+   <td>Support basique</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: #888;" title="Veuillez mettre à jour avec la version minimale du support">(Oui)</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+  <tr>
+   <td><code>clipboardData</code></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td>22.0 (22)</td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+   <td><span style="color: rgb(255, 153, 0);" title="Compatibility unknown; please update this.">?</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="Evénements_liés">Evénements liés</h2>
+
+<ul>
+ <li><code><a href="/fr/docs/Web/Reference/Events/copy">copy</a></code>, <code><a href="/fr/docs/Web/Reference/Events/cut">cut</a></code>, <code><a href="/fr/docs/Web/Reference/Events/paste">paste</a></code></li>
+</ul>

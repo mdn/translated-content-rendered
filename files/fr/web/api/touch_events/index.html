@@ -1,0 +1,249 @@
+---
+title: Événements tactiles / Touch events
+slug: Web/API/Touch_events
+tags:
+  - Tactile
+  - touch
+translation_of: Web/API/Touch_events
+original_slug: Web/Guide/DOM/Events/Touch_events
+---
+<section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/API/Touch_events">Touch events</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/API/Touch_events/Using_Touch_Events">Using Touch Events</a> <a href="/fr/docs/Web/API/Touch_events/Using_Touch_Events$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/API/Touch_events/Multi-touch_interaction">Multi-touch interaction</a> <a href="/fr/docs/Web/API/Touch_events/Multi-touch_interaction$translate" style="opacity: 0.5;">[Traduire]</a></li><li><a href="/fr/docs/Web/Guide/DOM/Events/Touch_events/G%C3%A9rer_%C3%A0_la_fois_%C3%A9v%C3%A9nement_tactile_et_%C3%A9v%C3%A9nement_de_la_souris">Gérer à la fois événement tactile et événement de la souris</a></li></ol></details></li><li class="toggle"><details open><summary>Interfaces</summary><ol><li><a href="/fr/docs/Web/API/Touch"><code>Touch</code></a></li><li><a href="/fr/docs/Web/API/TouchEvent"><code>TouchEvent</code></a></li><li><a href="/fr/docs/Web/API/TouchList"><code>TouchList</code></a></li></ol></details></li><li class="toggle"><details open><summary>Événements</summary><ol><li><a href="/fr/docs/Web/API/Element/touchcancel_event"><code>Element</code>: <code>touchcancel</code></a></li><li><a href="/fr/docs/Web/API/Element/touchend_event"><code>Element</code>: <code>touchend</code></a></li><li><a href="/fr/docs/Web/API/Element/touchmove_event"><code>Element</code>: <code>touchmove</code></a></li><li><a href="/fr/docs/Web/API/Element/touchstart_event"><code>Element</code>: <code>touchstart</code></a></li></ol></details></li></ol></section>
+
+<p>Afin de fournir un support de qualité pour les interfaces tactiles, les événements tactiles (<em>touch events</em>) permettent d&apos;interpréter les interactions tactiles (sur les écrans ou trackpads).</p>
+
+<h2 id="Définitions">Définitions</h2>
+
+<dl>
+ <dt>Surface</dt>
+ <dd>La surface tactile. Cela peut être un écran ou un trackpad.</dd>
+</dl>
+
+<dl>
+ <dt><strong style="font-weight: bold;">Point de toucher (<em>Touch point</em>)</strong></dt>
+ <dd>Le point de contact avec la surface. Cela peut être un doigt ou un stylet (ou un coude, une oreille, un nez... enfin il y a quand même des chances que cela soit un doigt).</dd>
+</dl>
+
+<h2 id="Interfaces">Interfaces</h2>
+
+<dl>
+ <dt><a href="/fr/docs/Web/API/TouchEvent"><code>TouchEvent</code></a></dt>
+ <dd>Représente l&apos;événement qui se produit quand l&apos;action de toucher change.</dd>
+ <dt><a href="/fr/docs/Web/API/Touch"><code>Touch</code></a></dt>
+ <dd>Représente un point unique de contact entre l&apos;utilisateur et la surface tactile.</dd>
+ <dt><a href="/fr/docs/Web/API/TouchList"><code>TouchList</code></a></dt>
+ <dd>Représente un groupe de plusieurs interactions tactiles. Cela peut par exemple être le cas quand l&apos;utilisateur utilise plusieurs doigts pour toucher simultanément la même surface.</dd>
+ <dt><a href="/fr/docs/Web/API/DocumentTouch"><code>DocumentTouch</code></a></dt>
+ <dd>Contient des méthodes permettant de créer les objets  <a href="/fr/docs/Web/API/Touch"><code>Touch</code></a> et <a href="/fr/docs/Web/API/TouchList"><code>TouchList</code></a>.</dd>
+</dl>
+
+<h2 id="Exemple">Exemple</h2>
+
+<p>Cet exemple permet de gérer un toucher multiple (plusieurs contacts simultanés), permettant ainsi à l&apos;utilisateur de dessiner dans un <a href="/fr/docs/Web/HTML/Element/canvas" title="L&apos;élément &lt;canvas&gt; permet de modifier une zone graphique via un script (habituellement en JavaScript ou grâce à WebGL). Il peut par exemple être utilisé afin de dessiner des graphiques, manipuler des images ou jouer des animations."><code>&lt;canvas&gt;</code></a> avec plusieurs doigts. Cela ne fonctionne qu&apos;avec les navigateurs supportant les interactions tactiles.</p>
+
+<div class="note notecard"><strong>Note :</strong> Le texte qui suit utilisera le terme de « doigt » pour désigner le point de toucher entre l&apos;utilisateur et la surface. Bien entendu, cela est transposable avec une autre méthode de toucher (stylet...).</div>
+
+<h3 id="Initialiser_les_gestionnaires_dévénements">Initialiser les gestionnaires d&apos;événements</h3>
+
+<p>Quand la page charge, la fonction <code>startup()</code> décrite ci-dessous est appelée par l&apos;attribut <code>onload</code> de l&apos;élément <a href="/fr/docs/Web/HTML/Element/body" title="L&apos;élément &lt;body&gt; représente le contenu principal du document HTML. Il ne peut y avoir qu&apos;un élément &lt;body&gt; par document."><code>&lt;body&gt;</code></a>.</p>
+
+<pre class="brush: js notranslate">function startup() {
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  el.addEventListener(&quot;touchstart&quot;, handleStart, false);
+  el.addEventListener(&quot;touchend&quot;, handleEnd, false);
+  el.addEventListener(&quot;touchcancel&quot;, handleCancel, false);
+  el.addEventListener(&quot;touchleave&quot;, handleLeave, false);
+  el.addEventListener(&quot;touchmove&quot;, handleMove, false);
+}
+</pre>
+
+<p>Cela permet simplement d&apos;initialiser les observateurs d&apos;événements pour l&apos;élément <a href="/fr/docs/Web/HTML/Element/canvas" title="L&apos;élément &lt;canvas&gt; permet de modifier une zone graphique via un script (habituellement en JavaScript ou grâce à WebGL). Il peut par exemple être utilisé afin de dessiner des graphiques, manipuler des images ou jouer des animations."><code>&lt;canvas&gt;</code></a> afin de pouvoir gérer ceux-ci lorsqu&apos;ils se produisent.</p>
+
+<h3 id="Gérer_les_nouveaux_touchers">Gérer les nouveaux touchers</h3>
+
+<p>Quand un événement <code>touchstart</code> se produit, cela indique qu&apos;un nouveau toucher s&apos;est produit. La fonction <code>handleStart()</code> est alors appelée.</p>
+
+<pre class="brush: js notranslate">function handleStart(evt) {
+  evt.preventDefault();
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  for (var i=0; i&lt;touches.length; i++) {
+    ongoingTouches.push(touches[i]);
+    var color = colorForTouch(touches[i]);
+    ctx.fillStyle = color;
+    ctx.fillRect(touches[i].pageX-2, touches[i].pageY-2, 4, 4);
+  }
+}
+</pre>
+
+<p>Cette fonction appelle <a href="/fr/docs/Web/API/Event/preventDefault"><code>event.preventDefault()</code></a>, ce qui évite au navigateur de continuer à traiter cet événement (le début du toucher). Cela permet aussi de ne pas déclencher d&apos;événement de souris. On obtient ensuite le contexte, duquel on peut obtenir une liste des changements des points de toucher grâce à la propriété <a href="/fr/docs/Web/API/TouchEvent/changedTouches"><code>TouchEvent.changedTouches</code></a> de l&apos;événement.</p>
+
+<p>Après quoi, on fait une boucle sur les différents objets <a href="/fr/docs/Web/API/Touch"><code>Touch</code></a> de la liste. puis on les stocke dans un tableau pour ensuite dessiner les points (on souhaite peindre une ligne large de 4 pixels, on dessinera donc des points comme des carrés mesurant 4x4 pixels).</p>
+
+<h3 id="Dessiner_avec_les_déplacements">Dessiner avec les déplacements</h3>
+
+<p>Chaque fois que le(s) doigt(s) bouge(nt), un événement <code>touchmove</code> est déclenché, ce qui provoque l&apos;appel de la fonction <code>handleMove()</code> que l&apos;on a créée. Son rôle, dans cet exemple, est d&apos;actualiser les informations mises en cache sur les informations tactiles et de dessiner une ligne entre la position précédente et la position actuelle pour chacune des touches.</p>
+
+<pre class="brush: js notranslate">function handleMove(evt) {
+  evt.preventDefault();
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  ctx.lineWidth = 4;
+
+  for (var i=0; i&lt;touches.length; i++) {
+    var color = colorForTouch(touches[i]);
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(ongoingTouches[idx].pageX, ongoingTouches[idx].pageY);
+    ctx.lineTo(touches[i].pageX, touches[i].pageY);
+    ctx.closePath();
+    ctx.stroke();
+    ongoingTouches.splice(idx, 1, touches[i]);  // mettre à jour la liste des touchers
+  }
+}
+</pre>
+
+<p>Cette fonction boucle également sur les changements de touchers. Elle consulte toutefois les informations en cache dans le tableau pour déterminer le point de départ de chaque nouveau segment. Cela se fait en consultant la propriété <a href="/fr/docs/Web/API/Touch/identifier"><code>Touch.identifier</code></a>. Cette propriété est un entier unique pour chaque touche, cet entier reste le même pour chaque événement tant que le doigt est en contact avec la surface.</p>
+
+<p>Cela permet d&apos;obtenir les précédentes coordonnées pour chaque toucher et ainsi d&apos;utiliser la méthode adaptée pour dessiner le segment reliant les deux positions.</p>
+
+<p>Une fois le segment dessiné, on appelle <a href="/fr/JavaScript/Reference/Global_Objects/Array/splice" title="en/JavaScript/Reference/Global Objects/Array/splice"><code>Array.splice()</code></a> pour remplacer les informations précédentes sur les points de toucher par les informations courantes contenues dans le tableau <code>ongoingTouches</code>.</p>
+
+<h3 id="Gérer_la_fin_dun_toucher">Gérer la fin d&apos;un toucher</h3>
+
+<p>Lorsqu&apos;un utilisateur enlève son doigt de la surface, un événement <code>touchend</code> est envoyé. De la même manière, un événement <code>touchleave</code> sera envoyé si le doigt sort du canvas. Ici, les deux événements sont gérés en commun avec la fonction <code>handleEnd()</code> ci-dessous. Son rôle est de dessiner le dernier segment pour chaque toucher qui s&apos;est fini et de retirer le point de contact de la liste.</p>
+
+<pre class="brush: js notranslate">function handleEnd(evt) {
+  evt.preventDefault();
+  var el = document.getElementsByTagName(&quot;canvas&quot;)[0];
+  var ctx = el.getContext(&quot;2d&quot;);
+  var touches = evt.changedTouches;
+
+  ctx.lineWidth = 4;
+
+  for (var i=0; i&lt;touches.length; i++) {
+    var color = colorForTouch(touches[i]);
+    var idx = ongoingTouchIndexById(touches[i].identifier);
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(ongoingTouches[i].pageX, ongoingTouches[i].pageY);
+    ctx.lineTo(touches[i].pageX, touches[i].pageY);
+    ongoingTouches.splice(i, 1);  // On enlève le point
+  }
+}
+</pre>
+
+<p>Cette fonction ressemble beaucoup à la précédente sauf qu&apos;ici en appelant <a href="/en/JavaScript/Reference/Global_Objects/Array/splice" title="en/JavaScript/Reference/Global Objects/Array/splice"><code>Array.splice()</code></a>, on retire simplement l&apos;ancien point sans ajouter un point mis à jour. On arrête donc de « suivre » ce point.</p>
+
+<h3 id="Gérer_lannulation_dun_toucher">Gérer l&apos;annulation d&apos;un toucher</h3>
+
+<p>Si le doigt de l&apos;utilisateur se balade dans l&apos;interface du navigateur ou si un toucher doit être annulé, l&apos;événement <code>touchcancel</code> est envoyé et on appelle alors la fonction <code>handleCancel()</code>.</p>
+
+<pre class="brush: js notranslate">function handleCancel(evt) {
+  evt.preventDefault();
+  var touches = evt.changedTouches;
+
+  for (var i=0; i&lt;touches.length; i++) {
+    ongoingTouches.splice(i, 1);  // on retire le point
+  }
+}
+</pre>
+
+<p>L&apos;idée est ici la même que pour la fin d&apos;un toucher, on retire simplement le point de la liste. Ici on ne dessine pas le dernier segment.</p>
+
+<h3 id="Fonctions_auxiliaires">Fonctions auxiliaires</h3>
+
+<p>Cet exemple utilise deux fonctions auxiliaires qu&apos;il est conseillé de lire rapidement afin de mieux comprendre le reste du code.</p>
+
+<h4 id="Sélectionner_une_couleur_pour_chaque_toucher">Sélectionner une couleur pour chaque toucher</h4>
+
+<p>Afin que chaque contact soit différent, on utilisera la fonction <code>colorForTouch()</code> pour choisir un couleur unique pour chacun, basée sur l&apos;identifiant du toucher. Cet identifiant sera toujours compris entre 0 et le nombre de touchers moins 1. Imaginons que personne n&apos;utilisera plus de 16 touchers simultanés, on peut alors directement convertir les identifiants en niveaux de gris.</p>
+
+<pre class="brush: js notranslate">function colorForTouch(touch) {
+  var id = touch.identifier;
+  id = id.toString(16); // creer un nombre hexadécimal
+  return &quot;#&quot; + id + id + id;
+}
+</pre>
+
+<p>Le résultat de cette fonction sera une chaîne de caractères qui pourra être utilisée par les fonctions de l&apos;élément <a href="/fr/docs/Web/HTML/Element/canvas" title="L&apos;élément &lt;canvas&gt; permet de modifier une zone graphique via un script (habituellement en JavaScript ou grâce à WebGL). Il peut par exemple être utilisé afin de dessiner des graphiques, manipuler des images ou jouer des animations."><code>&lt;canvas&gt;</code></a> pour dessiner les couleurs. Ainsi avec un identifiant initial <a href="/fr/docs/Web/API/Touch/identifier"><code>Touch.identifier</code></a> de 10, le résultat de cette fonction sera la chaîne &quot;#aaa&quot;.</p>
+
+<h4 id="Retrouver_un_toucher_en_cours">Retrouver un toucher en cours</h4>
+
+<p>La fonction <code>ongoingTouchIndexById()</code> analyse le tableau <code>ongoingTouches</code> pour trouver le toucher correspondant à l&apos;identifiant donné. Elle retourne alors l&apos;indice du toucher dans le tableau.</p>
+
+<pre class="brush: js notranslate">function ongoingTouchIndexById(idToFind) {
+  for (var i=0; i&lt;ongoingTouches.length; i++) {
+    var id = ongoingTouches[i].identifier;
+
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1;    // toucher non trouvé
+}
+</pre>
+
+<p><a href="/samples/domref/touchevents.html">Voir l&apos;exemple sur une page</a></p>
+
+<h2 id="Astuces_supplémentaires">Astuces supplémentaires</h2>
+
+<p>Cette section fournit quelques astuces supplémentaires pour gérer les événements tactiles au sein de votre application web.</p>
+
+<h3 id="Gérer_les_clics">Gérer les clics</h3>
+
+<p>Étant donné que l&apos;appel de la méthode <code>preventDefault()</code> sur l&apos;événement  <code>touchstart</code> ou le premier événement <code>touchmove</code> de la série empêche la saisie d&apos;événements en provenance de la souris, on appelle souvent  <code>preventDefault()</code> sur <code>touchmove</code> plutôt que sur <code>touchstart</code>. Ainsi, les événements de la souris peuvent continuer à se déclencher et le reste du site fonctionnera de manière habituelle. Une autre méthode parfois utilisée est de déclencher des événements de souris à partir des événements tactiles. (L&apos;exemple qui suit représente seulement une indication. La logique a été simplifiée et ce code, tel quel, aura un comportement étrange.)</p>
+
+<pre class="brush: js notranslate">function onTouch(evt) {
+  evt.preventDefault();
+  if (evt.touches.length &gt; 1 || (evt.type == &quot;touchend&quot; &amp;&amp; evt.touches.length &gt; 0))
+    return;
+
+  var newEvt = <a href="https://developer.mozilla.org/en/DOM/document.createEvent" rel="internal" title="en/DOM/document.createEvent">document.createEvent</a>(&quot;MouseEvents&quot;);
+  var type = null;
+  var touch = null;
+  switch (event.type) {
+    case &quot;touchstart&quot;: type = &quot;mousedown&quot;; touch = event.changedTouches[0];
+    case &quot;touchmove&quot;:  type = &quot;mousemove&quot;; touch = event.changedTouches[0];
+    case &quot;touchend&quot;:   type = &quot;mouseup&quot;; touch = event.changedTouches[0];
+  }
+  newEvt.<strong>initMouseEvent</strong>(type, true, true, event.<code><a href="https://developer.mozilla.org/en/DOM/event.originalTarget" rel="custom">originalTarget</a>.ownerDocument.defaultView</code>, 0,
+    touch.screenX, touch.screenY, touch.clientX, touch.clientY,
+    evt.ctrlKey, evt.altKey, evt.shirtKey, evt.metaKey, 0, null);
+  event.<code><a href="https://developer.mozilla.org/en/DOM/event.originalTarget" rel="custom">originalTarget</a></code>.<a href="https://developer.mozilla.org/en/DOM/element.dispatchEvent" rel="internal" title="en/DOM/element.dispatchEvent">dispatchEvent</a>(newEvt);
+}
+</pre>
+
+<h3 id="Appeler_preventDefault_uniquement_pour_un_deuxième_toucher">Appeler preventDefault() uniquement pour un deuxième toucher</h3>
+
+<p>Pour éviter que des événements de zoom (comme <code>pinchZoom</code>) ne se produisent sur la page, il est possible d&apos;appeler la méthode <code>preventDefault()</code> sur le deuxième toucher de la série. Ce comportement n&apos;est pas encore parfaitement défini dans les différentes spécifications. Différents résultats se produisent sur les différents navigateurs (ainsi iOS empêchera le zoom mais continuera à autoriser le déroulement de la page avec deux doigts, Android autorisera le zoom mais pas le déroulement, Opera et Firefox empêcheront ces deux opérations). Il est actuellement déconseillé d&apos;être dépendant d&apos;un de ces comportements en particulier. Il faut plutôt utiliser les méta-données concernant la vue virtuelle (<em>viewport</em>) pour éviter un zoom quelconque.</p>
+
+<dl>
+</dl>
+
+<h2 id="Compatibilité_des_navigateurs">Compatibilité des navigateurs</h2>
+
+<div class="bc-data" id="bcd:api.Touch"></div>
+
+<div id="compat-mobile"> </div>
+
+<h3 id="Notes_relatives_à_Gecko">Notes relatives à Gecko</h3>
+
+<p>Le paramètre <code>dom.w3c_touch_events.enabled</code> peut être utilisé avec ses trois états pour désactiver (0), activer (1) et détecter automatiquement (2) le support des événements tactiles. La valeur par défaut est la détection automatique (2). Une fois que le paramètre a été changé, il est nécessaire de redémarrer le navigateur.</p>
+
+<div class="geckoVersionNote" style>
+<div class="geckoVersionHeading">
+Gecko 12.0 note
+<div style="font-size: 9px; line-height: 1; font-style: italic;">(Firefox 12.0 / Thunderbird 12.0 / SeaMonkey 2.9)</div>
+</div>
+
+<p>Avant Gecko 12.0 (Firefox 12.0 / Thunderbird 12.0 / SeaMonkey 2.9), Gecko ne supportait pas les contacts multiples simultanés. Seul un toucher à la fois était supporté.</p>
+</div>
+
+<div class="note notecard"><strong>Note : </strong>Avant Gecko 6.0 (Firefox 6.0 / Thunderbird 6.0 / SeaMonkey 2.3), Gecko permettait d&apos;utiliser une <a href="/en/DOM/Touch_events_(Mozilla_experimental)" title="en/DOM/Touch events (Mozilla experimental)">API propriétaire pour les événements tactile.</a> Cette API est maintenant dépréciée, celle-ci doit être utilisée à la place.</div>

@@ -1,0 +1,146 @@
+---
+title: Utilisation des objets FormData
+slug: Web/API/FormData/Using_FormData_Objects
+tags:
+  - AJAX
+  - Blob
+  - File
+  - FormData
+  - Formulaires
+  - XHR
+  - XMLHttpRequest
+translation_of: Web/API/FormData/Using_FormData_Objects
+original_slug: Web/API/FormData/Utilisation_objets_FormData
+---
+<p class="summary">L’objet <code><a href="/en-US/docs/Web/API/FormData">FormData</a></code> vous permet de compiler un ensemble de paires clé/valeur à envoyer à l’aide de l’API <code><a href="/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a></code>. Il est principalement destiné à l’envoi de données de formulaire, mais il peut également être utilisé indépendamment des formulaires pour transmettre des données indexées. Le format des données transmises est le même que celui qu’utiliserait la méthode <a href="/fr/docs/Web/API/HTMLFormElement/submit" title="Cette documentation n&apos;a pas encore été rédigée, vous pouvez aider en contribuant !"><code>submit()</code></a> du formulaire pour envoyer les données si l’encodage de ce dernier était défini sur <code>multipart/form-data</code>.</p>
+
+<h2 id="Création_intégrale_d’un_objet_FormData">Création intégrale d’un objet FormData</h2>
+
+<p>Vous pouvez construire un objet <code>FormData</code> vous-même, en créer une instance, puis y ajouter des champs en appelant la méthode <a href="/fr/docs/Web/API/FormData/append" title="La méthode append() de l&apos;interface FormData ajoute une nouvelle valeur à une clé existante dans un objet FormData, ou rajoute cette clé et cette valeur quand elle n&apos;existe pas."><code>append()</code></a>, comme suit :</p>
+
+<pre class="brush: js">var formData = new FormData();
+
+formData.append(&quot;username&quot;, &quot;Groucho&quot;);
+formData.append(&quot;accountnum&quot;, 123456); // le numéro 123456 est converti immédiatement en chaîne &quot;123456&quot;
+
+// fichier HTML choisi par l&apos;utilisateur
+formData.append(&quot;userfile&quot;, fileInputElement.files[0]);
+
+// objet JavaScript de type fichier
+var content = &apos;&lt;a id=&quot;a&quot;&gt;&lt;b id=&quot;b&quot;&gt;hey!&lt;/b&gt;&lt;/a&gt;&apos;; // the body of the new file...
+var blob = new Blob([content], { type: &quot;text/xml&quot;});
+
+formData.append(&quot;webmasterfile&quot;, blob);
+
+var request = new XMLHttpRequest();
+request.open(&quot;POST&quot;, &quot;http://foo.com/submitform.php&quot;);
+request.send(formData);
+</pre>
+
+<div class="note notecard"><strong>Remarque :</strong> les champs « userfile » et « webmasterfile » contiennent tous deux un fichier. Le numéro attribué au champ « accountnum » est immédiatement converti en chaîne par la méthode <a href="/en/DOM/XMLHttpRequest/FormData#append()" title="en/XMLHttpRequest/FormData#append()"><code>FormData.append()</code></a> (la valeur du champ peut être un objet <a href="/fr/docs/Web/API/Blob" title="Un objet Blob représente un objet, semblable à un fichier, qui est immuable et qui contient des données brutes. Les blobs (pour Binary Large Objects) représentent des données qui ne sont pas dans un format JavaScript natif. L&apos;interface File est basée sur l&apos;interface Blob et hérite des fonctionnalités de cette dernière tout en ajoutant des fonctionnalités pour gérer les fichiers sur le système de l&apos;utilisateur."><code>Blob</code></a>, <a href="/fr/docs/Web/API/File" title="L&apos;objet File fournit un tableau contenant des informations sur l&apos;accès au contenu du ou des fichiers selectionnés, des informations sur le type mime, la taille, le nom des fichiers ainsi que le nombre de fichiers selectionnés. Ils sont généralement extraits d&apos;un objet FileList retourné comme résultat lors de la sélection des fichiers en utilisant un input de type file, ou à partir d&apos;un objet DataTransfer lors d&apos;un glisser-déposer."><code>File</code></a> ou une chaîne : <strong>s’il ne s’agit ni d’un objet Blob, ni d’un objet File, la valeur est convertie en chaîne</strong>).</div>
+
+<p>Dans cet exemple, une instance <code>FormData</code> contenant les valeurs des champs « username », « accountnum », « userfile » et « webmasterfile » est créée, puis la méthode <code>XMLHttpRequest</code> <a href="/en/DOM/XMLHttpRequest#send()" title="en/XMLHttpRequest#send()"><code>send()</code></a> est utilisée pour envoyer les données du formulaire. Le champ « webmasterfile » est un objet <a href="/fr/docs/Web/API/Blob" title="Un objet Blob représente un objet, semblable à un fichier, qui est immuable et qui contient des données brutes. Les blobs (pour Binary Large Objects) représentent des données qui ne sont pas dans un format JavaScript natif. L&apos;interface File est basée sur l&apos;interface Blob et hérite des fonctionnalités de cette dernière tout en ajoutant des fonctionnalités pour gérer les fichiers sur le système de l&apos;utilisateur."><code>Blob</code></a>. Un objet <code>Blob</code> représente un objet-fichier de données brutes immuables. Les Blobs représentent des données qui ne sont pas nécessairement dans un format JavaScript natif. L’interface <a href="/fr/docs/Web/API/File" title="L&apos;objet File fournit un tableau contenant des informations sur l&apos;accès au contenu du ou des fichiers selectionnés, des informations sur le type mime, la taille, le nom des fichiers ainsi que le nombre de fichiers selectionnés. Ils sont généralement extraits d&apos;un objet FileList retourné comme résultat lors de la sélection des fichiers en utilisant un input de type file, ou à partir d&apos;un objet DataTransfer lors d&apos;un glisser-déposer."><code>File</code></a> se base sur l’objet <code>Blob</code>, elle en hérite les fonctionnalités et les étend pour prendre en charge les fichiers du système de l’utilisateur. Pour construire un <code>Blob</code>, vous pouvez invoquer le <a href="/fr/docs/Web/API/Blob/Blob" title="Le constructeur Blob() retourne un nouvel objet Blob. Le contenu d&apos;un blob consiste en une concaténation de valeurs données dans le tableau passé en paramètre."><code>constructeur Blob()</code></a>.</p>
+
+<h2 id="Récupération_d’un_objet_FormData_dans_un_formulaire_HTML">Récupération d’un objet FormData dans un formulaire HTML</h2>
+
+<p>Pour construire un objet <code>FormData</code> contenant les données d’un élément HTML <a href="/fr/docs/Web/HTML/Element/form" title="L&apos;élément HTML &lt;form&gt; représente une section d&apos;un document qui contient des contrôles interactifs permettant à un utilisateur d&apos;envoyer des données à un serveur web."><code>&lt;form&gt;</code></a> existant, spécifiez cet élément lors de la création de l’objet<code> </code>:</p>
+
+<pre class="brush: js">var formData = new FormData(someFormElement);
+</pre>
+
+<p>Par exemple :</p>
+
+<pre class="brush: js">var formElement = document.querySelector(&quot;form&quot;);
+var request = new XMLHttpRequest();
+request.open(&quot;POST&quot;, &quot;submitform.php&quot;);
+request.send(new FormData(formElement));
+</pre>
+
+<p>Vous pouvez également ajouter des données supplémentaires à l’objet <code>FormData</code> entre sa récupération dans un formulaire et son envoi, comme suit :</p>
+
+<pre class="brush: js">var formElement = document.querySelector(&quot;form&quot;);
+var formData = new FormData(formElement);
+var request = new XMLHttpRequest();
+request.open(&quot;POST&quot;, &quot;submitform.php&quot;);
+formData.append(&quot;serialnumber&quot;, serialNumber++);
+request.send(formData);</pre>
+
+<p>Vous pouvez ainsi ajouter des données au formulaire avant de l’envoyer, pour y inclure des informations supplémentaires que les utilisateurs ne peuvent pas nécessairement modifier.</p>
+
+<h2 id="Envoi_de_fichiers_via_un_objet_FormData">Envoi de fichiers via un objet FormData</h2>
+
+<p>L’objet <code>FormData</code> vous permet également d’envoyer des fichiers. Il vous suffit d’inclure un élément HTML <a href="/fr/docs/Web/HTML/Element/input" title="L&apos;élément HTML &lt;input&gt; est utilisé pour créer un contrôle interactif dans un formulaire web qui permet à l&apos;utilisateur de saisir des données. Les saisies possibles et le comportement de l&apos;élément &lt;input&gt; dépend fortement de la valeur indiquée dans son attribut type."><code>&lt;input&gt;</code></a> de type <code>file</code> dans votre élément <a href="/fr/docs/Web/HTML/Element/form" title="L&apos;élément HTML &lt;form&gt; représente une section d&apos;un document qui contient des contrôles interactifs permettant à un utilisateur d&apos;envoyer des données à un serveur web."><code>&lt;form&gt;</code></a> :</p>
+
+<pre class="brush: html">&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot; name=&quot;fileinfo&quot;&gt;
+  &lt;label&gt;Votre adresse électronique :&lt;/label&gt;
+  &lt;input type=&quot;email&quot; autocomplete=&quot;on&quot; autofocus name=&quot;userid&quot; placeholder=&quot;email&quot; required size=&quot;32&quot; maxlength=&quot;64&quot; /&gt;&lt;br /&gt;
+  &lt;label&gt;Étiquette du fichier personnalisé :&lt;/label&gt;
+  &lt;input type=&quot;text&quot; name=&quot;filelabel&quot; size=&quot;12&quot; maxlength=&quot;32&quot; /&gt;&lt;br /&gt;
+  &lt;label&gt;Fichier à mettre de côté :&lt;/label&gt;
+  &lt;input type=&quot;file&quot; name=&quot;file&quot; required /&gt;
+  &lt;input type=&quot;submit&quot; value=&quot;Mettez le fichier de côté.&quot; /&gt;
+&lt;/form&gt;
+&lt;div&gt;&lt;/div&gt;
+</pre>
+
+<p>Vous pouvez ensuite l’envoyer à l’aide du code suivant :</p>
+
+<pre class="brush: js">var form = document.forms.namedItem(&quot;fileinfo&quot;);
+form.addEventListener(&apos;submit&apos;, function(ev) {
+
+  var oOutput = document.querySelector(&quot;div&quot;),
+      oData = new FormData(form);
+
+  oData.append(&quot;CustomField&quot;, &quot;Données supplémentaires&quot;);
+
+  var oReq = new XMLHttpRequest();
+  oReq.open(&quot;POST&quot;, &quot;stash.php&quot;, true);
+  oReq.onload = function(oEvent) {
+    if (oReq.status == 200) {
+      oOutput.innerHTML = &quot;Envoyé !&quot;;
+    } else {
+      oOutput.innerHTML = &quot;Erreur &quot; + oReq.status + &quot; lors de la tentative d’envoi du fichier.&lt;br \/&gt;&quot;;
+    }
+  };
+
+  oReq.send(oData);
+  ev.preventDefault();
+}, false);
+</pre>
+
+<div class="note notecard">
+<p><strong>Remarque </strong>: si vous passez une référence dans le formulaire, la méthode spécifiée dans ce dernier sera utilisée au lieu de celle définie dans l’appel de la méthode open().</p>
+</div>
+
+<p>Vous pouvez également ajouter un objet <a href="/fr/docs/Web/API/File" title="L&apos;objet File fournit un tableau contenant des informations sur l&apos;accès au contenu du ou des fichiers selectionnés, des informations sur le type mime, la taille, le nom des fichiers ainsi que le nombre de fichiers selectionnés. Ils sont généralement extraits d&apos;un objet FileList retourné comme résultat lors de la sélection des fichiers en utilisant un input de type file, ou à partir d&apos;un objet DataTransfer lors d&apos;un glisser-déposer."><code>File</code></a> ou <a href="/fr/docs/Web/API/Blob" title="Un objet Blob représente un objet, semblable à un fichier, qui est immuable et qui contient des données brutes. Les blobs (pour Binary Large Objects) représentent des données qui ne sont pas dans un format JavaScript natif. L&apos;interface File est basée sur l&apos;interface Blob et hérite des fonctionnalités de cette dernière tout en ajoutant des fonctionnalités pour gérer les fichiers sur le système de l&apos;utilisateur."><code>Blob</code></a> directement dans l’objet <a href="/fr/docs/Web/API/FormData" title="XMLHttpRequest Niveau 2 ajoute le support de la nouvelle interface FormData. Des objets formData fournissent un moyen facile de construire un ensemble de paires clé / valeur qui représentent les champs du formulaire et leurs valeurs, qui peuvent ensuite être facilement envoyés à l&apos;aide de la méthode send () de l&apos;objet XMLHttpRequest."><code>FormData</code></a> :</p>
+
+<pre class="brush: js">data.append(&quot;myfile&quot;, myBlob, &quot;filename.txt&quot;);
+</pre>
+
+<p>Avec la méthode <a href="/fr/docs/Web/API/FormData/append" title="La méthode append() de l&apos;interface FormData ajoute une nouvelle valeur à une clé existante dans un objet FormData, ou rajoute cette clé et cette valeur quand elle n&apos;existe pas."><code>append()</code></a>, vous pouvez utiliser le troisième paramètre facultatif pour passer un nom de fichier dans l’en-tête <code>Content-Disposition</code> envoyé au serveur. Si aucun nom de fichier n’est spécifié (ou si le paramètre n’est pas pris en charge), le nom « blob » est utilisé.</p>
+
+<p>Vous pouvez utiliser l’objet <code>FormData</code> avec jQuery si vous définissez les options appropriées :</p>
+
+<pre class="brush: js">var fd = new FormData(document.querySelector(&quot;form&quot;));
+fd.append(&quot;CustomField&quot;, &quot;Données supplémentaires&quot;);
+$.ajax({
+  url: &quot;stash.php&quot;,
+  type: &quot;POST&quot;,
+  data: fd,
+  processData: false,  // dire à jQuery de ne pas traiter les données
+  contentType: false   // dire à jQuery de ne pas définir le contentType
+});
+</pre>
+
+<h2 id="Envoi_de_formulaires_et_de_fichiers_via_AJAX_sans_objet_FormData">Envoi de formulaires et de fichiers via AJAX <em>sans</em> objet <code>FormData</code></h2>
+
+<p>Si vous voulez en savoir plus sur la sérialisation des données  et l’envoi d’un formulaire via <a href="/en-US/docs/AJAX" title="/en-US/docs/AJAX">AJAX</a> <em>sans</em> utiliser d’objets FormData, consultez <a href="/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Submitting_forms_and_uploading_files" title="/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest#Submitting_forms_and_uploading_files">ce paragraph</a>e.</p>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest">Utiliser XMLHttpRequest</a></li>
+ <li><a href="/fr/docs/Web/API/HTMLFormElement"><code>HTMLFormElement</code></a></li>
+ <li><a href="/fr/docs/Web/API/Blob"><code>Blob</code></a></li>
+ <li><a href="/en-US/docs/Web/JavaScript/Typed_arrays">Tableaux typés</a></li>
+</ul>

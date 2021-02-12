@@ -1,0 +1,1095 @@
+---
+title: Utiliser les transitions CSS
+slug: Web/CSS/CSS_Transitions/Using_CSS_transitions
+tags:
+  - Avancé
+  - CSS
+  - Guide
+  - Transitions
+translation_of: Web/CSS/CSS_Transitions/Using_CSS_transitions
+original_slug: Web/CSS/CSS_Transitions/Utiliser_transitions_CSS
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/fr/docs/Web/CSS">CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/Reference">Référence CSS</a></strong></li><li><strong><a href="/fr/docs/Web/CSS/CSS_Transitions">CSS Transitions</a></strong></li><li class="toggle"><details open><summary>Guides</summary><ol><li><a href="/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS">Utiliser les transitions CSS</a></li></ol></details></li><li class="toggle"><details open><summary>Propriétés</summary><ol><li><a href="/fr/docs/Web/CSS/timing-function"><code>&lt;timing-function&gt;</code></a></li><li><a href="/fr/docs/Web/CSS/transition"><code>transition</code></a></li><li><a href="/fr/docs/Web/CSS/transition-delay"><code>transition-delay</code></a></li><li><a href="/fr/docs/Web/CSS/transition-duration"><code>transition-duration</code></a></li><li><a href="/fr/docs/Web/CSS/transition-property"><code>transition-property</code></a></li><li><a href="/fr/docs/Web/CSS/transition-timing-function"><code>transition-timing-function</code></a></li></ol></details></li></ol></section></div>
+
+<p>Les <strong>transitions CSS</strong> permettent de contrôler la vitesse d&apos;animation lorsque les propriétés CSS sont modifiées. Plutôt que le changement soit immédiat, on peut l&apos;étaler sur une certaine période. Ainsi, si on souhaite passer un élément de blanc à noir, on pourra utiliser les transitions CSS afin que cette modification soit effectuée progressivement, selon une courbe d&apos;accélération donnée.</p>
+
+<p>Les animations qui utilisent des transitions entre deux états sont souvent appelées <em>transitions implicites</em> car l&apos;état initial et l&apos;état final sont définis implicitement par le navigateur.</p>
+
+<p><img alt="A CSS transition tells the browser to draw the intermediate states between the initial and final states, showing the user a smooth transitions." src="/files/4529/TransitionsPrinciple.png" style="display: block; height: 196px; margin: auto; width: 680px;"></p>
+
+<p>Les transitions CSS vous permettent de choisir :</p>
+
+<ul>
+ <li>les propriétés à animer en les listant explicitement</li>
+ <li>le début de l&apos;animation</li>
+ <li>la durée de l&apos;animation</li>
+ <li>la façon dont la transition s&apos;exécutera</li>
+</ul>
+
+<h2 id="Quelles_sont_les_propriétés_CSS_qui_peuvent_être_animées">Quelles sont les propriétés CSS qui peuvent être animées ?</h2>
+
+<p>On peut définir les propriétés qu&apos;on souhaite animer et la façon dont on souhaite les animer. Cela permet de créer des transitions complexes. Toutefois, toutes les propriétés ne peuvent pas être animées et <a href="/fr/docs/Web/CSS/Liste_propriétés_CSS_animées">la liste des propriétés concernées est limitée</a>.</p>
+
+<p class="note"><strong>Note :</strong> La gestion de la valeur <code>auto</code> représente un cas complexe. La spécification requiert de ne pas animer une telle valeur. Certains navigateurs dont ceux basés sur Gecko respectent cette règle mais d&apos;autres comme WebKit sont moins stricts. Attention donc lors de l&apos;utilisation des animations avec <code>auto</code>.</p>
+
+<p class="note"><strong>Note :</strong> Attention lorsqu&apos;on manipule des transitions directement après avoir ajouté un élément via <code>.appendChild()</code> ou en modiant <code>display: none;</code>. Cela sera compris comme si l&apos;état initial n&apos;avait jamais eu lieu et que l&apos;élément avait toujours été dans son état final. Pour contourner ce problème, on peut appliquer <code>window.setTimeout()</code> pendant quelques millisecondes avant de modifier la propriété CSS sur laquelle on souhaite appliquer une transition.</p>
+
+<h2 id="Les_propriétés_CSS_relatives_aux_transitions">Les propriétés CSS relatives aux transitions</h2>
+
+<p>Les transitions CSS sont généralement contrôlées grâce à la propriété raccourcie <a href="/fr/docs/Web/CSS/transition" title="La propriété transition est une propriété raccourcie pour les propriétés transition-property, transition-duration, transition-timing-function et transition-delay."><code>transition</code></a>. Les différents composants d&apos;une transition CSS peuvent être décrits dans le détail grâce aux propriétés détaillées suivantes :</p>
+
+<div class="note notecard">
+<p><strong>Note : </strong>Dans les exemples ci-après, l&apos;effet de répétition est uniquement utilisé à des fins de visualisation. Si vous souhaitez obtenir des effets visuels qui se répètent, il faudra utiliser la propriété <a href="/fr/docs/Web/CSS/animation" title="La propriété animation est une propriété raccourcie qui permet de d&apos;appliquer une animation entre des styles."><code>animation</code></a>.</p>
+</div>
+
+<dl>
+ <dt><a href="/fr/docs/Web/CSS/transition-property" title="La propriété transition-property désigne les noms des propriétés CSS sur lesquelles un effet de transition devrait être appliqué."><code>transition-property</code></a></dt>
+ <dd>Cette propriété définit le nom des propriétés CSS pour lesquelles on veut appliquer des transitions. Seules les propriétés listées ici seront sujettes aux transitions. Les modifications appliquées aux autres propriétés seront instantanées.</dd>
+ <dt><a href="/fr/docs/Web/CSS/transition-duration" title="La propriété transition-duration définit le nombre de secondes ou de millisecondes que doit durer une animation. La valeur par défaut, 0s, indique qu&apos;il n&apos;y aura aucune animation."><code>transition-duration</code></a></dt>
+ <dd>Cette propriété définit la durée de la transition. On peut définir une durée pour toutes les transitions ou une durée pour chacuune des propriétés.
+ <div>
+ <div id="duration_0_5s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-duration: 0.5s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush:css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+}
+.box1{
+    transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transformv color;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_duration_0_5s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/duration_0_5s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="duration_1s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-duration: 1s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top -webkit-transform color;
+    -webkit-transition-duration: 1s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform color;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
+}
+.box1{
+    transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top -webkit-transform transform color;
+    -webkit-transition-duration: 1s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_duration_1s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/duration_1s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="duration_2s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-duration: 2s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 2s;
+    transition-timing-function: ease-in-out;
+}
+.box1{
+    transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 2s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_duration_2s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/duration_2s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="duration_4s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-duration: 4s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 4s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 4s;
+    transition-timing-function: ease-in-out;
+}
+.box1{
+    transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top transform -webkit-transform color;
+    -webkit-transition-duration: 4s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top transform -webkit-transform color;
+    transition-duration: 4s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_duration_4s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/duration_4s?revision=1581702" width="275"></iframe></div>
+ </div>
+ </div>
+ </dd>
+ <dt><a href="/fr/docs/Web/CSS/transition-timing-function" title="La propriété transition-timing-function décrit la façon dont les valeurs intermédiaires des propriétés CSS affectées par un effet de transition sont calculées. Ceci permet donc de définir une courbe d&apos;accelération, de manière à ce que la vitesse de la transition varie au cours de sa durée."><code>transition-timing-function</code></a></dt>
+ <dd><img alt src="/files/3434/TF_with_output_gt_than_1.png" style="float: left; height: 173px; margin-right: 5px; width: 130px;">Cette propriété définit une fonction qui décrit la façon dont les valeurs intermédiaires sont calculées. On utilise pour cela des <a href="/fr/docs/Web/CSS/timing-function">fonctions de temporisation</a>.
+ <div class="cleared">
+ <div id="ttf_ease" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-timing-function: ease</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: ease;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: ease;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position:absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: ease;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: ease;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_ease" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/ttf_ease?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="ttf_linear" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-timing-function: linear</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: linear;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: linear;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_linear" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/ttf_linear?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="ttf_stepend" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-timing-function: step-end</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: step-end;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: step-end;
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: step-end;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: step-end;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_stepend" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/ttf_stepend?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="ttf_step4end" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-timing-function: steps(4, end)</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent { width: 250px; height:125px;}
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: steps(4, end);
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: steps(4, end);
+}
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-timing-function: steps(4, end);
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-timing-function: steps(4, end);
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_ttf_step4end" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/ttf_step4end?revision=1581702" width="275"></iframe></div>
+ </div>
+ </div>
+ </dd>
+ <dt><a href="/fr/docs/Web/CSS/transition-delay" title="La propriété transition-delay indique la durée à attendre avant de débuter la transition qui s&apos;applique pour un changement de propriété."><code>transition-delay</code></a></dt>
+ <dd>Cette propriété indique le temps à attendre entre le moment où la propriété est modifiée et le début de la transition.
+ <div>
+ <div id="delay_0_5s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-delay: 0.5s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent {
+    width: 250px;
+    height: 125px;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 0.5s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 0.5s;
+    transition-timing-function: linear;
+}
+
+.box1 {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top:25px;
+    position: absolute;
+     -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 0.5s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 0.5s;
+    transition-timing-function: linear;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_delay_0_5s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/delay_0_5s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="delay_1s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-delay: 1s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent {
+    width: 250px;
+    height: 125px;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+     -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 1s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 1s;
+    transition-timing-function: linear;
+}
+
+.box1{
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 1s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 1s;
+    transition-timing-function: linear;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_delay_1s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/delay_1s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="delay_2s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-delay: 2s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent {
+    width: 250px;
+    height: 125px;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 2s;
+    transition-timing-function: linear;
+}
+
+.box1 {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 2s;
+    -webkit-transition-timing-function: linear;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 2s;
+    transition-timing-function: linear;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_delay_2s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/delay_2s?revision=1581702" width="275"></iframe></div>
+ </div>
+
+ <div id="delay_4s" style="width: 251px; display: inline-block; margin-right: 1px; margin-bottom: 1px;">
+ <p><code>transition-delay: 4s</code></p>
+
+ <div style="display: none;">
+ <pre class="brush:html"> &lt;div class=&quot;parent&quot;&gt;
+  &lt;div class=&quot;box&quot;&gt;Lorem&lt;/div&gt;
+&lt;/div&gt;
+  </pre>
+
+ <pre class="brush: css">.parent {
+    width: 250px;
+    height: 125px;
+}
+
+.box {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+    font-size: 20px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 4s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 4s;
+    transition-timing-function: ease-in-out;
+}
+
+.box1 {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    color: yellow;
+    font-size: 18px;
+    left: 150px;
+    top: 25px;
+    position: absolute;
+    -webkit-transition-property: width height background-color font-size left top color;
+    -webkit-transition-duration: 2s;
+    -webkit-transition-delay: 4s;
+    -webkit-transition-timing-function: ease-in-out;
+    transition-property: width height background-color font-size left top color;
+    transition-duration: 2s;
+    transition-delay: 4s;
+    transition-timing-function: ease-in-out;
+}
+</pre>
+
+ <pre class="brush:js">function updateTransition() {
+  var el = document.querySelector(&quot;div.box&quot;);
+
+  if (el) {
+    el.className = &quot;box1&quot;;
+  } else {
+    el = document.querySelector(&quot;div.box1&quot;);
+    el.className = &quot;box&quot;;
+  }
+
+  return el;
+}
+
+var intervalID = window.setInterval(updateTransition, 7000);
+</pre>
+ </div>
+
+ <div><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="150" id="frame_delay_4s" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/delay_4s?revision=1581702" width="275"></iframe></div>
+ </div>
+ </div>
+ </dd>
+</dl>
+
+<p>La syntaxe de la propriété raccourcie <a href="/fr/docs/Web/CSS/transition" title="La propriété transition est une propriété raccourcie pour les propriétés transition-property, transition-duration, transition-timing-function et transition-delay."><code>transition</code></a> est :</p>
+
+<pre class="brush: css">div {
+  transition: &lt;property&gt; &lt;duration&gt; &lt;timing-function&gt; &lt;delay&gt;;
+}</pre>
+
+<h2 id="Exemples">Exemples</h2>
+
+<h3 id="Un_exemple_simple">Un exemple simple</h3>
+
+<p>Avec cette feuille de style, on opère une transition CSS sur la taille de police de quatre secondes après deux secondes écoulées lorsque l&apos;utilisateur passe la souris sur l&apos;élément :</p>
+
+<pre class="brush: css">#delay {
+  font-size: 14px;
+  transition-property: font-size;
+  transition-duration: 4s;
+  transition-delay: 2s;
+}
+
+#delay:hover {
+  font-size: 36px;
+}</pre>
+
+<h3 id="Appliquer_une_transition_sur_plusieurs_propriétés">Appliquer une transition sur plusieurs propriétés</h3>
+
+<h4 id="CSS">CSS</h4>
+
+<pre class="brush: css; highlight:[8,9]">.box {
+  border-style: solid;
+  border-width: 1px;
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-color: #0000FF;
+  transition: width 2s, height 2s, background-color 2s, transform 2s;
+}
+
+.box:hover {
+  background-color: #FFCCCC;
+  width: 200px;
+  height: 200px;
+  transform: rotate(180deg);
+}
+</pre>
+
+<h4 id="HTML">HTML</h4>
+
+<pre class="brush: html; highlight:[3]">&lt;p&gt;Cette boîte utilisera des transitions pour width, height, background-color, transform.
+   Survolez cette boîte pour voir l&apos;effet.&lt;/p&gt;
+&lt;div class=&quot;box&quot;&gt;&lt;/div&gt;
+</pre>
+
+<h4 id="Résultat">Résultat</h4>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Appliquer_une_transition_sur_plusieurs_propriétés" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/Appliquer_une_transition_sur_plusieurs_propri%C3%A9t%C3%A9s?revision=1581702" width="600"></iframe></p>
+
+<h3 id="Le_rôle_de_la_taille_des_listes_de_valeurs">Le rôle de la taille des listes de valeurs</h3>
+
+<p>Si la liste des valeurs pour une propriété est plus courte qu&apos;une autre, les valeurs de la liste la plus courte seront répétées pour que la longueur réelle corresponde. Ainsi :</p>
+
+<pre class="brush: css">div {
+  transition-property: opacity, left, top, height;
+  transition-duration: 3s, 5s;
+}
+</pre>
+
+<p>Sera équivalent à :</p>
+
+<pre class="brush: css">div {
+  transition-property: opacity, left, top, height;
+  transition-duration: 3s, 5s, 3s, 5s;
+}</pre>
+
+<p>De même, si la liste est trop longue par rapport à <a href="/fr/docs/Web/CSS/transition-property" title="La propriété transition-property désigne les noms des propriétés CSS sur lesquelles un effet de transition devrait être appliqué."><code>transition-property</code></a>, elle sera tronquée. Ainsi,</p>
+
+<pre class="brush: css">div {
+ transition-property: opacity, left;
+ transition-duration: 3s, 5s, 2s, 1s;
+}</pre>
+
+<p>Sera équivalent à :</p>
+
+<pre class="brush: css">div {
+  transition-property: opacity, left;
+  transition-duration: 3s, 5s;
+}</pre>
+
+<h3 id="Utiliser_les_transitions_pour_accentuer_les_éléments_pour_un_menu">Utiliser les transitions pour accentuer les éléments pour un menu</h3>
+
+<p>On utilise parfois CSS pour mettre en avant les éléments d&apos;un menu lorsque l&apos;utilisateur les survole avec sa souris. On peut facilement utiliser les transitions CSS pour améliorer l&apos;effet obtenu.</p>
+
+<p>Tout d&apos;abord, on définit le menu en HTML :</p>
+
+<pre class="brush: html">&lt;nav&gt;
+  &lt;a href=&quot;#&quot;&gt;Accueil&lt;/a&gt;
+  &lt;a href=&quot;#&quot;&gt;À propos&lt;/a&gt;
+  &lt;a href=&quot;#&quot;&gt;Contact&lt;/a&gt;
+  &lt;a href=&quot;#&quot;&gt;Liens&lt;/a&gt;
+&lt;/nav&gt;
+</pre>
+
+<p>On construit le CSS pour définir l&apos;apparence du menu :</p>
+
+<pre class="brush: css">a {
+  color: #fff;
+  background-color: #333;
+  transition: all 1s ease-out;
+}
+
+a:hover,
+a:focus {
+  color: #333;
+  background-color: #fff;
+}</pre>
+
+<pre class="brush: css hidden">html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  display: flex;
+  padding: 12px;
+  background-color: #333;
+}
+
+a {
+  width: 100px;
+  border: 1px solid #fff;
+  border-radius: 18px;
+  outline: 0;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  font: bold 12px Verdana;
+}
+
+a:not(:last-child) {
+  margin-right: 12px;
+}
+</pre>
+
+<p>Ainsi, lorsque la souris survole l&apos;élément, la couleur du texte et de l&apos;arrière-plan change.</p>
+
+<p><iframe class="live-sample-frame sample-code-frame" frameborder="0" height="300" id="frame_Utiliser_les_transitions_pour_accentuer_les_éléments_pour_un_menu" src="https://mdn.mozillademos.org/fr/docs/Web/CSS/CSS_Transitions/Utiliser_transitions_CSS$samples/Utiliser_les_transitions_pour_accentuer_les_%C3%A9l%C3%A9ments_pour_un_menu?revision=1581702" width="300"></iframe></p>
+
+<h2 id="Exemples_avec_JavaScript">Exemples avec JavaScript</h2>
+
+<h3 id="Utiliser_les_transitions_CSS_pour_lisser_les_transformations_avec_JavaScript">Utiliser les transitions CSS pour lisser les transformations avec JavaScript</h3>
+
+<p>Les transitions permettent de lisser les opérations effectuées avec JavaScript. Par exemple :</p>
+
+<pre class="brush: html">&lt;p&gt;Click anywhere to move the ball&lt;/p&gt;
+&lt;div id=&quot;foo&quot;&gt;&lt;/div&gt;
+</pre>
+
+<p>Avec JavaScript on peut ajouter un effet de mouvement sur la balle :</p>
+
+<pre class="brush: js">var f = document.getElementById(&apos;foo&apos;);
+document.addEventListener(&apos;click&apos;, function(ev){
+    f.style.transform = &apos;translateY(&apos;+(ev.clientY-25)+&apos;px)&apos;;
+    f.style.transform += &apos;translateX(&apos;+(ev.clientX-25)+&apos;px)&apos;;
+},false);
+</pre>
+
+<p>Avec CSS, il suffit d&apos;ajouter une transition à l&apos;élément et chaque modification sera appliquée de façon régulière :</p>
+
+<pre class="brush: css">p {
+  padding-left: 60px;
+}
+
+#foo {
+  border-radius: 50px;
+  width: 50px;
+  height: 50px;
+  background: #c00;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 1s;
+}
+</pre>
+
+<p><iframe frameborder="0" height src="https://jsfiddle.net/9h261pzo/291/embedded/" width="100%"></iframe></p>
+
+<h3 id="Détecter_le_début_et_la_fin_d&apos;une_transition">Détecter le début et la fin d&apos;une transition</h3>
+
+<p>L&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/transitionend" title="/fr/docs/Web/Reference/Events/transitionend">transitionend</a></code> est déclenché lorsqu&apos;une transition est terminée. C&apos;est un objet <a href="/fr/docs/Web/API/TransitionEvent" title="L&apos; TransitionEventinterface représente des événements fournissant des informations relatives aux transitions ."><code>TransitionEvent</code></a> qui possède deux propriétés supplémentaires qu&apos;un <a href="/fr/docs/Web/API/Event" title="L&apos;interface Event représente tout événement qui a lieu dans le DOM ; certains sont générés par l&apos;utilisateur (tels que des événements de souris ou de clavier), tandis que d&apos;autres sont générés par des API (par exemple, des événements indiquant qu&apos;une animation est terminée, qu&apos;une vidéo a été suspendue, etc.). Il existe plusieurs types d&apos;événements, dont certains utilisent d&apos;autres interfaces basées sur l&apos;interface principale Event. Event elle-même contient les propriétés et méthodes communes à tous les événements."><code>Event</code></a> :</p>
+
+<dl>
+ <dt><code>propertyName</code></dt>
+ <dd>Une chaîne de caractères qui indique le nom de la propriété CSS pour laquelle la transition est terminée.</dd>
+ <dt><code>elapsedTime</code></dt>
+ <dd>Un nombre flottant qui indique le nombre de secondes durant lesquelles la transition s&apos;est déroulée. Cette valeur n&apos;est pas modifiée par la valeur de <a href="/fr/docs/Web/CSS/transition-delay" title="La propriété transition-delay indique la durée à attendre avant de débuter la transition qui s&apos;applique pour un changement de propriété."><code>transition-delay</code></a>.</dd>
+</dl>
+
+<p>Comme pour les différents évènements, on pourra utiliser <a href="/fr/docs/Web/API/Eventtarget/addEventListener" title="La méthode addEventListener() d&apos;EventTarget met en place une fonction à appeler chaque fois que l&apos;événement spécifié est remis à la cible. Les cibles courantes sont un Element, le Document lui-même et une Window, mais elle peut être tout objet prenant en charge les évènements (comme XMLHttpRequest)."><code>eventtarget.addEventListener()</code></a>) pour « écouter » cet événement :</p>
+
+<pre class="brush: js">el.addEventListener(&quot;transitionend&quot;, updateTransition, true);
+</pre>
+
+<p>Pour détecter le début d&apos;une transition, on pourra utiliser l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/transitionrun" title="/fr/docs/Web/Reference/Events/transitionrun">transitionrun</a></code> qui est déclenché avant tout retardement et l&apos;évènement <code><a href="/fr/docs/Web/Reference/Events/transitionstart" title="/fr/docs/Web/Reference/Events/transitionstart">transitionstart</a></code> qui est déclenché après tout retardement :</p>
+
+<pre class="brush: js">el.addEventListener(&quot;transitionrun&quot;, signalStart, true);
+el.addEventListener(&quot;transitionstart&quot;, signalStart, true);</pre>
+
+<div class="note notecard"><strong>Note :</strong> L&apos;événement <code>transitionend</code> n&apos;est pas déclenché si la transition est interrompue avant la fin de la transition si <a href="/fr/docs/Web/CSS/display" title="La propriété display définit le type d&apos;affichage utilisée pour le rendu d&apos;un élément (de bloc ou en ligne) et la disposition utilisée pour ses éléments fils : grille ou boîtes flexibles."><code>display</code></a><code>: none</code> ou si la valeur de la propriété est modifiée.</div>
+
+<h2 id="Spécifications">Spécifications</h2>
+
+<table class="standard-table">
+ <thead>
+  <tr>
+   <th scope="col">Spécification</th>
+   <th scope="col">État</th>
+   <th scope="col">Commentaires</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td><a class="external" href="https://drafts.csswg.org/css-transitions/" hreflang="en" lang="en">CSS Transitions</a></td>
+   <td><span class="spec-WD">Version de travail</span></td>
+   <td>Définition initiale.</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="Voir_aussi">Voir aussi</h2>
+
+<ul>
+ <li>L&apos;interface <a href="/fr/docs/Web/API/TransitionEvent"><code>TransitionEvent</code></a> et l&apos;événement <code><a href="/fr/docs/Web/Reference/Events/transitionend">transitionend</a></code></li>
+ <li><a href="/fr/docs/Web/CSS/Animations_CSS/Utiliser_les_animations_CSS">Utiliser les animations CSS</a></li>
+</ul>
