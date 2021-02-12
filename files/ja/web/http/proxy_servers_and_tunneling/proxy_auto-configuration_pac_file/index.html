@@ -1,0 +1,828 @@
+---
+title: プロキシ自動設定ファイル
+slug: Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file
+tags:
+  - Necko
+  - Networking
+  - PAC
+  - Proxy
+translation_of: Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_(PAC)_file
+original_slug: Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_(PAC)_file
+---
+<div><section class="Quick_links" id="Quick_Links">
+  <ol>
+    <li><a href="/ja/docs/Web/HTTP"><strong><em>HTTP</em></strong></a></li>
+    <li><strong>Guides:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>Resources and URIs</summary>
+            <ol>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/Identifying_resources_on_the_Web">Identifying resources on the Web</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Data URIs</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/MIME_Types">Introduction to MIME Types</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types">Complete list of MIME Types</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/Choosing_between_www_and_non-www_URLs">Choosing between www and non-www URLs</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP guide</summary>
+            <ol>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP">Basics of HTTP</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Overview">Overview of HTTP</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP">Evolution of HTTP</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Messages">HTTP Messages</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Session">A typical HTTP session</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Connection_management_in_HTTP_1.x">Connection management in HTTP/1.x</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Protocol_upgrade_mechanism">Protocol upgrade mechanism</a></li>
+            </ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP security</summary>
+            <ol>
+                <li><a href="/ja/docs/Web/HTTP/CSP">Content Security Policy (CSP)</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Public_Key_Pinning">HTTP Public Key Pinning (HPKP)</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Headers/Strict-Transport-Security">HTTP Strict Transport Security (HSTS)</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies">Cookie security</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+                <li><a href="/ja/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+                <li><a href="https://wiki.mozilla.org/Security/Guidelines/Web_Security">Mozilla web security guidelines</a></li>
+                <li><a href="https://observatory.mozilla.org/">Mozilla Observatory</a></li>
+            </ol>
+        </details>
+    </li>
+
+    <li><a href="/ja/docs/Web/HTTP/CORS">HTTP access control (CORS)</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Authentication">HTTP authentication</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Caching">HTTP caching</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Compression">HTTP compression</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Conditional_requests">HTTP conditional requests</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Content_negotiation">HTTP content negotiation</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Cookies">HTTP cookies</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Range_requests">HTTP range requests</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Redirections">HTTP redirects</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Resources_and_specifications">HTTP specifications</a></li>
+    <li><a href="/ja/docs/Web/HTTP/Feature_Policy">Feature policy</a></li>
+    <li><strong>References:</strong></li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP headers</summary>
+            <ol><li><a href="/ja/docs/Web/HTTP/Headers/Accept"><code>Accept</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-CH"><code>Accept-CH</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-CH-Lifetime"><code>Accept-CH-Lifetime</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-Charset"><code>Accept-Charset</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-Encoding"><code>Accept-Encoding</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-Language"><code>Accept-Language</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-Patch"><code>Accept-Patch</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Accept-Ranges"><code>Accept-Ranges</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials"><code>Access-Control-Allow-Credentials</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Allow-Headers"><code>Access-Control-Allow-Headers</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Allow-Methods"><code>Access-Control-Allow-Methods</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"><code>Access-Control-Allow-Origin</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Expose-Headers"><code>Access-Control-Expose-Headers</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Max-Age"><code>Access-Control-Max-Age</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Request-Headers"><code>Access-Control-Request-Headers</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Access-Control-Request-Method"><code>Access-Control-Request-Method</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Age"><code>Age</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Allow"><code>Allow</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Alt-Svc"><code>Alt-Svc</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Authorization"><code>Authorization</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Cache-Control"><code>Cache-Control</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Clear-Site-Data"><code>Clear-Site-Data</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Connection"><code>Connection</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Disposition"><code>Content-Disposition</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Encoding"><code>Content-Encoding</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Language"><code>Content-Language</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Length"><code>Content-Length</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Location"><code>Content-Location</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Range"><code>Content-Range</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy"><code>Content-Security-Policy</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only"><code>Content-Security-Policy-Report-Only</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Type"><code>Content-Type</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Cookie2"><code>Cookie2</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy"><code>Cross-Origin-Embedder-Policy</code></a> <a href="/ja/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy"><code>Cross-Origin-Opener-Policy</code></a> <a href="/ja/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Cross-Origin-Resource-Policy"><code>Cross-Origin-Resource-Policy</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/DNT"><code>DNT</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/DPR"><code>DPR</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Date"><code>Date</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Device-Memory"><code>Device-Memory</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Digest"><code>Digest</code></a> <a href="/ja/docs/Web/HTTP/Headers/Digest$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/ETag"><code>ETag</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Early-Data"><code>Early-Data</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Expect"><code>Expect</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Expect-CT"><code>Expect-CT</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Expires"><code>Expires</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy"><code>Feature-Policy</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Forwarded"><code>Forwarded</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/From"><code>From</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Host"><code>Host</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/If-Match"><code>If-Match</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/If-Modified-Since"><code>If-Modified-Since</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/If-None-Match"><code>If-None-Match</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/If-Range"><code>If-Range</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/If-Unmodified-Since"><code>If-Unmodified-Since</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Index"><code>索引</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Keep-Alive"><code>Keep-Alive</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Large-Allocation"><code>Large-Allocation</code></a> <a href="/ja/docs/Web/HTTP/Headers/Large-Allocation$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Last-Modified"><code>Last-Modified</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Link"><code>Link</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Location"><code>Location</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/NEL"><code>NEL</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Origin"><code>Origin</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Pragma"><code>Pragma</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Proxy-Authenticate"><code>Proxy-Authenticate</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Proxy-Authorization"><code>Proxy-Authorization</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Public-Key-Pins"><code>Public-Key-Pins</code></a> <a href="/ja/docs/Web/HTTP/Headers/Public-Key-Pins$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは非推奨 API です。未だ動作しているかも知れませんが、将来的に削除される可能性があります。"><i class="icon-thumbs-down-alt"> </i></span></span><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only"><code>Public-Key-Pins-Report-Only</code></a> <a href="/ja/docs/Web/HTTP/Headers/Public-Key-Pins-Report-Only$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Range"><code>Range</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Referer"><code>Referer</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Referrer-Policy"><code>Referrer-Policy</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Retry-After"><code>Retry-After</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Save-Data"><code>Save-Data</code></a> <a href="/ja/docs/Web/HTTP/Headers/Save-Data$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Dest"><code>Sec-Fetch-Dest</code></a> <a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Dest$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Mode"><code>Sec-Fetch-Mode</code></a> <a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Mode$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Site"><code>Sec-Fetch-Site</code></a> <a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-Site$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-User"><code>Sec-Fetch-User</code></a> <a href="/ja/docs/Web/HTTP/Headers/Sec-Fetch-User$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Sec-WebSocket-Accept"><code>Sec-WebSocket-Accept</code></a> <a href="/ja/docs/Web/HTTP/Headers/Sec-WebSocket-Accept$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Server"><code>Server</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Server-Timing"><code>Server-Timing</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Set-Cookie2"><code>Set-Cookie2</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/SourceMap"><code>SourceMap</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Strict-Transport-Security"><code>Strict-Transport-Security</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/TE"><code>TE</code></a> <a href="/ja/docs/Web/HTTP/Headers/TE$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Timing-Allow-Origin"><code>Timing-Allow-Origin</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Tk"><code>Tk</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Trailer"><code>Trailer</code></a> <a href="/ja/docs/Web/HTTP/Headers/Trailer$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Transfer-Encoding"><code>Transfer-Encoding</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Upgrade-Insecure-Requests"><code>Upgrade-Insecure-Requests</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/User-Agent"><code>User-Agent</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Vary"><code>Vary</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Via"><code>Via</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/WWW-Authenticate"><code>WWW-Authenticate</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Want-Digest"><code>Want-Digest</code></a> <a href="/ja/docs/Web/HTTP/Headers/Want-Digest$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Warning"><code>Warning</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/X-Content-Type-Options"><code>X-Content-Type-Options</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control"><code>X-DNS-Prefetch-Control</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/X-Forwarded-For"><code>X-Forwarded-For</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/X-Forwarded-Host"><code>X-Forwarded-Host</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="この API は標準化されていません。"><i class="icon-warning-sign"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/X-Forwarded-Proto"><code>X-Forwarded-Proto</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/X-Frame-Options"><code>X-Frame-Options</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/X-XSS-Protection"><code>X-XSS-Protection</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+            <summary>HTTP request methods</summary>
+            <ol><li><a href="/ja/docs/Web/HTTP/Methods/CONNECT"><code>CONNECT</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/DELETE"><code>DELETE</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/GET"><code>GET</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/HEAD"><code>HEAD</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/OPTIONS"><code>OPTIONS</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/PATCH"><code>PATCH</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/POST"><code>POST</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/PUT"><code>PUT</code></a></li><li><a href="/ja/docs/Web/HTTP/Methods/TRACE"><code>TRACE</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>HTTP response status codes</summary>
+          <ol><li><a href="/ja/docs/Web/HTTP/Status/100"><code>100 Continue</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/101"><code>101 Switching Protocols</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/103"><code>103 Early Hints</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/200"><code>200 OK</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/201"><code>201 Created</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/202"><code>202 Accepted</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/203"><code>203 Non-Authoritative Information</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/204"><code>204 No Content</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/205"><code>205 Reset Content</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/206"><code>206 Partial Content</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/300"><code>300 Multiple Choices</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/301"><code>301 Moved Permanently</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/302"><code>302 Found</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/303"><code>303 See Other</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/304"><code>304 Not Modified</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/307"><code>307 Temporary Redirect</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/308"><code>308 Permanent Redirect</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/400"><code>400 Bad Request</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/401"><code>401 Unauthorized</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/402"><code>402 Payment Required</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/403"><code>403 Forbidden</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/404"><code>404 Not Found</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/405"><code>405 Method Not Allowed</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/406"><code>406 Not Acceptable</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/407"><code>407 Proxy Authentication Required</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/408"><code>408 Request Timeout</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/409"><code>409 Conflict</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/410"><code>410 Gone</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/411"><code>411 Length Required</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/412"><code>412 Precondition Failed</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/413"><code>413 Payload Too Large</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/414"><code>414 URI Too Long</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/415"><code>415 Unsupported Media Type</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/416"><code>416 Range Not Satisfiable</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/417"><code>417 Expectation Failed</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/418"><code>418 I&apos;m a teapot</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/422"><code>422 Unprocessable Entity</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/425"><code>425 Too Early</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/426"><code>426 Upgrade Required</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/428"><code>428 Precondition Required</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/429"><code>429 Too Many Requests</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/431"><code>431 Request Header Fields Too Large</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/451"><code>451 Unavailable For Legal Reasons</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/500"><code>500 Internal Server Error</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/501"><code>501 Not Implemented</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/502"><code>502 Bad Gateway</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/503"><code>503 Service Unavailable</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/504"><code>504 Gateway Timeout</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/505"><code>505 HTTP Version Not Supported</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/506"><code>506 Variant Also Negotiates</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/507"><code>507 Insufficient Storage</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/508"><code>508 Loop Detected</code></a></li><li><a href="/ja/docs/Web/HTTP/Status/510"><code>510 Not Extended</code></a> <a href="/ja/docs/Web/HTTP/Status/510$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Status/511"><code>511 Network Authentication Required</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CSP directives</summary>
+          <ol><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/base-uri"><code>CSP: base-uri</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/block-all-mixed-content"><code>CSP: block-all-mixed-content</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/child-src"><code>CSP: child-src</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/child-src$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src"><code>CSP: connect-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/default-src"><code>CSP: default-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/font-src"><code>CSP: font-src</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/font-src$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/form-action"><code>CSP: form-action</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/form-action$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors"><code>CSP: frame-ancestors</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src"><code>CSP: frame-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/img-src"><code>CSP: img-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src"><code>CSP: manifest-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/media-src"><code>CSP: media-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/navigate-to"><code>CSP: navigate-to</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/navigate-to$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/object-src"><code>CSP: object-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/plugin-types"><code>CSP: plugin-types</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/prefetch-src"><code>CSP: prefetch-src</code></a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/referrer"><code>CSP: referrer</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/report-to"><code>CSP: report-to</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri"><code>CSP: report-uri</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/require-sri-for"><code>CSP: require-sri-for</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox"><code>CSP: sandbox</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"><code>CSP: script-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-attr"><code>CSP: script-src-attr</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-attr$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/script-src-elem"><code>CSP: script-src-elem</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/style-src"><code>CSP: style-src</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-attr"><code>CSP: style-src-attr</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-attr$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-elem"><code>CSP: style-src-elem</code></a> <a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/style-src-elem$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/trusted-types"><code>CSP: trusted-types</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/upgrade-insecure-requests"><code>CSP: upgrade-insecure-requests</code></a></li><li><a href="/ja/docs/Web/HTTP/Headers/Content-Security-Policy/worker-src"><code>CSP: worker-src</code></a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>CORS errors</summary>
+          <ol><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSDisabled">Reason: CORS disabled</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSAllowOriginNotMatchingOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; does not match &apos;xyz&apos;</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin">Reason: CORS header &apos;Access-Control-Allow-Origin&apos; missing</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSOriginHeaderNotAdded">Reason: CORS header ‘Origin’ cannot be added</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSPreflightDidNotSucceed">Reason: CORS preflight channel did not succeed</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSDidNotSucceed">Reason: CORS request did not succeed</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSExternalRedirectNotAllowed">Reason: CORS request external redirect not allowed</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp">Reason: CORS request not HTTP</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials">Reason: Credential is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSMethodNotFound">Reason: Did not find method in CORS header ‘Access-Control-Allow-Methods’</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSMultipleAllowOriginNotAllowed">Reason: Multiple CORS header &apos;Access-Control-Allow-Origin&apos; not allowed</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSMIssingAllowCredentials">Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowHeader">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSInvalidAllowMethod">Reason: invalid token ‘xyz’ in CORS header ‘Access-Control-Allow-Methods’</a></li><li><a href="/ja/docs/Web/HTTP/CORS/Errors/CORSMissingAllowHeaderFromPreflight">Reason: missing token ‘xyz’ in CORS header ‘Access-Control-Allow-Headers’ from CORS preflight channel</a></li></ol>
+        </details>
+    </li>
+    <li class="toggle">
+        <details>
+          <summary>Feature-Policy directives</summary>
+          <ol><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/accelerometer">Feature-Policy: accelerometer</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/accelerometer$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/ambient-light-sensor">Feature-Policy: ambient-light-sensor</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/ambient-light-sensor$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/autoplay">Feature-Policy: autoplay</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/battery">Feature-Policy: battery</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/camera">Feature-Policy: camera</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/display-capture">Feature-Policy: display-capture</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/display-capture$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><span class="sidebar-icon"><span class="icon-only-inline" title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/document-domain">Feature-Policy: document-domain</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/document-domain$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/encrypted-media">Feature-Policy: encrypted-media</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/fullscreen">Feature-Policy:fullscreen</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/geolocation">Feature-Policy:geolocation</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/gyroscope">Feature-Policy: gyroscope</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/gyroscope$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/layout-animations">Feature-Policy: layout-animations</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/layout-animations$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/legacy-image-formats">Feature-Policy: legacy-image-formats</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/legacy-image-formats$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/magnetometer">Feature-Policy: magnetometer</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/magnetometer$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/microphone">Feature-Policy:microphone</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/midi">Feature-Policy: midi</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/oversized-images">Feature-Policy: oversized-images</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/oversized-images$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/payment">Feature-Policy: payment</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/picture-in-picture">Feature-Policy: picture-in-picture</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/picture-in-picture$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/publickey-credentials-get">Feature-Policy: publickey-credentials-get</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/publickey-credentials-get$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/screen-wake-lock">Feature-Policy: screen-wake-lock</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/screen-wake-lock$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/sync-xhr">Feature-Policy: sync-xhr</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/sync-xhr$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/unoptimized-images">Feature-Policy: unoptimized-images</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/unoptimized-images$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/unsized-media">Feature-Policy: unsized-media</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/unsized-media$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/usb">Feature-Policy: usb</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/usb$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/vibrate">Feature-Policy: vibrate</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/vibrate$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/vr">Feature-Policy: vr</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/wake-lock">Feature-Policy: wake-lock</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/wake-lock$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/xr">Feature-Policy: xr</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/xr-spatial-tracking">Feature-Policy: xr-spatial-tracking</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/xr-spatial-tracking$translate" style="opacity: 0.5;">[翻訳する]</a></li><li><a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/web-share">web-share</a> <a href="/ja/docs/Web/HTTP/Headers/Feature-Policy/web-share$translate" style="opacity: 0.5;">[翻訳する]</a></li></ol>
+        </details>
+    </li>
+  </ol>
+</section></div>
+
+<div><strong>プロキシ自動設定 (Proxy Auto-Configuration, PAC) ファイル</strong>は、ウェブブラウザーのリクエスト (HTTP, HTTPS, FTP 等) を直接宛先に送るか、ウェブプロキシサーバーに転送するか決める JavaScript の関数です。次の JavaScript 関数を PAC ファイル内に記述します。</div>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  // ...
+}</pre>
+
+<h2 id="Syntax" name="Syntax">構文</h2>
+
+<pre class="syntaxbox notranslate">function FindProxyForURL(<var>url</var>, <var>host</var>)</pre>
+
+<h3 id="Parameters" name="Parameters">引数</h3>
+
+<dl>
+ <dt><code><var>url</var></code></dt>
+ <dd>アクセスする URL です。 <code>https://</code> の URL ではパスとクエリの部分が削除されます。 Chrome (バージョン52～73) ではポリシーで <code>PacHttpsUrlStrippingEnabled</code> を <code>false</code> に設定するか、コマンドラインで <code>--unsafe-pac-url</code> フラグを指定することで無効にすることができます (Chrome 74では、フラグのみが動作します。75以降では、パスの削除を無効にする方法はありません。 Chrome 81 では、パスの削除は HTTP の URL では適用されませんが、 HTTPS に合わせて変更される予定です。)。 Firefox では、設定値は <code>network.proxy.autoconfig_url.include_path</code> です。</dd>
+ <dt><code><var>host</var></code></dt>
+ <dd>URL から抽出したホスト名です。これは利便性のみのためのものです。 <code>://</code> とそのあとに最初に現れる <code>:</code> または <code>/</code> と同じ文字列です。この引数にはポート番号は含まれません。必要ならば URL から取り出してください。</dd>
+</dl>
+
+<h2 id="Description" name="Description">解説</h2>
+
+<p>構成を表す文字列を返します。この文字列の書式は後述の<strong>返値の形式</strong>で定義されています。</p>
+
+<h3 id="Return_value_format" name="Return_value_format">返値の形式</h3>
+
+<ul>
+ <li>この JavaScript の関数は1つの文字列を返す</li>
+ <li>文字列が null である場合、プロキシは使用されない</li>
+ <li>文字列にはセミコロン区切りで、以下の構成ブロックを任意の数だけ含むことができる</li>
+</ul>
+
+<dl>
+ <dt><code>DIRECT</code></dt>
+ <dd>接続はプロキシを使用せずに、直接行われる</dd>
+ <dt><code>PROXY <em>host:port</em></code></dt>
+ <dd>指定されたプロキシを使用する</dd>
+ <dt><code>SOCKS <em>host:port</em></code></dt>
+ <dd>指定された SOCKS サーバーを使用する</dd>
+</dl>
+
+<p>最近の Firefox のバージョンでは次の書き方にも対応しています。</p>
+
+<dl>
+ <dt><code>HTTP <em>host:port</em></code></dt>
+ <dd>指定されたプロキシを使用する</dd>
+ <dt><code>HTTPS <em>host:port</em></code></dt>
+ <dd>指定された HTTPS プロキシを使用する</dd>
+ <dt><code>SOCKS4 <em>host:port</em></code></dt>
+ <dt><code>SOCKS5 <em>host:port</em></code></dt>
+ <dd>指定された SOCKS サーバーを (指定された SOCK バージョンで) 使用する</dd>
+</dl>
+
+<p>セミコロン区切りで複数の設定があった場合、 最も左の設定が、 Firefox がプロキシへの接続の確立に失敗しない限り使用されます。この場合は、その次の設定が使用されます。</p>
+
+<p>ブラウザーは応答がなかったプロキシに対して、30分後に再接続を試みます。その次は１時間後に試行し、試行のたびに間隔を30分追加します。</p>
+
+<p>すべてのプロキシが使用できず、 DIRECT オプションが設定されていない場合、ブラウザーは一時的にプロキシを無視して直接接続するか尋ねます。20分後ブラウザーはプロキシが使えるか再確認するかを尋ね、その40分後に再度尋ねます。この動作は間隔を20分ずつ長くして続きます。</p>
+
+<h4 id="Examples" name="Examples">例</h4>
+
+<dl>
+ <dt><code>PROXY w3proxy.netscape.com:8080; PROXY mozilla.netscape.com:8081</code></dt>
+ <dd>1番目のプロキシは w3proxy:8080 です。1番目のプロキシが使用できない場合は再度使用できるようになるまで mozilla:8081 を使用します。</dd>
+ <dt><code>PROXY w3proxy.netscape.com:8080; PROXY mozilla.netscape.com:8081; DIRECT</code></dt>
+ <dd>上と同じですが、両方使用できない場合に自動的に直接接続します。 (上記の最初の例では、 Netscape はユーザーに直接接続するか確認しますが、この例では確認されません。)</dd>
+ <dt><code>PROXY w3proxy.netscape.com:8080; SOCKS socks:1080</code></dt>
+ <dd>1番目のプロキシが使用できない場合 SOCKS サーバを使います。</dd>
+</dl>
+
+<p id="Saving_the_Auto-Config_File_Setting_the_MIME_Type">自動設定ファイルは .pac の拡張子で保存しなければなりません。</p>
+
+<pre class="syntaxbox notranslate">proxy.pac</pre>
+
+<p>MIME タイプは以下のように設定してください。</p>
+
+<pre class="syntaxbox notranslate">application/x-ns-proxy-autoconfig</pre>
+
+<p>次に、 .pac 拡張子をこの MIME タイプに結び付けるようサーバーを設定してください。</p>
+
+<div class="note notecard">
+<p><strong>注: </strong></p>
+
+<ul>
+ <li>JavaScript 関数は常に単体のファイルで保存し、 HTML ファイルやその他のファイルに埋め込まないでください。</li>
+ <li>この文書の最後にある例は完全なものです。ファイルを保存して使用するのに追加する必要がある構文はありません。 (もちろん、 JavaScript を編集して自分のサイトのドメイン名やサブネットマスクに合わせる必要があります。)</li>
+</ul>
+</div>
+
+<h2 id="Predefined_functions_and_environment" name="Predefined_functions_and_environment">定義済みの関数と環境</h2>
+
+<p>PAC ファイルを作成するために、以下の関数を使用できます。</p>
+
+<ul>
+ <li>ホスト名に基づく条件
+  <ul>
+   <li><code><a href="#isPlainHostName">isPlainHostName()</a></code></li>
+   <li><code><a href="#dnsDomainIs">dnsDomainIs()</a></code></li>
+   <li><code><a href="#localHostOrDomainIs">localHostOrDomainIs()</a></code></li>
+   <li><code><a href="#isResolvable">isResolvable()</a></code></li>
+   <li><code><a href="#isInNet">isInNet()</a></code></li>
+  </ul>
+ </li>
+ <li>関連するユーティリティー関数
+  <ul>
+   <li><code><a href="#dnsResolve">dnsResolve()</a></code></li>
+   <li><code><a href="#convert_addr">convert_addr()</a></code></li>
+   <li><code><a href="#myIpAddress">myIpAddress()</a></code></li>
+   <li><code><a href="#dnsDomainLevels">dnsDomainLevels()</a></code></li>
+  </ul>
+ </li>
+ <li>URL/ホスト名に基づく条件
+  <ul>
+   <li><code><a href="#shExpMatch(str, shexp)">shExpMatch()</a></code></li>
+  </ul>
+ </li>
+ <li>時刻に基づく条件
+  <ul>
+   <li><code><a href="#weekdayRange">weekdayRange()</a></code></li>
+   <li><code><a href="#dateRange">dateRange()</a></code></li>
+   <li><code><a href="#timeRange">timeRange()</a></code></li>
+  </ul>
+ </li>
+ <li>ログ用ユーティリティ
+  <ul>
+   <li><a href="/ja/docs/Web/API/Window/alert"><code>alert()</code></a></li>
+  </ul>
+ </li>
+ <li>以前は JavaScript コードが自分自身で定義することができなかったため、定義済みの連想配列 (オブジェクト) が一つ用意されていました。
+  <ul>
+   <li><code>ProxyConfig.bindings</code> <span class="icon-only-inline" title="これは廃止されたAPIであり、今後の動作は保障されていません。ご注意下さい。"><i class="icon-trash"> </i></span></li>
+  </ul>
+ </li>
+</ul>
+
+<div class="note notecard">
+<p><strong>注:</strong> 以下の例をテストするために、 pactester (<a href="https://github.com/pacparser/pacparser">pacparser</a>パッケージの一部) を使用しました。</p>
+
+<ul>
+ <li>PAC ファイルは <code>proxy.pac</code> という名前です</li>
+ <li>コマンドライン: <code>pactester -p ~/pacparser-master/tests/proxy.pac -u http://www.mozilla.org</code> (引数 <code>host</code> に <code>www.mozilla.org</code> を、引数 <code>url</code> に <code>http://www.mozilla.org</code> を渡します)</li>
+</ul>
+</div>
+
+<h3 id="isPlainHostName">isPlainHostName()</h3>
+
+<h4 id="Syntax_2" name="Syntax_2">構文</h4>
+
+<pre class="syntaxbox notranslate">isPlainHostName(<var>host</var>)</pre>
+
+<h4 id="Parameters_2" name="Parameters_2">引数</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>URLから取り出したホスト名 (ポート番号を除いたもの)</dd>
+</dl>
+
+<h4 id="解説">解説</h4>
+
+<p>ホスト名にドメイン名が含まれていない (=ドットを含まない) 場合は true になります。</p>
+
+<h4 id="Examples_2" name="Examples_2">例</h4>
+
+<pre class="brush: js notranslate">isPlainHostName(&quot;www.mozilla.org&quot;) // false
+isPlainHostName(&quot;www&quot;) // true
+</pre>
+
+<h3 id="dnsDomainIshost_domain" name="dnsDomainIs(host, domain)">dnsDomainIs()</h3>
+
+<h4 id="Syntax_3" name="Syntax_3">構文</h4>
+
+<pre class="syntaxbox notranslate">dnsDomainIs(<var>host</var>, <var>domain</var>)</pre>
+
+<h4 id="Parameters_3" name="Parameters_3">引数</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>URL から取り出したホスト名</dd>
+ <dt>domain</dt>
+ <dd>ホストが所属しているか確認したいドメイン名</dd>
+</dl>
+
+<h4 id="Description_3" name="Description_3">解説</h4>
+
+<p>ホスト名のドメインが一致する場合にのみ true を返します。</p>
+
+<h4 id="Examples_3" name="Examples_3">例</h4>
+
+<pre class="brush: js notranslate">dnsDomainIs(&quot;www.mozilla.org&quot;, &quot;.mozilla.org&quot;) // true
+dnsDomainIs(&quot;www&quot;, &quot;.mozilla.org&quot;) // false
+</pre>
+
+<h3 id="localHostOrDomainIs">localHostOrDomainIs()</h3>
+
+<h4 id="Syntax_4" name="Syntax_4">構文</h4>
+
+<pre class="syntaxbox notranslate">localHostOrDomainIs(<var>host</var>, <var>hostdom</var>)</pre>
+
+<h4 id="Parameters_4" name="Parameters_4">引数</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>URLから取り出したホスト名です。</dd>
+ <dt>hostdom</dt>
+ <dd>比較対象の完全修飾ホスト名です。</dd>
+</dl>
+
+<h4 id="Description_4" name="Description_4">解説</h4>
+
+<p>ホスト名が<em>完全に</em>指定されたホスト名と一致した場合、またはホスト名にドメイン名の部分がなく、修飾されていないホスト名が一致する場合に true を返します。</p>
+
+<h4 id="Examples_4" name="Examples_4">例</h4>
+
+<pre class="brush: js notranslate">localHostOrDomainIs(&quot;www.mozilla.org&quot; , &quot;www.mozilla.org&quot;) // true (exact match)
+localHostOrDomainIs(&quot;www&quot;             , &quot;www.mozilla.org&quot;) // true (hostname match, domain not specified)
+localHostOrDomainIs(&quot;www.google.com&quot;  , &quot;www.mozilla.org&quot;) // false (domain name mismatch)
+localHostOrDomainIs(&quot;home.mozilla.org&quot;, &quot;www.mozilla.org&quot;) // false (hostname mismatch)</pre>
+
+<h3 id="isResolvable">isResolvable()</h3>
+
+<h4 id="Syntax_5" name="Syntax_5">構文</h4>
+
+<pre class="syntaxbox notranslate">isResolvable(<var>host</var>)</pre>
+
+<h4 id="Parameters_5" name="Parameters_5">引数</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>URLから取り出したホスト名です。</dd>
+</dl>
+
+<p>ホスト名の解決を試みます。成功すれば true を返します。</p>
+
+<h4 id="Examples_5" name="Examples_5">例:</h4>
+
+<pre class="brush: js notranslate">isResolvable(&quot;www.mozilla.org&quot;) // true
+</pre>
+
+<h3 id="isInNet">isInNet()</h3>
+
+<h4 id="Syntax_6" name="Syntax_6">構文</h4>
+
+<pre class="syntaxbox notranslate">isInNet(<var>host</var>, <var>pattern</var>, <var>mask</var>)</pre>
+
+<h4 id="Parameters_6">Parameters</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>a DNS hostname, or IP address. If a hostname is passed, it will be resolved into an IP address by this function.</dd>
+ <dt>pattern</dt>
+ <dd>an IP address pattern in the dot-separated format.</dd>
+ <dt>mask</dt>
+ <dd>mask for the IP address pattern informing which parts of the IP address should be matched against. 0 means ignore, 255 means match.</dd>
+</dl>
+
+<p>True if and only if the IP address of the host matches the specified IP address pattern.</p>
+
+<p>Pattern and mask specification is done the same way as for SOCKS configuration.</p>
+
+<h4 id="Examples_6">Examples:</h4>
+
+<pre class="brush: js notranslate">function alert_eval(str) { alert(str + &apos; is &apos; + eval(str)) }
+function FindProxyForURL(url, host) {
+  alert_eval(&apos;isInNet(host, &quot;63.245.213.24&quot;, &quot;255.255.255.255&quot;)&apos;)
+  // &quot;PAC-alert: isInNet(host, &quot;63.245.213.24&quot;, &quot;255.255.255.255&quot;) is true&quot;
+}
+</pre>
+
+<h3 id="dnsResolve">dnsResolve()</h3>
+
+<pre class="syntaxbox notranslate">dnsResolve(<em>host</em>)</pre>
+
+<h4 id="Parameters_7">Parameters</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>hostname to resolve.</dd>
+</dl>
+
+<p>Resolves the given DNS hostname into an IP address, and returns it in the dot-separated format as a string.</p>
+
+<h4 id="Example">Example</h4>
+
+<pre class="brush: js notranslate">dnsResolve(&quot;www.mozilla.org&quot;); // returns the string &quot;104.16.41.2&quot;</pre>
+
+<h3 id="convert_addr">convert_addr()</h3>
+
+<h4 id="Syntax_7">Syntax</h4>
+
+<pre class="syntaxbox notranslate">convert_addr(ipaddr)</pre>
+
+<h4 id="Parameters_8">Parameters</h4>
+
+<dl>
+ <dt>ipaddr</dt>
+ <dd>Any dotted address such as an IP address or mask.</dd>
+</dl>
+
+<p>Concatenates the four dot-separated bytes into one 4-byte word and converts it to decimal.</p>
+
+<h4 id="Example_2">Example</h4>
+
+<pre class="brush: js notranslate">convert_addr(&quot;104.16.41.2&quot;); // returns the decimal number 1745889538</pre>
+
+<h3 id="myIpAddress">myIpAddress()</h3>
+
+<h4 id="Syntax_8">Syntax</h4>
+
+<pre class="syntaxbox notranslate">myIpAddress()</pre>
+
+<h4 id="Parameters_9">Parameters</h4>
+
+<p><strong>(none)</strong></p>
+
+<p>Returns the server IP address of the machine Firefox is running on, as a string in the dot-separated integer format.</p>
+
+<div class="warning notecard">
+<p>myIpAddress() returns the same IP address as the server address returned by <strong><code>nslookup localhost</code> </strong>on a Linux machine. It does not return the public IP address.</p>
+</div>
+
+<h4 id="Example_3">Example</h4>
+
+<pre class="brush: js notranslate">myIpAddress() //returns the string &quot;127.0.1.1&quot; if you were running Firefox on that localhost</pre>
+
+<h3 id="dnsDomainLevels">dnsDomainLevels()</h3>
+
+<h4 id="Syntax_9">Syntax</h4>
+
+<pre class="syntaxbox notranslate">dnsDomainLevels(<var>host</var>)</pre>
+
+<h4 id="Parameters_10">Parameters</h4>
+
+<dl>
+ <dt>host</dt>
+ <dd>is the hostname from the URL.</dd>
+</dl>
+
+<p>Returns the number (integer) of DNS domain levels (number of dots) in the hostname.</p>
+
+<h4 id="Examples_7">Examples:</h4>
+
+<pre class="brush: js notranslate">dnsDomainLevels(&quot;www&quot;);             // 0
+dnsDomainLevels(&quot;mozilla.org&quot;);     // 1
+dnsDomainLevels(&quot;www.mozilla.org&quot;); // 2
+</pre>
+
+<h3 id="shExpMatch">shExpMatch()</h3>
+
+<h4 id="Syntax_10">Syntax</h4>
+
+<pre class="syntaxbox notranslate">shExpMatch(<var>str</var>, <var>shexp</var>)</pre>
+
+<h4 id="Parameters_11">Parameters</h4>
+
+<dl>
+ <dt>str</dt>
+ <dd>is any string to compare (e.g. the URL, or the hostname).</dd>
+ <dt>shexp</dt>
+ <dd>is a shell expression to compare against.</dd>
+</dl>
+
+<p>Returns true if the string matches the specified shell expression.</p>
+
+<p><strong>Note that the patterns are <em>shell</em> glob <em>expressions</em>, not regular expressions. </strong><code>*</code> and <code>?</code> are always supported, while <code>[characters]</code> and <code>[^characters]</code> are supported by some implmentations including Firefox. This is mainly because the expression is translated to a RegExp via subsitution of <code>[.*?]</code>. For a reliable way to use these RegExp syntaxes, just use RegExp instead.</p>
+
+<h4 id="Examples_8">Examples</h4>
+
+<pre class="brush: js notranslate">shExpMatch(&quot;http://home.netscape.com/people/ari/index.html&quot;     , &quot;*/ari/*&quot;); // returns true
+shExpMatch(&quot;http://home.netscape.com/people/montulli/index.html&quot;, &quot;*/ari/*&quot;); // returns false</pre>
+
+<h3 id="weekdayRange">weekdayRange()</h3>
+
+<h4 id="Syntax_11">Syntax</h4>
+
+<pre class="syntaxbox notranslate">weekdayRange(<var>wd1</var>, <var>wd2</var>, [<var>gmt</var>])</pre>
+
+<div class="note notecard">
+<p><strong>Note:</strong> (Before Firefox 49) wd1 must be less than wd2 if you want the function to evaluate these parameters as a range. See the warning below.</p>
+</div>
+
+<h4 id="Parameters_12">Parameters</h4>
+
+<dl>
+ <dt>wd1 and wd2</dt>
+ <dd>One of the ordered weekday strings:</dd>
+ <dt>
+ <pre class="syntaxbox notranslate">&quot;SUN&quot;|&quot;MON&quot;|&quot;TUE&quot;|&quot;WED&quot;|&quot;THU&quot;|&quot;FRI&quot;|&quot;SAT&quot;</pre>
+ </dt>
+ <dt>gmt</dt>
+ <dd>Is either the string &quot;GMT&quot; or is left out.</dd>
+</dl>
+
+<p>Only the first parameter is mandatory. Either the second, the third, or both may be left out.</p>
+
+<p>If only one parameter is present, the function returns a value of true on the weekday that the parameter represents. If the string &quot;GMT&quot; is specified as a second parameter, times are taken to be in GMT. Otherwise, they are assumed to be in the local timezone.</p>
+
+<p>If both <strong>wd1 </strong>and <strong>wd1 </strong>are defined, the condition is true if the current weekday is in between those two <em>ordered </em>weekdays. Bounds are inclusive, <em>but the bounds are ordered</em>. If the &quot;GMT&quot; parameter is specified, times are taken to be in GMT. Otherwise, the local timezone is used.</p>
+
+<div class="warning notecard">
+<p><strong>The order of the days matters</strong>; Before Firefox 49, <code>weekdayRange(&quot;<em>SUN&quot;, &quot;SAT&quot;</em>)</code> will always evaluate to true. Now <code>weekdayRange(&quot;<em>WED&quot;, &quot;SUN&quot;</em>)</code> will only evaluate true if the current day is Wednesday or Sunday.</p>
+</div>
+
+<h4 id="Examples_9">Examples</h4>
+
+<pre class="brush: js notranslate">weekdayRange(&quot;MON&quot;, &quot;FRI&quot;);        // returns true Monday through Friday (local timezone)
+weekdayRange(&quot;MON&quot;, &quot;FRI&quot;, &quot;GMT&quot;); // returns true Monday through Friday (GMT timezone)
+weekdayRange(&quot;SAT&quot;);               // returns true on Saturdays local time
+weekdayRange(&quot;SAT&quot;, &quot;GMT&quot;);        // returns true on Saturdays GMT time
+weekdayRange(&quot;FRI&quot;, &quot;MON&quot;);        // returns true Friday and Monday only (note, order does matter!)</pre>
+
+<h3 id="dateRange">dateRange()</h3>
+
+<h4 id="Syntax_12">Syntax</h4>
+
+<pre class="syntaxbox notranslate">dateRange(&lt;day&gt; | &lt;month&gt; | &lt;year&gt;, [gmt])  // ambiguity is resolved by assuming year is greater than 31
+dateRange(&lt;day1&gt;, &lt;day2&gt;, [gmt])
+dateRange(&lt;month1&gt;, &lt;month2&gt;, [gmt])
+dateRange(&lt;year1&gt;, &lt;year2&gt;, [gmt])
+dateRange(&lt;day1&gt;, &lt;month1&gt;, &lt;day2&gt;, &lt;month2&gt;, [gmt])
+dateRange(&lt;month1&gt;, &lt;year1&gt;, &lt;month2&gt;, &lt;year2&gt;, [gmt])
+dateRange(&lt;day1&gt;, &lt;month1&gt;, &lt;year1&gt;, &lt;day2&gt;, &lt;month2&gt;, &lt;year2&gt;, [gmt])</pre>
+
+<div class="note notecard">
+<p><strong>Note:</strong> (Before Firefox 49) day1 must be less than day2, month1 must be less than month2, and year1 must be less than year2 if you want the function to evaluate these parameters as a range. See the warning below.</p>
+</div>
+
+<h4 id="Parameters_13">Parameters</h4>
+
+<dl>
+ <dt>day</dt>
+ <dd>Is the ordered day of the month between 1 and 31 (as an integer).</dd>
+</dl>
+
+<pre class="syntaxbox notranslate">1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31</pre>
+
+<dl>
+ <dt>month</dt>
+ <dd>Is one of the ordered month strings below.</dd>
+</dl>
+
+<pre class="syntaxbox notranslate">&quot;JAN&quot;|&quot;FEB&quot;|&quot;MAR&quot;|&quot;APR&quot;|&quot;MAY&quot;|&quot;JUN&quot;|&quot;JUL&quot;|&quot;AUG&quot;|&quot;SEP&quot;|&quot;OCT&quot;|&quot;NOV&quot;|&quot;DEC&quot;</pre>
+
+<dl>
+ <dt>year</dt>
+ <dd>Is the ordered full year integer number. For example, 2016 (<strong>not</strong> 16).</dd>
+ <dt>gmt</dt>
+ <dd>Is either the string &quot;GMT&quot;, which makes time comparison occur in GMT timezone, or is left out. If left unspecified, times are taken to be in the local timezone.</dd>
+</dl>
+
+<p>If only a single value is specified (from each category: day, month, year), the function returns a true value only on days that match that specification. If both values are specified, the result is true between those times, including bounds, <em>but the bounds are ordered</em>.</p>
+
+<div class="warning notecard">
+<p><strong>The order of the days, months, and years matter</strong>; Before Firefox 49, <code>dateRange(&quot;<em>JAN&quot;, &quot;DEC&quot;</em>)</code> will always evaluate to <code>true</code>. Now <code>dateRange(&quot;<em>DEC&quot;, &quot;JAN&quot;</em>)</code> will only evaluate true if the current month is December or January.</p>
+</div>
+
+<h4 id="Examples_10">Examples</h4>
+
+<pre class="brush: js notranslate">dateRange(1);            // returns true on the first day of each month, local timezone
+dateRange(1, &quot;GMT&quot;)      // returns true on the first day of each month, GMT timezone
+dateRange(1, 15);        // returns true on the first half of each month
+dateRange(24, &quot;DEC&quot;);    // returns true on 24th of December each year
+dateRange(&quot;JAN&quot;, &quot;MAR&quot;); // returns true on the first quarter of the year
+
+dateRange(1, &quot;JUN&quot;, 15, &quot;AUG&quot;);
+// returns true from June 1st until August 15th, each year
+// (including June 1st and August 15th)
+
+dateRange(1, &quot;JUN&quot;, 1995, 15, &quot;AUG&quot;, 1995);
+// returns true from June 1st, 1995, until August 15th, same year
+
+dateRange(&quot;OCT&quot;, 1995, &quot;MAR&quot;, 1996);
+// returns true from October 1995 until March 1996
+// (including the entire month of October 1995 and March 1996)
+
+dateRange(1995);
+// returns true during the entire year of 1995
+
+dateRange(1995, 1997);
+// returns true from beginning of year 1995 until the end of year 1997</pre>
+
+<h3 id="timeRange">timeRange()</h3>
+
+<h4 id="Syntax_13">Syntax</h4>
+
+<pre class="syntaxbox notranslate">// The full range of expansions is analogous to dateRange.
+timeRange(&lt;hour1&gt;, &lt;min1&gt;, &lt;sec1&gt;, &lt;hour2&gt;, &lt;min2&gt;, &lt;sec2&gt;, [gmt])</pre>
+
+<div class="note notecard">
+<p><strong>Note:</strong> (Before Firefox 49) the category hour1, min1, sec1 must be less than the category hour2, min2, sec2 if you want the function to evaluate these parameters as a range. See the warning below.</p>
+</div>
+
+<h4 id="Parameters_14">Parameters</h4>
+
+<dl>
+ <dt>hour</dt>
+ <dd>Is the hour from 0 to 23. (0 is midnight, 23 is 11 pm.)</dd>
+ <dt>min</dt>
+ <dd>Minutes from 0 to 59.</dd>
+ <dt>sec</dt>
+ <dd>Seconds from 0 to 59.</dd>
+ <dt>gmt</dt>
+ <dd>Either the string &quot;GMT&quot; for GMT timezone, or not specified, for local timezone.</dd>
+</dl>
+
+<p>If only a single value is specified (from each category: hour, minute, second), the function returns a true value only at times that match that specification. If both values are specified, the result is true between those times, including bounds, <em>but the bounds are ordered</em>.</p>
+
+<div class="warning notecard">
+<p><strong>The order of the hour, minute, second matter</strong>; Before Firefox 49, <code>timeRange(<em>0, 23</em>)</code> will always evaluate to true. Now <code>timeRange(<em>23, 0</em>)</code> will only evaluate true if the current hour is 23:00 or midnight.</p>
+</div>
+
+<h4 id="Examples_11">Examples</h4>
+
+<pre class="brush: js notranslate">timerange(12);                // returns true from noon to 1pm
+timerange(12, 13);            // returns true from noon to 1pm
+timerange(12, &quot;GMT&quot;);         // returns true from noon to 1pm, in GMT timezone
+timerange(9, 17);             // returns true from 9am to 5pm
+timerange(8, 30, 17, 00);     // returns true from 8:30am to 5:00pm
+timerange(0, 0, 0, 0, 0, 30); // returns true between midnight and 30 seconds past midnight</pre>
+
+<h2 id="Example_1">Example 1</h2>
+
+<h3 id="Use_proxy_for_everything_except_local_hosts">Use proxy for everything except local hosts</h3>
+
+<div class="note notecard">
+<p><strong>Note:</strong> Since all of the examples that follow are very specific, they have not been tested.</p>
+</div>
+
+<p>All hosts which aren&apos;t fully qualified, or the ones that are in local domain, will be connected to directly. Everything else will go through <code>w3proxy.mozilla.org:8080</code>. If the proxy goes down, connections become direct automatically:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (isPlainHostName(host) || dnsDomainIs(host, &quot;.mozilla.org&quot;)) {
+    return &quot;DIRECT&quot;;
+  } else {
+    return &quot;PROXY w3proxy.mozilla.org:8080; DIRECT&quot;;
+  }
+}</pre>
+
+<div class="note notecard">
+<p><strong>Note:</strong> This is the simplest and most efficient autoconfig file for cases where there&apos;s only one proxy.</p>
+</div>
+
+<h2 id="Example_2_2">Example 2</h2>
+
+<h3 id="As_above_but_use_proxy_for_local_servers_which_are_outside_the_firewall">As above, but use proxy for local servers which are outside the firewall</h3>
+
+<p>If there are hosts (such as the main Web server) that belong to the local domain but are outside the firewall and are only reachable through the proxy server, those exceptions can be handled using the <code>localHostOrDomainIs()</code> function:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (
+    (isPlainHostName(host) || dnsDomainIs(host, &quot;.mozilla.org&quot;)) &amp;&amp;
+    !localHostOrDomainIs(host, &quot;www.mozilla.org&quot;) &amp;&amp;
+    !localHostOrDoaminIs(host, &quot;merchant.mozilla.org&quot;)
+  ) {
+    return &quot;DIRECT&quot;;
+  } else {
+    return &quot;PROXY w3proxy.mozilla.org:8080; DIRECT&quot;;
+  }
+}</pre>
+
+<p>The above example will use the proxy for everything except local hosts in the mozilla.org domain, with the further exception that hosts <code>www.mozilla.org</code> and <code>merchant.mozilla.org</code> will go through the proxy.</p>
+
+<div class="note notecard">
+<p><strong>Note</strong> the order of the above exceptions for efficiency: localHostOrDomainIs() functions only get executed for URLs that are in local domain, not for every URL. Be careful to note the parentheses around the<em> or</em> expression before the <em>and</em> expression to achieve the above-mentioned efficient behaviour.</p>
+</div>
+
+<h2 id="Example_3_2">Example 3</h2>
+
+<h3 id="Use_proxy_only_if_cannot_resolve_host">Use proxy only if cannot resolve host</h3>
+
+<p>This example will work in an environment where the internal DNS server is set up so that it can only resolve internal host names, and the goal is to use a proxy only for hosts that aren&apos;t resolvable:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (isResolvable(host))
+    return &quot;DIRECT&quot;;
+  else
+    return &quot;PROXY proxy.mydomain.com:8080&quot;;
+}</pre>
+
+<p>The above requires consulting the DNS every time; it can be grouped intelligently with other rules so that DNS is consulted only if other rules do not yield a result:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (
+    isPlainHostName(host) ||
+    dnsDomainIs(host, &quot;.mydomain.com&quot;) ||
+    isResolvable(host)
+  ) {
+    return &quot;DIRECT&quot;;
+  } else {
+    return &quot;PROXY proxy.mydomain.com:8080&quot;;
+  }
+}</pre>
+
+<h2 id="Example_4">Example 4</h2>
+
+<h3 id="Subnet_based_decisions">Subnet based decisions</h3>
+
+<p>In this example all of the hosts in a given subnet are connected-to directly, others are connected through the proxy:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (isInNet(host, &quot;198.95.0.0&quot;, &quot;255.255.0.0&quot;))
+    return &quot;DIRECT&quot;;
+  else
+    return &quot;PROXY proxy.mydomain.com:8080&quot;;
+}</pre>
+
+<p>Again, use of the DNS server in the above can be minimized by adding redundant rules in the beginning:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+  if (
+    isPlainHostName(host) ||
+    dnsDomainIs(host, &quot;.mydomain.com&quot;) ||
+    isInNet(host, &quot;198.95.0.0&quot;, &quot;255.255.0.0&quot;)
+  ) {
+    return &quot;DIRECT&quot;;
+  } else {
+    return &quot;PROXY proxy.mydomain.com:8080&quot;;
+  }
+}</pre>
+
+<h2 id="Example_5">Example 5</h2>
+
+<h3 id="Load_balancingrouting_based_on_URL_patterns">Load balancing/routing based on URL patterns</h3>
+
+<p>This example is more sophisticated. There are four (4) proxy servers; one of them is a hot stand-by for all of the other ones, so if any of the remaining three goes down the fourth one will take over. Furthermore, the three remaining proxy servers share the load based on URL patterns, which makes their caching more effective (there is only one copy of any document on the three servers - as opposed to one copy on each of them). The load is distributed like this:</p>
+
+<table>
+ <tbody>
+  <tr>
+   <th>Proxy</th>
+   <th>Purpose</th>
+  </tr>
+  <tr>
+   <td>#1</td>
+   <td>.com domain</td>
+  </tr>
+  <tr>
+   <td>#2</td>
+   <td>.edu domain</td>
+  </tr>
+  <tr>
+   <td>#3</td>
+   <td>all other domains</td>
+  </tr>
+  <tr>
+   <td>#4</td>
+   <td>hot stand-by</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>All local accesses are desired to be direct. All proxy servers run on the port 8080 (they don&apos;t need to, you can just change your port but remember to modify your configuations on both side). Note how strings can be concatenated with the <code><strong>+</strong></code> operator in JavaScript.</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+
+  if (isPlainHostName(host) || dnsDomainIs(host, &quot;.mydomain.com&quot;))
+    return &quot;DIRECT&quot;;
+
+  else if (shExpMatch(host, &quot;*.com&quot;))
+    return &quot;PROXY proxy1.mydomain.com:8080; &quot; +
+           &quot;PROXY proxy4.mydomain.com:8080&quot;;
+
+  else if (shExpMatch(host, &quot;*.edu&quot;))
+    return &quot;PROXY proxy2.mydomain.com:8080; &quot; +
+           &quot;PROXY proxy4.mydomain.com:8080&quot;;
+
+  else
+    return &quot;PROXY proxy3.mydomain.com:8080; &quot; +
+           &quot;PROXY proxy4.mydomain.com:8080&quot;;
+}</pre>
+
+<h2 id="Example_6">Example 6</h2>
+
+<h3 id="Setting_a_proxy_for_a_specific_protocol">Setting a proxy for a specific protocol</h3>
+
+<p>Most of the standard JavaScript functionality is available for use in the <code>FindProxyForURL()</code> function. As an example, to set different proxies based on the protocol the <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"><code>startsWith()</code></a> function can be used:</p>
+
+<pre class="brush: js notranslate">function FindProxyForURL(url, host) {
+
+  if (url.startsWith(&quot;http:&quot;))
+    return &quot;PROXY http-proxy.mydomain.com:8080&quot;;
+
+  else if (url.startsWith(&quot;ftp:&quot;))
+    return &quot;PROXY ftp-proxy.mydomain.com:8080&quot;;
+
+  else if (url.startsWith(“gopher:&quot;))
+    return &quot;PROXY gopher-proxy.mydomain.com:8080&quot;;
+
+  else if (url.startsWith(&quot;https:&quot;) || url.startsWith(&quot;snews:&quot;))
+    return &quot;PROXY security-proxy.mydomain.com:8080&quot;;
+
+  else
+    return &quot;DIRECT&quot;;
+
+}</pre>
+
+<div class="note notecard">
+<p><strong>Note:</strong> The same can be accomplished using the <code><a href="#shExpMatch">shExpMatch()</a></code> function described earlier.</p>
+</div>
+
+<p>For example:</p>
+
+<pre class="brush: js notranslate">// ...
+if (shExpMatch(url, &quot;http:*&quot;)) {
+  return &quot;PROXY http-proxy.mydomain.com:8080&quot;;
+}
+// ...</pre>
+
+<div class="note notecard">
+<p>The autoconfig file can be output by a CGI script. This is useful, for example, when making the autoconfig file act differently based on the client IP address (the <code>REMOTE_ADDR</code> environment variable in CGI).</p>
+
+<p>Usage of <code>isInNet()</code>, <code>isResolvable()</code> and <code>dnsResolve()</code> functions should be carefully considered, as they require the DNS server to be consulted. All the other autoconfig-related functions are mere string-matching functions that don&apos;t require the use of a DNS server. If a proxy is used, the proxy will perform its DNS lookup which would double the impact on the DNS server. Most of the time these functions are not necessary to achieve the desired result.</p>
+</div>
+
+<h2 id="History_and_implementation">History and implementation</h2>
+
+<p>Proxy auto-config was introduced into Netscape Navigator 2.0 in the late 1990s, at the same time when JavaScript was introduced. Open-sourcing Netscape eventually lead to Firefox itself.</p>
+
+<p>The most &quot;original&quot; implementation of PAC and its JavaScript libraries is, therefore, <code>nsProxyAutoConfig.js</code> found in early versions of Firefox. These utilities are found in many other open-source systems including <a href="https://cs.chromium.org/chromium/src/services/proxy_resolver/pac_js_library.h">Chromium</a>. Firefox later integrated the file into <code><a href="https://dxr.mozilla.org/mozilla-central/source/netwerk/base/ProxyAutoConfig.cpp">ProxyAutoConfig.cpp</a></code> as a C++ string literal. To extract it into its own file, it suffices to copy the chunk into JavaScript with a <code>console.log</code> directive to print it.</p>
+
+<p>Microsoft in general made its own implementation. There used to be <a href="https://en.wikipedia.org/wiki/Proxy_auto-config#Old_Microsoft_problems">some problems with their libraries</a>, but most are resolved by now. They have defined <a href="https://docs.microsoft.com/en-us/windows/win32/winhttp/ipv6-extensions-to-navigator-auto-config-file-format">some new &quot;Ex&quot; suffixed functions</a> around the address handling parts to support IPv6. The feature is supported by Chromium, but not yet by Firefox (<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=558253">bugzilla #558253</a>).</p>

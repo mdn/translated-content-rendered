@@ -1,0 +1,175 @@
+---
+title: VRDisplay.requestPresent()
+slug: Web/API/VRDisplay/requestPresent
+tags:
+  - API
+  - Experimental
+translation_of: Web/API/VRDisplay/requestPresent
+original_slug: Web/API/VRDevice/requestPresent
+---
+<div><section class="Quick_links" id="Quick_Links"><ol><li><strong><a href="/ja/docs/Web/API/WebVR_API">WebVR API</a></strong></li><li><strong><a href="/ja/docs/Web/API/VRDevice"><code>VRDevice</code></a></strong></li><li class="toggle"><details open><summary>WebVR API に関連するページ</summary><ol><li><a href="/ja/docs/Web/API/Gamepad/displayId"><code>Gamepad.displayId</code></a></li><li><a href="/ja/docs/Web/API/Navigator/activeVRDisplays"><code>Navigator.activeVRDisplays</code></a></li><li><a href="/ja/docs/Web/API/Navigator/getVRDisplays"><code>Navigator.getVRDisplays()</code></a></li><li><a href="/ja/docs/Web/API/VRDisplay"><code>VRDisplay</code></a></li><li><a href="/ja/docs/Web/API/VRDisplayCapabilities"><code>VRDisplayCapabilities</code></a></li><li><a href="/ja/docs/Web/API/VRDisplayEvent"><code>VRDisplayEvent</code></a></li><li><a href="/ja/docs/Web/API/VREyeParameters"><code>VREyeParameters</code></a></li><li><a href="/ja/docs/Web/API/VRFieldOfView"><code>VRFieldOfView</code></a></li><li><a href="/ja/docs/Web/API/VRFrameData"><code>VRFrameData</code></a></li><li><a href="/ja/docs/Web/API/VRLayerInit"><code>VRLayerInit</code></a></li><li><a href="/ja/docs/Web/API/VRPose"><code>VRPose</code></a></li><li><a href="/ja/docs/Web/API/VRStageParameters"><code>VRStageParameters</code></a></li></ol></details></li></ol></section><div class="experimental indicator-warning notecard">
+    <p><strong>これは<a href="/ja/docs/MDN/Contribute/Guidelines/Conventions_definitions#Experimental">実験的な機能</a>です。</strong>本番で使用する前に<a href="#Browser_compatibility">ブラウザー実装状況</a>をチェックしてください。</p>
+</div></div>
+
+<p><a href="/ja/docs/Web/API/VRDisplay"><code>VRDisplay</code></a> インターフェイスの <code><strong>requestPresent()</strong></code> メソッドは，<code>VRDisplay</code> へのシーン表示を開始します．</p>
+
+<h2 id="シンタックス">シンタックス</h2>
+
+<pre class="brush: js notranslate">vrDisplayInstance.requestPresent(<em>layers</em>).then(function() {
+  // Do something after the presentation has begun
+});
+</pre>
+
+<h3 id="パラメータ">パラメータ</h3>
+
+<dl>
+ <dt>layers</dt>
+ <dd>表示したいシーンを表す <a href="/ja/docs/Web/API/VRLayer"><code>VRLayer</code></a> オブジェクトの配列．なお現時点では，指定できるのは最小0要素，最大1要素です．</dd>
+</dl>
+
+<h3 id="戻り値">戻り値</h3>
+
+<p>表示が開始されたかを解決するpromise．</p>
+
+<div class="note notecard">
+<p><strong>注記</strong>: <a href="/ja/docs/Web/API/VRDisplayCapabilities/canPresent"><code>VRDisplayCapabilities.canPresent</code></a> が <code>false，あるいは</code> <code>VRLayer</code> 配列数が <a href="/ja/docs/Web/API/VRDisplayCapabilities/maxLayers"><code>VRDisplayCapabilities.maxLayers</code></a> レイヤより多い場合, promiseはリジェクトされます．</p>
+</div>
+
+<div class="note notecard">
+<p><strong>注記</strong>:   <code>requestPresent()</code> を呼出した時に<code>VRDisplay</code> が表示中の場合，<code>VRDisplay</code> は表示する <code>VRLayer</code> 配列を更新します．<code>VRDisplayが表示中で</code> <code>requestPresent()</code> がリジェクトされたら，<code>VRDisplay</code> は表示を終了します．</p>
+</div>
+
+<h2 id="例">例</h2>
+
+<pre class="notranslate">if(navigator.getVRDisplays) {
+  console.log(&apos;WebVR 1.1 supported&apos;);
+  // Then get the displays attached to the computer
+  navigator.getVRDisplays().then(function(displays) {
+    // If a display is available, use it to present the scene
+    if(displays.length &gt; 0) {
+      vrDisplay = displays[0];
+      console.log(&apos;Display found&apos;);
+      // Starting the presentation when the button is clicked: It can only be called in response to a user gesture
+      btn.addEventListener(&apos;click&apos;, function() {
+        if(btn.textContent === &apos;Start VR display&apos;) {
+          vrDisplay.requestPresent([{ source: canvas }]).then(function() {
+            console.log(&apos;Presenting to WebVR display&apos;);
+
+            // Set the canvas size to the size of the vrDisplay viewport
+
+            var leftEye = vrDisplay.getEyeParameters(&apos;left&apos;);
+            var rightEye = vrDisplay.getEyeParameters(&apos;right&apos;);
+
+            canvas.width = Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2;
+            canvas.height = Math.max(leftEye.renderHeight, rightEye.renderHeight);
+
+            // stop the normal presentation, and start the vr presentation
+            window.cancelAnimationFrame(normalSceneFrame);
+            drawVRScene();
+
+            btn.textContent = &apos;Exit VR display&apos;;
+          });
+        } else {
+          vrDisplay.exitPresent();
+          console.log(&apos;Stopped presenting to WebVR display&apos;);
+
+          btn.textContent = &apos;Start VR display&apos;;
+
+          // Stop the VR presentation, and start the normal presentation
+          vrDisplay.cancelAnimationFrame(vrSceneFrame);
+          drawScene();
+        }
+      });
+    }
+  });
+}</pre>
+
+<div class="note notecard">
+<p><strong>Note</strong>: You can see this complete code at <a href="https://github.com/mdn/webvr-tests/blob/master/raw-webgl-example/webgl-demo.js">raw-webgl-example</a>.</p>
+</div>
+
+<h2 id="仕様">仕様</h2>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th scope="col">Specification</th>
+   <th scope="col">Status</th>
+   <th scope="col">Comment</th>
+  </tr>
+  <tr>
+   <td><a class="external" hreflang="en" lang="en">Unknown<br><small lang="ja">requestPresent() の定義</small></a></td>
+   <td><span class="spec-">不明</span></td>
+   <td>Initial definition</td>
+  </tr>
+ </tbody>
+</table>
+
+<h2 id="ブラウザの互換性">ブラウザの互換性</h2>
+
+<div class="warning notecard"><strong><a href="https://github.com/mdn/browser-compat-data">現在、互換性データを可読形式の JSON フォーマットに置き換えているところです。</a></strong>
+            この互換性一覧は古い形式を使っており、これに含まれるデータの置き換えが済んでいません。
+            <strong><a href="/ja/docs/MDN/Contribute/Structures/Compatibility_tables">手助けしていただける場合は、こちらから！</a></strong></div>
+
+<div class="htab">
+    <a id="AutoCompatibilityTable" name="AutoCompatibilityTable"></a>
+    <ul>
+        <li class="selected"><a>デスクトップ</a></li>
+        <li><a>モバイル</a></li>
+    </ul>
+</div>
+
+<div id="compat-desktop">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Chrome</th>
+   <th>Firefox (Gecko)</th>
+   <th>Internet Explorer</th>
+   <th>Opera</th>
+   <th>Safari (WebKit)</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<div id="compat-mobile">
+<table class="compat-table">
+ <tbody>
+  <tr>
+   <th>Feature</th>
+   <th>Android</th>
+   <th>Firefox Mobile (Gecko)</th>
+   <th>IE Phone</th>
+   <th>Opera Mobile</th>
+   <th>Safari Mobile</th>
+   <th>Chrome for Android</th>
+  </tr>
+  <tr>
+   <td>Basic support</td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #888;" title="最新の対応状況に更新してください。">(有)</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+   <td><span style="color: #f00;">未サポート</span></td>
+  </tr>
+ </tbody>
+</table>
+</div>
+
+<h2 id="参照">参照</h2>
+
+<ul>
+ <li><a href="/en-US/docs/Web/API/WebVR_API">WebVR API homepage</a>.</li>
+ <li><a href="http://mozvr.com/">MozVr.com</a> — Mozilla VRチームのデモ，ダウンロード，その他のリソース．</li>
+</ul>

@@ -1,0 +1,190 @@
+---
+title: canvas の最適化
+slug: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+tags:
+  - Advanced
+  - Canvas
+  - Graphics
+  - HTML
+  - HTML5
+  - Tutorial
+translation_of: Web/API/Canvas_API/Tutorial/Optimizing_canvas
+original_slug: Web/Guide/HTML/Canvas_tutorial/Optimizing_canvas
+---
+<div><section id="Quick_Links">
+ <ol>
+  <li><a href="/ja/docs/Web/API/Canvas_API"><strong>Canvas API</strong></a></li>
+  <li class="toggle">
+    <details open>
+      <summary>Canvas tutorial</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Basic_usage">Basic usage</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes">Drawing shapes</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Applying_styles_and_colors">Applying styles and colors</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Drawing_text">Drawing text</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Using_images">Using images</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Transformations">Transformations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Compositing">Compositing and clipping</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Basic_animations">Basic animations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Advanced_animations">Advanced animations</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas">Pixel manipulation</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility">Hit regions and accessibility</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas">Optimizing the canvas</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Finale">Finale</a></li>
+        </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Examples</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/Canvas_API/A_basic_ray-caster">A basic raycaster</a></li>
+        <li><a href="/ja/Add-ons/Code_snippets/Canvas">Canvas code snippets</a></li>
+        <li><a href="/ja/docs/Web/API/Canvas_API/Manipulating_video_using_canvas">Manipulating video using canvas</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details open>
+      <summary>Interfaces</summary>
+      <ol>
+        <li><a href="/ja/docs/Web/API/HTMLCanvasElement"><code>HTMLCanvasElement</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasRenderingContext2D"><code>CanvasRenderingContext2D</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasGradient"><code>CanvasGradient</code></a></li>
+        <li><a href="/ja/docs/Web/API/CanvasPattern"><code>CanvasPattern</code></a></li>
+        <li><a href="/ja/docs/Web/API/ImageBitmap"><code>ImageBitmap</code></a></li>
+        <li><a href="/ja/docs/Web/API/ImageData"><code>ImageData</code></a></li>
+        <li><a href="/ja/docs/Web/API/TextMetrics"><code>TextMetrics</code></a></li>
+        <li><span class="sidebar-icon"><span title="これは実験段階の API です。製品内のコードで使用しないようご注意ください。"><i class="icon-beaker"> </i></span></span> <a href="/ja/docs/Web/API/Path2D"><code>Path2D</code></a></li>
+      </ol>
+    </details>
+  </li>
+  <li><strong><a href="/ja/docs/MDN">Documentation:</a></strong></li>
+  <li class="toggle">
+    <details>
+      <summary>Useful lists</summary>
+      <ol>
+        <li><a href="/ja/docs/tag/Canvas">Pages tagged &quot;Canvas&quot;</a></li>
+      </ol>
+    </details>
+  </li>
+  <li class="toggle">
+    <details>
+      <summary>Contribute</summary>
+      <ol>
+        <li><a href="/ja/docs/MDN/Doc_status/API/Canvas">Canvas doc status</a></li>
+        <li><a href="/ja/docs/MDN">The MDN project</a></li>
+      </ol>
+    </details>
+  </li>
+ </ol>
+</section> <div class="prevnext" style="text-align: right;">
+    <p><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" style="float: left;" class="button">« 前のページ</a><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">次のページ  »</a></p>
+</div></div>
+
+<div class="summary">
+<p><a href="/ja/docs/Web/HTML/Element/canvas" title="HTML の &lt;canvas&gt; 要素 と Canvas スクリプティング API や WebGL API を使用して、グラフィックやアニメーションを描画することができます。"><code>&lt;canvas&gt;</code></a> 要素は、ウェブで 2D グラフィックスを描画するためにもっとも広く使用されているツールのひとつです。しかし、ウェブサイトやアプリが Canvas API の限界付近まで使用するようになって、パフォーマンスが悪化するようになりました。<span class="seoSummary">この記事では、 canvas 要素の使用を最適化して、グラフィックを確実に改善するための提案を行います。</span></p>
+</div>
+
+<h2 id="Performance_tips" name="Performance_tips">パフォーマンスに関する TIPS</h2>
+
+<p>キャンバスのパフォーマンスを向上させるための TIPS 集を以下に掲載します。</p>
+
+<h3 id="Pre-render_similar_primitives_or_repeating_objects_on_an_offscreen_canvas" name="Pre-render_similar_primitives_or_repeating_objects_on_an_offscreen_canvas">同様のプリミティブや繰り返し使用するオブジェクトをオフスクリーン canvas で事前にレンダリングする</h3>
+
+<p>アニメーションフレーム毎に同じ描画操作を繰り返していることに気づいたら、あらかじめオフスクリーンキャンバスに描画しておくことを検討しましょう。そして、必要な時に本来のキャンバスにオフスクリーン画像を、最初の場所で生成したときのステップなしで描画することができます。</p>
+
+<pre class="brush: js">myCanvas.offscreenCanvas = document.createElement(&apos;canvas&apos;);
+myCanvas.offscreenCanvas.width = myCanvas.width;
+myCanvas.offscreenCanvas.height = myCanvas.height;
+
+myCanvas.getContext(&apos;2d&apos;).drawImage(myCanvas.offScreenCanvas, 0, 0);
+</pre>
+
+<h3 id="Avoid_floating-point_coordinates_and_use_integers_instead" name="Avoid_floating-point_coordinates_and_use_integers_instead">浮動小数点数値の座標を避けて整数を使用する</h3>
+
+<p>canvas で整数以外の値を使用してオブジェクトを描画すると、サブピクセルレンダリングを実行します。</p>
+
+<pre class="brush: js">ctx.drawImage(myImage, 0.3, 0.5);
+</pre>
+
+<p>これはアンチエイリアス効果を生成するために、ブラウザーに追加の計算処理を強制します。これを避けるために、たとえば <a href="/ja/docs/Web/API/CanvasRenderingContext2D/drawImage" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>drawImage()</code></a> を呼び出す際に <a href="/ja/docs/Web/JavaScript/Reference/Global_Objects/Math/floor" title="Math.floor() メソッドは、引数として与えた数以下の最大の整数を返します。"><code>Math.floor()</code></a> を使用して、すべての座標で端数処理を行ってください。</p>
+
+<h3 id="Don’t_scale_images_in_drawImage" name="Don’t_scale_images_in_drawImage"><code>drawImage</code> で画像のスケーリングを行わない</h3>
+
+<p><a href="/ja/docs/Web/API/CanvasRenderingContext2D/drawImage" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>drawImage()</code></a> でいつも画像のスケーリング処理を行うのではなく、さまざまなサイズの画像をオフスクリーン canvas でキャッシュしてください。</p>
+
+<h3 id="Use_multiple_layered_canvases_for_complex_scenes" name="Use_multiple_layered_canvases_for_complex_scenes">複雑なシーンでは複数レイヤーの canvas を使用する</h3>
+
+<p>アプリケーションでは、一部のオブジェクトは頻繁に動かしたり変更したりする必要があるのに対し、他のものは比較的静止していることが分かるかもしれません。この場合に可能な最適化は、複数の <code>&lt;canvas&gt;</code> 要素を使用してアイテムをレイヤー化することです。</p>
+
+<p>例えば、 UI があるゲームが最上位にあり、中間にゲームプレイの動作があり、最下位に静止した背景があるとします。この場合、ゲームを３つの <code>&lt;canvas&gt;</code> レイヤーに分割することができます。 UI はユーザーの入力のみに基づいて変化し、ゲームプレイレイヤーはフレーム毎に変化し、背景は基本的に変化しないままでいます。</p>
+
+<pre class="brush: html">&lt;div id=&quot;stage&quot;&gt;
+  &lt;canvas id=&quot;ui-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;game-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+  &lt;canvas id=&quot;background-layer&quot; width=&quot;480&quot; height=&quot;320&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+  #stage {
+    width: 480px;
+    height: 320px;
+    position: relative;
+    border: 2px solid black;
+  }
+
+  canvas { position: absolute; }
+  #ui-layer { z-index: 3; }
+  #game-layer { z-index: 2; }
+  #background-layer { z-index: 1; }
+&lt;/style&gt;
+</pre>
+
+<h3 id="Use_plain_CSS_for_large_background_images" name="Use_plain_CSS_for_large_background_images">大きな背景画像に CSS を使用する</h3>
+
+<p>静止した背景画像がある場合は、ただの <a href="/ja/docs/Web/HTML/Element/div" title="HTML の コンテンツ分割要素 (&lt;div&gt;) は、フローコンテンツの汎用コンテナーです。 CSS を用いてスタイル付けがされるまでは、コンテンツやレイアウトには影響を与えません。"><code>&lt;div&gt;</code></a> に CSS の <a href="/ja/docs/Web/CSS/background" title="CSS の background 一括指定プロパティは、色、画像、原点と寸法、反復方法、その他の機能など、背景に関するすべてのスタイルプロパティを一括で設定します。"><code>background</code></a> プロパティを使用し、 canvas の下に配置することで描画することができます。これにより、大きな画像を毎回 canvas に描画する処理を避けます。</p>
+
+<h3 id="Scaling_canvas_using_CSS_transforms" name="Scaling_canvas_using_CSS_transforms">CSS transforms を使用して canvas をスケーリングする</h3>
+
+<p><a href="/ja/docs/Web/Guide/CSS/Using_CSS_transforms">CSS 変形</a> は、 GPU を使用しますのでより高速です。もっともよいのは拡大縮小しないことですが、そうでなければ大きな canvas を縮小するよりも小さな canvas を拡大したほうが良好です。</p>
+
+<pre class="brush: js">var scaleX = window.innerWidth / canvas.width;
+var scaleY = window.innerHeight / canvas.height;
+
+var scaleToFit = Math.min(scaleX, scaleY);
+var scaleToCover = Math.max(scaleX, scaleY);
+
+stage.style.transformOrigin = &apos;0 0&apos;; //scale from top left
+stage.style.transform = &apos;scale(&apos; + scaleToFit + &apos;)&apos;;
+</pre>
+
+<h3 id="Turn_off_transparency" name="Turn_off_transparency">透過をやめる</h3>
+
+<p>アプリケーションが canvas を使用していて背後のものを透過させる必要がない場合は、 <a href="/ja/docs/Web/API/HTMLCanvasElement/getContext" title="この項目についての文書はまだ書かれていません。書いてみませんか？"><code>HTMLCanvasElement.getContext()</code></a> で描画コンテキストを生成する際に <code>alpha</code> オプションを <code>false</code> に設定しましょう。この情報を使用してブラウザーが描画を最適化する可能性があります。</p>
+
+<pre class="brush: js">var ctx = canvas.getContext(&apos;2d&apos;, { alpha: false });</pre>
+
+<h3 id="More_tips" name="More_tips">その他の TIPS</h3>
+
+<ul>
+ <li>canvas の呼び出しをひとまとめにします。たとえば、複数に分割した線分ではなくポリラインを描画します。</li>
+ <li>不必要な canvas の状態変更を避けます。</li>
+ <li>新しい状態の全体を描画せずに、スクリーンの差分だけを描画します。</li>
+ <li>可能な限り <a href="/ja/docs/Web/API/CanvasRenderingContext2D/shadowBlur"><code>shadowBlur</code></a> プロパティを避けます。</li>
+ <li>可能な限り <a href="/ja/docs/Web/API/Canvas_API/Tutorial/Drawing_text">テキストレンダリング</a> を避けます。</li>
+ <li>canvas をクリアーする別の方法を試します (<a href="/ja/docs/Web/API/CanvasRenderingContext2D/clearRect"><code>clearRect()</code></a> 対 <a href="/ja/docs/Web/API/CanvasRenderingContext2D/fillRect"><code>fillRect()</code></a> 対 canvas のリサイズ)</li>
+ <li>アニメーションで <a href="/ja/docs/Web/API/Window/setInterval"><code>window.setInterval()</code></a> の代わりに <a href="/ja/docs/Web/API/Window/requestAnimationFrame"><code>window.requestAnimationFrame()</code></a> を使用します。</li>
+ <li>高負荷な物理演算ライブラリーに注意してください。</li>
+</ul>
+
+<h2 id="See_also" name="See_also">関連情報</h2>
+
+<ul>
+ <li><a href="http://www.html5rocks.com/en/tutorials/canvas/performance/#toc-ref">Improving HTML5 Canvas Performance – HTML5 Rocks</a></li>
+ <li><a href="https://hacks.mozilla.org/2013/05/optimizing-your-javascript-game-for-firefox-os/">Optimizing your JavaScript game for Firefox OS – Mozilla Hacks</a></li>
+</ul>
+
+<p></p><div class="prevnext" style="text-align: right;">
+    <p><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Hit_regions_and_accessibility" style="float: left;" class="button">« 前のページ</a><a href="/ja/docs/Web/API/Canvas_API/Tutorial/Finale" class="button">次のページ  »</a></p>
+</div><p></p>
